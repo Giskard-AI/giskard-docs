@@ -29,6 +29,7 @@ dev = [
     "ipywidgets>=8.1.7",
     "torch>=2.8.0",
     "sphinx-autobuild>=2024.10.3",
+    "giskard-hub>=2.1.0",
 ]
 
 [project.urls]
