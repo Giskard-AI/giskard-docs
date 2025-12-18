@@ -35,4 +35,3 @@ tests/build/
 tests/js/roots/*/_build
 tests/test-server.lock
 utils/regression_test.js
-docs/
