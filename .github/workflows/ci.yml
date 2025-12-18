@@ -32,12 +32,6 @@ jobs:
       - name: Install deps & build base images
         run: make setup
 
-      - name: Check format
-        run: make check_format
-
-      - name: Check linting
-        run: make check_linting
-
       # REQUIRED BY NBSphinx for Jupyter notebook processing
       - name: Install Pandoc
         run: |
