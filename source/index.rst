@@ -47,34 +47,6 @@ Giskard Hub
 
    `Start your free enterprise trial <start/enterprise-trial.html>`_ and see how Giskard Hub can transform your AI testing workflow.
 
-Open source
------------
-
-**Giskard Open Source** is a Python library for LLM testing and evaluation. It is available on `GitHub <https://github.com/Giskard-AI/giskard>`_ and formed the basis for our course on Red Teaming LLM Applications on `Deeplearning.AI <https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/>`_.
-
-The library provides a set of tools for testing and evaluating LLMs, including:
-
-* Automated detection of security vulnerabilities using LLM Scan.
-* Automated detection of business logic failures using RAG Evaluation Toolkit.
-
-.. grid:: 1 1 2 2
-
-   .. grid-item-card:: Giskard Open Source
-      :link: oss/sdk/index
-      :link-type: doc
-
-      As a developer, you can use the Open Source SDK to get familiar with basic testset generation for business and security failures.
-
-   .. grid-item-card:: Deeplearning.AI ↗
-      :link: https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/
-
-      Our course on red teaming LLM applications on Deeplearning.AI helps you understand how to test, red team and evaluate LLM applications.
-
-.. tip::
-   **⚖️ Unsure about the difference between Open Source and Hub?**
-
-   Check out our :doc:`/start/comparison` guide to learn more about the differnt features.
-
 Open research
 -------------
 
@@ -147,16 +119,3 @@ Some work has been funded by the `the European Commission <https://commission.eu
    hub/sdk/evaluations
    hub/sdk/reference/index
    GitHub <https://github.com/Giskard-AI/giskard-hub>
-
-.. toctree::
-   :caption: Giskard Open Source
-   :hidden:
-   :maxdepth: 4
-
-   oss/sdk/index
-   oss/sdk/security
-   oss/sdk/business
-   oss/sdk/legacy
-   oss/notebooks/index
-   oss/sdk/reference/index
-   GitHub <https://github.com/Giskard-AI/giskard>
