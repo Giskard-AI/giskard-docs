@@ -36,3 +36,4 @@ tests/js/roots/*/_build
 tests/test-server.lock
 utils/regression_test.js
 source/_templates/sidebars
+docs
