@@ -1,12 +1,16 @@
-:og:title: Giskard Hub - Enterprise AI Agent Testing - AI Vulnerability Scan
-:og:description: Scan your AI agent for safety and security failures, including prompt injection, harmful content, excessive agency and other OWASP top 10 vulnerabilities.
+:og:title: Giskard Hub UI - AI Vulnerability Scanning and Red Teaming
+:og:description: Scan your AI agent for safety and security failures, including prompt injection, harmful content, excessive agency and other OWASP top 10 vulnerabilities with automated red teaming.
 
 
-===============================================
-AI Vulnerability Scan
-===============================================
+==========================
+Launch vulnerability scans
+==========================
 
 Test your AI agent for safety and security vulnerabilities with automated red teaming attacks.
+
+.. raw:: html
+
+   <iframe width="100%" height="400" src="https://www.youtube.com/embed/uiyWEcVJgvc?si=ViEyFCdxwNkJtZ_1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 The vulnerability scan helps you identify weaknesses in your AI agent by testing it against common attack patterns. This includes:
 
@@ -19,6 +23,7 @@ The vulnerability scan helps you identify weaknesses in your AI agent by testing
 The scan runs dozens of specialized red teaming probes that adapt to your agent's capabilities and use case. Each probe tests for specific vulnerabilities and provides detailed results.
 
 **What you get:**
+
 * A security grade (A-D) based on detected vulnerabilities
 * Detailed breakdown by attack category and severity
 * Conversation logs showing exactly how attacks were performed
@@ -32,92 +37,47 @@ The scan runs dozens of specialized red teaming probes that adapt to your agent'
 Quick start
 -----------
 
-1. Go to **Scan** in the left sidebar
-2. Click **Launch Scan**
-3. Select your agent and vulnerability categories to test
-4. Click **Launch Scan** to start the red teaming process
-5. Review results and take action on detected vulnerabilities
+.. grid:: 1 1 2 2
+   
+   .. grid-item-card:: Launch a scan
+      :link: launch-scan
+      :link-type: doc
 
-.. toctree::
-   :maxdepth: 2
-   :hidden:
+      Select your agent and **Launch Scan** to start the red teaming process
 
-   launch-scan
-   review-scan-results
+   .. grid-item-card:: Review scan results
+      :link: review-scan-results
+      :link-type: doc
 
+      Review results and take action on detected vulnerabilities
 
+High-level workflow
+-------------------
+
+.. include:: graph.rst.inc
 
 Vulnerability categories
 ------------------------
 
 The scan tests for these common AI security risks:
 
-Security Risks
-==============
+.. grid:: 1
 
-.. grid:: 2
+  .. grid-item-card:: 📚 Vulnerability Categories
+    :link: vulnerability-categories/index
+    :link-type: doc
 
-    .. grid-item-card:: 🔓 Prompt Injection
-        :class-card: sd-border-1
+    Detailed information about the vulnerability categories tested by the scan
 
-        Malicious prompts that bypass your agent's safety instructions
+    * **55 specialized probes** across 11 vulnerability categories
+    * **Detailed attack patterns** and detection indicators  
+    * **Risk-level classifications** to prioritize remediation
+    * **Comprehensive mitigation strategies** with practical guidance
 
-    .. grid-item-card:: 📊 Training Data Extraction
-        :class-card: sd-border-1
+.. toctree::
+   :maxdepth: 3
+   :hidden:
 
-        Attempts to expose sensitive data from your model's training
-
-    .. grid-item-card:: 🔍 Internal Information Exposure
-        :class-card: sd-border-1
-
-        Leakage of system configurations or internal data
-
-    .. grid-item-card:: 🛡️ Data Privacy & Exfiltration
-        :class-card: sd-border-1
-
-        Unauthorized access to user data or privacy violations
-
-Safety Risks
-============
-
-.. grid:: 2
-
-    .. grid-item-card:: ⚠️ Harmful Content Generation
-        :class-card: sd-border-1
-
-        Toxic, offensive, or policy-violating content creation
-
-    .. grid-item-card:: 🚫 Excessive Agency
-        :class-card: sd-border-1
-
-        Actions beyond intended scope or authority level
-
-    .. grid-item-card:: 💥 Denial of Service
-        :class-card: sd-border-1
-
-        Resource exhaustion attacks that disable your system
-
-Business Risks
-==============
-
-.. grid:: 2
-
-    .. grid-item-card:: 🤔 Hallucination & Misinformation
-        :class-card: sd-border-1
-
-        False or misleading information that damages trust
-
-    .. grid-item-card:: 📉 Brand Damaging & Reputation
-        :class-card: sd-border-1
-
-        Outputs that harm your brand or public perception
-
-    .. grid-item-card:: ⚖️ Legal & Financial Risk
-        :class-card: sd-border-1
-
-        Content leading to legal liability or financial harm
-
-    .. grid-item-card:: 💼 Misguidance & Unauthorized Advice
-        :class-card: sd-border-1
-
-        Advice outside your agent's intended expertise
+   launch-scan
+   review-scan-results
+   vulnerability-categories/index

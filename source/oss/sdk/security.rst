@@ -2,7 +2,7 @@
 :og:description: Detect security vulnerabilities, prompt injection attacks, and data leakage in your LLM agents and language models with our free LLM Scan tool.
 
 ======================================================
-Detect security vulnerabilities in LLMs using LLM Scan
+Generate security tests with LLM Scan
 ======================================================
 
 What are AI Security Vulnerabilities?
@@ -17,7 +17,7 @@ Giskard provides a set of automated scanning capabilities to detect these vulner
 
    For more up-to-date business failure testing and a collaborative UI, see the :doc:`Giskard Hub Security Scanning </hub/sdk/datasets/security>` guide. Giskard Hub's enterprise subscription leverages continuous monitoring of the latest LLM business failures and state-of-the-art research, while the open-source vulnerability database is based on 2023 data and is not regularly updated.
 
-.. note::
+.. tip::
 
    Security vulnerabilities are different from business failures. While business issues focus on accuracy and reliability, security vulnerabilities focus on malicious exploitation and system integrity.
    If you want to detect business failures, check out the :doc:`/oss/sdk/business` guide.
@@ -353,3 +353,5 @@ If you encounter issues with security scanning:
 
 * Join our `Discord community <https://discord.gg/giskard>`_ and ask questions in the ``#support`` channel
 * Review our :doc:`glossary on AI terminology </start/glossary/index>` to better understand the terminology used in the documentation.
+
+

@@ -1,5 +1,5 @@
-:og:title: Giskard Hub - Enterprise Agent Testing - SDK Quickstart
-:og:description: Get started with the Giskard Hub Python SDK for programmatic LLM agent testing. Install, authenticate, and begin building automated testing workflows.
+:og:title: Giskard Hub SDK - Python Client for Enterprise Agent Testing
+:og:description: Get started with the Giskard Hub Python SDK for programmatic LLM agent testing. Install, authenticate, and begin building automated testing workflows with comprehensive API access.
 
 Quickstart & setup
 ==================
@@ -8,41 +8,46 @@ The Giskard Hub SDK provides a Python interface to interact with the Giskard Hub
 
 .. grid:: 1 1 2 2
 
-   .. grid-item-card:: Manage projects, agents and knowledge bases
-      :link: projects
+   .. grid-item-card:: Setup projects, agents and knowledge bases
+      :link: setup/index
       :link-type: doc
 
-      Create, update, and organize projects, agents and knowledge bases
-
-   .. grid-item-card:: Scan vulnerabilities in your agents
-      :link: scans
+      Setup and organize projects, agents and knowledge bases
+   
+   .. grid-item-card:: Launch vulnerability scans
+      :link: scan/index
       :link-type: doc
 
-      Launch several red teaming attacks to find vulnerabilities in your agents
+      Automatically scan your agent for safety and security failures.
 
-   .. grid-item-card:: Manage datasets and chat test cases
+   .. grid-item-card:: Create test cases and datasets
       :link: datasets/index
       :link-type: doc
 
-      Create, update, and organize test datasets and chat test cases manually or using synthetic data generation
+      Create, update, and delete test cases and datasets manually or using synthetic data generation
 
-   .. grid-item-card:: Manage checks
-      :link: checks
+   .. grid-item-card:: Review and refine test cases and metrics
+      :link: annotate/index
       :link-type: doc
 
-      Build and deploy validation rules and metrics for your tests
+      Review and refine test cases and metrics
 
-   .. grid-item-card:: Run and Schedule Evaluations
-      :link: evaluations
+   .. grid-item-card:: Run, review, schedule and compare evaluation runs
+      :link: evaluations/index
       :link-type: doc
 
-      Execute tests programmatically in the Hub or locally
+      Execute tests, review results, schedule and compare evaluations programmatically in the Hub or locally
 
    .. grid-item-card:: API Reference
       :link: reference/index
       :link-type: doc
 
       Complete SDK documentation for the Hub entities and resources
+
+High-level workflow
+-------------------
+
+.. include:: ../ui/graph.rst.inc
 
 Install the client library
 --------------------------
@@ -70,7 +75,7 @@ Alternatively, you can pass these values directly to the client:
     from giskard_hub import HubClient
 
     hub = HubClient(
-        hub_url="https://your-hub-url",
+        url="https://your-hub-url",
         token="your-token"
     )
 
@@ -78,13 +83,10 @@ Alternatively, you can pass these values directly to the client:
 
    Make sure you are using the correct URL for your Giskard Hub instance. The URL should end with ``/_api``.
 
-You can now use the client to interact with the Hub. You will be able to control the Hub programmatically, independently
+You can now use the client to interact with the Hub programmatically. Let's start by initializing a client instance:
 
 Running your first evaluation
 -----------------------------
-
-You can now use the client to interact with the Hub. You will be able to control the Hub programmatically, independently
-of the UI. Let's start by initializing a client instance:
 
 .. code-block:: python
 
@@ -196,18 +198,18 @@ These are the attributes you can set for a chat test case (the only required att
             - ``expected_value_type``: The expected type of the value at the JSON path, one of ``string``, ``number``, ``boolean``.
         - For the ``semantic_similarity`` check, the parameters are ``reference`` (type: ``str``) and ``threshold`` (type: ``float``), where ``reference`` is the expected output and ``threshold`` is the similarity score below which the check will fail.
 
-.. note::
+.. tip::
 
-   For detailed information about these checks, including examples and how they work, see :doc:`/hub/ui/annotate`.
+   For detailed information about these checks, including examples and how they work, see :doc:`/hub/ui/annotate/overview`.
 
 You can add as many chat test cases as you want to the dataset.
 
 Configure an Agent
 ___________________
 
-.. note:: In this section we will run evaluation against agents configured in
+.. tip:: In this section we will run evaluation against agents configured in
     the Hub. If you want to evaluate a local agent that is not yet exposed with
-    an API, check the :doc:`/hub/sdk/evaluations`.
+    an API, check the :doc:`/hub/sdk/evaluations/index`.
 
 Before running our first evaluation, we'll need to set up an agent. You'll need an API endpoint ready to serve the agent.
 Then, you can configure the agent API in the Hub:
