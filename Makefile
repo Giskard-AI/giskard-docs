@@ -34,7 +34,7 @@ dev: ## Start development server
 .PHONY: dev
 
 doc-auto: ## Start documentation server with autobuild
-	uv run sphinx-autobuild source build
+	uv run sphinx-autobuild source build --ignore _templates/sidebars/
 .PHONY: doc-auto
 
 doc: clean html ## Build the doc
