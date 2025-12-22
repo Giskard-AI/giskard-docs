@@ -13,18 +13,15 @@ AI systems in business environments must provide accurate, reliable responses th
 
 Giskard Hub solves this challenge by enabling **business users to directly generate synthetic tests from knowledge bases without requiring coding skills**.
 
-What are AI business failures?
-------------------------------
+Knowledge base tests generation
+-------------------------------
 
-AI business failures occur when AI systems fail to provide **correct** and **grounded** responses with respect to a knowledge base taken as ground truth. They have been specifically designed to detect "business failures" in Retrieval-Augmented Generation (RAG) systems, such as the following categories:
+The Giskard Hub provides an intuitive interface for synthetic test generation from your knowledge base. It generates legitimate user queries alongside their expected knowledge base context and answer, using the knowledge base as the ground truth.
+It automatically clusters your knowledge base documents into key topics. You can also re-use business topics that you set manually upon knowledge base import.
 
-- **Hallucinations**: The AI generates information not present in your knowledge base
-- **Denial of answers**: The AI refuses to answer legitimate business questions
-- **Moderation issues**: The AI applies overly restrictive content filters to valid business queries
-- **Context misinterpretation**: The AI fails to understand the business context of user queries
-- **Inconsistent responses**: The AI provides contradictory information across similar queries
+Then, for each topic/cluster of knowledge base documents, it generates representative test cases, applying a set of perturbations to generate legitimate queries that mimic real user behavior.
 
-To detect these failures effectively, we need to synthesize representative sets of agent's legitimate user queries and expected answers, focusing on **context-groundedness** and **correctness**.
+These clusters and topics are then used to generate dedicated tests that challenge the agent to answer questions about specific topics in ways that might not align with your business rules.
 
 .. tip::
 
@@ -35,28 +32,24 @@ To detect these failures effectively, we need to synthesize representative sets 
    - **Automatable**: A good synthetic test case generator should not only generate queries but also generate the expected outputs so that the evaluation judge can automatically compare them with the agent's responses. This is essential for the LLM-as-a-judge setup.
    - **Domain-specific**: Synthetic test cases should not be generic queries; otherwise, they won't truly represent real user queries. While these test cases should be reviewed by humans, it's important to add metadata to the synthetic data generator to make it more specific. The Giskard Hub includes the agent's description in the generation process to ensure that the queries are realistic.
 
-.. tip::
+Getting started
+---------------
 
-   Knowledge base failures are different from security failures. While security failures focus on malicious exploitation and system integrity, knowledge base failures focus on the agent's ability to provide accurate, reliable, and appropriate responses in normal usage scenarios.
-   If you want to test specific personas and business rules, check out :doc:`/hub/ui/datasets/scenario`.
+To begin, navigate to the Datasets page and click **Generate** in the upper-right corner of the screen. This will open a modal with two options: Knowledge Base, and Scenario. Select the **Knowledge Base** option.
 
-Document-based tests generation
--------------------------------
+.. image:: /_static/images/hub/generate-knowledge-base-select.png
+   :align: center
+   :alt: "Select scenario option from generation modal"
+   :width: 800
 
-The Giskard Hub provides an intuitive interface for synthetic test generation from your knowledge base. It generates legitimate user queries alongside their expected knowledge base context and answer, using the knowledge base as the ground truth.
-It automatically clusters your knowledge base documents into key topics. You can also re-use business topics that you set manually upon knowledge base import.
-
-Then, for each topic/cluster of knowledge base documents, it generates representative test cases, applying a set of perturbations to generate legitimate queries that mimic real user behavior.
-
-These clusters and topics are then used to generate dedicated tests that challenge the agent to answer questions about specific topics in ways that might not align with your business rules.
-
-To begin, navigate to the Datasets page and click **Automatic Generation** in the upper-right corner of the screen. This will open a modal with three options: Scan, Knowledge Base, and Scenario. Select the **Knowledge Base** option.
+Select a knowledge base
+-----------------------
 
 The Knowledge Base tab allows you to generate a dataset with examples based on your knowledge base.
 
 .. image:: /_static/images/hub/generate-dataset-document-based.png
    :align: center
-   :alt: "Generate document based dataset"
+   :alt: "Generate knowledge base based dataset"
    :width: 800
 
 In this case, dataset generation requires two additional pieces of information:
