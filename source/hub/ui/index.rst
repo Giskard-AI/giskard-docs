@@ -1,5 +1,5 @@
-:og:title: Giskard Hub - Enterprise Agent Testing - UI Quickstart
-:og:description: Launch enterprise LLM agent testing with team collaboration, continuous red teaming, and comprehensive evaluation workflows. Perfect for business users managing AI safety in production.
+:og:title: Giskard Hub UI - Enterprise Agent Testing Platform
+:og:description: Launch enterprise LLM agent testing with team collaboration, continuous red teaming, and comprehensive evaluation workflows. Perfect for business users managing AI safety in production environments.
 
 ====================
 Quickstart & setup
@@ -9,7 +9,6 @@ Quickstart & setup
 
 The Hub is the user interface from which you can perform LLM evaluations. It implements the following 4-step workflow:
 
-
 .. image:: /_static/images/hub/hub-workflow.png
    :align: center
    :alt: "The hub workflow"
@@ -18,43 +17,48 @@ The Hub is the user interface from which you can perform LLM evaluations. It imp
 
 .. grid:: 1 1 2 2
 
-   .. grid-item-card:: Scan your agent for vulnerabilities
+   .. grid-item-card:: Setup projects, agents and knowledge bases
+      :link: setup/index
+      :link-type: doc
+
+      Set up projects, agents and knowledge bases.
+   
+   .. grid-item-card:: Launch vulnerability scans
       :link: scan/index
       :link-type: doc
 
       Automatically scan your agent for safety and security failures.
 
-   .. grid-item-card:: Create test datasets
+   .. grid-item-card:: Create test cases and datasets
       :link: datasets/index
       :link-type: doc
 
-      Automate test case generation with a focus on legitimate and adversarial queries.
+      Create test cases and datasets manually or using synthetic data generation.
 
-   .. grid-item-card:: Review tests with human feedback
-      :link: annotate
+   .. grid-item-card:: Review and refine test cases and metrics
+      :link: annotate/index
       :link-type: doc
 
-      Use domain knowledge to review and refine test cases through humans in the loop.
+      Review and refine test cases and metrics with humans in the loop.
 
-   .. grid-item-card:: Run and schedule evaluations
-      :link: evaluations
+   .. grid-item-card:: Run, review, schedule and compare evaluation runs
+      :link: evaluations/index
       :link-type: doc
 
       Run evaluations and schedule them to run automatically.
 
-   .. grid-item-card:: Compare evaluations
-      :link: evaluations-compare
+   .. grid-item-card:: Release notes
+      :link: release_notes/index
       :link-type: doc
 
-      Compare evaluations to detect regressions and identify patterns.
+      View the latest features and changes.
 
-   .. grid-item-card:: Continuous red teaming
-      :link: continuous-red-teaming
-      :link-type: doc
+High-level workflow
+-------------------
 
-      Detect emerging vulnerabilities through proactive red teaming.
+.. include:: ./graph.rst.inc
 
-.. note::
+.. tip::
 
     Throughout this user guide, we'll use a banking app called Zephyr Bank, designed by data scientists. The app's agent provides customer service support on their website, offering knowledge about the bank's products, services, and more.
 
@@ -65,9 +69,9 @@ The Dashboard is the first page you'll see upon logging in. It provides an overv
 
 It also features a graph showing the agent's performance over time, measured by the average success rate of the evaluations. The success rate is calculated based on some evaluation metrics, such as Conformity, Correctness, Groundedness, String Matching, Metadata, Semantic Similarity, and more. We'll delve into these metrics in more detail in the Evaluations section.
 
-.. note::
+.. tip::
 
-   For detailed information about evaluation metrics and checks, including examples and how they work, see :doc:`/hub/ui/annotate`.
+   For detailed information about evaluation metrics and checks, including examples and how they work, see :doc:`/hub/ui/annotate/index`.
 
 Additionally, the dashboard lists your most recent evaluations and datasets for quick access.
 
@@ -99,7 +103,7 @@ Setup an agent
 
 This section guides you through creating a new agent.
 
-.. note::
+.. tip::
 
     Agents are configured through an API endpoint. They can be evaluated against datasets.
 
@@ -160,13 +164,12 @@ The endpoint's response should have the following structure:
         }
     }
 
-
 Import a knowledge base
 ========================
 
 This section guides you through importing your custom knowledge base.
 
-.. note::
+.. tip::
 
     A **Knowledge Base** is a domain-specific collection of information. You can have several knowledge bases for different areas of your business.
 

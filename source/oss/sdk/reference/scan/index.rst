@@ -23,3 +23,5 @@ LLM Scan is a security testing tool in Giskard Open Source that automatically de
     .. grid-item-card:: LLM Detectors
         :link: llm_detectors
         :link-type: doc
+
+

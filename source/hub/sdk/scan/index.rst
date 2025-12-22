@@ -1,11 +1,17 @@
-:og:title: Giskard Hub - Enterprise Agent Testing - Scan Vulnerabilities in your agents
-:og:description: Launch several red teaming attacks to find vulnerabilities in your agents.
+:og:title: Giskard Hub SDK - Vulnerability Scanning and Red Teaming
+:og:description: Launch comprehensive red teaming attacks to find vulnerabilities in your agents. Automated security scanning with OWASP LLM Top 10 compliance using the Python SDK.
 
 ==========================
 Launch vulnerability scans
 ==========================
 
 Security scanning is a critical component of AI agent testing that allows you to automatically probe your models for vulnerabilities and security issues using Giskard Hub's integrated red teaming capabilities.
+
+|
+
+.. raw:: html
+
+   <iframe width="100%" height="400" src="https://www.youtube.com/embed/uiyWEcVJgvc?si=ViEyFCdxwNkJtZ_1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 The Giskard Hub provides a comprehensive scanning system that enables you to:
 
@@ -21,10 +27,6 @@ In this section, we will walk you through how to run and manage scans using the 
 
 We recommend systematically launching scans every time before deploying an updated agent in a pre-production or staging environment. This allows you to collaborate with your team to ensure that your agent is secure and resilient against potential attacks.
 
-.. important::
-
-   Scans can only be launched with agents that are configured in the Hub and exposed via an API endpoint. Local agents are not currently supported for scanning.
-
 Let's start by initializing the Hub client or take a look at the :doc:`/hub/sdk/index` section to see how to install the SDK and connect to the Hub.
 
 .. code-block:: python
@@ -33,10 +35,17 @@ Let's start by initializing the Hub client or take a look at the :doc:`/hub/sdk/
 
     hub = HubClient()
 
-Run security scans
-~~~~~~~~~~~~~~~~~~
+First, you need to have an agent configured in the Hub. If you haven't created an agent yet, check the Create an agent section in the Projects guide.
 
-First, you need to have an agent configured in the Hub. If you haven't created an agent yet, check the :ref:`Create an agent <projects:Create an agent>` section in the :doc:`/hub/sdk/projects` guide.
+Attack overview
+---------------
+
+The vulnerability scan test suite includes various attack patterns designed to test for specific vulnerabilities in your agent. 
+We recommend running a full scan regularly but you can also run targeted scans for specific vulnerability types during development. 
+
+.. tip::
+    
+    For a full overview of the attacks, see the :doc:`/hub/ui/scan/vulnerability-categories/index` section.
 
 Launch a basic scan
 -------------------
@@ -59,7 +68,7 @@ We can now launch the scan:
         tags=tags,
     )
 
-.. note::
+.. tip::
 
     Running scans with all OWASP LLM Top 10 categories can be token-intensive and may take significant time to complete. Consider running targeted scans for specific vulnerability types during development.
 
@@ -104,6 +113,12 @@ This will display a formatted table showing:
    :alt: Scan metrics output
    :align: center
 
+Review scan results
+___________________
+
+.. tip::
+   
+   For more information on reviewing scan results and taking action on detected vulnerabilities, see the :doc:`/hub/ui/scan/review-scan-results` section of the UI documentation.
 
 Advanced scan configuration
 ---------------------------
@@ -118,7 +133,7 @@ Provide a ``knowledge_base_id`` to generate more targeted security tests based o
     scan_result = hub.scans.create(
         model_id="<GISKARD_HUB_MODEL_ID>",
         knowledge_base_id="<GISKARD_HUB_KNOWLEDGE_BASE_ID>",
-        tags=["owasp:llm-top-10-2025='LLM08'"],
+        tags=["owasp:llm-top-10-2025='LLM09'"],
     )
 
 Vulnerability type filtering
@@ -153,7 +168,6 @@ Similarly to the OWASP LLM Top 10 tags, you can use the ``gsk:threat-type`` tags
         tags=[category.id for category in categories],
     )
 
-
 Complete workflow example
 -------------------------
 
@@ -185,63 +199,10 @@ Here's a complete CI/CD scanning workflow:
     if scan_result.grade not in ["A", "B"]:
         print(f"❌ Security check failed: Scan with Grade {scan_result.grade.value}")
         sys.exit(1)
-
+    
     print(f"✅ Security check passed: Scan with Grade {scan_result.grade.value}")
 
-Scan management
-~~~~~~~~~~~~~~~
+API Reference
+==============
 
-Launch a scan
--------------
-
-You can launch a  scan using the ``hub.scans.create()`` method:
-
-.. code-block:: python
-
-    scan_result = hub.scans.create(
-        model_id=model_id,
-        knowledge_base_id=knowledge_base_id, # optional
-        tags=[], # optional, if not provided, all available categories will be used
-    )
-
-Retrieve a scan result
-----------------------
-
-You can retrieve a previously launched scan result using the ``hub.scans.retrieve()`` method:
-
-.. code-block:: python
-
-    scan_result = hub.scans.retrieve(scan_id)
-
-You can also retrieve its results calling the ``results`` property:
-
-.. code-block:: python
-
-    results = scan_result.results
-
-    # or using the scans resource
-    results = hub.scans.list_probes(scan_result.id)
-
-    for result in results:
-        print(f"Probe Result ID: {result.id} - Status: {result.progress.status.value}")
-
-List scans
-----------
-
-You can list scans using the ``hub.scans.list()`` method:
-
-.. code-block:: python
-
-    scans = hub.scans.list(project_id=project_id)
-
-    for scan in scans:
-        print(f"Scan ID: {scan.id} - Grade: {scan.grade.value} - Status: {scan.progress.status.value}")
-
-Delete a scan result
----------------------
-
-You can delete a scan using the ``hub.scans.delete()`` method:
-
-.. code-block:: python
-
-    hub.scans.delete(scan_id)
+For detailed information about scan management methods and parameters, see the :doc:`/hub/sdk/reference/index` section.

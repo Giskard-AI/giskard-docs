@@ -1,8 +1,8 @@
-:og:title: Giskard Hub - Enterprise Agent Testing - Import Datasets
-:og:description: Import your existing test data into Giskard Hub. Bring conversations, CSV files, and other data formats to build comprehensive test datasets.
+:og:title: Giskard Hub UI - Dataset Import and Migration
+:og:description: Import your existing test data into Giskard Hub. Bring conversations, CSV files, and other data formats to build comprehensive test datasets with intuitive visual tools.
 
 =============================
-Import Existing Datasets
+Import tests
 =============================
 
 You can import existing test datasets from a file. This is particularly useful when you already have a dataset that you want to use for evaluation.
@@ -39,9 +39,9 @@ Each conversation must be defined as a JSON object with a ``messages`` field con
 - ``tags``: a list of tags to categorize the conversation
 - ``checks``: a list of checks to evaluate the conversation, they can be built-in or custom ones
 
-.. note::
+.. tip::
 
-   For detailed information about built-in checks like correctness, conformity, groundedness, string matching, metadata, and semantic similarity, including examples and how they work, see :doc:`/hub/ui/annotate`.
+   For detailed information about built-in checks like correctness, conformity, groundedness, string matching, metadata, and semantic similarity, including examples and how they work, see :doc:`/hub/ui/annotate/overview`.
 
 .. image:: /_static/images/hub/import-conversations-detail.png
    :align: center
@@ -94,5 +94,7 @@ Here's an example of the structure and content in a dataset:
 Next steps
 ----------
 
-* **Review test case** - Make sure to :doc:`/hub/ui/annotate`
-* **Generate test cases** - Try :doc:`/hub/ui/datasets/business` or :doc:`/hub/ui/datasets/security`
+* **Agentic vulnerability detection** - Try :doc:`/hub/ui/scan/index`
+* **Generate business failures** - Try :doc:`/hub/ui/datasets/business`
+* **Generate security failures** - Try :doc:`/hub/ui/datasets/security`
+* **Review test case** - Make sure to :doc:`/hub/ui/annotate/index`

@@ -33,7 +33,10 @@ dev: ## Start development server
 	uv run sphinx-autobuild source build
 .PHONY: dev
 
+doc-auto: dev
+.PHONY: doc-auto
+
 doc: clean html ## Build the doc
 	rm -rf ./docs && mkdir -p ./docs && touch ./docs/.nojekyll && mv ./build/html/* ./docs
 	echo docs.giskard.ai > ./docs/CNAME
-.PHONY: setup
+.PHONY: doc

@@ -2,7 +2,7 @@
 :og:description: Detect business logic failures, compliance issues, and domain-specific problems in your LLM agents and applications with our free RAG Evaluation Toolkit.
 
 =============================================================
-Detect business failures in LLMs using RAGET
+Generate business tests with RAGET
 =============================================================
 
 What are AI business failures?
@@ -16,7 +16,7 @@ Business failures in LLMs are failures that impact the business logic, accuracy,
 
    For more up-to-date business failure testing and a collaborative UI, see the :doc:`Giskard Hub Business Failure Testing </hub/sdk/datasets/business>` guide. Giskard Hub's enterprise subscription leverages continuous monitoring of the latest LLM business failures and state-of-the-art research, while the open-source vulnerability database is based on 2023 data and is not regularly updated.
 
-.. note::
+.. tip::
 
    Business failures are different from security failures. While security failures focus on malicious exploitation and system integrity, business failures focus on the agent's ability to provide accurate, reliable, and appropriate responses in normal usage scenarios.
    If you want to detect security failures, check out the :doc:`/oss/sdk/security`.
@@ -475,3 +475,4 @@ If you encounter issues with business failure testing:
 
 * Join our `Discord community <https://discord.gg/giskard>`_ and ask questions in the ``#support`` channel
 * Review our :doc:`glossary on AI terminology </start/glossary/index>` to better understand the terminology used in the documentation.
+
