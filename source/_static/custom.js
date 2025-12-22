@@ -13,11 +13,11 @@
       event: 'gtm.js'
     });
 
-    var gtmScript = document.createElement('script');
+    const gtmScript = document.createElement('script');
     gtmScript.async = true;
     gtmScript.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-PQ9MJ64';
-    var head = document.head || document.getElementsByTagName('head')[0];
-    var firstScript = head.querySelector('script');
+    const head = document.head || document.getElementsByTagName('head')[0];
+    const firstScript = head.querySelector('script');
     if (firstScript) {
       head.insertBefore(gtmScript, firstScript);
     } else {
@@ -25,8 +25,8 @@
     }
 
     if (!document.querySelector('noscript iframe[src*="googletagmanager.com/ns.html"]')) {
-      var noscript = document.createElement('noscript');
-      var iframe = document.createElement('iframe');
+      const noscript = document.createElement('noscript');
+      const iframe = document.createElement('iframe');
       iframe.src = 'https://www.googletagmanager.com/ns.html?id=GTM-PQ9MJ64';
       iframe.height = '0';
       iframe.width = '0';

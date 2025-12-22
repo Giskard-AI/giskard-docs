@@ -280,7 +280,7 @@ If you do not provide an answer example, the Hub will automatically use the assi
 
 .. tip::
 
-   For more detailed information about creating and managing conversations, see :doc:`/hub/ui/annotate/review_test_results`.
+   For more detailed information about creating and managing conversations, see :doc:`/hub/ui/datasets/manual`.
 
 Conversation metadata
 _____________________

@@ -33,8 +33,7 @@ dev: ## Start development server
 	uv run sphinx-autobuild source build
 .PHONY: dev
 
-doc-auto: ## Start documentation server with autobuild
-	uv run sphinx-autobuild source build
+doc-auto: dev
 .PHONY: doc-auto
 
 doc: clean html ## Build the doc
