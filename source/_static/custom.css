@@ -27,6 +27,7 @@
   --sidebar-heading-color: #0f1729;
   --non-selected-color: rgba(15, 23, 41, 0.6);
   --link-color: inherit;
+  --border: 0 0% 100% / 0.10;
 }
 
 .dark {
@@ -419,6 +420,14 @@ header nav a:not(.text-foreground):hover {
 .dark header nav a.text-foreground\/60:hover,
 .dark header nav a:not(.text-foreground):hover {
   color: rgba(198, 255, 255, 0.8) !important;
+}
+
+#left-sidebar a.current {
+  border: none;
+}
+
+#left-sidebar ul ul:is(.dark *)::before {
+  background-color: hsl(var(--border));
 }
 
 #left-sidebar p[role="heading"],
