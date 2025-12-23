@@ -129,8 +129,8 @@ def setup(app):
             """Render toctree starting from a specific document"""
             from sphinx.environment.adapters.toctree import TocTree
             from sphinx import addnodes
-            doctree = app.env.get_doctree(docname)
-            toctrees = list(doctree.findall(addnodes.toctree))
+            source_doctree = app.env.get_doctree(docname)
+            toctrees = list(source_doctree.findall(addnodes.toctree))
 
             if not toctrees:
                 return ""
@@ -138,7 +138,7 @@ def setup(app):
             toctree_adapter = TocTree(app.env)
             resolved = [
                 toctree_adapter.resolve(
-                    docname,
+                    pagename,  # Use current page context, not the toctree source
                     app.builder,
                     toctree,
                     prune=False,
