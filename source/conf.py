@@ -82,6 +82,13 @@ html_css_files = ["pygments-dark.css", "custom.css"]
 html_js_files = ["custom.js"]
 html_favicon = "_static/favicon.ico"
 
+html_sidebars = {
+    "oss/checks/**": [
+        "sidebar_main_nav_links.html",
+        "sidebars/sidebar_oss_checks.html",
+    ],
+}
+
 # Do not execute the notebooks when building the docs
 docs_version = os.getenv("READTHEDOCS_VERSION", "latest")
 if docs_version == "latest" or docs_version == "stable":
@@ -100,6 +107,7 @@ theme_options = ThemeOptions(
         "Getting Started": "/index",
         "Hub UI": "/hub/ui/index",
         "Hub SDK": "/hub/sdk/index",
+        "Checks": "/oss/checks/index",
     },
 )
 html_theme_options = asdict(theme_options)
@@ -112,6 +120,49 @@ ogp_site_url = "https://docs.giskard.ai/"
 
 # Open Graph image (logo for social sharing) - use relative path for local builds
 ogp_image = "https://docs.giskard.ai/_static/open-graph-image.png"
+
+
+# Add custom template function to render toctree from a specific document
+def setup(app):
+    def html_page_context(app, pagename, templatename, context, doctree):
+        def toctree_from_doc(docname, **kwargs):
+            """Render toctree starting from a specific document"""
+            from sphinx.environment.adapters.toctree import TocTree
+            from sphinx import addnodes
+            doctree = app.env.get_doctree(docname)
+            toctrees = list(doctree.findall(addnodes.toctree))
+
+            if not toctrees:
+                return ""
+
+            toctree_adapter = TocTree(app.env)
+            resolved = [
+                toctree_adapter.resolve(
+                    docname,
+                    app.builder,
+                    toctree,
+                    prune=False,
+                    maxdepth=kwargs.get("maxdepth", -1),
+                    titles_only=kwargs.get("titles_only", False),
+                    collapse=kwargs.get("collapse", False),
+                    includehidden=kwargs.get("includehidden", False),
+                )
+                for toctree in toctrees
+            ]
+
+            resolved = [r for r in resolved if r is not None]
+            if not resolved:
+                return ""
+
+            result = resolved[0]
+            for toctree in resolved[1:]:
+                result.extend(toctree.children)
+
+            return app.builder.render_partial(result)["fragment"]
+
+        context["toctree_from_doc"] = toctree_from_doc
+
+    app.connect("html-page-context", html_page_context)
 
 
 # make github links resolve
