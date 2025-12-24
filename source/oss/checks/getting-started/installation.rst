@@ -9,7 +9,7 @@ Giskard Checks requires **Python 3.12 or higher**. Install using pip:
 
 .. code-block:: bash
 
-   pip install giskard-checks[all]
+   pip install giskard-checks
 
 
 Configure the default LLM judge model

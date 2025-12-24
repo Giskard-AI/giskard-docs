@@ -129,6 +129,7 @@ Scenario
 A ``Scenario`` allows you to compose multiple steps of testing in sequences alternating some interactions and some checks. This is useful when you are testing complex multi-turn scenarios and you want to test intermediate checkpoints.
 
 For example, we can test a simple conversation flow with two turns:
+
 .. code-block:: python
 
    from giskard.checks import Scenario, InteractionSpec, from_fn

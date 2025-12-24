@@ -48,7 +48,7 @@ We can now create a test case that will check that the answer is grounded in the
         checks=[
             Groundedness(
                 name="answer is grounded",
-                answer_key="last.outputs",
+                answer_key="trace.last.outputs",
                 context="""France is a country in Western Europe. Its capital
                            and largest city is Paris, known for the Eiffel Tower
                            and the Louvre Museum."""
@@ -112,12 +112,12 @@ We can easily create a trace based on this format, and adapt our test case:
         checks=[
             Groundedness(
                 name="answer is grounded",
-                answer_key="last.outputs.answer",
-                context_key="last.outputs.documents",
+                answer_key="trace.last.outputs.answer",
+                context_key="trace.last.outputs.documents",
             ),
             GreaterThan(
                 name="confidence is high",
-                key="last.outputs.confidence",
+                key="trace.last.outputs.confidence",
                 threshold=0.90,
             ),
 
@@ -146,6 +146,7 @@ In practice, we'll often want to create the ``outputs`` automatically from the s
 Differently from static interactions, ``InteractionSpec`` allows both inputs and outputs to be generated at test time.
 
 For example, our simple Q&A bot could be implemented using the OpenAI API:
+
 .. code-block:: python
 
     from openai import OpenAI
@@ -178,8 +179,8 @@ We can now create an interaction spec that will use this function to generate th
         checks=[
             Groundedness(
                 name="answer is grounded",
-                answer_key="last.outputs.answer",
-                context_key="last.outputs.documents",
+                answer_key="trace.last.outputs.answer",
+                context_key="trace.last.outputs.documents",
             )
         ],
     )
