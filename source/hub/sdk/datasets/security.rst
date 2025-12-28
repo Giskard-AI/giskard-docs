@@ -50,7 +50,7 @@ The ``generate_adversarial`` method creates test cases designed to expose securi
 
 .. tip::
 
-   You can also use the `Giskard Hub UI </hub/ui/datasets/security>`_ to generate security test cases if you prefer a visual interface.
+   You can also use the :doc:`Giskard Hub UI </hub/ui/datasets/security>` to generate security test cases if you prefer a visual interface.
 
 Next steps
 ----------

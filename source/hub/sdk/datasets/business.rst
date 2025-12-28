@@ -25,7 +25,7 @@ Document-Based Testing
 
 The ``generate_document_based`` method creates test cases from your knowledge base, making it ideal for testing business logic and accuracy.
 
-Before generating test cases, you need to `create a knowledge base </hub/sdk/projects>`_.
+Before generating test cases, you need to :doc:`setup knowledge bases </hub/sdk/setup/knowledge_bases>` and :doc:`create an agent </hub/sdk/setup/agents>`.
 
 .. code-block:: python
 
@@ -48,7 +48,7 @@ Before generating test cases, you need to `create a knowledge base </hub/sdk/pro
 
 .. tip::
 
-   You can also use the `Giskard Hub UI </hub/ui/datasets/business>`_ to generate business test cases if you prefer a visual interface.
+   You can also use the :doc:`Giskard Hub UI </hub/ui/datasets/business>` to generate business test cases if you prefer a visual interface.
 
 Next steps
 ----------

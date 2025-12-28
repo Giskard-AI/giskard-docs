@@ -30,11 +30,8 @@ pre-commit-install: ## Setup pre-commit hooks
 .PHONY: pre-commit-install
 
 dev: ## Start development server
-	uv run sphinx-autobuild source build
+	uv run sphinx-autobuild source build --ignore "source/_templates/sidebars/**"
 .PHONY: dev
-
-doc-auto: dev
-.PHONY: doc-auto
 
 doc: clean html ## Build the doc
 	rm -rf ./docs && mkdir -p ./docs && touch ./docs/.nojekyll && mv ./build/html/* ./docs

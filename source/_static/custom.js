@@ -5,38 +5,6 @@
 (function () {
   'use strict';
 
-  // Inject Google Tag Manager if not already present
-  if (!document.querySelector('script[src*="googletagmanager.com/gtm.js"]')) {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      'gtm.start': new Date().getTime(),
-      event: 'gtm.js'
-    });
-
-    const gtmScript = document.createElement('script');
-    gtmScript.async = true;
-    gtmScript.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-PQ9MJ64';
-    const head = document.head || document.getElementsByTagName('head')[0];
-    const firstScript = head.querySelector('script');
-    if (firstScript) {
-      head.insertBefore(gtmScript, firstScript);
-    } else {
-      head.appendChild(gtmScript);
-    }
-
-    if (!document.querySelector('noscript iframe[src*="googletagmanager.com/ns.html"]')) {
-      const noscript = document.createElement('noscript');
-      const iframe = document.createElement('iframe');
-      iframe.src = 'https://www.googletagmanager.com/ns.html?id=GTM-PQ9MJ64';
-      iframe.height = '0';
-      iframe.width = '0';
-      iframe.style.display = 'none';
-      iframe.style.visibility = 'hidden';
-      noscript.appendChild(iframe);
-      document.body.insertBefore(noscript, document.body.firstChild);
-    }
-  }
-
   // Expand parent sections that contain the current page - runs BEFORE Alpine initializes
   function preExpandCurrentSections() {
     const sidebar = document.querySelector('#left-sidebar');
@@ -101,12 +69,21 @@
     // Save scroll position
     sessionStorage.setItem('sidebarScrollTop', sidebar.scrollTop);
 
-    // Save expanded dropdowns
+    // Save expanded dropdowns by checking if the child <ul> is visible
+    // This is safer than accessing Alpine's internal _x_dataStack
     const expandedHrefs = [];
     sidebar.querySelectorAll('[x-data]').forEach(element => {
       const link = element.querySelector('a');
-      if (link && link.href && element._x_dataStack && element._x_dataStack[0]?.expanded) {
-        expandedHrefs.push(link.href);
+      if (!link || !link.href) return;
+
+      // Check if the child <ul> with x-show is visible
+      // When x-show="expanded" is true, the element should be visible (not display: none)
+      const childUl = element.querySelector(':scope > ul[x-show]');
+      if (childUl) {
+        const style = window.getComputedStyle(childUl);
+        if (style.display !== 'none' && style.visibility !== 'hidden') {
+          expandedHrefs.push(link.href);
+        }
       }
     });
 
@@ -240,5 +217,74 @@
   if (sessionStorage.getItem('enterprise-trial-banner-closed') !== 'true') {
     createEnterpriseTrialBanner();
   }
+
+  // Fix Mermaid node colors in dark mode - ensure all nodes use green color scheme
+  function fixMermaidDarkModeColors() {
+    if (!document.documentElement.classList.contains('dark')) {
+      return; // Only apply in dark mode
+    }
+
+    const mermaidDiagrams = document.querySelectorAll('.mermaid svg');
+    mermaidDiagrams.forEach(svg => {
+      // Find all node shapes (rect, polygon, circle, ellipse, path)
+      const nodeShapes = svg.querySelectorAll('.node rect, .node polygon, .node circle, .node ellipse, .node path');
+      nodeShapes.forEach(shape => {
+        // Override fill color to ensure green color scheme
+        const currentFill = shape.getAttribute('fill');
+        // Only override if it's not already the correct color and not transparent/none
+        if (currentFill &&
+            currentFill !== '#004040' &&
+            currentFill !== 'none' &&
+            currentFill !== 'transparent' &&
+            !currentFill.includes('rgb(0, 64, 64)')) {
+          shape.setAttribute('fill', '#004040');
+        }
+        // Also ensure stroke is correct
+        const currentStroke = shape.getAttribute('stroke');
+        if (currentStroke && !currentStroke.includes('198, 255, 255')) {
+          shape.setAttribute('stroke', 'rgba(198, 255, 255, 0.2)');
+        }
+      });
+    });
+  }
+
+  // Run after Mermaid diagrams are rendered
+  function observeMermaidDiagrams() {
+    // Run immediately in case diagrams are already rendered
+    fixMermaidDarkModeColors();
+
+    // Watch for new Mermaid diagrams being added
+    const observer = new MutationObserver(() => {
+      fixMermaidDarkModeColors();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Also run after a short delay to catch async renders
+    setTimeout(fixMermaidDarkModeColors, 1000);
+    setTimeout(fixMermaidDarkModeColors, 2000);
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', observeMermaidDiagrams);
+  } else {
+    observeMermaidDiagrams();
+  }
+
+  // Re-run when theme changes to dark mode
+  const themeObserver = new MutationObserver(() => {
+    if (document.documentElement.classList.contains('dark')) {
+      setTimeout(fixMermaidDarkModeColors, 100);
+    }
+  });
+
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
 
 })();

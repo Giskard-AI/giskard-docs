@@ -118,7 +118,7 @@ Feature comparison
 
    Experience the full power of enterprise-grade AI testing by requesting a **free trial**. Get access to advanced security detection, team collaboration, continuous red teaming, and more.
 
-   `Request your free enterprise trial today </start/enterprise-trial.html>`_ and see the difference for yourself!
+   :doc:`Request your free enterprise trial today </start/enterprise-trial>` and see the difference for yourself!
 
 
 When to use Giskard Open Source

@@ -235,7 +235,7 @@ We can now evaluate the test suite against another model.
 
    Try our enterprise-grade solution with a **free trial**. Get access to advanced security detection, team collaboration, continuous red teaming, and more.
 
-   `Request your free enterprise trial today </start/enterprise-trial.html>`_ and see the difference for yourself!
+   :doc:`Request your free enterprise trial today </start/enterprise-trial>` and see the difference for yourself!
 
 
 Customizing security scans
@@ -353,5 +353,3 @@ If you encounter issues with security scanning:
 
 * Join our `Discord community <https://discord.gg/giskard>`_ and ask questions in the ``#support`` channel
 * Review our :doc:`glossary on AI terminology </start/glossary/index>` to better understand the terminology used in the documentation.
-
-
