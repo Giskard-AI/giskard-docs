@@ -1,11 +1,17 @@
-:og:title: Giskard Hub - Enterprise Agent Testing - Checks Management
-:og:description: Create, manage, and deploy custom validation rules and metrics for your LLM agent tests. Build specialized testing logic tailored to your business requirements.
+:og:title: Giskard Hub SDK - Checks and Metrics Management
+:og:description: Create, manage, and deploy custom validation rules and metrics for your LLM agent tests. Build specialized testing logic tailored to your business requirements using the Python SDK.
 
-===================
-Manage your checks
-===================
+=============================================
+Review and refine test cases and metrics
+=============================================
 
 Checks are validation rules that are used to evaluate the responses of your agents. They can be used to ensure that your agents are behaving correctly and following the rules that you have defined.
+
+|
+
+.. raw:: html
+
+   <iframe width="100%" height="400" src="https://www.youtube.com/embed/VLejoLvDy-o?si=FXzYphE06Oi1fiBH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 The Giskard Hub provides a set of built-in checks that cover common use cases, such as:
 
@@ -17,6 +23,10 @@ The Giskard Hub provides a set of built-in checks that cover common use cases, s
 * **Semantic Similarity**: Verifies that the agent's response is semantically similar to the expected output.
 
 You can also create custom checks to address specific business requirements or domain-specific validation needs.
+
+.. tip::
+
+    For more background on the process of reviewing and refining test cases and metrics, see the :doc:`/hub/ui/annotate/index` section of the UI documentation.
 
 Let's start by initializing the Hub client or take a look at the :doc:`/hub/sdk/index` section to see how to install the SDK and connect to the Hub.
 
@@ -35,7 +45,7 @@ Giskard provides a set of built-in checks that you can use to evaluate your agen
 
 .. tip::
 
-    For more background information on the built-in checks, see the :doc:`/hub/ui/annotate` section.
+    For more background information on the built-in checks, see the :doc:`/hub/ui/annotate/overview` section.
 
 .. _custom-checks:
 
@@ -50,9 +60,6 @@ Custom checks can be used in the following ways:
 - Used during agent evaluations
 - Shared across your team **within the same project**
 - Modified or updated as your requirements evolve
-
-Create a check
-______________
 
 You can create a check using the ``hub.checks.create()`` method. Here's a basic example:
 
@@ -188,78 +195,7 @@ The parameters for creating a custom check are:
     - Custom checks are project-specific. If you need the same check logic across multiple projects, you'll need to create it separately in each project.
 
 
-Retrieve a check
-________________
-
-You can retrieve a check using the ``hub.checks.retrieve()`` method. Here's a basic example:
-
-.. code-block:: python
-
-    # Get a specific check by ID
-    check = hub.checks.retrieve(check_id="your_check_id")
-    print(f"Check name: {check.name}")
-    print(f"Parameters: {check.params}")
-
-Update a check
-______________
-
-You can update a check using the ``hub.checks.update()`` method. Here's a basic example:
-
-.. code-block:: python
-
-    # Update an existing check
-    updated_check = hub.checks.update(
-        check_id="your_check_id",
-        identifier="updated_check",
-        name="Updated Check Name",
-        description="Updated description",
-        params={
-            "type": "correctness",
-            "reference": "Updated reference answer"
-        }
-    )
-
-    # Partial update
-    hub.checks.update(
-        check_id="your_check_id",
-        params={
-            "type": "conformity",
-            "rules": ["Be clear and educational"]
-        }
-    )
-
-Delete a check
-______________
-
-You can delete a check using the ``hub.checks.delete()`` method. Here's a basic example:
-
-.. code-block:: python
-
-    # Delete a check (this will remove it permanently)
-    hub.checks.delete(check_id="your_check_id")
-
-    # Or delete multiple checks at once
-    hub.checks.delete(check_id=["check_id_1", "check_id_2"])
-
-.. warning::
-
-    Deleting a check is permanent and cannot be undone. Make sure you're not using the check in any active chat test cases or evaluations before deleting it.
-
-List checks
-___________
-
-You can list all checks for a project using the ``hub.checks.list()`` method. Here's a basic example:
-
-.. code-block:: python
-
-    # Get all custom checks for a project
-    checks = hub.checks.list(project_id=project.id)
-
-    for check in checks:
-        print(f"Check: {check.name} (ID: {check.id})")
-        print(f"Identifier: {check.identifier}")
-        print(f"Description: {check.description}")
-        print("---")
+For detailed information about check management methods and parameters, see the :doc:`/hub/sdk/reference/index` section.
 
 .. _add-checks-to-conversations:
 
@@ -404,3 +340,10 @@ You can use a semantic similarity check to verify that the agent's response is s
             "reference": "The capital of France is Paris, which is located in the northern part of the country.",
             "threshold": 0.8
         }
+
+Next steps
+----------
+
+Now that you have created a check, you can use it in your chat test cases.
+
+* **Run evaluations** - :doc:`/hub/sdk/evaluations/index`
