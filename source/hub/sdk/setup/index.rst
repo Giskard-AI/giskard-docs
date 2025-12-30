@@ -5,7 +5,7 @@
 Setup API keys, projects, agents and knowledge bases
 =====================================================
 
-In this section, we will walk you through how to setup keys, IDs, projects, agents and knowledge bases using the SDK.
+In this section, we will walk you through how to setup the API key (required when using the SDK to interact with hub entities) and then how to create and manage projects, agents, and knowledge bases using the SDK.
 
 * **Projects**: Projects are the top-level organizational units in Giskard Hub. They provide a workspace for your team to collaborate on LLM agent testing and evaluation.
 * **Agents**: The AI systems, LLMs or agents you want to test and evaluate
@@ -17,7 +17,7 @@ In this section, we will walk you through how to setup keys, IDs, projects, agen
       :link: keys
       :link-type: doc
 
-      Retrieve API keys and entity IDs programmatically
+      Set up API keys and retrieve entity IDs programmatically
 
    .. grid-item-card:: Setup projects
       :link: projects

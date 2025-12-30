@@ -16,7 +16,7 @@ You can find your API key and Hub URL in the Hub UI. After login, click your use
    :alt: "API key"
    :width: 800
 
-You can configure the API key and Hub URL by setting the following environment variables:
+To use the Hub SDK and interact with the hub entities, you need to set the following environment variables:
 
 .. code-block:: bash
 
