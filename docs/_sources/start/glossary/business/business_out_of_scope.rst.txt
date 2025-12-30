@@ -23,28 +23,32 @@ Types of Out of Scope Issues
 -----------------------------
 
 **Internal Metrics**
-   * Revealing internal performance data
-   * Sharing confidential business metrics
-   * Exposing operational statistics
-   * Disclosing financial information
+
+* Revealing internal performance data
+* Sharing confidential business metrics
+* Exposing operational statistics
+* Disclosing financial information
 
 **Confidential Information**
-   * Sharing proprietary business information
-   * Revealing internal processes or procedures
-   * Exposing confidential customer data
-   * Disclosing trade secrets or IP
+
+* Sharing proprietary business information
+* Revealing internal processes or procedures
+* Exposing confidential customer data
+* Disclosing trade secrets or IP
 
 **Competitive Intelligence**
-   * Providing information about competitors
-   * Sharing market analysis not meant for public consumption
-   * Revealing strategic positioning details
-   * Exposing competitive advantages
+
+* Providing information about competitors
+* Sharing market analysis not meant for public consumption
+* Revealing strategic positioning details
+* Exposing competitive advantages
 
 **Strategic Details**
-   * Sharing future business plans
-   * Revealing strategic initiatives
-   * Exposing business roadmap information
-   * Disclosing partnership or acquisition details
+
+* Sharing future business plans
+* Revealing strategic initiatives
+* Exposing business roadmap information
+* Disclosing partnership or acquisition details
 
 Business Impact
 ----------------
@@ -71,7 +75,7 @@ Giskard provides comprehensive tools to test and detect business out of scope vu
       Use the Hub interface to generate document-based test cases for business out of scope detection. The UI automatically generates queries that test whether models stay within defined business boundaries.
 
    .. grid-item-card:: Annotate test cases with test rules
-      :link: /hub/ui/annotate
+      :link: /hub/ui/annotate/overview
       :link-type: doc
 
       Annotate test cases with test rules to help the model understand the business boundaries.
