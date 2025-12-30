@@ -1,9 +1,11 @@
-:og:title: Giskard Hub - Enterprise Agent Testing - Security Testing
-:og:description: Generate and manage security-focused test cases programmatically. Test for vulnerabilities, prompt injection attacks, and security failures using the Python SDK.
+:og:title: Giskard Hub SDK - Security Test Generation
+:og:description: Generate and manage security-focused test cases programmatically. Test for vulnerabilities, prompt injection attacks, and security failures using the comprehensive Python SDK.
 
 =============================================================
-Detect security vulnerabilities by generating synthetic tests
+Generate security tests
 =============================================================
+
+This section will guide you through generating security-focused test cases using the Hub interface.
 
 Security testing is a critical component of LLM agent evaluation. It focuses on identifying vulnerabilities that could be exploited by malicious actors or lead to unintended behavior.
 
@@ -46,13 +48,13 @@ The ``generate_adversarial`` method creates test cases designed to expose securi
     for chat_test_case in security_dataset.chat_test_cases:
         print(chat_test_case.messages[0].content)
 
-.. note::
+.. tip::
 
-   You can also use the `Giskard Hub UI </hub/ui/datasets/security>`_ to generate security test cases if you prefer a visual interface.
+   You can also use the :doc:`Giskard Hub UI </hub/ui/datasets/security>` to generate security test cases if you prefer a visual interface.
 
 Next steps
 ----------
 
-* **Review test case** - Make sure to :doc:`/hub/ui/annotate`
+* **Agentic vulnerability detection** - Try :doc:`/hub/sdk/scan/index`
 * **Generate business failures** - Try :doc:`/hub/sdk/datasets/business`
-* **Set-up continuous red teaming** - Understand exhaustive and proactive detection with :doc:`/hub/ui/continuous-red-teaming`
+* **Review test case** - Make sure to :doc:`/hub/ui/annotate/index`

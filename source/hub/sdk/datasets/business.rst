@@ -1,20 +1,31 @@
-:og:title: Giskard Hub - Enterprise Agent Testing - Detect Business Failures
-:og:description: Generate and manage business logic test cases programmatically. Test compliance, domain-specific scenarios, and business requirements in your LLM agents.
+:og:title: Giskard Hub SDK - Business Logic Test Generation
+:og:description: Generate and manage business logic test cases programmatically. Test compliance, domain-specific scenarios, and business requirements in your LLM agents using the Python SDK.
 
 ======================================================
-Detect business failures by generating synthetic tests
+Generate business tests
 ======================================================
 
+This section will guide you through generating business-focused test cases using the Hub interface.
 Generative AI agents can face an endless variety of real-world scenarios, making it impossible to manually enumerate all possible scenarios. Automated, synthetic test case generation is therefore essential—especially when you lack real user chats to import as tests. However, a major challenge is to ensure that these synthetic cases are tailored to your business context, rather than being overly generic.
 
 By generating domain-specific synthetic tests, you can proactively identify and address these types of failures before they impact your users or business operations.
+
+Let's start by initializing the Hub client or take a look at the :doc:`/hub/sdk/index` section to see how to install the SDK and connect to the Hub.
+
+.. code-block:: python
+
+    from giskard_hub import HubClient
+
+    hub = HubClient()
+
+You can now use the ``hub.datasets`` and ``hub.knowledge_bases`` clients to control the Giskard Hub!
 
 Document-Based Testing
 ----------------------
 
 The ``generate_document_based`` method creates test cases from your knowledge base, making it ideal for testing business logic and accuracy.
 
-Before generating test cases, you need to `create a knowledge base </hub/sdk/projects>`_.
+Before generating test cases, you need to :doc:`setup knowledge bases </hub/sdk/setup/knowledge_bases>` and :doc:`create an agent </hub/sdk/setup/agents>`.
 
 .. code-block:: python
 
@@ -35,13 +46,13 @@ Before generating test cases, you need to `create a knowledge base </hub/sdk/pro
     for chat_test_case in business_dataset.chat_test_cases:
         print(chat_test_case.messages[0].content)
 
-.. note::
+.. tip::
 
-   You can also use the `Giskard Hub UI </hub/ui/datasets/business>`_ to generate business test cases if you prefer a visual interface.
+   You can also use the :doc:`Giskard Hub UI </hub/ui/datasets/business>` to generate business test cases if you prefer a visual interface.
 
 Next steps
 ----------
 
-* **Review test case** - Make sure to :doc:`/hub/ui/annotate`
+* **Agentic vulnerability detection** - Try :doc:`/hub/sdk/scan/index`
 * **Generate security vulnerabilities** - Try :doc:`/hub/sdk/datasets/security`
-* **Set-up continuous red teaming** - Understand exhaustive and proactive detection with :doc:`/hub/ui/continuous-red-teaming`
+* **Review test case** - Make sure to :doc:`/hub/ui/annotate/index`
