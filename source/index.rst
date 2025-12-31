@@ -45,7 +45,7 @@ Giskard Hub
 
    Ready to unlock the full potential of enterprise-grade AI testing? Try **Giskard Hub** with a free trial and discover advanced team collaboration, continuous red teaming, and enterprise security features.
 
-   `Start your free enterprise trial <start/enterprise-trial.html>`_ and see how Giskard Hub can transform your AI testing workflow.
+   :doc:`Start your free enterprise trial </start/enterprise-trial>` and see how Giskard Hub can transform your AI testing workflow.
 
 Open source
 -----------

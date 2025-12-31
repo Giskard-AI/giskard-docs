@@ -421,10 +421,16 @@ header nav a:not(.text-foreground):hover {
 }
 
 /* Recently selected navbar item styling */
-header nav a.recently-selected {
-  color: var(--accent-color) !important;
-  opacity: 1 !important;
-  font-weight: 600 !important;
+header nav a.recently-selected,
+html[data-content_root="./"] header nav a.recently-selected,
+body[data-content_root="./"] header nav a.recently-selected,
+html[data-content_root="./"] header nav a.recently-selected.text-foreground,
+body[data-content_root="./"] header nav a.recently-selected.text-foreground,
+html[data-content_root="./"] header nav a.recently-selected[class*="text-foreground"],
+body[data-content_root="./"] header nav a.recently-selected[class*="text-foreground"] {
+  color: var(--accent-color);
+  opacity: 1;
+  font-weight: 600;
   position: relative;
 }
 
@@ -439,8 +445,14 @@ header nav a.recently-selected::after {
   border-radius: 1px;
 }
 
-.dark header nav a.recently-selected {
-  color: var(--accent-color) !important;
+.dark header nav a.recently-selected,
+html.dark[data-content_root="./"] header nav a.recently-selected,
+.dark body[data-content_root="./"] header nav a.recently-selected,
+html.dark[data-content_root="./"] header nav a.recently-selected.text-foreground,
+.dark body[data-content_root="./"] header nav a.recently-selected.text-foreground,
+html.dark[data-content_root="./"] header nav a.recently-selected[class*="text-foreground"],
+.dark body[data-content_root="./"] header nav a.recently-selected[class*="text-foreground"] {
+  color: var(--accent-color);
 }
 
 .dark header nav a.recently-selected::after {
@@ -766,15 +778,6 @@ body[data-content_root="./"] header nav a[class*="text-foreground"] {
   display: none !important;
 }
 
-/* Navbar highlighting styles */
-header nav a.recently-selected {
-  color: var(--accent-color) !important;
-  font-weight: 600;
-}
-
-.dark header nav a.recently-selected {
-  color: var(--accent-color) !important;
-}
 
 /* Fix duplicate external link icons in sidebar */
 /* Hide any duplicate SVG elements (in case multiple SVGs are added as children) */
@@ -866,13 +869,67 @@ pre.mermaid.align-center {
    Dark Mode
    -------------------------------------------------------------------------- */
 .dark .mermaid .node rect,
-.dark .mermaid .node polygon {
+.dark .mermaid .node polygon,
+.dark .mermaid .node circle,
+.dark .mermaid .node ellipse,
+.dark .mermaid .node path,
+.dark .mermaid .node > * {
   stroke-width: 1.5px !important;
+  fill: #004040 !important;
+  stroke: rgba(198, 255, 255, 0.2) !important;
+}
+
+.dark .mermaid .node rect,
+.dark .mermaid .node polygon {
   rx: 8px !important;
   ry: 8px !important;
+}
+
+/* Override any default Mermaid colors for all node shapes */
+.dark .mermaid .node[class*="node"] > *,
+.dark .mermaid .cluster > rect,
+.dark .mermaid .cluster > polygon,
+.dark .mermaid .cluster > circle,
+.dark .mermaid .cluster > ellipse,
+.dark .mermaid .cluster > path {
   fill: #004040 !important;
-  stroke: #c6ffff !important;
   stroke: rgba(198, 255, 255, 0.2) !important;
+}
+
+/* Override Mermaid's default node colors that might appear pink/red */
+.dark .mermaid svg .node rect[fill],
+.dark .mermaid svg .node polygon[fill],
+.dark .mermaid svg .node circle[fill],
+.dark .mermaid svg .node ellipse[fill],
+.dark .mermaid svg .node path[fill] {
+  fill: #004040 !important;
+}
+
+/* Ensure all shapes within nodes use the green color scheme */
+.dark .mermaid .node > svg > *,
+.dark .mermaid .node svg rect,
+.dark .mermaid .node svg polygon,
+.dark .mermaid .node svg circle,
+.dark .mermaid .node svg ellipse,
+.dark .mermaid .node svg path {
+  fill: #004040 !important;
+  stroke: rgba(198, 255, 255, 0.2) !important;
+}
+
+/* Override any background colors on node containers */
+.dark .mermaid .node {
+  background-color: transparent !important;
+}
+
+/* Catch any remaining default colors - override all fills in dark mode mermaid nodes */
+/* This targets any element with a fill attribute that isn't explicitly set to none/transparent */
+.dark .mermaid svg .node *[fill]:not([fill="none"]):not([fill="transparent"]):not([fill="#ffffff"]):not([fill="white"]) {
+  fill: #004040 !important;
+}
+
+/* Override any style attributes that might contain pink/red colors */
+.dark .mermaid svg .node *[style*="fill"] {
+  fill: #004040 !important;
 }
 
 .dark .mermaid .node text,
@@ -903,4 +960,21 @@ pre.mermaid.align-center {
 
 .dark .labelBkg {
   background: #002929 !important;
+}
+
+/* Dark mode hyperlinks in mermaid graphs */
+.dark .mermaid a,
+.dark .mermaid .nodeLabel a,
+.dark .mermaid .node text a,
+.dark .mermaid .label text a {
+  color: #888888 !important;
+  fill: #888888 !important;
+}
+
+.dark .mermaid a:hover,
+.dark .mermaid .nodeLabel a:hover,
+.dark .mermaid .node text a:hover,
+.dark .mermaid .label text a:hover {
+  color: #aaaaaa !important;
+  fill: #aaaaaa !important;
 }

@@ -95,7 +95,7 @@ For example:
     eval_run.wait_for_completion()
 
     for metric in eval_run.metrics:
-        print(metric.name, metric.percentage})
+        print(metric.name, metric.percentage)
 
         if metric.percentage < 90:
             print(f"FAILED: {metric.name} is below 90%.")

@@ -51,13 +51,16 @@ This shows you:
 Take action on findings
 -----------------------
 
-For each detected issue, you have two main actions:
+For each detected issue, you have three main actions:
 
 - **Mark as false positive:**  
   If the identified issue is not a real risk for your use case (for example, it is expected behavior or not relevant to your deployment), you can mark it as a false positive. This will immediately update your agent's security grade and help you track which findings require action.
 
 - **Convert to test case:**  
   You can save the detected attack as a reproducible test case by clicking **Send to dataset**. This allows you to track fixes over time, build regression tests to make sure the issue doesn't reappear, and share concrete examples with your team for further analysis and improvement.
+
+- **Create a task:**  
+  You can create a task to track and assign work items for reviewing vulnerabilities. This is useful for organizing the review of issues found during scans and coordinating work among team members. To create a task, click on **Add task** button on the top right side of the screen when reviewing a specific probe. You can set the task priority, status, assignees, and provide a description of what needs to be done.
 
 .. tip:: 
 

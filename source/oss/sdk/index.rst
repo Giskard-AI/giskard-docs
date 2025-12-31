@@ -23,12 +23,12 @@ We support two main use cases:
       Detect business failures, by generating synthetic test cases to detect business failures, like *hallucinations* or *denial to answer questions*, using document-based queries and knowledge bases.
 
 .. tip::
-    
+
    **🚀 Love Giskard Open Source?**
 
    Try it to the next level with **Giskard Hub** - featuring a friendly UI, team collaboration, continuous red teaming, enterprise security, and a **free trial**!
 
-   `Explore our features to Giskard Hub </start/comparison.html>`_ and learn how it can help you with enterprise-grade AI testing.
+   :doc:`Explore our features to Giskard Hub </start/comparison>` and learn how it can help you with enterprise-grade AI testing.
 
 This guide will walk you through installing the library, configuring your agents and finding security and business failures in your LLM.
 
@@ -191,7 +191,7 @@ We can now evaluate the test suite against another model.
 
    Try our enterprise-grade solution with a **free trial**. Get access to advanced security detection, team collaboration, continuous red teaming, and more.
 
-   `Request your free enterprise trial today </start/enterprise-trial.html>`_ and see the difference for yourself!
+   :doc:`Request your free enterprise trial today </start/enterprise-trial>` and see the difference for yourself!
 
 Detect business failures with RAGET
 -----------------------------------
@@ -287,7 +287,7 @@ This will return a report object that contains the evaluation results.
 
    Try our enterprise-grade solution with a **free trial**. Get access to advanced business logic validation, team collaboration, continuous red teaming, and more.
 
-   `Request your free enterprise trial today </start/enterprise-trial.html>`_ and see the difference for yourself!
+   :doc:`Request your free enterprise trial today </start/enterprise-trial>` and see the difference for yourself!
 
 Next steps
 ----------

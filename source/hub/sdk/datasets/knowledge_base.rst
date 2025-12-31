@@ -25,7 +25,7 @@ Document-Based Testing
 
 The ``generate_document_based`` method creates test cases from your knowledge base, making it ideal for testing business logic and accuracy.
 
-Before generating test cases, you need to `create a knowledge base </hub/sdk/projects>`_.
+Before generating test cases, you need to :doc:`setup knowledge bases </hub/sdk/setup/knowledge_bases>` and :doc:`create an agent </hub/sdk/setup/agents>`.
 
 .. code-block:: python
 

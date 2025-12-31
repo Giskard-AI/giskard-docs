@@ -74,18 +74,15 @@ def extract_ipynb_title(file_path: str) -> str | None:
 def get_url_extension(file_path: str) -> str:
     """
     Get the appropriate URL extension for a file.
+    nbsphinx converts notebooks to .html files, so all files use .html extension.
 
     Args:
         file_path: Path to the file
 
     Returns:
-        ".html" for regular files, ".ipynb.html" for notebook files
+        ".html" for all files (including notebooks)
     """
-    file_path_obj = Path(file_path)
-    if file_path_obj.suffix == ".ipynb":
-        return ".ipynb.html"
-    else:
-        return ".html"
+    return ".html"
 
 
 def extract_file_title(file_path: str) -> str | None:
@@ -526,7 +523,7 @@ def _parse_toctree_entries(
                     ):
                         # Extract path after script-docs
                         relevant_parts = parts[script_docs_index + 1 :]
-                        url = f"/{'/'.join(relevant_parts).replace('.rst', url_ext).replace('.ipynb', '.ipynb.html')}"
+                        url = f"/{'/'.join(relevant_parts).replace('.rst', url_ext).replace('.ipynb', url_ext)}"
                     else:
                         # Fallback: use the original line-based approach
                         url = f"/{line}{url_ext}"
@@ -637,20 +634,12 @@ def _get_nested_children(
                     else:
                         # Extract the path from the current URL (remove leading / and any extension)
                         path_part = current_url.lstrip("/")
-                        # Remove both .html and .ipynb.html extensions
-                        if path_part.endswith(".ipynb.html"):
-                            path_part = path_part[:-10]  # Remove .ipynb.html
-                        elif path_part.endswith(".html"):
+                        # Remove .html extension if present
+                        if path_part.endswith(".html"):
                             path_part = path_part[:-5]  # Remove .html
 
-                        # Determine the correct extension for this path
-                        # Try to find the actual file to determine the extension
-                        potential_ipynb = Path("script-docs") / f"{path_part}.ipynb"
-
-                        if potential_ipynb.exists():
-                            url_ext = ".ipynb.html"
-                        else:
-                            url_ext = ".html"
+                        # All files use .html extension (nbsphinx converts notebooks to .html)
+                        url_ext = ".html"
 
                         # Construct absolute path using the parent URL prefix
                         if parent_url_prefix:
@@ -798,13 +787,13 @@ def _discover_files_with_glob_pattern(file_path: str, glob_pattern: str) -> list
                     ):
                         # Extract path after script-docs
                         relevant_parts = parts[script_docs_index + 1 :]
-                        url_path = f"/{'/'.join(relevant_parts).replace('.rst', '.html').replace('.ipynb', '.ipynb.html')}"
+                        url_path = f"/{'/'.join(relevant_parts).replace('.rst', '.html').replace('.ipynb', '.html')}"
                     else:
                         # Fallback: use the filename only
-                        url_path = f"/{discovered_file.name.replace('.rst', '.html').replace('.ipynb', '.ipynb.html')}"
+                        url_path = f"/{discovered_file.name.replace('.rst', '.html').replace('.ipynb', '.html')}"
                 else:
                     # Single filename
-                    url_path = f"/{discovered_file.name.replace('.rst', '.html').replace('.ipynb', '.ipynb.html')}"
+                    url_path = f"/{discovered_file.name.replace('.rst', '.html').replace('.ipynb', '.html')}"
 
             # Extract title from file
             file_title = extract_file_title(str(discovered_file))
@@ -972,7 +961,7 @@ def _discover_files_with_glob(
                         ):
                             # Extract path after script-docs
                             relevant_parts = parts[script_docs_index + 1 :]
-                            url_path = f"/{'/'.join(relevant_parts).replace('.rst', url_ext).replace('.ipynb', '.ipynb.html')}"
+                            url_path = f"/{'/'.join(relevant_parts).replace('.rst', url_ext).replace('.ipynb', url_ext)}"
                         else:
                             # Fallback: use the filename only
                             url_path = f"/{discovered_file.stem}{url_ext}"
@@ -1117,7 +1106,5 @@ def _generate_entry_html(entry: dict, level: int = 1) -> list:
     html_lines = [
         line.replace("toctree_start.html", "index.html") for line in html_lines
     ]
-    html_lines = [line.replace(".ipynb..html", ".html") for line in html_lines]
-    html_lines = [line.replace(".ipynb.html", ".html") for line in html_lines]
 
     return html_lines
