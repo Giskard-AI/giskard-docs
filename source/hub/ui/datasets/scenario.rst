@@ -47,7 +47,7 @@ When creating a new persona scenario, it's always nice to have:
 Define rules
 ------------
 
-You can then add specific rules, and these rules help evaluate different persona scenarios and will be used for the generation of these different scenarios.
+You can then add specific rules that define behaviors your agent should respect and that are at risk of being broken when interacting with the selected personas. These rules help evaluate different persona scenarios and will be used for the generation of test cases that specifically test whether your agent maintains these behaviors.
 
 .. image:: /_static/images/hub/scenario-persona-create.png
    :align: center
@@ -57,6 +57,9 @@ You can then add specific rules, and these rules help evaluate different persona
 For example:
 - **Persona**: Customer using slang/emojis asking about loans
 - **Rules**: Enforce professional tone and refusal to do interest calculations
+
+- **Persona**: Crypto investor seeking investment advice
+- **Rules**: Refuse to provide unauthorized financial advice and avoid making specific investment recommendations
 
 After defining a set of rules, you can add them to the scenario.
 

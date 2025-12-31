@@ -17,7 +17,7 @@ Knowledge base tests generation
 -------------------------------
 
 The Giskard Hub provides an intuitive interface for synthetic test generation from your knowledge base. It generates legitimate user queries alongside their expected knowledge base context and answer, using the knowledge base as the ground truth.
-It automatically clusters your knowledge base documents into key topics. You can also re-use business topics that you set manually upon knowledge base import.
+Your knowledge base documents are automatically clustered into key topics upon import. You can also re-use business topics that you set manually during knowledge base import.
 
 Then, for each topic/cluster of knowledge base documents, it generates representative test cases, applying a set of perturbations to generate legitimate queries that mimic real user behavior.
 
@@ -59,7 +59,7 @@ In this case, dataset generation requires two additional pieces of information:
 
   .. tip::
 
-     Giskard can automatically cluster your knowledge base into topics for you, or, if your knowledge base already includes tags or categories, you can use those existing tags as topics. This flexibility ensures that topic selection aligns with your business context and data organization.
+     Giskard automatically clusters your knowledge base into topics upon import, or, if your knowledge base already includes tags or categories, you can use those existing tags as topics. This flexibility ensures that topic selection aligns with your business context and data organization.
 
   .. tip::
 
