@@ -1,0 +1,18 @@
+2.2.1 (2025-12-17)
+==================
+
+We're releasing a fix for an issue where tasks could not be saved while in edit mode.
+
+Hub UI
+------
+
+What's fixed?
+~~~~~~~~~~~~~
+
+- **Task editing** - Fixed an issue that prevented tasks from being saved when opening the edit mode.
+
+Hub SDK
+-------
+
+No changes yet.
+
