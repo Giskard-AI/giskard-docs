@@ -32,7 +32,6 @@ You can create a dataset manually using the ``hub.datasets.create()`` method. Ex
     )
 
     print(dataset.id)
-    # "666030a0d41f357fd061374c"
 
 For detailed information about creating datasets, see the :doc:`/hub/sdk/reference/resources/index` section.
 
@@ -96,5 +95,5 @@ Next steps
 __________
 
 * **Agentic vulnerability detection** - Try :doc:`/hub/sdk/scan/index`
-* **Generate test cases** - Try :doc:`/hub/sdk/datasets/business` or :doc:`/hub/sdk/datasets/security`
+* **Generate test cases** - Try :doc:`/hub/sdk/datasets/knowledge_base` or :doc:`/hub/sdk/datasets/security`
 * **Review test case and assign checks** - Make sure to :doc:`/hub/ui/annotate/index`
