@@ -9,7 +9,7 @@ Hub UI
 What's fixed?
 ~~~~~~~~~~~~~
 
-- **Task editing** - Fixed an issue that prevented tasks from being saved when opening the edit mode.
+- **Task editing** - Fixed an issue that prevented tasks from being saved while in edit mode.
 
 Hub SDK
 -------
