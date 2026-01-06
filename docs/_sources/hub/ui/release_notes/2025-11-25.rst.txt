@@ -1,4 +1,17 @@
 2.1.1 (2025-11-25)
 ==================
 
-Hotfix release,emergency fix on email sending.
+We're releasing an emergency hotfix to resolve a critical issue that completely blocked outbound email delivery.
+
+Hub UI
+------
+
+What's fixed?
+~~~~~~~~~~~~~
+
+- **Email delivery restoration** - Fixed a critical issue that prevented all outbound email delivery. Email sending has been restored for all notifications and system emails.
+
+Hub SDK
+-------
+
+No changes yet.

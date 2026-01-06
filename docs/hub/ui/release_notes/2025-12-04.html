@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 
-<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../../../../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
+<html :class="{'dark': darkMode === 'dark' || (darkMode === 'system' &amp;&amp; window.matchMedia('(prefers-color-scheme: dark)').matches)}" class="scroll-smooth" data-content_root="../../../" lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system'), activeSection: '' }" x-init="$watch('darkMode', val =&gt; localStorage.setItem('darkMode', val))">
 <head>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta charset="utf-8"/>
 <meta content="white" media="(prefers-color-scheme: light)" name="theme-color"/>
 <meta content="black" media="(prefers-color-scheme: dark)" name="theme-color"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="Giskard Hub UI - Prompt Injection Vulnerabilities (OWASP LLM 01)" property="og:title"/>
+<meta content="2.1.2 (2025-12-04)" property="og:title"/>
 <meta content="website" property="og:type"/>
-<meta content="https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/prompt-injection.html" property="og:url"/>
+<meta content="https://docs.giskard.ai/hub/ui/release_notes/2025-12-04.html" property="og:url"/>
 <meta content="Giskard Documentation" property="og:site_name"/>
-<meta content="Comprehensive guide to prompt injection attacks and mitigation strategies. Learn about DAN attacks, framing techniques, encoding manipulation, and advanced jailbreak methods for AI security testing." property="og:description"/>
+<meta content="We’re releasing a hotfix that addresses a critical security vulnerability affecting the frontend stack. Hub UI: What’s fixed?: Security patch- Upgraded Next.js to 15.5.7 and React to 19.2.1 to reme..." property="og:description"/>
 <meta content="https://docs.giskard.ai/_static/open-graph-image.png" property="og:image"/>
 <meta content="Giskard Documentation" property="og:image:alt"/>
-<meta content="Attacks that attempt to manipulate AI agents through carefully crafted input prompts to override original instructions. Variation &amp; Optimization Attacks: Advanced Prompt Generation Techniques:,..." name="description"/>
-<title>Prompt Injection (OWASP LLM 01) | Giskard  documentation</title>
-<meta content="Prompt Injection (OWASP LLM 01) | Giskard  documentation" property="og:title"/>
-<meta content="Prompt Injection (OWASP LLM 01) | Giskard  documentation" name="twitter:title"/>
-<link href="../../../../_static/pygments.css?v=beddf052" rel="stylesheet" type="text/css"/>
-<link href="../../../../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
-<link href="../../../../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
-<link href="../../../../_static/pygments-dark.css?v=d7994ac5" rel="stylesheet" type="text/css"/>
-<link href="../../../../_static/custom.css?v=902f537d" rel="stylesheet" type="text/css"/>
-<link href="../../../../_static/awesome-sphinx-design.css?v=15e0fffa" rel="stylesheet" type="text/css"/>
-<link href="/hub/ui/scan/vulnerability-categories/prompt-injection.html" rel="canonical"/>
-<link href="../../../../_static/favicon.ico" rel="icon"/>
-<link href="../../../../search.html" rel="search" title="Search"/>
-<link href="../../../../genindex.html" rel="index" title="Index"/>
-<link href="harmful-content-generation.html" rel="next" title="Harmful Content Generation"/>
-<link href="index.html" rel="prev" title="Attack categories"/>
+<meta content="We’re releasing a hotfix that addresses a critical security vulnerability affecting the frontend stack. Hub UI: What’s fixed?: Security patch- Upgraded Next.js to 15.5.7 and React to 19.2.1 to reme..." name="description"/>
+<title>2.1.2 (2025-12-04) | Giskard  documentation</title>
+<meta content="2.1.2 (2025-12-04) | Giskard  documentation" property="og:title"/>
+<meta content="2.1.2 (2025-12-04) | Giskard  documentation" name="twitter:title"/>
+<link href="../../../_static/pygments.css?v=beddf052" rel="stylesheet" type="text/css"/>
+<link href="../../../_static/theme.css?v=42baaae4" rel="stylesheet" type="text/css"/>
+<link href="../../../_static/sphinx-design.min.css?v=95c83b7e" rel="stylesheet" type="text/css"/>
+<link href="../../../_static/pygments-dark.css?v=d7994ac5" rel="stylesheet" type="text/css"/>
+<link href="../../../_static/custom.css?v=902f537d" rel="stylesheet" type="text/css"/>
+<link href="../../../_static/awesome-sphinx-design.css?v=15e0fffa" rel="stylesheet" type="text/css"/>
+<link href="/hub/ui/release_notes/2025-12-04.html" rel="canonical"/>
+<link href="../../../_static/favicon.ico" rel="icon"/>
+<link href="../../../search.html" rel="search" title="Search"/>
+<link href="../../../genindex.html" rel="index" title="Index"/>
+<link href="2025-12-16.html" rel="next" title="2.2.0 (2025-12-16)"/>
+<link href="2025-11-25.html" rel="prev" title="2.1.1 (2025-11-25)"/>
 <script>
     <!-- Prevent Flash of wrong theme -->
       const userPreference = localStorage.getItem('darkMode');
@@ -48,9 +48,9 @@
       Skip to content
     </a><header class="sticky top-0 z-40 w-full border-b shadow-sm border-border supports-backdrop-blur:bg-background/60 bg-background/95 backdrop-blur"><div class="container flex items-center h-14">
 <div class="hidden mr-4 md:flex">
-<a class="flex items-center mr-6" href="../../../../index.html">
-<img alt="Logo" class="mr-2 hidden dark:block" height="24" src="../../../../_static/logo_dark.png" width="24"/>
-<img alt="Logo" class="mr-2 dark:hidden" height="24" src="../../../../_static/logo_light.png" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Giskard  documentation</span>
+<a class="flex items-center mr-6" href="../../../index.html">
+<img alt="Logo" class="mr-2 hidden dark:block" height="24" src="../../../_static/logo_dark.png" width="24"/>
+<img alt="Logo" class="mr-2 dark:hidden" height="24" src="../../../_static/logo_light.png" width="24"/><span class="hidden font-bold sm:inline-block text-clip whitespace-nowrap">Giskard  documentation</span>
 </a><nav class="flex items-center space-x-6 text-sm font-medium">
 <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="/index.html">Overview</a>
 <a class="transition-colors hover:text-foreground/80 text-foreground/60" href="/hub/ui/index.html">Hub UI</a>
@@ -63,7 +63,7 @@
 <span class="sr-only">Toggle navigation menu</span>
 </button>
 <div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
-<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../../../../search.html" class="relative flex items-center group" id="searchbox" method="get">
+<div class="flex-1 w-full md:w-auto md:flex-none"><form @keydown.k.window.meta="$refs.search.focus()" action="../../../search.html" class="relative flex items-center group" id="searchbox" method="get">
 <input aria-label="Search the docs" class="inline-flex items-center font-medium transition-colors bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background border border-input hover:bg-accent focus:bg-accent hover:text-accent-foreground focus:text-accent-foreground hover:placeholder-accent-foreground py-2 px-4 relative h-9 w-full justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64" id="search-input" name="q" placeholder="Search ..." type="search" x-ref="search"/>
 <kbd class="pointer-events-none absolute right-1.5 top-2 hidden h-5 select-none text-muted-foreground items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex group-hover:bg-accent group-hover:text-accent-foreground">
 <span class="text-xs">⌘</span>
@@ -85,9 +85,9 @@
 </div>
 </header>
 <div class="flex-1"><div class="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10"><aside :aria-hidden="!showSidebar" :class="{ 'translate-x-0': showSidebar }" class="fixed inset-y-0 left-0 md:top-14 z-50 md:z-30 bg-background md:bg-transparent transition-all duration-100 -translate-x-full md:translate-x-0 ml-0 p-6 md:p-0 md:-ml-2 md:h-[calc(100vh-3.5rem)] w-5/6 md:w-full shrink-0 overflow-y-auto border-r border-border md:sticky" id="left-sidebar">
-<a class="!justify-start text-sm md:!hidden bg-background" href="../../../../index.html">
-<img alt="Logo" class="mr-2 hidden dark:block" height="16" src="../../../../_static/logo_dark.png" width="16"/>
-<img alt="Logo" class="mr-2 dark:hidden" height="16" src="../../../../_static/logo_light.png" width="16"/><span class="font-bold text-clip whitespace-nowrap">Giskard  documentation</span>
+<a class="!justify-start text-sm md:!hidden bg-background" href="../../../index.html">
+<img alt="Logo" class="mr-2 hidden dark:block" height="16" src="../../../_static/logo_dark.png" width="16"/>
+<img alt="Logo" class="mr-2 dark:hidden" height="16" src="../../../_static/logo_light.png" width="16"/><span class="font-bold text-clip whitespace-nowrap">Giskard  documentation</span>
 </a>
 <div class="relative overflow-hidden md:overflow-auto my-4 md:my-0 h-[calc(100vh-8rem)] md:h-auto">
 <div class="overflow-y-auto h-full w-full relative pr-6"><nav class="table w-full min-w-full my-6 lg:my-8">
@@ -185,154 +185,51 @@
 <main class="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
 <div class="w-full min-w-0 mx-auto">
 <nav aria-label="breadcrumbs" class="flex items-center mb-4 space-x-1 text-sm text-muted-foreground">
-<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../../../../index.html">
+<a class="overflow-hidden text-ellipsis whitespace-nowrap hover:text-foreground" href="../../../index.html">
 <span class="hidden md:inline">Giskard  documentation</span>
 <svg aria-label="Home" class="md:hidden" fill="currentColor" height="18" stroke="none" viewbox="0 96 960 960" width="18" xmlns="http://www.w3.org/2000/svg">
 <path d="M240 856h120V616h240v240h120V496L480 316 240 496v360Zm-80 80V456l320-240 320 240v480H520V696h-80v240H160Zm320-350Z"></path>
 </svg>
 </a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="../index.html">Launch vulnerability scans</a>
-<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="index.html">Attack categories</a>
-<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">Prompt Injection (OWASP LLM 01)</span>
+<div class="mr-1">/</div><a class="hover:text-foreground overflow-hidden text-ellipsis whitespace-nowrap" href="index.html">Release notes</a>
+<div class="mr-1">/</div><span aria-current="page" class="font-medium text-foreground overflow-hidden text-ellipsis whitespace-nowrap">2.1.2 (2025-12-04)</span>
 </nav>
 <div id="content" role="main">
-<section id="prompt-injection-owasp-llm-01">
-<h1>Prompt Injection (OWASP LLM 01)<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#prompt-injection-owasp-llm-01"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h1>
-<p>Attacks that attempt to manipulate AI agents through carefully crafted input prompts to override original instructions.</p>
-<section id="variation-optimization-attacks">
-<h2>Variation &amp; Optimization Attacks<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#variation-optimization-attacks" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#variation-optimization-attacks'"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h2>
-<table class="docutils align-default" id="id1">
-<caption><span class="caption-text">Advanced Prompt Generation Techniques</span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#id1"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></caption>
-<colgroup>
-<col style="width: 25.0%"/>
-<col style="width: 75.0%"/>
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Probe Name</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Best-of-N</p></td>
-<td><p>This probe implements the Best-of-N attack strategy, which generates multiple diverse variations of adversarial prompts using methods such as word scrambling, random capitalization, and other obfuscation techniques to maximize the chance of bypassing prompt injection defenses. For more details, see: <a class="reference external" href="https://arxiv.org/pdf/2412.03556" rel="nofollow noopener">https://arxiv.org/pdf/2412.03556<svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>TAP</p></td>
-<td><p>This probe implements the Tree of Attacks with Pruning (TAP) method, an automated approach for jailbreaking black-box large language models by systematically generating and refining adversarial prompts through iterative tree search. For more details, see: <a class="reference external" href="https://arxiv.org/pdf/2312.02119" rel="nofollow noopener">https://arxiv.org/pdf/2312.02119<svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p></td>
-</tr>
-</tbody>
-</table>
+<section id="id1">
+<h1>2.1.2 (2025-12-04)<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#id1"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h1>
+<p>We’re releasing a hotfix that addresses a critical security vulnerability affecting the frontend stack.</p>
+<section id="hub-ui">
+<h2>Hub UI<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#hub-ui" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#hub-ui'"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h2>
+<section id="what-s-fixed">
+<h3>What’s fixed?<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#what-s-fixed" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#what-s-fixed'"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h3>
+<ul>
+<li><p><strong>Security patch</strong> - Upgraded Next.js to 15.5.7 and React to 19.2.1 to remediate CVE-2025-55182.</p>
+<p>References:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://nvd.nist.gov/vuln/detail/CVE-2025-55182" rel="nofollow noopener">NVD CVE-2025-55182<svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p></li>
+<li><p><a class="reference external" href="https://nextjs.org/blog/CVE-2025-66478" rel="nofollow noopener">Next.js CVE-2025-66478<svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p></li>
+</ul>
+</li>
+</ul>
 </section>
-<section id="framing-based-attacks">
-<h2>Framing-Based Attacks<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#framing-based-attacks" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#framing-based-attacks'"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h2>
-<table class="docutils align-default" id="id2">
-<caption><span class="caption-text">Context Manipulation Techniques</span><a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#id2"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></caption>
-<colgroup>
-<col style="width: 25.0%"/>
-<col style="width: 75.0%"/>
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Probe Name</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Math Framing Injection</p></td>
-<td><p>This probe tests whether an AI agent can be tricked by framing harmful requests as mathematical reasoning problems, equations, or academic exercises to bypass safety measures and content filters</p></td>
-</tr>
-<tr class="row-odd"><td><p>Likert Framing Injection</p></td>
-<td><p>This probe tests whether an AI agent can be tricked by framing harmful requests as academic research questions and using Likert scales or survey methodologies to answer. For more information, see: <a class="reference external" href="https://unit42.paloaltonetworks.com/multi-turn-technique-jailbreaks" rel="nofollow noopener">https://unit42.paloaltonetworks.com/multi-turn-technique-jailbreaks<svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p></td>
-</tr>
-<tr class="row-even"><td><p>Citation Framing Injection</p></td>
-<td><p>This probe tests whether an AI agent can be manipulated by framing harmful requests as academic citations, research references, or scholarly content to bypass safety mechanisms. For more information, see: <a class="reference external" href="https://arxiv.org/pdf/2411.11407" rel="nofollow noopener">https://arxiv.org/pdf/2411.11407<svg fill="currentColor" height="1em" stroke="none" viewbox="0 96 960 960" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M188 868q-11-11-11-28t11-28l436-436H400q-17 0-28.5-11.5T360 336q0-17 11.5-28.5T400 296h320q17 0 28.5 11.5T760 336v320q0 17-11.5 28.5T720 696q-17 0-28.5-11.5T680 656V432L244 868q-11 11-28 11t-28-11Z"></path></svg></a></p></td>
-</tr>
-<tr class="row-odd"><td><p>Grandma Framing Injection</p></td>
-<td><p>This probe tests whether an AI agent can be manipulated through emotional framing that involves a grandmother scenario, where harmful requests are disguised as innocent family interactions or memories</p></td>
-</tr>
-</tbody>
-</table>
 </section>
-<section id="classic-jailbreak-techniques">
-<h2>Classic Jailbreak Techniques<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#classic-jailbreak-techniques" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#classic-jailbreak-techniques'"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h2>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 25.0%"/>
-<col style="width: 75.0%"/>
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Probe Name</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>DAN</p></td>
-<td><p>This probe tests the target’s resistance to DAN-style jailbreak attempts that try to override the AI’s safety guidelines. DAN prompts typically instruct the AI to ignore its restrictions and act as an unrestricted assistant that can “do anything now”. The probe uses a curated dataset of DAN prompts and variations to evaluate whether the target can be manipulated into bypassing its safety mechanisms and producing harmful or inappropriate content through role-playing scenarios</p></td>
-</tr>
-<tr class="row-odd"><td><p>Deepset Injection</p></td>
-<td><p>This probe tests the target using samples from the Deepset prompt injection dataset to evaluate vulnerability to various prompt injection techniques and manipulation strategies</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="template-based-attacks">
-<h2>Template-Based Attacks<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#template-based-attacks" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#template-based-attacks'"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h2>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 25.0%"/>
-<col style="width: 75.0%"/>
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Probe Name</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>ChatInject</p></td>
-<td><p>This probe tests whether agents can be manipulated through malicious instructions formatted to match their native chat templates. Unlike traditional plain-text injection attacks, ChatInject exploits the structured role-based formatting (system, user, assistant tags) that agents use internally. By wrapping attack payloads with forged chat template tokens, mimicking the model’s own instruction hierarchy, attackers can bypass defenses that rely on role priority. The probe includes a multi-turn variant that sends persuasive conversation, delimited with adequate separation tokens, inside one message to confuse the agent under test. This technique achieves significantly higher success rates than standard injection methods and transfers effectively across models, even when the target model’s exact template structure is unknown.</p></td>
-</tr>
-<tr class="row-odd"><td><p>CoT Forgery</p></td>
-<td><p>This probe implements the Chain-of-Thought (CoT) forgery attack strategy, which appends realistic and compliant reasoning traces to harmful requests that mimic the format and tone of legitimate reasoning steps, causing the model to continue the compliant reasoning pattern and answer requests it should refuse.</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="encoding-character-manipulation">
-<h2>Encoding &amp; Character Manipulation<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#encoding-character-manipulation" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#encoding-character-manipulation'"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h2>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 25.0%"/>
-<col style="width: 75.0%"/>
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>Probe Name</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>ASCII Smuggling Injection</p></td>
-<td><p>This probe tests whether an AI agent can be tricked by injecting invisible ASCII characters. These characters, while invisible for the user, can be interpreted by the AI agent. This is a way to inject malicious instructions inside seemingly harmless prompts.</p></td>
-</tr>
-<tr class="row-odd"><td><p>Encoding</p></td>
-<td><p>This probe tests whether an agent can be tricked into generating harmful content when prompts are encoded (e.g., base64, NATO, etc.) to bypass content filters</p></td>
-</tr>
-<tr class="row-even"><td><p>Transliteration</p></td>
-<td><p>This probe tests whether an AI agent can be tricked into generating harmful content when prompts are transliterated (converted to different character sets or writing systems) to bypass content filters and detection mechanisms</p></td>
-</tr>
-</tbody>
-</table>
+<section id="hub-sdk">
+<h2>Hub SDK<a @click.prevent="window.navigator.clipboard.writeText($el.href); $el.setAttribute('data-tooltip', 'Copied!'); setTimeout(() =&gt; $el.setAttribute('data-tooltip', 'Copy link to this element'), 2000)" aria-label="Copy link to this element" class="headerlink" data-tooltip="Copy link to this element" href="#hub-sdk" x-intersect.margin.0%.0%.-70%.0%="activeSection = '#hub-sdk'"><svg height="1em" viewbox="0 0 24 24" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path></svg></a></h2>
+<p>No changes yet.</p>
 </section>
 </section>
 </div><div class="flex justify-between items-center pt-6 mt-12 border-t border-border gap-4">
 <div class="mr-auto">
-<a class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input hover:bg-accent hover:text-accent-foreground py-2 px-4" href="index.html">
+<a class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input hover:bg-accent hover:text-accent-foreground py-2 px-4" href="2025-11-25.html">
 <svg class="mr-2 h-4 w-4" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 <polyline points="15 18 9 12 15 6"></polyline>
 </svg>
-        Attack categories
+        2.1.1 (2025-11-25)
       </a>
 </div>
 <div class="ml-auto">
-<a class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input hover:bg-accent hover:text-accent-foreground py-2 px-4" href="harmful-content-generation.html">
-        Harmful Content Generation
+<a class="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors border border-input hover:bg-accent hover:text-accent-foreground py-2 px-4" href="2025-12-16.html">
+        2.2.0 (2025-12-16)
         <svg class="ml-2 h-4 w-4" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
 <polyline points="9 18 15 12 9 6"></polyline>
 </svg>
@@ -341,11 +238,11 @@
 </div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
 <div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
 <ul>
-<li><a :data-current="activeSection === '#variation-optimization-attacks'" class="reference internal" href="#variation-optimization-attacks">Variation &amp; Optimization Attacks</a></li>
-<li><a :data-current="activeSection === '#framing-based-attacks'" class="reference internal" href="#framing-based-attacks">Framing-Based Attacks</a></li>
-<li><a :data-current="activeSection === '#classic-jailbreak-techniques'" class="reference internal" href="#classic-jailbreak-techniques">Classic Jailbreak Techniques</a></li>
-<li><a :data-current="activeSection === '#template-based-attacks'" class="reference internal" href="#template-based-attacks">Template-Based Attacks</a></li>
-<li><a :data-current="activeSection === '#encoding-character-manipulation'" class="reference internal" href="#encoding-character-manipulation">Encoding &amp; Character Manipulation</a></li>
+<li><a :data-current="activeSection === '#hub-ui'" class="reference internal" href="#hub-ui">Hub UI</a><ul>
+<li><a :data-current="activeSection === '#what-s-fixed'" class="reference internal" href="#what-s-fixed">What’s fixed?</a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#hub-sdk'" class="reference internal" href="#hub-sdk">Hub SDK</a></li>
 </ul>
 </div>
 </aside>
@@ -364,13 +261,13 @@
 </svg>
   Back to top
 </button>
-<script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
-<script src="../../../../_static/doctools.js?v=9bcbadda"></script>
-<script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-<script defer="defer" src="../../../../_static/theme.js?v=073f68d9"></script>
-<script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+<script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+<script src="../../../_static/doctools.js?v=9bcbadda"></script>
+<script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script defer="defer" src="../../../_static/theme.js?v=073f68d9"></script>
+<script src="../../../_static/design-tabs.js?v=f930bc37"></script>
 <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
-<script src="../../../../_static/custom.js?v=fb797fca"></script>
+<script src="../../../_static/custom.js?v=fb797fca"></script>
 </body>
 </html>

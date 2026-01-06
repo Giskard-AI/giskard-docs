@@ -1,0 +1,23 @@
+2.1.2 (2025-12-04)
+==================
+
+We're releasing a hotfix that addresses a critical security vulnerability affecting the frontend stack.
+
+Hub UI
+------
+
+What's fixed?
+~~~~~~~~~~~~~
+
+- **Security patch** - Upgraded Next.js to 15.5.7 and React to 19.2.1 to remediate CVE-2025-55182.
+
+  References:
+  
+  * `NVD CVE-2025-55182 <https://nvd.nist.gov/vuln/detail/CVE-2025-55182>`_
+  * `Next.js CVE-2025-66478 <https://nextjs.org/blog/CVE-2025-66478>`_
+
+Hub SDK
+-------
+
+No changes yet.
+
