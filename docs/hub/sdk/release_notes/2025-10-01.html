@@ -95,8 +95,9 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="/hub/sdk/index.html">Quickstart &amp; setup</a></li>
 <li class="toctree-l1" x-data="{ expanded: false }">
-<a :class="{ 'expanded' : expanded }" class="reference internal expandable" href="/hub/sdk/setup/index.html">Setup projects, agents and knowledge bases<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a>
+<a :class="{ 'expanded' : expanded }" class="reference internal expandable" href="/hub/sdk/setup/index.html">Setup API keys, projects, agents and knowledge bases<button @click.prevent.stop="expanded = !expanded" type="button"><span class="sr-only"></span><svg fill="currentColor" height="18px" stroke="none" viewbox="0 0 24 24" width="18px" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg></button></a>
 <ul x-show="expanded">
+<li class="toctree-l2"><a class="reference internal" href="/hub/sdk/setup/keys.html">Find API keys and resource IDs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="/hub/sdk/setup/projects.html">Setup projects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="/hub/sdk/setup/agents.html">Setup agents</a></li>
 <li class="toctree-l2"><a class="reference internal" href="/hub/sdk/setup/knowledge_bases.html">Setup knowledge bases</a></li>
