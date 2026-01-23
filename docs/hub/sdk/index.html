@@ -306,12 +306,13 @@ API Reference</div>
 </span><span id="line-7"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">projects</span><span class="p">)</span><span class="si">}</span><span class="s2"> projects"</span><span class="p">)</span>
 </span><span id="line-8">
 </span><span id="line-9"><span class="c1"># Get a specific project</span>
-</span><span id="line-10"><span class="n">project</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">projects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"project-id"</span><span class="p">)</span>
-</span><span id="line-11"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Project: </span><span class="si">{</span><span class="n">project</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-12">
-</span><span id="line-13"><span class="c1"># List all datasets in the project</span>
-</span><span id="line-14"><span class="n">datasets</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-</span><span id="line-15"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> datasets"</span><span class="p">)</span>
+</span><span id="line-10"><span class="n">project_id</span> <span class="o">=</span> <span class="n">projects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+</span><span id="line-11"><span class="n">project</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">projects</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+</span><span id="line-12"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Project: </span><span class="si">{</span><span class="n">project</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</span><span id="line-13">
+</span><span id="line-14"><span class="c1"># List all datasets in the project</span>
+</span><span id="line-15"><span class="n">datasets</span> <span class="o">=</span> <span class="n">hub</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+</span><span id="line-16"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span><span class="si">}</span><span class="s2"> datasets"</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 <section id="create-a-project">
