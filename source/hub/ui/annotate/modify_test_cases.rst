@@ -14,12 +14,12 @@ This section guides you through the product owner workflow for modifying test ca
 .. tip::
 
    **💡 When to modify test cases**
-   
+
    * Review feedback indicates that test cases need adjustment (see :doc:`/hub/ui/annotate/review_test_results`)
    * Test cases are not accurately representing the intended scenarios
    * Checks need to be adjusted to better match evaluation criteria
    * Test cases need to be organized with tags and descriptions
-   
+
    This workflow is typically triggered after a business user reviews test results and identifies issues that need modification.
 
 Modify test cases
@@ -133,14 +133,14 @@ It is important to understand any changes you make to the checks and how they wi
 Enable/Disable checks
 ---------------------
 
-You can enable multiple checks on a single test case to evaluate different aspects of the agent's response. 
+You can enable multiple checks on a single test case to evaluate different aspects of the agent's response.
 
 Disabling a check removes it from the evaluation for that specific test case, but the check definition remains available for use on other test cases.
 
 Modify check requirements
 --------------------------
 
-You can adjust the parameters of most built-in checks (like context or reference answer) specifically for the current test case by editing them directly within the test case view. These changes only impact the selected test case. 
+You can adjust the parameters of most built-in checks (like context or reference answer) specifically for the current test case by editing them directly within the test case view. These changes only impact the selected test case.
 
 If you want to change the requirements of a custom check (such as its overall rules or similarity threshold), you must edit the custom check itself from the Checks page. Modifying a custom check will affect all test cases using that check. For major or experimental changes, it's recommended to create a new custom check instead—then enable it only on the test cases where you want the new behavior.
 
@@ -154,7 +154,7 @@ Validate the check
 After modifying a check, you should validate it to ensure it works correctly.
 
 Rerunning the agent answer
-________________________
+__________________________
 
 To validate that your check modifications work correctly:
 
@@ -204,4 +204,3 @@ Now that you understand how to modify test cases, you can:
 * **Distribute tasks** - Learn how tasks are created and managed :doc:`/hub/ui/annotate/task_management`
 * **Learn about checks** - Get detailed information about check types :doc:`/hub/ui/annotate/overview`
 * **Learn about tags** - Understand how to organize with tags :doc:`/hub/ui/annotate/overview`
-
