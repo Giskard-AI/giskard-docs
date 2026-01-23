@@ -106,11 +106,12 @@ Running your first evaluation
     print(f"Found {len(projects)} projects")
 
     # Get a specific project
-    project = hub.projects.get("project-id")
+    project_id = projects[0].id
+    project = hub.projects.retrieve(project_id)
     print(f"Project: {project.name}")
 
     # List all datasets in the project
-    datasets = hub.datasets.list(project.id)
+    datasets = hub.datasets.list(project_id)
     print(f"Found {len(datasets)} datasets")
 
 
