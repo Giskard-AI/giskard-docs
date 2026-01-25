@@ -31,13 +31,12 @@ pre-commit-install: ## Setup pre-commit hooks
 .PHONY: pre-commit-install
 
 generate-probe-docs: ## Generate probe documentation from lidar
-	rm -rf .venv-probe-docs
 	uv venv .venv-probe-docs
 	uv pip install --python .venv-probe-docs/bin/python "git+https://github.com/Giskard-AI/lidar@$(LIDAR_RELEASE)"
 	.venv-probe-docs/bin/python scripts/generate_probe_docs.py
 .PHONY: generate-probe-docs
 
-dev: install ## Start development server
+dev: ## Start development server
 	uv run sphinx-autobuild source build --ignore "source/_templates/sidebars/**"
 .PHONY: dev
 

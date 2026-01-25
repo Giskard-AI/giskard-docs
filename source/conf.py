@@ -33,6 +33,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from toctree_utils import generate_sidebar_html, parse_toctree_file
 
+
 # Generate sidebar templates dynamically
 def update_sidebar_templates():
     """
