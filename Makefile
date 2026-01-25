@@ -31,7 +31,7 @@ pre-commit-install: ## Setup pre-commit hooks
 .PHONY: pre-commit-install
 
 generate-probe-docs: ## Generate probe documentation from lidar
-	uv venv .venv-probe-docs
+	uv venv .venv-probe-docs --clear 0
 	uv pip install --python .venv-probe-docs/bin/python "git+https://github.com/Giskard-AI/lidar@$(LIDAR_RELEASE)"
 	.venv-probe-docs/bin/python scripts/generate_probe_docs.py
 .PHONY: generate-probe-docs
