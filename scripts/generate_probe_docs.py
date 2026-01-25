@@ -197,24 +197,10 @@ def get_probe_info(probe_class: type) -> dict[str, Any]:
         raise  # Re-raise to fail the build if probes are invalid
 
 
-def discover_all_threat_types(probes: list[dict]) -> set[str]:
-    """Discover all unique threat types from probes."""
-    threat_types = set()
-    for probe in probes:
-        if probe is None:
-            continue
-        threat_type = probe.get("threat_type")
-        if threat_type:
-            threat_types.add(threat_type)
-    return threat_types
-
-
 def group_probes_by_category(probes: list[dict]) -> dict[str, list[dict]]:
     """Group probes by threat type category."""
     grouped: dict[str, list[dict]] = {}
     for probe in probes:
-        if probe is None:
-            continue
         threat_type = probe.get("threat_type")
         if threat_type:
             if threat_type not in grouped:
@@ -253,6 +239,7 @@ def generate_rst_content(category: str, probes: list[dict], probe_infos: list[di
 
     lines = [
         f":og:title: Giskard Hub UI - {title} Vulnerabilities",
+        "",
         f":og:description: Comprehensive guide to {title.lower()} vulnerabilities in AI systems.",
         "",
         display_title,
@@ -519,6 +506,7 @@ def update_index_file(
 
     # Generate the complete index content
     content = f""":og:title: Giskard Hub UI - AI Vulnerability Categories and Attack Patterns
+
 :og:description: Comprehensive guide to AI security vulnerabilities and attack patterns tested by Giskard's vulnerability scan. Understand OWASP LLM Top 10 risks, mitigation strategies, and security testing approaches.
 
 
@@ -546,14 +534,14 @@ At Giskard, we use probes to stress-test AI systems and uncover vulnerabilities 
 
 Below you'll find the full catalog of probes, organized by vulnerability category. Each category includes a short explanation and detailed information about the corresponding probes.
 
-{chr(10).join(grid_items)}
+{"\n".join(grid_items)}
 
 .. toctree::
    :maxdepth: 2
    :caption: Vulnerability Categories
    :hidden:
 
-{chr(10).join(toctree_items)}
+{"\n".join(toctree_items)}
 """
 
     index_file.write_text(content, encoding="utf-8")
