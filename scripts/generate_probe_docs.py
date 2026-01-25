@@ -21,7 +21,7 @@ THREAT_TYPE_MAPPINGS: dict[str, str] = {
 
 PROBE_TYPE_MAPPINGS: dict[str, str] = {
     "agentic": "Uses autonomous agents to explore and test vulnerabilities through multi-step interactions",
-    "multi-turn": "Uses multiple makeconversation turns to gradually escalate attacks or extract information",
+    "multi-turn": "Uses multiple conversation turns to gradually escalate attacks or extract information",
 }
 
 OWASP_LLM_MAPPINGS: dict[str, str] = {
@@ -84,9 +84,9 @@ def extract_owasp_tags(tags: list[str]) -> list[str]:
     for tag in tags:
         if tag.startswith("owasp:llm-top-10"):
             # Extract OWASP tags
-            match_2025 = re.search(r"owasp:llm-top-10-2025='([^']+)'", tag)
-            if match_2025:
-                owasp_tags.append(match_2025.group(1))
+            match = re.search(r"owasp:llm-top-10-\d{4}='([^']+)'", tag)
+            if match:
+                owasp_tags.append(match.group(1))
     return owasp_tags
 
 
