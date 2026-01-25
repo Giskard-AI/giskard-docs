@@ -7,7 +7,7 @@ SPHINXOPTS    ?=
 SPHINXBUILD   ?= uv run sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build
-LIDAR_RELEASE = v0.2.3
+LIDAR_RELEASE = main
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -37,11 +37,11 @@ generate-probe-docs: ## Generate probe documentation from lidar
 	.venv-probe-docs/bin/python scripts/generate_probe_docs.py
 .PHONY: generate-probe-docs
 
-dev: install generate-probe-docs ## Start development server
+dev: install ## Start development server
 	uv run sphinx-autobuild source build --ignore "source/_templates/sidebars/**"
 .PHONY: dev
 
-doc: install generate-probe-docs clean html ## Build the doc
+doc: install clean html ## Build the doc
 	rm -rf ./docs && mkdir -p ./docs && touch ./docs/.nojekyll && mv ./build/html/* ./docs
 	echo docs.giskard.ai > ./docs/CNAME
 .PHONY: doc
