@@ -21,35 +21,37 @@ Basic Multi-Turn Flow
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, StringMatchingCheck
+   from giskard.checks import scenario, StringMatchingCheck
 
-   scenario = Scenario(
-       name="greeting_conversation",
-       sequence=[
-           # First interaction
-           InteractionSpec(
-               inputs="Hello",
-               outputs=lambda inputs: "Hi! How can I help you?"
-           ),
+   test_scenario = (
+       scenario("greeting_conversation")
+       # First interaction
+       .interact(
+           inputs="Hello",
+           outputs=lambda inputs: "Hi! How can I help you?"
+       )
+       .check(
            StringMatchingCheck(
                name="polite_greeting",
                content="help",
                key="interactions[-1].outputs"
-           ),
-           # Second interaction
-           InteractionSpec(
-               inputs="What's the weather?",
-               outputs=lambda inputs: "It's sunny and 72°F."
-           ),
+           )
+       )
+       # Second interaction
+       .interact(
+           inputs="What's the weather?",
+           outputs=lambda inputs: "It's sunny and 72°F."
+       )
+       .check(
            StringMatchingCheck(
                name="provides_weather",
                content="sunny",
                key="interactions[-1].outputs"
-           ),
-       ]
+           )
+       )
    )
 
-   result = await scenario.run()
+   result = await test_scenario.run()
    print(f"Scenario passed: {result.passed}")
 
 **Key Points:**
@@ -67,15 +69,15 @@ Test systems that maintain conversation state:
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, from_fn, Trace
+   from giskard.checks import scenario, from_fn
 
    class Chatbot:
        def __init__(self):
            self.conversation_history = []
-       
+
        def chat(self, message: str) -> str:
            self.conversation_history.append({"role": "user", "content": message})
-           
+
            # Your chatbot logic
            if "my name is" in message.lower():
                name = message.split("my name is")[-1].strip()
@@ -91,37 +93,39 @@ Test systems that maintain conversation state:
                    response = "I don't recall your name."
            else:
                response = "I understand."
-           
+
            self.conversation_history.append({"role": "assistant", "content": response})
            return response
 
    bot = Chatbot()
 
-   scenario = Scenario(
-       name="name_memory",
-       sequence=[
-           InteractionSpec(
-               inputs="Hello, my name is Alice",
-               outputs=lambda inputs: bot.chat(inputs)
-           ),
+   test_scenario = (
+       scenario("name_memory")
+       .interact(
+           inputs="Hello, my name is Alice",
+           outputs=lambda inputs: bot.chat(inputs)
+       )
+       .check(
            from_fn(
                lambda trace: "Alice" in trace.interactions[-1].outputs,
                name="acknowledges_name"
-           ),
-           InteractionSpec(
-               inputs="What is my name?",
-               outputs=lambda inputs: bot.chat(inputs)
-           ),
+           )
+       )
+       .interact(
+           inputs="What is my name?",
+           outputs=lambda inputs: bot.chat(inputs)
+       )
+       .check(
            from_fn(
                lambda trace: "Alice" in trace.interactions[-1].outputs,
                name="remembers_name",
                success_message="Correctly recalled the name",
                failure_message="Failed to recall the name"
-           ),
-       ]
+           )
+       )
    )
 
-   result = await scenario.run()
+   result = await test_scenario.run()
 
 
 Testing Agent Workflows
@@ -133,8 +137,7 @@ Test multi-step agent workflows with tool usage:
 
    from giskard.agents.generators import Generator
    from giskard.checks import (
-       Scenario,
-       InteractionSpec,
+       scenario,
        LLMJudge,
        from_fn,
        set_default_generator
@@ -145,7 +148,7 @@ Test multi-step agent workflows with tool usage:
    class Agent:
        def __init__(self):
            self.available_tools = ["search", "calculator", "database"]
-       
+
        def run(self, task: str) -> dict:
            # Your agent logic
            return {
@@ -158,47 +161,51 @@ Test multi-step agent workflows with tool usage:
 
    agent = Agent()
 
-   scenario = Scenario(
-       name="agent_workflow",
-       sequence=[
-           # Agent receives task
-           InteractionSpec(
-               inputs="Find me a Python tutorial",
-               outputs=lambda inputs: agent.run(inputs)
-           ),
-           # Check that agent chose appropriate tool
+   test_scenario = (
+       scenario("agent_workflow")
+       # Agent receives task
+       .interact(
+           inputs="Find me a Python tutorial",
+           outputs=lambda inputs: agent.run(inputs)
+       )
+       # Check that agent chose appropriate tool
+       .check(
            from_fn(
                lambda trace: trace.interactions[-1].outputs["action"] == "search",
                name="correct_tool_choice",
                success_message="Agent selected search tool",
                failure_message="Agent selected wrong tool"
-           ),
-           # Validate reasoning
+           )
+       )
+       # Validate reasoning
+       .check(
            LLMJudge(
                name="reasoning_quality",
                prompt="""
                Evaluate the agent's reasoning.
-               
+
                Task: {{ interactions[0].inputs }}
                Thought: {{ interactions[0].outputs.thought }}
                Action: {{ interactions[0].outputs.action }}
-               
+
                Return 'passed: true' if the reasoning is logical and appropriate.
                """
-           ),
-           # Check final answer quality
+           )
+       )
+       # Check final answer quality
+       .check(
            LLMJudge(
                name="answer_quality",
                prompt="""
                Evaluate if the final answer addresses the original task.
-               
+
                Task: {{ interactions[0].inputs }}
                Answer: {{ interactions[0].outputs.final_answer }}
-               
+
                Return 'passed: true' if the answer is helpful and relevant.
                """
-           ),
-       ]
+           )
+       )
    )
 
 
@@ -209,36 +216,33 @@ Generate interactions dynamically based on previous outputs:
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, from_fn, Trace
+   from giskard.checks import scenario, from_fn, Trace
 
    def chatbot(message: str, context: list = None) -> dict:
        # Your chatbot that tracks context
        return {"response": "...", "context": context or []}
-
-   # First interaction with static inputs
-   first_interaction = InteractionSpec(
-       inputs="What's the capital of France?",
-       outputs=lambda inputs: chatbot(inputs)
-   )
 
    # Second interaction depends on first response
    async def generate_followup(trace: Trace):
        first_response = trace.interactions[-1].outputs["response"]
        return f"Tell me more about {first_response}"
 
-   followup_interaction = InteractionSpec(
-       inputs=generate_followup,
-       outputs=lambda inputs: chatbot(inputs)
-   )
-
-   scenario = Scenario(
-       name="dynamic_conversation",
-       sequence=[
-           first_interaction,
-           from_fn(lambda trace: len(trace.interactions) == 1, name="first_complete"),
-           followup_interaction,
-           from_fn(lambda trace: len(trace.interactions) == 2, name="second_complete"),
-       ]
+   test_scenario = (
+       scenario("dynamic_conversation")
+       .interact(
+           inputs="What's the capital of France?",
+           outputs=lambda inputs: chatbot(inputs)
+       )
+       .check(
+           from_fn(lambda trace: len(trace.interactions) == 1, name="first_complete")
+       )
+       .interact(
+           inputs=generate_followup,
+           outputs=lambda inputs: chatbot(inputs)
+       )
+       .check(
+           from_fn(lambda trace: len(trace.interactions) == 2, name="second_complete")
+       )
    )
 
 
@@ -249,7 +253,7 @@ Verify that systems handle errors gracefully across turns:
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, from_fn, LLMJudge
+   from giskard.checks import scenario, from_fn, LLMJudge
 
    class RobustChatbot:
        def chat(self, message: str) -> dict:
@@ -262,34 +266,38 @@ Verify that systems handle errors gracefully across turns:
 
    bot = RobustChatbot()
 
-   scenario = Scenario(
-       name="error_recovery",
-       sequence=[
-           # Send invalid input
-           InteractionSpec(
-               inputs="",
-               outputs=lambda inputs: bot.chat(inputs)
-           ),
+   test_scenario = (
+       scenario("error_recovery")
+       # Send invalid input
+       .interact(
+           inputs="",
+           outputs=lambda inputs: bot.chat(inputs)
+       )
+       .check(
            from_fn(
                lambda trace: "error" in trace.interactions[-1].outputs,
                name="detects_error"
-           ),
+           )
+       )
+       .check(
            from_fn(
                lambda trace: trace.interactions[-1].outputs["response"],
                name="provides_feedback",
                success_message="Bot provided error feedback"
-           ),
-           # Send valid follow-up
-           InteractionSpec(
-               inputs="Hello",
-               outputs=lambda inputs: bot.chat(inputs)
-           ),
+           )
+       )
+       # Send valid follow-up
+       .interact(
+           inputs="Hello",
+           outputs=lambda inputs: bot.chat(inputs)
+       )
+       .check(
            from_fn(
                lambda trace: "error" not in trace.interactions[-1].outputs,
                name="recovers_from_error",
                success_message="System recovered successfully"
-           ),
-       ]
+           )
+       )
    )
 
 
@@ -300,64 +308,64 @@ Test RAG systems with follow-up questions and context references:
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, Groundedness, from_fn
+   from giskard.checks import scenario, Groundedness, from_fn
 
    class ConversationalRAG:
        def __init__(self):
            self.conversation_history = []
-       
+
        def answer(self, question: str) -> dict:
            # Retrieve context considering conversation history
            context = self.retrieve(question, self.conversation_history)
            answer = self.generate(question, context, self.conversation_history)
-           
+
            self.conversation_history.append({
                "question": question,
                "answer": answer,
                "context": context
            })
-           
+
            return {"answer": answer, "context": context}
-       
+
        def retrieve(self, question, history):
            # Your retrieval logic
            return ["context chunk 1", "context chunk 2"]
-       
+
        def generate(self, question, context, history):
            # Your generation logic
            return "Answer based on context..."
 
    rag = ConversationalRAG()
 
-   scenario = Scenario(
-       name="conversational_rag",
-       sequence=[
-           # Initial question
-           InteractionSpec(
-               inputs="What is machine learning?",
-               outputs=lambda inputs: rag.answer(inputs)
-           ),
-           Groundedness(name="first_answer_grounded"),
-           
-           # Follow-up with pronoun reference
-           InteractionSpec(
-               inputs="What are its main applications?",
-               outputs=lambda inputs: rag.answer(inputs)
-           ),
-           Groundedness(name="followup_grounded"),
+   test_scenario = (
+       scenario("conversational_rag")
+       # Initial question
+       .interact(
+           inputs="What is machine learning?",
+           outputs=lambda inputs: rag.answer(inputs)
+       )
+       .check(Groundedness(name="first_answer_grounded"))
+
+       # Follow-up with pronoun reference
+       .interact(
+           inputs="What are its main applications?",
+           outputs=lambda inputs: rag.answer(inputs)
+       )
+       .check(Groundedness(name="followup_grounded"))
+       .check(
            from_fn(
                lambda trace: len(trace.interactions) == 2,
                name="maintains_context",
                success_message="System handled follow-up correctly"
-           ),
-           
-           # Another follow-up
-           InteractionSpec(
-               inputs="Can you explain the first one in detail?",
-               outputs=lambda inputs: rag.answer(inputs)
-           ),
-           Groundedness(name="second_followup_grounded"),
-       ]
+           )
+       )
+
+       # Another follow-up
+       .interact(
+           inputs="Can you explain the first one in detail?",
+           outputs=lambda inputs: rag.answer(inputs)
+       )
+       .check(Groundedness(name="second_followup_grounded"))
    )
 
 
@@ -368,13 +376,13 @@ Test that multi-step tasks are completed successfully:
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, from_fn, LLMJudge
+   from giskard.checks import scenario, from_fn, LLMJudge
 
    class TaskAgent:
        def __init__(self):
            self.tasks = []
            self.completed = []
-       
+
        def process(self, instruction: str) -> dict:
            # Parse and execute tasks
            if "add task" in instruction.lower():
@@ -393,44 +401,50 @@ Test that multi-step tasks are completed successfully:
 
    agent = TaskAgent()
 
-   scenario = Scenario(
-       name="task_management",
-       sequence=[
-           # Add first task
-           InteractionSpec(
-               inputs="Add task: Write documentation",
-               outputs=lambda inputs: agent.process(inputs)
-           ),
+   test_scenario = (
+       scenario("task_management")
+       # Add first task
+       .interact(
+           inputs="Add task: Write documentation",
+           outputs=lambda inputs: agent.process(inputs)
+       )
+       .check(
            from_fn(
                lambda trace: trace.interactions[-1].outputs["status"] == "added",
                name="task_added"
-           ),
-           
-           # Add second task
-           InteractionSpec(
-               inputs="Add task: Review pull request",
-               outputs=lambda inputs: agent.process(inputs)
-           ),
+           )
+       )
+
+       # Add second task
+       .interact(
+           inputs="Add task: Review pull request",
+           outputs=lambda inputs: agent.process(inputs)
+       )
+       .check(
            from_fn(
                lambda trace: len(trace.interactions[-1].outputs["tasks"]) == 2,
                name="multiple_tasks"
-           ),
-           
-           # Complete a task
-           InteractionSpec(
-               inputs="Complete the first task",
-               outputs=lambda inputs: agent.process(inputs)
-           ),
+           )
+       )
+
+       # Complete a task
+       .interact(
+           inputs="Complete the first task",
+           outputs=lambda inputs: agent.process(inputs)
+       )
+       .check(
            from_fn(
                lambda trace: trace.interactions[-1].outputs["status"] == "completed",
                name="task_completed"
-           ),
-           
-           # List remaining tasks
-           InteractionSpec(
-               inputs="List tasks",
-               outputs=lambda inputs: agent.process(inputs)
-           ),
+           )
+       )
+
+       # List remaining tasks
+       .interact(
+           inputs="List tasks",
+           outputs=lambda inputs: agent.process(inputs)
+       )
+       .check(
            from_fn(
                lambda trace: (
                    len(trace.interactions[-1].outputs["pending"]) == 1 and
@@ -439,8 +453,8 @@ Test that multi-step tasks are completed successfully:
                name="correct_task_state",
                success_message="Task state tracked correctly",
                failure_message="Task state incorrect"
-           ),
-       ]
+           )
+       )
    )
 
 
@@ -453,12 +467,13 @@ Add checks after each interaction to validate state:
 
 .. code-block:: python
 
-   sequence=[
-       InteractionSpec(...),
-       from_fn(lambda trace: validate_state(trace), name="state_check_1"),
-       InteractionSpec(...),
-       from_fn(lambda trace: validate_state(trace), name="state_check_2"),
-   ]
+   (
+       scenario("example")
+       .interact(...)
+       .check(from_fn(lambda trace: validate_state(trace), name="state_check_1"))
+       .interact(...)
+       .check(from_fn(lambda trace: validate_state(trace), name="state_check_2"))
+   )
 
 **2. Use Descriptive Scenario Names**
 
@@ -466,9 +481,9 @@ Name scenarios to describe the user flow:
 
 .. code-block:: python
 
-   scenario = Scenario(
-       name="user_onboarding_collect_preferences_send_confirmation",
-       sequence=[...]
+   scenario = (
+       scenario("user_onboarding_collect_preferences_send_confirmation")
+       ...
    )
 
 **3. Test Both Happy and Error Paths**
@@ -477,8 +492,14 @@ Create separate scenarios for success and failure cases:
 
 .. code-block:: python
 
-   happy_path = Scenario(name="booking_success", sequence=[...])
-   error_path = Scenario(name="booking_invalid_date", sequence=[...])
+   happy_path = (
+       scenario("booking_success")
+       ...
+   )
+   error_path = (
+       scenario("booking_invalid_date")
+       ...
+   )
 
 **4. Leverage the Full Trace**
 
@@ -501,4 +522,3 @@ Next Steps
 * Learn how to write :doc:`custom-checks` for domain-specific validation
 * Explore :doc:`../tutorials/index` for complete examples
 * See :doc:`single-turn` for single-interaction patterns
-

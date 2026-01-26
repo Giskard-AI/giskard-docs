@@ -44,12 +44,12 @@ For more control, create a custom check class:
        async def run(self, trace: Trace) -> CheckResult:
            output = trace.interactions[-1].outputs
            actual_length = len(output)
-           
+
            if actual_length >= self.min_length:
                return CheckResult.success(
                    message=f"Output length {actual_length} meets minimum {self.min_length}"
                )
-           
+
            return CheckResult.failure(
                message=f"Output length {actual_length} below minimum {self.min_length}"
            )
@@ -67,16 +67,18 @@ Using Your Custom Check
 
 .. code-block:: python
 
-   from giskard.checks import InteractionSpec, TestCase
+   from giskard.checks import scenario
 
    check = MinLengthCheck(name="length_check", min_length=20)
 
-   interaction = InteractionSpec(
-       inputs="test",
-       outputs="This is a reasonably long output"
+   tc = (
+       scenario("test")
+       .interact(
+           inputs="test",
+           outputs="This is a reasonably long output"
+       )
+       .check(check)
    )
-
-   tc = TestCase(interaction=interaction, checks=[check], name="test")
    result = await tc.run()
 
 
@@ -95,16 +97,16 @@ Checks can return numeric metrics for analysis:
 
        async def run(self, trace: Trace) -> CheckResult:
            text = trace.interactions[-1].outputs
-           
+
            # Calculate readability (Flesch-Kincaid grade level)
            grade_level = calculate_readability(text)
-           
+
            if grade_level <= self.max_grade_level:
                return CheckResult.success(
                    message=f"Readability grade {grade_level:.1f} is acceptable",
                    metrics={"grade_level": grade_level}
                )
-           
+
            return CheckResult.failure(
                message=f"Readability grade {grade_level:.1f} exceeds maximum {self.max_grade_level}",
                metrics={"grade_level": grade_level}
@@ -115,10 +117,10 @@ Checks can return numeric metrics for analysis:
        words = len(text.split())
        sentences = text.count('.') + text.count('!') + text.count('?')
        syllables = sum(count_syllables(word) for word in text.split())
-       
+
        if sentences == 0:
            return 0
-       
+
        return 0.39 * (words / sentences) + 11.8 * (syllables / words) - 15.59
 
    def count_syllables(word: str) -> int:
@@ -152,12 +154,12 @@ Use JSONPath to extract values from complex structures:
        async def run(self, trace: Trace) -> CheckResult:
            extractor = JsonPathExtractor(key=self.field_path)
            value = extractor.extract(trace)
-           
+
            if value >= self.min_value:
                return CheckResult.success(
                    message=f"Value {value} meets minimum {self.min_value}"
                )
-           
+
            return CheckResult.failure(
                message=f"Value {value} below minimum {self.min_value}"
            )
@@ -198,12 +200,12 @@ Build domain-specific LLM-based checks:
        def get_prompt(self) -> TemplateReference | str:
            return """
            Evaluate the tone of the assistant's response.
-           
+
            User message: {{ inputs }}
            Assistant response: {{ outputs }}
-           
+
            Required tone: {{ required_tone }}
-           
+
            Provide:
            - is_professional: true/false
            - is_empathetic: true/false
@@ -234,7 +236,7 @@ Build domain-specific LLM-based checks:
                    message=f"Tone is appropriate: {output_value.reasoning}",
                    metrics={"tone_score": output_value.tone_score}
                )
-           
+
            return CheckResult.failure(
                message=f"Tone issues: {output_value.reasoning}",
                metrics={"tone_score": output_value.tone_score},
@@ -261,7 +263,7 @@ Checks can be async for I/O operations:
 
        async def run(self, trace: Trace) -> CheckResult:
            output = trace.interactions[-1].outputs
-           
+
            # Make async HTTP request
            async with httpx.AsyncClient() as client:
                response = await client.post(
@@ -269,13 +271,13 @@ Checks can be async for I/O operations:
                    json={"text": output}
                )
                result = response.json()
-           
+
            if result["is_valid"]:
                return CheckResult.success(
                    message="Output validated by external API",
                    details=result
                )
-           
+
            return CheckResult.failure(
                message=f"Validation failed: {result.get('error')}",
                details=result
@@ -299,12 +301,12 @@ Checks can maintain state across scenarios (use with caution):
 
        async def run(self, trace: Trace) -> CheckResult:
            output = trace.interactions[-1].outputs
-           
+
            if output in self.seen_values:
                return CheckResult.failure(
                    message=f"Duplicate output detected: {output}"
                )
-           
+
            self.seen_values.add(output)
            return CheckResult.success(
                message="Output is unique",
@@ -332,13 +334,13 @@ Build complex checks by composing simpler ones:
        async def run(self, trace: Trace) -> CheckResult:
            output = trace.interactions[-1].outputs
            issues = []
-           
+
            # Length checks
            if len(output) < self.min_length:
                issues.append(f"Too short (minimum {self.min_length})")
            if len(output) > self.max_length:
                issues.append(f"Too long (maximum {self.max_length})")
-           
+
            # Keyword checks
            missing_keywords = [
                kw for kw in self.required_keywords
@@ -346,13 +348,13 @@ Build complex checks by composing simpler ones:
            ]
            if missing_keywords:
                issues.append(f"Missing keywords: {', '.join(missing_keywords)}")
-           
+
            if issues:
                return CheckResult.failure(
                    message="; ".join(issues),
                    details={"issues": issues}
                )
-           
+
            return CheckResult.success(
                message="All quality checks passed",
                metrics={
@@ -383,18 +385,18 @@ Medical Transcript Validation
 
        async def run(self, trace: Trace) -> CheckResult:
            transcript = trace.interactions[-1].outputs
-           
+
            missing_sections = [
                section for section in self.required_sections
                if section not in transcript
            ]
-           
+
            if missing_sections:
                return CheckResult.failure(
                    message=f"Missing required sections: {', '.join(missing_sections)}",
                    details={"missing": missing_sections}
                )
-           
+
            return CheckResult.success(
                message="All required sections present"
            )
@@ -415,7 +417,7 @@ Financial Report Validation
        async def run(self, trace: Trace) -> CheckResult:
            report = trace.interactions[-1].outputs
            issues = []
-           
+
            # Check for required disclaimer
            if self.require_disclaimer:
                disclaimer_patterns = [
@@ -425,7 +427,7 @@ Financial Report Validation
                ]
                if not any(re.search(p, report, re.IGNORECASE) for p in disclaimer_patterns):
                    issues.append("Missing required financial disclaimer")
-           
+
            # Check for unauthorized predictions
            if not self.allow_predictions:
                prediction_patterns = [
@@ -435,13 +437,13 @@ Financial Report Validation
                ]
                if any(re.search(p, report, re.IGNORECASE) for p in prediction_patterns):
                    issues.append("Contains unauthorized predictions")
-           
+
            if issues:
                return CheckResult.failure(
                    message="; ".join(issues),
                    details={"violations": issues}
                )
-           
+
            return CheckResult.success(message="Report meets compliance requirements")
 
 
@@ -457,24 +459,26 @@ Write tests for your custom checks:
 
    @pytest.mark.asyncio
    async def test_min_length_check():
+       from giskard.checks import scenario, Trace, Interaction
+
        # Test passing case
        trace_pass = Trace(interactions=[
            Interaction(inputs="test", outputs="This is long enough")
        ])
-       
+
        check = MinLengthCheck(name="test", min_length=10)
        result = await check.run(trace_pass)
-       
+
        assert result.passed
        assert "meets minimum" in result.message
-       
+
        # Test failing case
        trace_fail = Trace(interactions=[
            Interaction(inputs="test", outputs="Short")
        ])
-       
+
        result = await check.run(trace_fail)
-       
+
        assert not result.passed
        assert "below minimum" in result.message
 
@@ -531,12 +535,12 @@ Document your checks:
    @Check.register("documented_check")
    class DocumentedCheck(Check):
        """Validates that outputs meet quality standards.
-       
+
        This check evaluates:
        - Minimum length requirements
        - Presence of required keywords
        - Readability score
-       
+
        Parameters
        ----------
        min_length : int
@@ -544,7 +548,7 @@ Document your checks:
        required_keywords : list[str]
            Keywords that must appear
        """
-       
+
        min_length: int
        required_keywords: list[str]
 
@@ -555,4 +559,3 @@ Next Steps
 * Apply custom checks in :doc:`../tutorials/index`
 * Review :doc:`single-turn` and :doc:`multi-turn` for usage patterns
 * See the :doc:`core-concepts` for architecture details
-

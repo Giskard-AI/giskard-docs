@@ -19,12 +19,16 @@ An ``Interaction`` represents a single turn of data exchange with the system und
 
 .. code-block:: python
 
-   from giskard.checks import Interaction
+   from giskard.checks import scenario
 
-   interaction = Interaction(
-       inputs="What is the capital of France?",
-       outputs="The capital of France is Paris.",
-       metadata={"model": "gpt-4", "tokens": 15, "latency_ms": 234}
+   # Interactions are created through the fluent builder
+   test_case = (
+       scenario("example_interaction")
+       .interact(
+           inputs="What is the capital of France?",
+           outputs="The capital of France is Paris.",
+           metadata={"model": "gpt-4", "tokens": 15, "latency_ms": 234}
+       )
    )
 
 **Properties:**
@@ -43,7 +47,7 @@ An ``InteractionSpec`` describes *how* to generate an interaction. Both inputs a
 
 .. code-block:: python
 
-   from giskard.checks import InteractionSpec
+   from giskard.checks import scenario
    from openai import OpenAI
    import random
 
@@ -58,13 +62,16 @@ An ``InteractionSpec`` describes *how* to generate an interaction. Both inputs a
         )
         return response.choices[0].message.content
 
-   spec = InteractionSpec(
-       inputs=generate_random_question,
-       outputs=generate_answer,
-       metadata={
-        "category": "math",
-        "difficulty": "easy"
-       }
+   test_case = (
+       scenario("dynamic_interaction")
+       .interact(
+           inputs=generate_random_question,
+           outputs=generate_answer,
+           metadata={
+               "category": "math",
+               "difficulty": "easy"
+           }
+       )
    )
 
 This is very common when you are testing multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See TODO for practical examples.
@@ -76,11 +83,13 @@ A ``Trace`` is an immutable snapshot of all data exchanged with the system under
 
 .. code-block:: python
 
-   from giskard.checks import Trace, Interaction
+   from giskard.checks import scenario
 
-   trace = Trace.from_interactions(
-       Interaction(inputs="Hello", outputs="Hi there!"),
-       Interaction(inputs="How are you?", outputs="I'm doing well, thanks!"),
+   # Create a scenario with multiple interactions
+   test_scenario = (
+       scenario("multi_interaction_example")
+       .interact(inputs="Hello", outputs="Hi there!")
+       .interact(inputs="How are you?", outputs="I'm doing well, thanks!")
    )
 
 Traces can also be created from ``InteractionSpec`` objects. In that case, the generation is performed immediately to resolve each spec into a frozen interaction.
@@ -111,14 +120,31 @@ A ``TestCase`` is combines a trace and the checks that will be applied to it.
 
 .. code-block:: python
 
-   from giskard.checks import TestCase, InteractionSpec, from_fn
+   from giskard.checks import scenario
 
-   test_case = TestCase(
-        trace=trace,
-        checks=[check1, check2]
+   test_case = (
+       scenario("test_with_checks")
+       .interact(inputs="test input", outputs="test output")
+       .check(check1)
+       .check(check2)
    )
 
    result = await test_case.run()
+
+.. note::
+   The ``run()`` method is asynchronous. When running in a script, use ``asyncio.run()``:
+
+   .. code-block:: python
+
+      import asyncio
+
+      async def main():
+          result = await test_case.run()
+          return result
+
+      result = asyncio.run(main())
+
+   In async contexts (like pytest with ``@pytest.mark.asyncio``), you can use ``await`` directly.
 
 This will give us a result object with the results of the checks.
 
@@ -132,15 +158,17 @@ For example, we can test a simple conversation flow with two turns:
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, from_fn
+   from giskard.checks import scenario
+   from giskard.checks.builtin import Conformity
 
-   scenario = Scenario.from_sequence(
-        InteractionSpec(inputs="Hello", outputs=generate_answer),
-        Conformity(key="last.outputs", rule="response should be a friendly greeting"),
-        InteractionSpec(inputs="Who invented the HTML?", outputs=generate_answer),
-        Conformity(key="last.outputs", rule="response should mention Tim Berners-Lee as the inventor of HTML"), 
+   test_scenario = (
+       scenario("conversation_flow")
+       .interact(inputs="Hello", outputs=generate_answer)
+       .check(Conformity(key="last.outputs", rule="response should be a friendly greeting"))
+       .interact(inputs="Who invented the HTML?", outputs=generate_answer)
+       .check(Conformity(key="last.outputs", rule="response should mention Tim Berners-Lee as the inventor of HTML"))
    )
 
-   result = await scenario.run()
-
-
+   # Run with asyncio.run() if in a script
+   import asyncio
+   result = await test_scenario.run()  # or: result = asyncio.run(test_scenario.run())

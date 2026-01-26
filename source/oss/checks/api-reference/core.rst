@@ -84,12 +84,16 @@ A single exchange between inputs and outputs.
 
 .. code-block:: python
 
-   from giskard.checks import Interaction
+   from giskard.checks import scenario
 
-   interaction = Interaction(
-       inputs="What is 2+2?",
-       outputs="4",
-       metadata={"model": "gpt-4", "tokens": 5}
+   # Interactions are created through the fluent builder
+   test_case = (
+       scenario("example")
+       .interact(
+           inputs="What is 2+2?",
+           outputs="4",
+           metadata={"model": "gpt-4", "tokens": 5}
+       )
    )
 
 
@@ -107,15 +111,18 @@ Immutable history of all interactions in a scenario.
 
 .. code-block:: python
 
-   from giskard.checks import Trace, Interaction
+   from giskard.checks import scenario
 
-   trace = Trace(interactions=[
-       Interaction(inputs="Hello", outputs="Hi!"),
-       Interaction(inputs="How are you?", outputs="I'm well!"),
-   ])
+   # Create a scenario with multiple interactions
+   test_scenario = (
+       scenario("example_trace")
+       .interact(inputs="Hello", outputs="Hi!")
+       .interact(inputs="How are you?", outputs="I'm well!")
+   )
 
-   # Access last interaction
-   last = trace.interactions[-1]
+   # After running, access the trace
+   result = await test_scenario.run()
+   last = result.trace.interactions[-1]
 
 
 InteractionSpec
@@ -132,18 +139,24 @@ Declarative specification for generating interactions.
 
 .. code-block:: python
 
-   from giskard.checks import InteractionSpec
+   from giskard.checks import scenario
 
    # Static values
-   spec = InteractionSpec(
-       inputs="test input",
-       outputs="test output"
+   test_case = (
+       scenario("static_example")
+       .interact(
+           inputs="test input",
+           outputs="test output"
+       )
    )
 
    # Callable outputs
-   spec = InteractionSpec(
-       inputs="test",
-       outputs=lambda inputs: my_function(inputs)
+   test_case = (
+       scenario("dynamic_example")
+       .interact(
+           inputs="test",
+           outputs=lambda inputs: my_function(inputs)
+       )
    )
 
 
@@ -172,18 +185,16 @@ Ordered sequence of interaction specs and checks with shared trace.
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, from_fn
+   from giskard.checks import scenario, from_fn
 
-   scenario = Scenario(
-       name="test_flow",
-       sequence=[
-           InteractionSpec(inputs="hello", outputs="hi"),
-           from_fn(lambda trace: True, name="check1"),
-           InteractionSpec(inputs="bye", outputs="goodbye"),
-       ]
+   test_scenario = (
+       scenario("test_flow")
+       .interact(inputs="hello", outputs="hi")
+       .check(from_fn(lambda trace: True, name="check1"))
+       .interact(inputs="bye", outputs="goodbye")
    )
 
-   result = await scenario.run()
+   result = await test_scenario.run()
 
 
 TestCase
@@ -200,11 +211,11 @@ Convenience wrapper for running one interaction with multiple checks.
 
 .. code-block:: python
 
-   from giskard.checks import TestCase, InteractionSpec, from_fn
+   from giskard.checks import scenario, from_fn
 
-   tc = TestCase(
-       name="my_test",
-       interaction=InteractionSpec(inputs="test", outputs="result"),
+   tc = (
+       scenario("my_test")
+       .interact(inputs="test", outputs="result")
        checks=[
            from_fn(lambda trace: True, name="check1"),
            from_fn(lambda trace: True, name="check2"),
@@ -273,4 +284,3 @@ ScenarioRunner
    :show-inheritance:
 
 Low-level runner for executing scenarios.
-

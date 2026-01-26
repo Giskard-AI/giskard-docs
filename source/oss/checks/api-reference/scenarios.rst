@@ -30,19 +30,17 @@ Execute a sequence of interaction specs and checks with a shared trace.
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, from_fn
+   from giskard.checks import scenario, from_fn
 
-   scenario = Scenario(
-       name="conversation_flow",
-       sequence=[
-           InteractionSpec(inputs="Hello", outputs="Hi!"),
-           from_fn(lambda trace: "Hi" in trace.interactions[-1].outputs, name="check1"),
-           InteractionSpec(inputs="How are you?", outputs="I'm well!"),
-           from_fn(lambda trace: len(trace.interactions) == 2, name="check2"),
-       ]
+   test_scenario = (
+       scenario("conversation_flow")
+       .interact(inputs="Hello", outputs="Hi!")
+       .check(from_fn(lambda trace: "Hi" in trace.interactions[-1].outputs, name="check1"))
+       .interact(inputs="How are you?", outputs="I'm well!")
+       .check(from_fn(lambda trace: len(trace.interactions) == 2, name="check2"))
    )
 
-   result = await scenario.run()
+   result = await test_scenario.run()
    print(f"Passed: {result.passed}")
 
 
@@ -89,21 +87,21 @@ High-level API for running one interaction with multiple checks.
 
 .. code-block:: python
 
-   from giskard.checks import TestCase, InteractionSpec, StringMatchingCheck
+   from giskard.checks import scenario, StringMatchingCheck
 
-   tc = TestCase(
-       name="qa_test",
-       interaction=InteractionSpec(
+   tc = (
+       scenario("qa_test")
+       .interact(
            inputs="What is the capital of France?",
            outputs=lambda inputs: "Paris"
-       ),
-       checks=[
+       )
+       .check(
            StringMatchingCheck(
                name="contains_paris",
                content="Paris",
                key="interactions[-1].outputs"
            )
-       ]
+       )
    )
 
    result = await tc.run()
@@ -145,10 +143,10 @@ Low-level runner for executing scenarios.
 
 .. code-block:: python
 
-   from giskard.checks import ScenarioRunner, Scenario
+   from giskard.checks import ScenarioRunner
 
    runner = ScenarioRunner()
-   result = await runner.run(scenario)
+   result = await runner.run(test_scenario)
 
 
 TestCaseRunner
@@ -171,11 +169,19 @@ Running Multiple Test Cases
 .. code-block:: python
 
    import asyncio
-   from giskard.checks import TestCase
+   from giskard.checks import scenario
 
    test_cases = [
-       TestCase(name="test1", interaction=..., checks=[...]),
-       TestCase(name="test2", interaction=..., checks=[...]),
+       (
+           scenario("test1")
+           .interact(...)
+           .check(...)
+       ),
+       (
+           scenario("test2")
+           .interact(...)
+           .check(...)
+       ),
    ]
 
    async def run_all():
@@ -183,7 +189,7 @@ Running Multiple Test Cases
        for tc in test_cases:
            result = await tc.run()
            results.append((tc.name, result))
-       
+
        passed = sum(1 for _, r in results if r.passed)
        print(f"Passed: {passed}/{len(results)}")
 
@@ -195,24 +201,22 @@ Scenario with Dynamic Interactions
 
 .. code-block:: python
 
-   from giskard.checks import Scenario, InteractionSpec, Trace
+   from giskard.checks import scenario, Trace
 
    async def dynamic_input(trace: Trace):
        count = len(trace.interactions)
        return f"Message #{count + 1}"
 
-   scenario = Scenario(
-       name="dynamic_flow",
-       sequence=[
-           InteractionSpec(
-               inputs=dynamic_input,
-               outputs=lambda inputs: f"Echo: {inputs}"
-           ),
-           InteractionSpec(
-               inputs=dynamic_input,
-               outputs=lambda inputs: f"Echo: {inputs}"
-           ),
-       ]
+   test_scenario = (
+       scenario("dynamic_flow")
+       .interact(
+           inputs=dynamic_input,
+           outputs=lambda inputs: f"Echo: {inputs}"
+       )
+       .interact(
+           inputs=dynamic_input,
+           outputs=lambda inputs: f"Echo: {inputs}"
+       )
    )
 
 
@@ -230,4 +234,3 @@ Error Handling
                    print(f"  - {check_result.name}: {check_result.message}")
    except Exception as e:
        print(f"Test execution error: {e}")
-

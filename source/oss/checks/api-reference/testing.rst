@@ -41,23 +41,25 @@ Spying on Model Calls
 
 .. code-block:: python
 
-   from giskard.checks import InteractionSpec, TestCase, WithSpy, from_fn
+   from giskard.checks import scenario, WithSpy, from_fn
 
    # Wrap your model
    model_spy = WithSpy(my_llm_model)
 
-   interaction = InteractionSpec(
-       inputs="test input",
-       outputs=lambda inputs: model_spy(inputs)
+   tc = (
+       scenario("spy_test")
+       .interact(
+           inputs="test input",
+           outputs=lambda inputs: model_spy(inputs)
+       )
+       .check(
+           from_fn(
+               lambda trace: len(model_spy.calls) == 1,
+               name="single_call",
+               success_message="Model called exactly once"
+           )
+       )
    )
-
-   check = from_fn(
-       lambda trace: len(model_spy.calls) == 1,
-       name="single_call",
-       success_message="Model called exactly once"
-   )
-
-   tc = TestCase(interaction=interaction, checks=[check], name="spy_test")
    result = await tc.run()
 
 
@@ -110,10 +112,14 @@ Saving and Loading Results
 .. code-block:: python
 
    import json
-   from giskard.checks import TestCase, CheckResult
+   from giskard.checks import scenario, CheckResult
 
    # Run test
-   tc = TestCase(...)
+   tc = (
+       scenario("example")
+       .interact(...)
+       .check(...)
+   )
    result = await tc.run()
 
    # Serialize
@@ -124,7 +130,7 @@ Saving and Loading Results
    # Load
    with open("result.json", "r") as f:
        data = json.load(f)
-   
+
    # Note: Can't directly validate back to TestCaseResult
    # but data is preserved
 
@@ -138,32 +144,30 @@ Reusable Test Setup
 .. code-block:: python
 
    from typing import List
-   from giskard.checks import TestCase, InteractionSpec, Check
+   from giskard.checks import scenario, Check
 
    class TestFixture:
        def __init__(self, system_under_test):
            self.sut = system_under_test
-       
+
        def create_test(
            self,
            name: str,
            input_text: str,
            checks: List[Check]
-       ) -> TestCase:
+       ):
            """Factory for creating test cases."""
-           interaction = InteractionSpec(
+           tc = scenario(name).interact(
                inputs=input_text,
                outputs=lambda inputs: self.sut(inputs)
            )
-           return TestCase(
-               name=name,
-               interaction=interaction,
-               checks=checks
-           )
-       
+           for check in checks:
+               tc = tc.check(check)
+           return tc
+
        async def run_test_suite(
            self,
-           test_cases: List[TestCase]
+           test_cases: List
        ):
            """Run multiple tests and report."""
            results = []
@@ -179,7 +183,7 @@ Parameterized Tests
 .. code-block:: python
 
    import pytest
-   from giskard.checks import TestCase, InteractionSpec, StringMatchingCheck
+   from giskard.checks import scenario, StringMatchingCheck
 
    test_data = [
        ("What is 2+2?", "4"),
@@ -190,23 +194,21 @@ Parameterized Tests
    @pytest.mark.parametrize("question,expected", test_data)
    @pytest.mark.asyncio
    async def test_calculator(question, expected):
-       interaction = InteractionSpec(
-           inputs=question,
-           outputs=lambda inputs: calculator(inputs)
+       tc = (
+           scenario(f"calc_{expected}")
+           .interact(
+               inputs=question,
+               outputs=lambda inputs: calculator(inputs)
+           )
+           .check(
+               StringMatchingCheck(
+                   name="correct_answer",
+                   content=expected,
+                   key="interactions[-1].outputs"
+               )
+           )
        )
-       
-       check = StringMatchingCheck(
-           name="correct_answer",
-           content=expected,
-           key="interactions[-1].outputs"
-       )
-       
-       tc = TestCase(
-           interaction=interaction,
-           checks=[check],
-           name=f"calc_{expected}"
-       )
-       
+
        result = await tc.run()
        assert result.passed
 
@@ -219,20 +221,20 @@ Measuring Execution Time
 
 .. code-block:: python
 
-   from giskard.checks import TestCase
+   from giskard.checks import scenario
 
-   async def benchmark_test(tc: TestCase, iterations: int = 10):
+   async def benchmark_test(tc, iterations: int = 10):
        """Run test multiple times and track performance."""
        durations = []
-       
+
        for _ in range(iterations):
            result = await tc.run()
            durations.append(result.duration_ms)
-       
+
        avg_duration = sum(durations) / len(durations)
        min_duration = min(durations)
        max_duration = max(durations)
-       
+
        print(f"Average: {avg_duration:.2f}ms")
        print(f"Min: {min_duration:.2f}ms")
        print(f"Max: {max_duration:.2f}ms")
@@ -243,23 +245,23 @@ Tracking Metrics
 
 .. code-block:: python
 
-   from giskard.checks import TestCase
+   from giskard.checks import scenario
    from typing import Dict, List
 
    class MetricsCollector:
        def __init__(self):
            self.metrics: List[Dict] = []
-       
-       async def run_and_collect(self, tc: TestCase):
+
+       async def run_and_collect(self, tc):
            """Run test and collect metrics."""
            result = await tc.run()
-           
+
            test_metrics = {
                "name": tc.name,
                "passed": result.passed,
                "duration_ms": result.duration_ms,
            }
-           
+
            # Collect check-specific metrics
            for check_result in result.results:
                if check_result.metrics:
@@ -267,19 +269,18 @@ Tracking Metrics
                        f"{check_result.name}_{k}": v
                        for k, v in check_result.metrics.items()
                    })
-           
+
            self.metrics.append(test_metrics)
            return result
-       
+
        def summary(self):
            """Print summary of collected metrics."""
            if not self.metrics:
                return
-           
+
            total = len(self.metrics)
            passed = sum(1 for m in self.metrics if m["passed"])
            avg_duration = sum(m["duration_ms"] for m in self.metrics) / total
-           
+
            print(f"Tests: {passed}/{total} passed")
            print(f"Avg duration: {avg_duration:.2f}ms")
-
