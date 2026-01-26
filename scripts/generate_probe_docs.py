@@ -90,6 +90,17 @@ def extract_owasp_tags(tags: list[str]) -> list[str]:
     return owasp_tags
 
 
+def clean_probe_name(name: str) -> str:
+    """Remove 'Probe' suffix from probe name (handles both ' Probe' and 'Probe')."""
+    # Remove " Probe" suffix (with space)
+    if name.endswith(" Probe"):
+        return name[:-6]
+    # Remove "Probe" suffix (without space) - less common but possible
+    if name.endswith("Probe"):
+        return name[:-5]
+    return name
+
+
 def validate_tags(tags: list[str], probe_name: str, probe_id: str) -> None:
     """Validate that all tag values are defined in the mappings.
 
@@ -216,26 +227,18 @@ def generate_rst_content(category: str, probes: list[dict], probe_infos: list[di
     # Get category title from filename
     title = filename.replace("-", " ").title()
 
-    # Get OWASP mapping to find which OWASP tags map to this threat type
-    owasp_mapping = get_owasp_mapping(probe_infos)
-
-    # Build reverse mapping: find OWASP tags for this threat type
-    owasp_tags = []
-
-    for owasp_num, threat_filename in owasp_mapping.items():
-        if threat_filename == filename:
-            owasp_tags.append(owasp_num)
+    # Collect all OWASP tags from probes in this category (many-to-many mapping)
+    owasp_tags = set()
+    for probe in probes:
+        probe_owasp_tags = probe.get("owasp_tags", [])
+        owasp_tags.update(probe_owasp_tags)
 
     # Build RST content
     # Get description from threat type mappings
     description = get_category_description(category)
 
-    # Build title with OWASP references if present
+    # Use plain title (no OWASP tags) for sidebar navigation
     display_title = title
-    if owasp_tags:
-        owasp_title_parts = [f"OWASP {ref}" for ref in sorted(owasp_tags)]
-        owasp_title_str = ", ".join(owasp_title_parts)
-        display_title = f"{title} ({owasp_title_str})"
 
     lines = [
         f":og:title: Giskard Hub UI - {title} Vulnerabilities",
@@ -274,21 +277,32 @@ def generate_rst_content(category: str, probes: list[dict], probe_infos: list[di
             "",
             ".. list-table::",
             "   :header-rows: 1",
-            "   :widths: 25 75",
+            "   :widths: 20 15 65",
             "",
             "   * - Probe Name",
+            "     - Type",
             "     - Description",
         ]
     )
 
     for probe in sorted(probes, key=lambda x: x["name"]):
-        name = probe["name"]
+        name = clean_probe_name(probe["name"])
+        probe_type = probe.get("probe_type")
+        # Format probe type for display
+        if probe_type == "agentic":
+            type_display = "Agentic"
+        elif probe_type == "multi-turn":
+            type_display = "Multi-turn"
+        else:
+            type_display = ""
+
         description = probe["description"] or "No description available."
         # Clean up description - remove extra whitespace
         description = " ".join(description.split())
         lines.extend(
             [
                 f"   * - {name}",
+                f"     - {type_display}",
                 f"     - {description}",
             ]
         )
@@ -374,13 +388,13 @@ def update_probe_documentation():
     update_index_file(docs_dir, grouped, probe_infos, expected_files)
 
 
-def get_owasp_mapping(probe_infos: list[dict]) -> dict[str, str]:
+def get_owasp_mapping(probe_infos: list[dict]) -> dict[str, list[str]]:
     """Build mapping from OWASP LLM numbers to threat type filenames.
 
     Returns:
-        Dictionary mapping OWASP tag to threat type filename
+        Dictionary mapping OWASP tag to list of threat type filenames (many-to-many)
     """
-    owasp_to_threat = {}
+    owasp_to_threat: dict[str, list[str]] = {}
 
     for probe in probe_infos:
         threat_type = probe.get("threat_type")
@@ -388,9 +402,11 @@ def get_owasp_mapping(probe_infos: list[dict]) -> dict[str, str]:
         if threat_type:
             filename = threat_type_to_filename(threat_type)
             for owasp_tag in owasp_tags:
-                # Keep the first threat type found for each OWASP tag
+                # Build many-to-many mapping: each OWASP tag can map to multiple threat types
                 if owasp_tag not in owasp_to_threat:
-                    owasp_to_threat[owasp_tag] = filename
+                    owasp_to_threat[owasp_tag] = []
+                if filename not in owasp_to_threat[owasp_tag]:
+                    owasp_to_threat[owasp_tag].append(filename)
 
     return owasp_to_threat
 
@@ -401,16 +417,18 @@ def update_index_file(
     """Dynamically generate the entire index.rst file."""
     index_file = docs_dir / "index.rst"
 
-    # Get OWASP mapping
-    owasp_mapping = get_owasp_mapping(probe_infos)
-
     # Build reverse mapping: threat type -> list of OWASP tags
+    # Collect all OWASP tags from probes in each threat type category
     threat_to_owasp: dict[str, list[str]] = {}
 
-    for owasp_num, filename in owasp_mapping.items():
-        if filename not in threat_to_owasp:
-            threat_to_owasp[filename] = []
-        threat_to_owasp[filename].append(owasp_num)
+    for threat_type, probes in grouped.items():
+        filename = threat_type_to_filename(threat_type)
+        owasp_tags = set()
+        for probe in probes:
+            probe_owasp_tags = probe.get("owasp_tags", [])
+            owasp_tags.update(probe_owasp_tags)
+        if owasp_tags:
+            threat_to_owasp[filename] = sorted(list(owasp_tags))
 
     # Build list of all threat types with their metadata
     threat_type_entries = []
@@ -423,15 +441,8 @@ def update_index_file(
         # Get OWASP references for this threat type
         owasp_refs = threat_to_owasp.get(filename, [])
 
-        # Build OWASP reference string with "OWASP" prefix
-        owasp_ref_str = ", ".join([f"OWASP {ref}" for ref in sorted(owasp_refs)]) if owasp_refs else ""
-
-        # Build display title with OWASP references if present
+        # Use plain title (no OWASP tags) for sidebar navigation
         display_title = title
-        if owasp_refs:
-            owasp_title_parts = [f"OWASP {ref}" for ref in sorted(owasp_refs)]
-            owasp_title_str = ", ".join(owasp_title_parts)
-            display_title = f"{title} ({owasp_title_str})"
 
         entry = {
             "threat_type": threat_type,
@@ -440,7 +451,6 @@ def update_index_file(
             "display_title": display_title,
             "description": description,
             "count": count,
-            "owasp_refs": owasp_ref_str,
             "owasp_refs_list": owasp_refs,
         }
         threat_type_entries.append(entry)
@@ -489,13 +499,10 @@ def update_index_file(
                 ]
             )
 
-            # Add description, OWASP refs, and probe count
+            # Add description and probe count (OWASP removed from cards)
             card_lines = []
             if entry['description']:
                 card_lines.append(f"      {entry['description']}")
-            if entry['owasp_refs']:
-                card_lines.append("")
-                card_lines.append(f"      **OWASP:** {entry['owasp_refs']}")
             if entry['count']:
                 card_lines.append("")
                 card_lines.append(f"      **Probes:** {entry['count']}")
