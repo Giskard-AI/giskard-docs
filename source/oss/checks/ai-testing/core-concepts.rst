@@ -16,24 +16,23 @@ Giskard Checks is built around a few core primitives that work together:
 * **Check**: A validation that runs on a trace and returns a result
 * **Scenario**: A list of steps (interactions and checks) executed sequentially
 
+At runtime, the flow looks like this:
+
+1. A Scenario is created with a sequence of steps.
+
+2. For each step in order:
+
+   a. Each InteractionSpec is resolved into a concrete Interaction.
+   b. The Interaction is appended to the Trace.
+   c. Checks run against the current Trace.
+
+3. Results are returned as a ScenarioResult.
+
 Interaction
 -----------
 
 An ``Interaction`` represents a single turn of data exchange with the system under test.
-
-.. code-block:: python
-
-   from giskard.checks import scenario
-
-   # Interactions are created through the fluent builder
-   test_case = (
-       scenario("example_interaction")
-       .interact(
-           inputs="What is the capital of France?",
-           outputs="The capital of France is Paris.",
-           metadata={"model": "gpt-4", "tokens": 15, "latency_ms": 234}
-       )
-   )
+Interactions are computed at execution time by resolving ``InteractionSpec`` objects into the trace.
 
 **Properties:**
 
@@ -47,38 +46,37 @@ Interactions are **immutable**, as they represent something that has already hap
 InteractionSpec
 ---------------
 
-An ``InteractionSpec`` describes *how* to generate an interaction. Both inputs and outputs can be generated dynamically:
+An ``InteractionSpec`` describes *how* to generate an interaction and is used to describe a scenario.
+When you call ``.interact(...)`` in the fluent API, it adds an ``InteractionSpec`` to the scenario sequence.
+Inputs and outputs can be static values or dynamic callables, and you can mix both.
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import InteractionSpec
    from openai import OpenAI
    import random
 
    def generate_random_question() -> str:
        return f"What is 2 + {random.randint(0, 10)}?"
 
-    def generate_answer(inputs: str) -> str:
-        client = OpenAI()
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": inputs}],
-        )
-        return response.choices[0].message.content
-
-   test_case = (
-       scenario("dynamic_interaction")
-       .interact(
-           inputs=generate_random_question,
-           outputs=generate_answer,
-           metadata={
-               "category": "math",
-               "difficulty": "easy"
-           }
+   def generate_answer(inputs: str) -> str:
+       client = OpenAI()
+       response = client.chat.completions.create(
+           model="gpt-4o-mini",
+           messages=[{"role": "user", "content": inputs}],
        )
+       return response.choices[0].message.content
+
+   spec = InteractionSpec(
+       inputs=generate_random_question,
+       outputs=generate_answer,
+       metadata={
+           "category": "math",
+           "difficulty": "easy"
+       }
    )
 
-This is very common when you are testing multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See TODO for practical examples.
+Specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See :doc:`multi-turn` for practical examples.
 
 Trace
 -----
@@ -87,16 +85,14 @@ A ``Trace`` is an immutable snapshot of all data exchanged with the system under
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Trace, Interaction
 
-   # Create a scenario with multiple interactions
-   test_scenario = (
-       scenario("multi_interaction_example")
-       .interact(inputs="Hello", outputs="Hi there!")
-       .interact(inputs="How are you?", outputs="I'm doing well, thanks!")
-   )
+   trace = Trace(interactions=[
+       Interaction(inputs="Hello", outputs="Hi there!"),
+       Interaction(inputs="How are you?", outputs="I'm doing well, thanks!")
+   ])
 
-Traces can also be created from ``InteractionSpec`` objects. In that case, the generation is performed immediately to resolve each spec into a frozen interaction.
+Traces are typically created during scenario execution by resolving each ``InteractionSpec`` into a frozen interaction.
 
 
 Checks
@@ -116,10 +112,10 @@ When referencing values in a trace, use JSONPath expressions that start with ``t
    )
 
 
-Creating Scenarios with Checks
--------------------------------
+Scenario
+--------
 
-A ``Scenario`` combines interactions and checks. You create scenarios using the ``scenario()`` function, which returns a Scenario (a list of steps). This works for both single-turn and multi-turn tests.
+A ``Scenario`` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. Scenarios work for both single-turn and multi-turn tests.
 
 .. code-block:: python
 
@@ -151,16 +147,16 @@ A ``Scenario`` combines interactions and checks. You create scenarios using the 
 
 This will give us a result object with the results of the checks.
 
-.. note::
-   **Internal Note**: ``TestCase`` is an internal implementation detail. Users should always use ``scenario()`` to create scenarios, which internally uses TestCase.
 
+Fluent API Mapping
+------------------
 
-Scenario
---------
+The fluent API is the preferred user-facing entry point and maps directly to the core primitives above:
 
-A ``Scenario`` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. You create scenarios using the ``scenario()`` function, which is the primary user-facing API. Scenarios work for both single-turn and multi-turn tests.
-
-The distinction between single-turn and multi-turn is conceptual - both use the same ``scenario()`` API. For multi-turn scenarios, you simply add multiple interactions and checks in sequence.
+* ``scenario(name)`` creates a ``Scenario`` builder.
+* ``.interact(...)`` adds an ``InteractionSpec`` to the scenario sequence.
+* ``.check(...)`` adds a ``Check`` to the scenario sequence.
+* ``.run()`` resolves specs to interactions, builds the ``Trace``, runs checks, and returns a ``ScenarioResult``.
 
 For example, we can test a simple conversation flow with two turns:
 
@@ -179,3 +175,5 @@ For example, we can test a simple conversation flow with two turns:
    # Run with asyncio.run() if in a script
    import asyncio
    result = await test_scenario.run()  # or: result = asyncio.run(test_scenario.run())
+
+For a practical introduction to the fluent API, see :doc:`quickstart`.
