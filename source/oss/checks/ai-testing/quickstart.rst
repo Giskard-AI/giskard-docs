@@ -2,7 +2,7 @@
 Quickstart
 ==========
 
-This guide will walk you through creating your first test case with Giskard Checks in under 5 minutes.
+This guide will walk you through creating your first scenario with Giskard Checks in under 5 minutes.
 
 
 A simple example
@@ -10,9 +10,7 @@ A simple example
 
 Let's consider a simple question-answering bot. We want to test that the answers of our bot are correct according to some context information.
 
-In the ``checks`` framework, all tests are performed on static representation of all data exchanged with the system under test (TODO: link to SUT). We call this a Trace (TODO: link to core concepts).
-
-We call each turn of data exchange an Interaction. Think of an Interaction as a single API call to your system under test, with some inputs and some outputs.
+In the ``checks`` framework, you test a **Trace**: an immutable snapshot of all data exchanged with your system under test (SUT). A Trace is made of one or more **Interactions**, each representing a single turn (inputs and outputs).
 
 .. note::
    For detailed explanations of these concepts, see :doc:`core-concepts`.
@@ -23,8 +21,8 @@ For our simple Q&A bot, we can represent a single turn as a trace with just one 
 
    from giskard.checks import scenario, Groundedness
 
-   # Use the fluent builder to create a test case with an interaction and checks
-   test_case = (
+   # Use the fluent builder to create a scenario with an interaction and checks
+   test_scenario = (
        scenario("test_france_capital")
        .interact(
            inputs="What is the capital of France?",
@@ -49,13 +47,16 @@ Note how we created the groundedness check:
 - ``answer_key``: this is the key (in JSONPath) to the answer in the trace. All JSONPath keys must start with ``trace.``. The ``last`` property is a shortcut for ``interactions[-1]`` and can be used in both JSONPath keys and Python code. In this case we want to check the ``outputs`` attribute of the last interaction in the trace (this is the default)
 - ``context``: this is the context information that will be used to check if the answer is grounded. Note that a ``context_key`` is also available if we want to dynamically load the context from the trace itself (see next example).
 
-We can now run the test case and inspect the results:
+We can now run the scenario and inspect the results. In a notebook, the ``ScenarioResult`` renders with a rich display:
 
 .. code-block:: python
 
-    result = await test_case.run()
+    result = await test_scenario.run()
+    result
 
-    print(result)
+.. image:: /_static/images/oss/checks/quickstart-simple_example_result.png
+   :alt: Rich display for a ScenarioResult with trace and check results
+   :width: 900
 
 .. note::
    The ``run()`` method is asynchronous. If you're running this code in a script or notebook, you'll need to use ``asyncio.run()`` to execute it:
@@ -65,14 +66,51 @@ We can now run the test case and inspect the results:
       import asyncio
 
       async def main():
-          result = await test_case.run()
+          result = await test_scenario.run()
           print(result)
 
       asyncio.run(main())
 
-   If you're already inside an async function (like in pytest with ``@pytest.mark.asyncio``), you can call ``await test_case.run()`` directly.
+   If you're already inside an async function (like in pytest with ``@pytest.mark.asyncio``), you can call ``await test_scenario.run()`` directly.
 
-TODO: result block, description
+
+Dynamic interactions
+--------------------
+
+So far, we've used static values for inputs and outputs. In practice, you'll often want to generate outputs dynamically by calling your SUT, or generate inputs based on previous interactions.
+
+You can pass callables (functions or lambdas) to ``interact()`` instead of static values:
+
+.. code-block:: python
+
+    from openai import OpenAI
+    from giskard.checks import scenario, Groundedness
+
+    client = OpenAI()
+
+    def get_answer(inputs: str) -> str:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": inputs}],
+        )
+        return response.choices[0].message.content
+
+    test_scenario = (
+        scenario("test_dynamic_output")
+        .interact(
+            inputs="What is the capital of France?",
+            outputs=get_answer
+        )
+        .check(
+            Groundedness(
+                name="answer is grounded",
+                answer_key="trace.last.outputs",
+                context="France is a country in Western Europe..."
+            )
+        )
+    )
+
+No need to precompute outputs anymore. This is especially useful in multi-turn scenarios, where inputs or outputs depend on earlier interactions (see :doc:`multi-turn`).
 
 
 Structuring the interactions
@@ -91,13 +129,13 @@ As mentioned above, in practice the interaction inputs and outputs can take any 
         ]
    }
 
-We can easily create a trace based on this format, and adapt our test case:
+We can easily create a trace based on this format, and adapt our scenario:
 
 .. code-block:: python
 
     from giskard.checks import scenario, GreaterThan, Groundedness
 
-    test_case = (
+    test_scenario = (
         scenario("test_structured_output")
         .interact(
             inputs={"role": "user", "content": "What is the capital of France?"},
@@ -125,69 +163,17 @@ We can easily create a trace based on this format, and adapt our test case:
 
 Note how this time we used ``context_key`` to obtain the context from the documents present in the trace itself. This is a common case for RAG systems. We also added a check to ensure the confidence is high.
 
-We can now run the test case and inspect the results:
+We can now run the scenario and inspect the results. In a notebook, the ``ScenarioResult`` renders with a rich display:
 
 .. code-block:: python
 
-    import asyncio
+    result = await test_scenario.run()
+    result
 
-    async def main():
-        result = await test_case.run()
-        print(f"Test passed: {result.passed}")
-
-    asyncio.run(main())
-
-
-TODO: result block
+.. image:: /_static/images/oss/checks/quickstart-structured_interactions.png
+   :alt: Rich display for a structured interaction scenario result
+   :width: 900
 
 This will give us a result object with the results of the checks.
-
-
-Dynamic interactions
---------------------
-
-In practice, we'll often want to create the ``outputs`` automatically from the system we are testing. The checks framework provides a simple way to do that using the ``InteractionSpec`` class.
-
-Differently from static interactions, ``InteractionSpec`` allows both inputs and outputs to be generated at test time.
-
-For example, our simple Q&A bot could be implemented using the OpenAI API:
-
-.. code-block:: python
-
-    from openai import OpenAI
-
-    client = OpenAI()
-
-    def get_answer(inputs: str) -> dict:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": inputs}],
-        )
-        return response.choices[0].message.content
-
-We can now use the fluent builder to create a test case with dynamic outputs:
-
-.. code-block:: python
-
-    from giskard.checks import scenario, Groundedness
-
-    test_case = (
-        scenario("test_dynamic_output")
-        .interact(
-            inputs="What is the capital of France?",
-            outputs=get_answer
-        )
-        .check(
-            Groundedness(
-                name="answer is grounded",
-                answer_key="trace.last.outputs.answer",
-                context_key="trace.last.outputs.documents",
-            )
-        )
-    )
-
-No need to specify outputs anymore!
-
-Note that also inputs can be dynamically generated! This is especially useful when you are testing multi-turn scenarios. For example, you can generate the inputs based on the previous interactions.
 
 Check out the :doc:`multi-turn` guide for more details on how to test multi-turn scenarios.
