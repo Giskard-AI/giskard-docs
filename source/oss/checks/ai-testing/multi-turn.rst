@@ -34,7 +34,7 @@ Basic Multi-Turn Flow
            StringMatchingCheck(
                name="polite_greeting",
                content="help",
-               key="interactions[-1].outputs"
+               key="trace.last.outputs"
            )
        )
        # Second interaction
@@ -46,7 +46,7 @@ Basic Multi-Turn Flow
            StringMatchingCheck(
                name="provides_weather",
                content="sunny",
-               key="interactions[-1].outputs"
+               key="trace.last.outputs"
            )
        )
    )
@@ -107,7 +107,7 @@ Test systems that maintain conversation state:
        )
        .check(
            from_fn(
-               lambda trace: "Alice" in trace.interactions[-1].outputs,
+               lambda trace: "Alice" in trace.last.outputs,
                name="acknowledges_name"
            )
        )
@@ -117,7 +117,7 @@ Test systems that maintain conversation state:
        )
        .check(
            from_fn(
-               lambda trace: "Alice" in trace.interactions[-1].outputs,
+               lambda trace: "Alice" in trace.last.outputs,
                name="remembers_name",
                success_message="Correctly recalled the name",
                failure_message="Failed to recall the name"
@@ -171,7 +171,7 @@ Test multi-step agent workflows with tool usage:
        # Check that agent chose appropriate tool
        .check(
            from_fn(
-               lambda trace: trace.interactions[-1].outputs["action"] == "search",
+               lambda trace: trace.last.outputs["action"] == "search",
                name="correct_tool_choice",
                success_message="Agent selected search tool",
                failure_message="Agent selected wrong tool"
@@ -224,7 +224,7 @@ Generate interactions dynamically based on previous outputs:
 
    # Second interaction depends on first response
    async def generate_followup(trace: Trace):
-       first_response = trace.interactions[-1].outputs["response"]
+       first_response = trace.last.outputs["response"]
        return f"Tell me more about {first_response}"
 
    test_scenario = (
@@ -275,13 +275,13 @@ Verify that systems handle errors gracefully across turns:
        )
        .check(
            from_fn(
-               lambda trace: "error" in trace.interactions[-1].outputs,
+               lambda trace: "error" in trace.last.outputs,
                name="detects_error"
            )
        )
        .check(
            from_fn(
-               lambda trace: trace.interactions[-1].outputs["response"],
+               lambda trace: trace.last.outputs["response"],
                name="provides_feedback",
                success_message="Bot provided error feedback"
            )
@@ -293,7 +293,7 @@ Verify that systems handle errors gracefully across turns:
        )
        .check(
            from_fn(
-               lambda trace: "error" not in trace.interactions[-1].outputs,
+               lambda trace: "error" not in trace.last.outputs,
                name="recovers_from_error",
                success_message="System recovered successfully"
            )
@@ -410,7 +410,7 @@ Test that multi-step tasks are completed successfully:
        )
        .check(
            from_fn(
-               lambda trace: trace.interactions[-1].outputs["status"] == "added",
+               lambda trace: trace.last.outputs["status"] == "added",
                name="task_added"
            )
        )
@@ -422,7 +422,7 @@ Test that multi-step tasks are completed successfully:
        )
        .check(
            from_fn(
-               lambda trace: len(trace.interactions[-1].outputs["tasks"]) == 2,
+               lambda trace: len(trace.last.outputs["tasks"]) == 2,
                name="multiple_tasks"
            )
        )
@@ -434,7 +434,7 @@ Test that multi-step tasks are completed successfully:
        )
        .check(
            from_fn(
-               lambda trace: trace.interactions[-1].outputs["status"] == "completed",
+               lambda trace: trace.last.outputs["status"] == "completed",
                name="task_completed"
            )
        )
@@ -447,8 +447,8 @@ Test that multi-step tasks are completed successfully:
        .check(
            from_fn(
                lambda trace: (
-                   len(trace.interactions[-1].outputs["pending"]) == 1 and
-                   len(trace.interactions[-1].outputs["completed"]) == 1
+                   len(trace.last.outputs["pending"]) == 1 and
+                   len(trace.last.outputs["completed"]) == 1
                ),
                name="correct_task_state",
                success_message="Task state tracked correctly",
@@ -510,7 +510,7 @@ Checks can inspect any previous interaction:
    from_fn(
        lambda trace: (
            trace.interactions[0].inputs == "initial request" and
-           trace.interactions[-1].outputs == "final response"
+           trace.last.outputs == "final response"
        ),
        name="validates_full_flow"
    )

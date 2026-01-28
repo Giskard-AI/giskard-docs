@@ -15,7 +15,7 @@ The simplest pattern is to define inputs, get outputs, and run checks:
    from giskard.checks import scenario, from_fn
 
    check = from_fn(
-       lambda trace: validate(trace.interactions[-1].outputs),
+       lambda trace: validate(trace.last.outputs),
        name="validation_check"
    )
 
@@ -72,7 +72,7 @@ Basic RAG Test
            StringMatchingCheck(
                name="has_answer",
                content="Paris",
-               key="interactions[-1].outputs.answer"
+               key="trace.last.outputs.answer"
            )
        )
    )
@@ -161,12 +161,12 @@ For classification tasks, validate both the predicted class and confidence:
            EqualityCheck(
                name="correct_label",
                expected="positive",
-               key="interactions[-1].outputs.label"
+               key="trace.last.outputs.label"
            )
        )
        .check(
            from_fn(
-               lambda trace: trace.interactions[-1].outputs.confidence > 0.8,
+               lambda trace: trace.last.outputs.confidence > 0.8,
                name="high_confidence",
                success_message="Confidence above threshold",
                failure_message="Confidence too low"
@@ -204,7 +204,7 @@ Evaluate summary quality, length, and factual consistency:
        )
        .check(
            from_fn(
-               lambda trace: len(trace.interactions[-1].outputs.split()) <= 100,
+               lambda trace: len(trace.last.outputs.split()) <= 100,
                name="length_constraint",
                success_message="Summary within length limit",
                failure_message="Summary too long"
@@ -295,7 +295,7 @@ Implement safety guardrails and content moderation:
        )
        .check(
            from_fn(
-               lambda trace: not contains_pii(trace.interactions[-1].outputs),
+               lambda trace: not contains_pii(trace.last.outputs),
                name="no_pii",
                success_message="No PII detected",
                failure_message="PII detected in response"
@@ -363,19 +363,19 @@ Test systems that return structured data:
            EqualityCheck(
                name="correct_name",
                expected="John Doe",
-               key="interactions[-1].outputs.name"
+               key="trace.last.outputs.name"
            )
        )
        .check(
            EqualityCheck(
                name="correct_age",
                expected=30,
-               key="interactions[-1].outputs.age"
+               key="trace.last.outputs.age"
            )
        )
        .check(
            from_fn(
-               lambda trace: "@" in trace.interactions[-1].outputs.email,
+               lambda trace: "@" in trace.last.outputs.email,
                name="valid_email_format",
                success_message="Email contains @",
                failure_message="Invalid email format"
@@ -415,7 +415,7 @@ Use test fixtures for reusable test data:
                    StringMatchingCheck(
                        name="contains_answer",
                        content=expected_answer,
-                       key="interactions[-1].outputs"
+                       key="trace.last.outputs"
                    )
                )
            )
@@ -453,7 +453,7 @@ Evaluate multiple test cases and aggregate results:
                    StringMatchingCheck(
                        name="contains_answer",
                        content=expected,
-                       key="interactions[-1].outputs"
+                       key="trace.last.outputs"
                    )
                )
            )

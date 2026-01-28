@@ -204,7 +204,7 @@ Parameterized Tests
                StringMatchingCheck(
                    name="correct_answer",
                    content=expected,
-                   key="interactions[-1].outputs"
+                   key="trace.last.outputs"
                )
            )
        )

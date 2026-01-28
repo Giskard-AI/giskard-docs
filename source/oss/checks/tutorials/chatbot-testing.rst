@@ -156,7 +156,7 @@ Test a simple greeting and name exchange:
            StringMatchingCheck(
                name="polite_greeting",
                content="help",
-               key="interactions[-1].outputs.message"
+               key="trace.last.outputs.message"
            )
        )
 
@@ -169,12 +169,12 @@ Test a simple greeting and name exchange:
            StringMatchingCheck(
                name="acknowledges_name",
                content="Alice",
-               key="interactions[-1].outputs.message"
+               key="trace.last.outputs.message"
            )
        )
        .check(
            from_fn(
-               lambda trace: trace.interactions[-1].outputs.context.user_name == "Alice",
+               lambda trace: trace.last.outputs.context.user_name == "Alice",
                name="stored_name",
                success_message="Chatbot stored the user's name",
                failure_message="Chatbot failed to store name"
@@ -190,7 +190,7 @@ Test a simple greeting and name exchange:
            StringMatchingCheck(
                name="recalls_name",
                content="Alice",
-               key="interactions[-1].outputs.message"
+               key="trace.last.outputs.message"
            )
        )
    )
@@ -235,7 +235,7 @@ Verify the chatbot handles different conversation types:
            EqualityCheck(
                name="casual_context",
                expected="casual",
-               key="interactions[-1].outputs.context.conversation_type"
+               key="trace.last.outputs.context.conversation_type"
            )
        )
 
@@ -248,7 +248,7 @@ Verify the chatbot handles different conversation types:
            EqualityCheck(
                name="support_context",
                expected="support",
-               key="interactions[-1].outputs.context.conversation_type"
+               key="trace.last.outputs.context.conversation_type"
            )
        )
        .check(
@@ -275,7 +275,7 @@ Verify the chatbot handles different conversation types:
            EqualityCheck(
                name="sales_context",
                expected="sales",
-               key="interactions[-1].outputs.context.conversation_type"
+               key="trace.last.outputs.context.conversation_type"
            )
        )
    )
@@ -360,7 +360,7 @@ Test the chatbot's ability to extract and remember user information:
            EqualityCheck(
                name="extracted_name",
                expected="Bob",
-               key="interactions[-1].outputs.context.user_name"
+               key="trace.last.outputs.context.user_name"
            )
        )
 
@@ -373,7 +373,7 @@ Test the chatbot's ability to extract and remember user information:
            EqualityCheck(
                name="extracted_email",
                expected="bob.johnson@example.com",
-               key="interactions[-1].outputs.context.user_email"
+               key="trace.last.outputs.context.user_email"
            )
        )
 
@@ -385,8 +385,8 @@ Test the chatbot's ability to extract and remember user information:
        .check(
            from_fn(
                lambda trace: (
-                   trace.interactions[-1].outputs.context.user_name == "Bob" and
-                   trace.interactions[-1].outputs.context.user_email == "bob.johnson@example.com"
+                   trace.last.outputs.context.user_name == "Bob" and
+                   trace.last.outputs.context.user_email == "bob.johnson@example.com"
                ),
                name="information_persisted",
                success_message="Chatbot retained user information",
@@ -419,7 +419,7 @@ Test how the chatbot handles unusual inputs:
        )
        .check(
            from_fn(
-               lambda trace: len(trace.interactions[-1].outputs.message) > 0,
+               lambda trace: len(trace.last.outputs.message) > 0,
                name="provides_response",
                success_message="Bot provided a response to empty input"
            )
@@ -435,7 +435,7 @@ Test how the chatbot handles unusual inputs:
        )
        .check(
            from_fn(
-               lambda trace: len(trace.interactions[-1].outputs.message) > 0,
+               lambda trace: len(trace.last.outputs.message) > 0,
                name="handles_long_input",
                success_message="Bot handled long input"
            )
@@ -533,7 +533,7 @@ Test complex stateful interactions:
            StringMatchingCheck(
                name="asks_confirmation",
                content="confirm",
-               key="interactions[-1].outputs.message"
+               key="trace.last.outputs.message"
            )
        )
 
@@ -665,8 +665,8 @@ Ensure the chatbot remembers important information:
 
    from_fn(
        lambda trace: (
-           trace.interactions[-1].outputs.context.user_name and
-           trace.interactions[-1].outputs.context.user_email
+           trace.last.outputs.context.user_name and
+           trace.last.outputs.context.user_email
        ),
        name="retains_user_info"
    )

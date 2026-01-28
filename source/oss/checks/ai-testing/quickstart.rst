@@ -21,8 +21,7 @@ For our simple Q&A bot, we can represent a single turn as a trace with just one 
 
 .. code-block:: python
 
-   from giskard.checks import scenario
-   from giskard.checks.builtin import Groundedness
+   from giskard.checks import scenario, Groundedness
 
    # Use the fluent builder to create a test case with an interaction and checks
    test_case = (
@@ -47,7 +46,7 @@ In practice, we'll get the outputs directly from the bot, or maybe from a datase
 Note how we created the groundedness check:
 
 - ``name``: this is an (optional) name for the check, to make it easier to interpret the results
-- ``answer_key``: this is the key (in JSONPath) to the answer in the trace. In this case we want to check the ``outputs`` attribute of the last interaction in the trace (this is the default)
+- ``answer_key``: this is the key (in JSONPath) to the answer in the trace. All JSONPath keys must start with ``trace.``. The ``last`` property is a shortcut for ``interactions[-1]`` and can be used in both JSONPath keys and Python code. In this case we want to check the ``outputs`` attribute of the last interaction in the trace (this is the default)
 - ``context``: this is the context information that will be used to check if the answer is grounded. Note that a ``context_key`` is also available if we want to dynamically load the context from the trace itself (see next example).
 
 We can now run the test case and inspect the results:
@@ -96,8 +95,7 @@ We can easily create a trace based on this format, and adapt our test case:
 
 .. code-block:: python
 
-    from giskard.checks import scenario
-    from giskard.checks.builtin import GreaterThan, Groundedness
+    from giskard.checks import scenario, GreaterThan, Groundedness
 
     test_case = (
         scenario("test_structured_output")
@@ -171,8 +169,7 @@ We can now use the fluent builder to create a test case with dynamic outputs:
 
 .. code-block:: python
 
-    from giskard.checks import scenario
-    from giskard.checks.builtin import Groundedness
+    from giskard.checks import scenario, Groundedness
 
     test_case = (
         scenario("test_dynamic_output")

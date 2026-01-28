@@ -155,7 +155,7 @@ Verify that the agent selects appropriate tools:
            )
            .check(
                from_fn(
-                   lambda trace: len(trace.interactions[-1].outputs.steps) > 0,
+                   lambda trace: len(trace.last.outputs.steps) > 0,
                    name="used_tools",
                    success_message="Agent used tools",
                    failure_message="Agent didn't use any tools"
@@ -165,12 +165,12 @@ Verify that the agent selects appropriate tools:
                EqualityCheck(
                    name="selected_calculator",
                    expected="calculator",
-                   key="interactions[-1].outputs.steps[0].tool"
+                   key="trace.last.outputs.steps[0].tool"
                )
            )
            .check(
                from_fn(
-                   lambda trace: trace.interactions[-1].outputs.success,
+                   lambda trace: trace.last.outputs.success,
                    name="task_successful",
                    success_message="Agent completed task successfully",
                    failure_message="Agent failed to complete task"
@@ -220,7 +220,7 @@ Evaluate the quality of the agent's reasoning:
        )
        .check(
            from_fn(
-               lambda trace: trace.interactions[-1].outputs.steps[0].tool == "search",
+               lambda trace: trace.last.outputs.steps[0].tool == "search",
                name="correct_tool_for_research",
                success_message="Selected search for research task",
                failure_message="Wrong tool selected"
@@ -282,7 +282,7 @@ Test agents that perform multiple steps:
        )
        .check(
            from_fn(
-               lambda trace: len(trace.interactions[-1].outputs.steps) >= 2,
+               lambda trace: len(trace.last.outputs.steps) >= 2,
                name="multiple_steps_taken",
                success_message="Agent performed multiple steps",
                failure_message="Agent didn't perform enough steps"
@@ -292,7 +292,7 @@ Test agents that perform multiple steps:
            from_fn(
                lambda trace: any(
                    step.tool == "search"
-                   for step in trace.interactions[-1].outputs.steps
+                   for step in trace.last.outputs.steps
                ),
                name="performed_research",
                success_message="Agent performed research",
@@ -303,7 +303,7 @@ Test agents that perform multiple steps:
            from_fn(
                lambda trace: any(
                    step.tool == "calculator"
-                   for step in trace.interactions[-1].outputs.steps
+                   for step in trace.last.outputs.steps
                ),
                name="performed_calculation",
                success_message="Agent performed calculation",
@@ -382,7 +382,7 @@ Verify that agents handle errors gracefully:
        )
        .check(
            from_fn(
-               lambda trace: len(trace.interactions[-1].outputs.steps) > 1,
+               lambda trace: len(trace.last.outputs.steps) > 1,
                name="tried_fallback",
                success_message="Agent tried fallback strategy",
                failure_message="Agent didn't attempt recovery"
@@ -487,7 +487,7 @@ Test agents that maintain state across turns:
        )
        .check(
            from_fn(
-               lambda trace: "Python tutorials" in trace.interactions[-1].outputs.final_answer,
+               lambda trace: "Python tutorials" in trace.last.outputs.final_answer,
                name="recalls_previous_task",
                success_message="Agent correctly recalled previous task",
                failure_message="Agent failed to recall previous task"
@@ -606,8 +606,8 @@ Verify that complex tasks are fully completed:
        .check(
            from_fn(
                lambda trace: (
-                   "Pending: 1" in trace.interactions[-1].outputs.final_answer and
-                   "Completed: 1" in trace.interactions[-1].outputs.final_answer
+                   "Pending: 1" in trace.last.outputs.final_answer and
+                   "Completed: 1" in trace.last.outputs.final_answer
                ),
                name="status_accurate",
                success_message="Agent tracking state correctly",
@@ -742,7 +742,7 @@ Track token usage, API calls, and execution time:
 
    checks = [
        from_fn(
-           lambda trace: len(trace.interactions[-1].outputs.steps) <= 5,
+           lambda trace: len(trace.last.outputs.steps) <= 5,
            name="reasonable_step_count",
            success_message="Used reasonable number of steps"
        ),

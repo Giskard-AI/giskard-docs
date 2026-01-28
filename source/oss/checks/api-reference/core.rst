@@ -122,7 +122,7 @@ Immutable history of all interactions in a scenario.
 
    # After running, access the trace
    result = await test_scenario.run()
-   last = result.trace.interactions[-1]
+   last = result.trace.last
 
 
 InteractionSpec
@@ -205,24 +205,23 @@ TestCase
    :undoc-members:
    :show-inheritance:
 
-Convenience wrapper for running one interaction with multiple checks.
+.. note::
+   **Internal Implementation Detail**: ``TestCase`` is an internal implementation detail. Users should always use ``scenario()`` to create scenarios, which internally uses TestCase. The ``scenario()`` function creates a Scenario (a list of steps) and is the primary user-facing API.
 
-**Example:**
+**Example using scenario() (recommended):**
 
 .. code-block:: python
 
    from giskard.checks import scenario, from_fn
 
-   tc = (
+   test_scenario = (
        scenario("my_test")
        .interact(inputs="test", outputs="result")
-       checks=[
-           from_fn(lambda trace: True, name="check1"),
-           from_fn(lambda trace: True, name="check2"),
-       ]
+       .check(from_fn(lambda trace: True, name="check1"))
+       .check(from_fn(lambda trace: True, name="check2"))
    )
 
-   result = await tc.run()
+   result = await test_scenario.run()
 
 
 Extractors
@@ -249,7 +248,7 @@ Extract values using JSONPath expressions.
 
    from giskard.checks import JsonPathExtractor
 
-   extractor = JsonPathExtractor(key="interactions[-1].outputs.answer")
+   extractor = JsonPathExtractor(key="trace.last.outputs.answer")
    value = extractor.extract(trace)
 
 

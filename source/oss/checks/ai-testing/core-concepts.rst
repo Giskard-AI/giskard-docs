@@ -10,7 +10,11 @@ Overview
 
 Giskard Checks is built around a few core primitives that work together:
 
-TODO
+* **Interaction**: A single turn of data exchange (inputs and outputs)
+* **InteractionSpec**: A specification for generating interactions dynamically
+* **Trace**: An immutable snapshot of all interactions in a scenario
+* **Check**: A validation that runs on a trace and returns a result
+* **Scenario**: A list of steps (interactions and checks) executed sequentially
 
 Interaction
 -----------
@@ -98,38 +102,37 @@ Traces can also be created from ``InteractionSpec`` objects. In that case, the g
 Checks
 ------
 
-A ``Check`` validates something about a trace and returns a ``CheckResult``. There's a library of built-in checks , but you can also create your own.
+A ``Check`` validates something about a trace and returns a ``CheckResult``. There's a library of built-in checks, but you can also create your own.
+
+When referencing values in a trace, use JSONPath expressions that start with ``trace.``. The ``last`` property is a shortcut for ``interactions[-1]`` and can be used in both JSONPath keys and Python code.
 
 .. code-block:: python
 
-   from giskard.checks.builtin import Groundedness
-   from giskard.checks import Trace
+   from giskard.checks import Groundedness, Trace
 
    check = Groundedness(
-        answer_key="last.outputs",
+        answer_key="trace.last.outputs",
         context="Giskard Checks is a testing framework for AI systems."
    )
 
-TODO
 
+Creating Scenarios with Checks
+-------------------------------
 
-TestCase
---------
-
-A ``TestCase`` is combines a trace and the checks that will be applied to it.
+A ``Scenario`` combines interactions and checks. You create scenarios using the ``scenario()`` function, which returns a Scenario (a list of steps). This works for both single-turn and multi-turn tests.
 
 .. code-block:: python
 
    from giskard.checks import scenario
 
-   test_case = (
+   test_scenario = (
        scenario("test_with_checks")
        .interact(inputs="test input", outputs="test output")
        .check(check1)
        .check(check2)
    )
 
-   result = await test_case.run()
+   result = await test_scenario.run()
 
 .. note::
    The ``run()`` method is asynchronous. When running in a script, use ``asyncio.run()``:
@@ -139,7 +142,7 @@ A ``TestCase`` is combines a trace and the checks that will be applied to it.
       import asyncio
 
       async def main():
-          result = await test_case.run()
+          result = await test_scenario.run()
           return result
 
       result = asyncio.run(main())
@@ -148,25 +151,29 @@ A ``TestCase`` is combines a trace and the checks that will be applied to it.
 
 This will give us a result object with the results of the checks.
 
+.. note::
+   **Internal Note**: ``TestCase`` is an internal implementation detail. Users should always use ``scenario()`` to create scenarios, which internally uses TestCase.
+
 
 Scenario
 --------
 
-A ``Scenario`` allows you to compose multiple steps of testing in sequences alternating some interactions and some checks. This is useful when you are testing complex multi-turn scenarios and you want to test intermediate checkpoints.
+A ``Scenario`` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. You create scenarios using the ``scenario()`` function, which is the primary user-facing API. Scenarios work for both single-turn and multi-turn tests.
+
+The distinction between single-turn and multi-turn is conceptual - both use the same ``scenario()`` API. For multi-turn scenarios, you simply add multiple interactions and checks in sequence.
 
 For example, we can test a simple conversation flow with two turns:
 
 .. code-block:: python
 
-   from giskard.checks import scenario
-   from giskard.checks.builtin import Conformity
+   from giskard.checks import scenario, Conformity
 
    test_scenario = (
        scenario("conversation_flow")
        .interact(inputs="Hello", outputs=generate_answer)
-       .check(Conformity(key="last.outputs", rule="response should be a friendly greeting"))
+       .check(Conformity(key="trace.last.outputs", rule="response should be a friendly greeting"))
        .interact(inputs="Who invented the HTML?", outputs=generate_answer)
-       .check(Conformity(key="last.outputs", rule="response should mention Tim Berners-Lee as the inventor of HTML"))
+       .check(Conformity(key="trace.last.outputs", rule="response should mention Tim Berners-Lee as the inventor of HTML"))
    )
 
    # Run with asyncio.run() if in a script

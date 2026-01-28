@@ -24,7 +24,7 @@ Create a check from a simple function.
    from giskard.checks import from_fn, Trace
 
    def my_validation(trace: Trace) -> bool:
-       return len(trace.interactions[-1].outputs) > 10
+       return len(trace.last.outputs) > 10
 
    check = from_fn(
        my_validation,
@@ -67,7 +67,7 @@ Check if text contains, starts with, ends with, or exactly matches a pattern.
    check = StringMatchingCheck(
        name="contains_answer",
        content="Paris",
-       key="interactions[-1].outputs.answer",
+       key="trace.last.outputs.answer",
        evaluation_mode="contains"  # or "exact", "starts_with", "ends_with"
    )
 
@@ -94,7 +94,7 @@ Check if extracted value equals expected value.
    check = EqualityCheck(
        name="correct_confidence",
        expected=0.95,
-       key="interactions[-1].outputs.confidence"
+       key="trace.last.outputs.confidence"
    )
 
 
@@ -190,10 +190,10 @@ Custom LLM-based evaluation with user-defined prompt.
        name="tone_check",
        prompt="""
        Evaluate if the response has a professional tone.
-       
+
        Input: {{ inputs }}
        Output: {{ outputs }}
-       
+
        Return 'passed: true' if professional, 'passed: false' otherwise.
        """
    )
@@ -250,4 +250,3 @@ Creating a custom LLM check:
            return CheckResult.failure(
                message=f"Score {output_value.score} below threshold"
            )
-

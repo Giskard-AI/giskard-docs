@@ -167,13 +167,13 @@ Test that the system answers questions correctly:
                StringMatchingCheck(
                    name="mentions_paris",
                    content="Paris",
-                   key="interactions[-1].outputs.answer"
+                   key="trace.last.outputs.answer"
                )
            )
            # Check that documents were retrieved
            .check(
                from_fn(
-                   lambda trace: len(trace.interactions[-1].outputs.retrieved_docs) > 0,
+                   lambda trace: len(trace.last.outputs.retrieved_docs) > 0,
                    name="retrieved_documents",
                    success_message="Retrieved relevant documents",
                    failure_message="No documents retrieved"
@@ -182,7 +182,7 @@ Test that the system answers questions correctly:
            # Check confidence is reasonable
            .check(
                from_fn(
-                   lambda trace: trace.interactions[-1].outputs.confidence > 0.5,
+                   lambda trace: trace.last.outputs.confidence > 0.5,
                    name="confident_answer",
                    success_message="High confidence answer",
                    failure_message="Low confidence answer"
@@ -226,7 +226,7 @@ Verify that answers are grounded in retrieved context:
                StringMatchingCheck(
                    name="mentions_year",
                    content="1889",
-                   key="interactions[-1].outputs.answer"
+                   key="trace.last.outputs.answer"
                )
            )
        )
@@ -245,7 +245,7 @@ Test that the right documents are retrieved:
 
    def check_retrieved_topics(trace) -> bool:
        """Verify retrieved docs are about the right topic."""
-       docs = trace.interactions[-1].outputs.retrieved_docs
+       docs = trace.last.outputs.retrieved_docs
        topics = [doc.metadata.get("topic") for doc in docs]
        return "Eiffel Tower" in topics or "France" in topics
 
@@ -257,7 +257,7 @@ Test that the right documents are retrieved:
        )
        .check(
            from_fn(
-               lambda trace: len(trace.interactions[-1].outputs.retrieved_docs) >= 2,
+               lambda trace: len(trace.last.outputs.retrieved_docs) >= 2,
                name="sufficient_context",
                success_message="Retrieved multiple documents",
                failure_message="Not enough documents retrieved"
@@ -291,7 +291,7 @@ Test how the system handles questions it can't answer:
        )
        .check(
            from_fn(
-               lambda trace: len(trace.interactions[-1].outputs.retrieved_docs) == 0,
+               lambda trace: len(trace.last.outputs.retrieved_docs) == 0,
                name="no_irrelevant_docs",
                success_message="Correctly retrieved no documents",
                failure_message="Retrieved documents for out-of-scope question"
@@ -413,7 +413,7 @@ Test a conversational RAG that handles follow-up questions:
            StringMatchingCheck(
                name="first_mentions_paris",
                content="Paris",
-               key="interactions[-1].outputs.answer"
+               key="trace.last.outputs.answer"
            )
        )
 
@@ -495,12 +495,12 @@ Combine all tests into a comprehensive suite:
                        StringMatchingCheck(
                            name=f"contains_{expected_content}",
                            content=expected_content,
-                           key="interactions[-1].outputs.answer"
+                           key="trace.last.outputs.answer"
                        )
                    )
                    .check(
                        from_fn(
-                           lambda trace: len(trace.interactions[-1].outputs.retrieved_docs) > 0,
+                           lambda trace: len(trace.last.outputs.retrieved_docs) > 0,
                            name="has_context"
                        )
                    )
@@ -550,7 +550,7 @@ Combine all tests into a comprehensive suite:
                    )
                    .check(
                        from_fn(
-                           lambda trace: trace.interactions[-1].outputs.answer,
+                           lambda trace: trace.last.outputs.answer,
                            name="provides_response",
                            success_message="System provided a response"
                        )
@@ -628,9 +628,9 @@ Track confidence metrics to identify problematic queries:
 
    checks = [
        from_fn(
-           lambda trace: trace.interactions[-1].outputs.confidence,
+           lambda trace: trace.last.outputs.confidence,
            name="track_confidence",
-           success_message=lambda trace: f"Confidence: {trace.interactions[-1].outputs.confidence}"
+           success_message=lambda trace: f"Confidence: {trace.last.outputs.confidence}"
        ),
    ]
 

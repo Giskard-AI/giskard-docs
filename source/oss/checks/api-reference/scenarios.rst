@@ -15,7 +15,7 @@ Scenario
    :undoc-members:
    :show-inheritance:
 
-Execute a sequence of interaction specs and checks with a shared trace.
+A Scenario is a list of steps (interactions and checks) executed sequentially with a shared trace. You create scenarios using the ``scenario()`` function, which is the primary user-facing API. Scenarios work for both single-turn and multi-turn tests - the distinction is conceptual, not API-based.
 
 **Attributes:**
 
@@ -35,7 +35,7 @@ Execute a sequence of interaction specs and checks with a shared trace.
    test_scenario = (
        scenario("conversation_flow")
        .interact(inputs="Hello", outputs="Hi!")
-       .check(from_fn(lambda trace: "Hi" in trace.interactions[-1].outputs, name="check1"))
+       .check(from_fn(lambda trace: "Hi" in trace.last.outputs, name="check1"))
        .interact(inputs="How are you?", outputs="I'm well!")
        .check(from_fn(lambda trace: len(trace.interactions) == 2, name="check2"))
    )
@@ -71,25 +71,16 @@ TestCase
    :undoc-members:
    :show-inheritance:
 
-High-level API for running one interaction with multiple checks.
+.. note::
+   **Internal Implementation Detail**: ``TestCase`` is an internal implementation detail. Users should always use ``scenario()`` to create scenarios, which internally uses TestCase. The ``scenario()`` function creates a Scenario (a list of steps) and is the primary user-facing API.
 
-**Attributes:**
-
-* ``name``: Test case name
-* ``interaction``: InteractionSpec to execute
-* ``checks``: List of checks to run
-
-**Methods:**
-
-* ``run()``: Execute the test case and return results
-
-**Example:**
+**Example using scenario() (recommended):**
 
 .. code-block:: python
 
    from giskard.checks import scenario, StringMatchingCheck
 
-   tc = (
+   test_scenario = (
        scenario("qa_test")
        .interact(
            inputs="What is the capital of France?",
@@ -99,12 +90,12 @@ High-level API for running one interaction with multiple checks.
            StringMatchingCheck(
                name="contains_paris",
                content="Paris",
-               key="interactions[-1].outputs"
+               key="trace.last.outputs"
            )
        )
    )
 
-   result = await tc.run()
+   result = await test_scenario.run()
    assert result.passed
 
 

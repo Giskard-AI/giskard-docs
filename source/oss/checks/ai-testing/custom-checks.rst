@@ -15,7 +15,7 @@ The easiest way to create a check is using ``from_fn``:
    from giskard.checks import from_fn, Trace
 
    def my_validation(trace: Trace) -> bool:
-       output = trace.interactions[-1].outputs
+       output = trace.last.outputs
        return len(output) > 10
 
    check = from_fn(
@@ -42,7 +42,7 @@ For more control, create a custom check class:
        min_length: int = 10
 
        async def run(self, trace: Trace) -> CheckResult:
-           output = trace.interactions[-1].outputs
+           output = trace.last.outputs
            actual_length = len(output)
 
            if actual_length >= self.min_length:
@@ -96,7 +96,7 @@ Checks can return numeric metrics for analysis:
        max_grade_level: int = 8
 
        async def run(self, trace: Trace) -> CheckResult:
-           text = trace.interactions[-1].outputs
+           text = trace.last.outputs
 
            # Calculate readability (Flesch-Kincaid grade level)
            grade_level = calculate_readability(text)
@@ -170,7 +170,7 @@ Usage:
 
    check = FieldValidatorCheck(
        name="confidence_check",
-       field_path="interactions[-1].outputs.confidence",
+       field_path="trace.last.outputs.confidence",
        min_value=0.8
    )
 
@@ -220,8 +220,8 @@ Build domain-specific LLM-based checks:
 
        def get_inputs(self, trace: Trace) -> dict:
            return {
-               "inputs": trace.interactions[-1].inputs,
-               "outputs": trace.interactions[-1].outputs,
+               "inputs": trace.last.inputs,
+               "outputs": trace.last.outputs,
                "required_tone": self.required_tone
            }
 
@@ -262,7 +262,7 @@ Checks can be async for I/O operations:
        api_endpoint: str
 
        async def run(self, trace: Trace) -> CheckResult:
-           output = trace.interactions[-1].outputs
+           output = trace.last.outputs
 
            # Make async HTTP request
            async with httpx.AsyncClient() as client:
@@ -300,7 +300,7 @@ Checks can maintain state across scenarios (use with caution):
            self.seen_values = set()
 
        async def run(self, trace: Trace) -> CheckResult:
-           output = trace.interactions[-1].outputs
+           output = trace.last.outputs
 
            if output in self.seen_values:
                return CheckResult.failure(
@@ -332,7 +332,7 @@ Build complex checks by composing simpler ones:
        required_keywords: list[str] = []
 
        async def run(self, trace: Trace) -> CheckResult:
-           output = trace.interactions[-1].outputs
+           output = trace.last.outputs
            issues = []
 
            # Length checks
@@ -384,7 +384,7 @@ Medical Transcript Validation
        ]
 
        async def run(self, trace: Trace) -> CheckResult:
-           transcript = trace.interactions[-1].outputs
+           transcript = trace.last.outputs
 
            missing_sections = [
                section for section in self.required_sections
@@ -415,7 +415,7 @@ Financial Report Validation
        allow_predictions: bool = False
 
        async def run(self, trace: Trace) -> CheckResult:
-           report = trace.interactions[-1].outputs
+           report = trace.last.outputs
            issues = []
 
            # Check for required disclaimer
