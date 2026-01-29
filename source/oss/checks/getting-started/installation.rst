@@ -15,7 +15,7 @@ Giskard Checks requires **Python 3.12 or higher**. Install using pip:
 Configure the default LLM judge model
 -------------------------------------
 
-For LLM-based checks (``LLMJudge``, ``Groundedness``, ``Conformity``), you'll need to configure an LLM provider.
+Some checks require calling an LLM (``LLMJudge`, ``Groundedness``, ``Conformity``). To use them, you'll need configure an LLM provider.
 
 Giskard Checks supports any LiteLLM-compatible provider (Azure, Anthropic, etc.). See the `LiteLLM documentation <https://docs.litellm.ai/docs/providers>`_ for details.
 
