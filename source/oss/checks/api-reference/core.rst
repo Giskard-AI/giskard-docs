@@ -266,7 +266,7 @@ Set the default LLM generator for LLM-based checks.
    from giskard.agents.generators import Generator
    from giskard.checks import set_default_generator
 
-   set_default_generator(Generator(model="openai/gpt-4o-mini"))
+   set_default_generator(Generator(model="openai/gpt-5-mini"))
 
 
 .. autofunction:: get_default_generator

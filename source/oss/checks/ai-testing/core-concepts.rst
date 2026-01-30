@@ -62,7 +62,7 @@ Inputs and outputs can be static values or dynamic callables, and you can mix bo
    def generate_answer(inputs: str) -> str:
        client = OpenAI()
        response = client.chat.completions.create(
-           model="gpt-4o-mini",
+           model="gpt-5-mini",
            messages=[{"role": "user", "content": inputs}],
        )
        return response.choices[0].message.content

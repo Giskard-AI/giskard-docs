@@ -90,7 +90,7 @@ You can pass callables (functions or lambdas) to ``interact()`` instead of stati
 
     def get_answer(inputs: str) -> str:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-mini",
             messages=[{"role": "user", "content": inputs}],
         )
         return response.choices[0].message.content

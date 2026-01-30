@@ -143,7 +143,7 @@ Test multi-step agent workflows with tool usage:
        set_default_generator
    )
 
-   set_default_generator(Generator(model="openai/gpt-4o-mini"))
+   set_default_generator(Generator(model="openai/gpt-5-mini"))
 
    class Agent:
        def __init__(self):

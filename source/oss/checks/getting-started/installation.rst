@@ -27,7 +27,7 @@ For example, to use OpenAI, you can set the ``OPENAI_API_KEY`` environment varia
 
 Preferrably, you should set these environment variables in your ``.env`` file.
 
-Then you can set your preferred LLM judge model like this: 
+Then you can set your preferred LLM judge model like this:
 
 .. code-block:: python
 
@@ -35,7 +35,7 @@ Then you can set your preferred LLM judge model like this:
    from giskard.checks import set_default_generator
 
    # Create a generator with giskard.agents
-   llm_judge = Generator(model="openai/gpt-4o-mini")
+   llm_judge = Generator(model="openai/gpt-5-mini")
 
    # Configure the checks to use this judge model by default
    set_default_generator(llm_judge)
@@ -47,4 +47,3 @@ Next Steps
 ----------
 
 Head to the :doc:`../ai-testing/quickstart` to write your first test!
-

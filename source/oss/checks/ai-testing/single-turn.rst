@@ -48,7 +48,7 @@ Basic RAG Test
        set_default_generator
    )
 
-   set_default_generator(Generator(model="openai/gpt-4o-mini"))
+   set_default_generator(Generator(model="openai/gpt-5-mini"))
 
    def rag_system(question: str) -> dict:
        # Your RAG system
@@ -190,7 +190,7 @@ Evaluate summary quality, length, and factual consistency:
        set_default_generator
    )
 
-   set_default_generator(Generator(model="openai/gpt-4o-mini"))
+   set_default_generator(Generator(model="openai/gpt-5-mini"))
 
    def summarize(document: str) -> str:
        # Your summarization system
