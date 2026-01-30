@@ -59,7 +59,7 @@ We can now run the scenario and inspect the results. In a notebook, the ``Scenar
    :width: 900
 
 .. note::
-   The ``run()`` method is asynchronous. If you're running this code in a script or notebook, you'll need to use ``asyncio.run()`` to execute it:
+   The ``run()`` method is asynchronous. In a script, wrap it with ``asyncio.run()``:
 
    .. code-block:: python
 
