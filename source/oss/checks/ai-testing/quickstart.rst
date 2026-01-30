@@ -156,7 +156,7 @@ We can easily create a trace based on this format, and adapt our scenario:
             GreaterThan(
                 name="confidence is high",
                 key="trace.last.outputs.confidence",
-                threshold=0.90,
+                expected_value=0.90,
             )
         )
     )
