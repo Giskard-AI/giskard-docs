@@ -2,7 +2,7 @@
 Multi-Turn Scenarios
 ===================
 
-Multi-turn scenarios test conversational flows, stateful interactions, and complex workflows that span multiple exchanges.
+Multi-turn scenarios test conversational flows, stateful interactions, and complex workflows that span multiple exchanges. Use them to verify that your system stays compliant, consistent, and safe across an entire conversation.
 
 Many AI applications involve multiple interactions:
 
@@ -19,34 +19,42 @@ The ``Scenario`` class executes multiple interaction specs and checks in sequenc
 Basic Multi-Turn Flow
 ~~~~~~~~~~~~~~~~~~~~~~
 
+**Why this matters:** Multi-step conversations are where guardrails most often erode. A safe first reply can still lead to data leakage or policy violations in later turns.
+
 .. code-block:: python
 
-   from giskard.checks import scenario, StringMatchingCheck
+   from giskard.checks import scenario, StringMatching
 
    test_scenario = (
-       scenario("greeting_conversation")
+       scenario("incident_intake")
        # First interaction
        .interact(
-           inputs="Hello",
-           outputs=lambda inputs: "Hi! How can I help you?"
+           inputs="I think my account was compromised.",
+           outputs=lambda inputs: (
+               "Thanks. I have opened case ID SEC-1042. "
+               "Can you confirm the last transaction?"
+           )
        )
        .check(
-           StringMatchingCheck(
-               name="polite_greeting",
-               content="help",
-               key="trace.last.outputs"
+           StringMatching(
+               name="case_id_provided",
+               keyword="SEC-",
+               text_key="trace.last.outputs"
            )
        )
        # Second interaction
        .interact(
-           inputs="What's the weather?",
-           outputs=lambda inputs: "It's sunny and 72°F."
+           inputs="The last transfer was $9,000 to ACME Ltd.",
+           outputs=lambda inputs: (
+               "Understood. I escalated this as potential fraud "
+               "and locked the account."
+           )
        )
        .check(
-           StringMatchingCheck(
-               name="provides_weather",
-               content="sunny",
-               key="trace.last.outputs"
+           StringMatching(
+               name="escalation_confirmed",
+               keyword="escalated",
+               text_key="trace.last.outputs"
            )
        )
    )
@@ -65,6 +73,8 @@ Basic Multi-Turn Flow
 Stateful Conversations
 ----------------------
 
+**Why this matters:** Losing context can misroute incidents, expose private data, or break compliance workflows.
+
 Test systems that maintain conversation state:
 
 .. code-block:: python
@@ -79,18 +89,18 @@ Test systems that maintain conversation state:
            self.conversation_history.append({"role": "user", "content": message})
 
            # Your chatbot logic
-           if "my name is" in message.lower():
-               name = message.split("my name is")[-1].strip()
-               response = f"Nice to meet you, {name}!"
-           elif "what is my name" in message.lower():
+           if "case id is" in message.lower():
+               case_id = message.split("case id is")[-1].strip()
+               response = f"Got it. I am tracking case {case_id}."
+           elif "what case are we" in message.lower():
                # Reference earlier context
                for msg in reversed(self.conversation_history):
-                   if "my name is" in msg.get("content", "").lower():
-                       name = msg["content"].split("my name is")[-1].strip()
-                       response = f"Your name is {name}."
+                   if "case id is" in msg.get("content", "").lower():
+                       case_id = msg["content"].split("case id is")[-1].strip()
+                       response = f"We are discussing case {case_id}."
                        break
                else:
-                   response = "I don't recall your name."
+                   response = "I don't see a case ID yet."
            else:
                response = "I understand."
 
@@ -100,27 +110,27 @@ Test systems that maintain conversation state:
    bot = Chatbot()
 
    test_scenario = (
-       scenario("name_memory")
+       scenario("case_id_memory")
        .interact(
-           inputs="Hello, my name is Alice",
+           inputs="My case ID is SEC-1042.",
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
            from_fn(
-               lambda trace: "Alice" in trace.last.outputs,
-               name="acknowledges_name"
+               lambda trace: "SEC-1042" in trace.last.outputs,
+               name="acknowledges_case_id"
            )
        )
        .interact(
-           inputs="What is my name?",
+           inputs="What case are we discussing?",
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
            from_fn(
-               lambda trace: "Alice" in trace.last.outputs,
-               name="remembers_name",
-               success_message="Correctly recalled the name",
-               failure_message="Failed to recall the name"
+               lambda trace: "SEC-1042" in trace.last.outputs,
+               name="remembers_case_id",
+               success_message="Correctly recalled the case ID",
+               failure_message="Failed to recall the case ID"
            )
        )
    )
@@ -130,6 +140,8 @@ Test systems that maintain conversation state:
 
 Testing Agent Workflows
 ------------------------
+
+**Why this matters:** Agents that select the wrong tool or reasoning path can violate policy, leak data, or skip critical steps.
 
 Test multi-step agent workflows with tool usage:
 
@@ -162,10 +174,10 @@ Test multi-step agent workflows with tool usage:
    agent = Agent()
 
    test_scenario = (
-       scenario("agent_workflow")
+       scenario("policy_research_agent")
        # Agent receives task
        .interact(
-           inputs="Find me a Python tutorial",
+           inputs="Find the policy section on export-controlled data sharing.",
            outputs=lambda inputs: agent.run(inputs)
        )
        # Check that agent chose appropriate tool
@@ -184,9 +196,9 @@ Test multi-step agent workflows with tool usage:
                prompt="""
                Evaluate the agent's reasoning.
 
-               Task: {{ interactions[0].inputs }}
-               Thought: {{ interactions[0].outputs.thought }}
-               Action: {{ interactions[0].outputs.action }}
+               Task: {{ trace.interactions[0].inputs }}
+               Thought: {{ trace.interactions[0].outputs.thought }}
+               Action: {{ trace.interactions[0].outputs.action }}
 
                Return 'passed: true' if the reasoning is logical and appropriate.
                """
@@ -199,8 +211,8 @@ Test multi-step agent workflows with tool usage:
                prompt="""
                Evaluate if the final answer addresses the original task.
 
-               Task: {{ interactions[0].inputs }}
-               Answer: {{ interactions[0].outputs.final_answer }}
+               Task: {{ trace.interactions[0].inputs }}
+               Answer: {{ trace.interactions[0].outputs.final_answer }}
 
                Return 'passed: true' if the answer is helpful and relevant.
                """
@@ -211,6 +223,8 @@ Test multi-step agent workflows with tool usage:
 
 Dynamic Multi-Turn Interactions
 --------------------------------
+
+**Why this matters:** Follow-up logic must stay aligned with prior context to avoid compounding mistakes.
 
 Generate interactions dynamically based on previous outputs:
 
@@ -228,9 +242,9 @@ Generate interactions dynamically based on previous outputs:
        return f"Tell me more about {first_response}"
 
    test_scenario = (
-       scenario("dynamic_conversation")
+       scenario("dynamic_incident_followup")
        .interact(
-           inputs="What's the capital of France?",
+           inputs="Report a suspected account takeover.",
            outputs=lambda inputs: chatbot(inputs)
        )
        .check(
@@ -248,6 +262,8 @@ Generate interactions dynamically based on previous outputs:
 
 Testing Error Recovery
 ----------------------
+
+**Why this matters:** Error handling is where systems either fail safely or amplify risk.
 
 Verify that systems handle errors gracefully across turns:
 
@@ -304,6 +320,8 @@ Verify that systems handle errors gracefully across turns:
 Conversational RAG
 ------------------
 
+**Why this matters:** Follow-up questions often revisit sensitive policies where hallucinations create legal exposure.
+
 Test RAG systems with follow-up questions and context references:
 
 .. code-block:: python
@@ -338,20 +356,32 @@ Test RAG systems with follow-up questions and context references:
    rag = ConversationalRAG()
 
    test_scenario = (
-       scenario("conversational_rag")
+       scenario("policy_rag_followups")
        # Initial question
        .interact(
-           inputs="What is machine learning?",
+           inputs="What is our data retention policy for KYC documents?",
            outputs=lambda inputs: rag.answer(inputs)
        )
-       .check(Groundedness(name="first_answer_grounded"))
+       .check(
+           Groundedness(
+               name="first_answer_grounded",
+               answer_key="trace.last.outputs.answer",
+               context_key="trace.last.outputs.context",
+           )
+       )
 
        # Follow-up with pronoun reference
        .interact(
-           inputs="What are its main applications?",
+           inputs="Does that policy apply to archived records too?",
            outputs=lambda inputs: rag.answer(inputs)
        )
-       .check(Groundedness(name="followup_grounded"))
+       .check(
+           Groundedness(
+               name="followup_grounded",
+               answer_key="trace.last.outputs.answer",
+               context_key="trace.last.outputs.context",
+           )
+       )
        .check(
            from_fn(
                lambda trace: len(trace.interactions) == 2,
@@ -362,15 +392,23 @@ Test RAG systems with follow-up questions and context references:
 
        # Another follow-up
        .interact(
-           inputs="Can you explain the first one in detail?",
+           inputs="Can you summarize the retention timeline?",
            outputs=lambda inputs: rag.answer(inputs)
        )
-       .check(Groundedness(name="second_followup_grounded"))
+       .check(
+           Groundedness(
+               name="second_followup_grounded",
+               answer_key="trace.last.outputs.answer",
+               context_key="trace.last.outputs.context",
+           )
+       )
    )
 
 
 Task Completion Tracking
 -------------------------
+
+**Why this matters:** Multi-step task flows often power customer operations, and missing a step can create costly remediation.
 
 Test that multi-step tasks are completed successfully:
 
@@ -402,10 +440,10 @@ Test that multi-step tasks are completed successfully:
    agent = TaskAgent()
 
    test_scenario = (
-       scenario("task_management")
+       scenario("incident_checklist")
        # Add first task
        .interact(
-           inputs="Add task: Write documentation",
+           inputs="Add task: Notify security on-call",
            outputs=lambda inputs: agent.process(inputs)
        )
        .check(
@@ -417,7 +455,7 @@ Test that multi-step tasks are completed successfully:
 
        # Add second task
        .interact(
-           inputs="Add task: Review pull request",
+           inputs="Add task: Lock affected accounts",
            outputs=lambda inputs: agent.process(inputs)
        )
        .check(
