@@ -36,6 +36,9 @@ What's new?
       :alt: Knowledge bases with compact list layout and search
       :width: 100%
 
+**API v2 surface**
+   A new /v2 API surface is now available for core Hub resources (including agents, datasets, evaluations, scans, projects, knowledge bases, checks, and audit logs), with bulk actions and export endpoints. This helps SDKs and client integrations rely on a more predictable contract and reduces breakage as the API evolves.
+
 **Brand fonts update**
    The Hub UI now uses the new brand typography served from local font files, with spacing tweaks for improved readability. This helps keep the product visually consistent while reducing reliance on third-party font hosting.
 
