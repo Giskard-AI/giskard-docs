@@ -14,14 +14,14 @@ What's new?
    You can now perform bulk operations on multiple conversations at once, including deleting conversations, exporting data (JSON format), modifying tags, updating checks, changing status, and moving conversations between projects. This helps you organize large conversation datasets faster and with fewer manual actions.
 
 **Redesigned dashboard**
-   The project dashboard now features a two-column layout displaying Evaluations and Scans side-by-side, with richer visual summaries including a scans grade gauge and an interactive issue-category treemap. Clicking on specific results takes you directly to the corresponding scan run for deeper analysis. This helps you get a faster, more actionable overview of both security and quality metrics without leaving the dashboard.
+   The project dashboard now features a two-column layout displaying Evaluations and Scans side-by-side, with richer visual summaries including a scans grade gauge and an interactive issue-category treemap. Clicking on specific results takes you directly to the corresponding scan run for deeper analysis. This helps you get a faster, more actionable overview of both security and quality metrics and accelerates the diagnostic process without leaving the dashboard.
 
    .. image:: /_static/images/hub/new-dashboard.png
       :alt: New dashboard with evaluations and scans side-by-side
       :width: 100%
 
 **Automated agent description**
-   When setting up a new agent, you can now automatically generate its description with a single click. The system probes your agent and drafts a description that accurately depicts the agent's tone, abilities, and constraints, which you can then review and edit as needed. This helps you create comprehensive agent documentation faster than writing from scratch.
+   When setting up a new agent, you can now automatically generate its description with a single click. The system probes your agent and drafts a description that accurately depicts the agent's tone, abilities, and constraints, which you can then review and edit as needed. This helps you create comprehensive agent documentation faster than writing from scratch and ensures you have a good description of the agent domain and abilities.
 
 **Faster evaluation results**
    The evaluation results page now loads faster and remains responsive even for large evaluation runs with thousands of results. You can navigate between results while keeping your filters active. This helps you review large evaluations without slowdowns or delays.
@@ -42,8 +42,8 @@ What's new?
 **New security probes**
    Enhanced scanning capabilities with two new built-in probes:
 
-   * **Domain Misguidance** (Misguidance & Unauthorized Advice) - This probe adapts its follow-up questions based on the agent's previous answers to test if the chatbot can be led into providing harmful or out-of-scope guidance.
-   * **Reasoning Denial of Service** (Availability) - This probe targets agents that use reasoning models by testing whether they can be slowed down significantly with complex questions, which could make them unavailable to other users.
+   * **Domain Misguidance** (Misguidance & Unauthorized Advice) - A new dynamic attack probe that adapts its follow-up questions based on the agent's previous answers to probe for weaknesses and see if the chatbot can be led into providing harmful or out-of-scope guidance. Similar to TAP (Tree-of-Attacks Prompting), this probe uses dynamic logic to detect potential misguidance vulnerabilities.
+   * **Reasoning Denial of Service** (`OWASP LLM10:2025 - Unbounded Consumption <https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/>`_) - This probe targets agents relying on reasoning models to detect availability vulnerabilities. Evaluation is done by comparing the resource consumption (latency and token count) of standard questions against obfuscated variations that require a reasoning step. Significant performance degradation on the obfuscated prompts indicates a vulnerability to reasoning-induced resource exhaustion.
 
 What's fixed?
 ~~~~~~~~~~~~~
