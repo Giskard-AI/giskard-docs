@@ -47,7 +47,7 @@ What's new?
    Enhanced scanning capabilities with two new built-in probes:
 
    * **Domain Misguidance** (Misguidance & Unauthorized Advice) - A new dynamic attack probe that adapts its follow-up questions based on the agent's previous answers to probe for weaknesses and see if the chatbot can be led into providing harmful or out-of-scope guidance. Similar to TAP (Tree-of-Attacks Prompting), this probe uses dynamic logic to detect potential misguidance vulnerabilities.
-   * **Reasoning Denial of Service** (`OWASP LLM10:2025 - Unbounded Consumption <https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/>`_) - This probe targets agents relying on reasoning models to detect availability vulnerabilities. Evaluation is done by comparing the resource consumption (latency and token count) of standard questions against obfuscated variations that require a reasoning step. Significant performance degradation on the obfuscated prompts indicates a vulnerability to reasoning-induced resource exhaustion.
+   * **Reasoning Denial of Service** (`OWASP LLM10 - Denial of Service <https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/denial-of-service.html>`_) - This probe targets agents relying on reasoning models to detect availability vulnerabilities. Evaluation is done by comparing the resource consumption (latency and token count) of standard questions against obfuscated variations that require a reasoning step. Significant performance degradation on the obfuscated prompts indicates a vulnerability to reasoning-induced resource exhaustion.
 
 What's fixed?
 ~~~~~~~~~~~~~
