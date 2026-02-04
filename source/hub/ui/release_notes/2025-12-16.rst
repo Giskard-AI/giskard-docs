@@ -43,3 +43,8 @@ What's fixed?
 - **Export fixes**:
    - Added missing parameters to export options
    - Fixed metadata display in evaluation results
+
+Hub SDK
+-------
+
+No changes yet.

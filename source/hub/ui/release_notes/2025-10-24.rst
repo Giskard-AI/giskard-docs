@@ -32,3 +32,8 @@ What's fixed?
 - **Database Issues with Forbidden Characters** - Resolved problems caused by special characters in database operations
 - **Large Document Generation** - Fixed failures that occurred when generating large documents
 - **"Permission" Renamed to User Management** - Updated terminology for better clarity and consistency
+
+Hub SDK
+-------
+
+.. include:: ../../sdk/release_notes/2025-10-30.rst

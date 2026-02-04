@@ -59,3 +59,8 @@ What's fixed?
 - **Task permissions** - Fixed permission issues on tasks to ensure proper access control.
 
 - **Chart tooltips** - Improved tooltip rendering in evaluation charts.
+
+Hub SDK
+-------
+
+No changes yet.
