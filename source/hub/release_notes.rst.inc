@@ -15,6 +15,8 @@ Click on a release below to browse the release notes for that version:
 
    * - Hub UI
      - Hub SDK
+   * - :doc:`/hub/ui/release_notes/2026-02-03`
+     -
    * - :doc:`/hub/ui/release_notes/2025-12-17`
      -
    * - :doc:`/hub/ui/release_notes/2025-12-16`
