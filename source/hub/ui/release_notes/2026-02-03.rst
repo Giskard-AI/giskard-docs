@@ -10,6 +10,10 @@ Hub UI
 What's new?
 ~~~~~~~~~~~
 
+.. raw:: html
+
+   <iframe width="100%" height="400" src="https://www.youtube.com/embed/WyK-DL-ESvM?si=p0kZOr3Kb7aTZlE6&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 **Bulk conversation management**
    You can now perform bulk operations on multiple conversations at once, including deleting conversations, exporting data (JSON format), modifying tags, updating checks, changing status, and moving conversations between projects. This helps you organize large conversation datasets faster and with fewer manual actions.
 
