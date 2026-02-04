@@ -1,7 +1,7 @@
 2.3.0 (2026-02-03)
 ==================
 
-We are releasing a major update to the Hub that introduces bulk conversation management, a redesigned dashboard, automated agent descriptions, enhanced knowledge base browsing, and two new security probes. This release also brings significant performance improvements for large evaluation runs and a new API v2 surface for better SDK integration.
+We are releasing a new version of the Hub that brings significant improvements to productivity and user experience. This release introduces bulk conversation management for faster dataset organization, a redesigned dashboard with side-by-side evaluations and scans, automated agent description generation, enhanced knowledge base browsing with dedicated chunk navigation, and improved list views across all resources. We've also added two new security probes (Domain Misguidance and Reasoning Denial of Service) and delivered major performance improvements for large evaluation runs.
 
 
 Hub UI
@@ -23,50 +23,39 @@ What's new?
 **Automated agent description**
    When setting up a new agent, you can now automatically generate its description with a single click. The system probes your agent and drafts a description that accurately depicts the agent's tone, abilities, and constraints, which you can then review and edit as needed. This helps you create comprehensive agent documentation faster than writing from scratch.
 
-**Enhanced evaluation results**
-   Evaluation results now use server-side pagination, filtering, and sorting with URL-synced state. The result detail view supports navigation while keeping filters in sync, even for large evaluation runs. This helps large evaluations stay responsive and avoids slowdowns from loading and rendering huge result sets.
+**Faster evaluation results**
+   The evaluation results page now loads faster and remains responsive even for large evaluation runs with thousands of results. You can navigate between results while keeping your filters active. This helps you review large evaluations without slowdowns or delays.
 
 **Improved knowledge base browsing**
-   Knowledge Base documents now support server-driven search with topic filtering, plus a dedicated document detail page with next/previous navigation that preserves your filters. This helps you find and review KB content faster, especially in large knowledge bases.
+   The Knowledge Base documents page now loads faster and includes improved search with topic filtering. A new dedicated chunk detail page lets you navigate between chunks with next/previous buttons while preserving your search and filter settings. This helps you find and review KB content faster, especially in large knowledge bases.
 
 **Enhanced list views**
-   Agents, Datasets, Checks, and Knowledge Bases index pages now share a compact list layout with search, sort, and filters (where applicable), with URL-synced state. This helps you scan and find items faster and share or reload views without losing your place.
+   Agents, Datasets, Checks, and Knowledge Bases now display in a compact list layout with search, sort, and filters (where applicable). Your search and filter settings are preserved when you share links or reload the page. This helps you search, find, and share items faster without losing your place.
 
    .. image:: /_static/images/hub/kb-compact-list.png
       :alt: Knowledge bases with compact list layout and search
       :width: 100%
 
-**API v2 surface**
-   A new /v2 API surface is now available for core Hub resources (including agents, datasets, evaluations, scans, projects, knowledge bases, checks, and audit logs), with bulk actions and export endpoints. This helps SDKs and client integrations rely on a more predictable contract and reduces breakage as the API evolves.
-
 **Brand fonts update**
-   The Hub UI now uses the new brand typography served from local font files, with spacing tweaks for improved readability. This helps keep the product visually consistent while reducing reliance on third-party font hosting.
+   The Hub UI now uses the new brand typography with improved readability and visual consistency.
 
 **New security probes**
    Enhanced scanning capabilities with two new built-in probes:
 
-   * **Domain Misguidance** (Misguidance & Unauthorized Advice) - This probe uses dynamic logic similar to Tree-of-Attacks Prompting (TAP), adapting its follow-up questions based on the agent's previous answers. It probes for weaknesses to see if the chatbot can be led into providing harmful or out-of-scope guidance. The probe evaluates resource consumption by comparing the latency and token count of standard questions against variations requiring reasoning steps.
-   * **Reasoning Denial of Service** (Availability) - This probe targets agents relying on reasoning models to detect availability vulnerabilities. Evaluation is done by comparing the resource consumption (latency and token count) of standard questions against obfuscated variations that require a reasoning step. Significant performance degradation on the obfuscated prompts indicates a vulnerability to reasoning-induced resource exhaustion.
+   * **Domain Misguidance** (Misguidance & Unauthorized Advice) - This probe adapts its follow-up questions based on the agent's previous answers to test if the chatbot can be led into providing harmful or out-of-scope guidance.
+   * **Reasoning Denial of Service** (Availability) - This probe targets agents that use reasoning models by testing whether they can be slowed down significantly with complex questions, which could make them unavailable to other users.
 
 What's fixed?
 ~~~~~~~~~~~~~
 
-- **Dataset and test case access** - Users without permission to read check configurations can now still view datasets and test cases, with check UI falling back to identifiers when details aren't available. This helps limited-permission users review and work with datasets without needing extra access.
+- **Dataset and test case access** - Users without full permissions can now still view datasets and test cases. Check details are displayed when available based on your permission level. This helps limited-permission users review and work with datasets without needing extra access.
 
-- **Scheduled evaluation validation** - Weekly schedules now require a day of week and monthly schedules require a day of month on create and update, with clear error messages when invalid. This helps prevent misconfigured schedules that could fail or run at unexpected times.
+- **Scheduled evaluation validation** - Improved validation when creating or updating scheduled evaluations to ensure proper configuration. This helps prevent misconfigured schedules that could fail or run at unexpected times.
 
 - **Knowledge base import handling** - KB imports now skip empty or missing documents and keep topics aligned with the remaining documents. This helps imports succeed when source data contains incomplete rows.
 
-- **Knowledge base export download** - KB JSON exports now download as a proper file with the correct JSON content type and filename. This helps exports download reliably instead of breaking during navigation.
+- **Pretty view rendering** - Improved the "Pretty" conversation view rendering, especially whitespace handling. This helps conversations display more cleanly and remain readable.
 
-- **Proxy tool calls** - Fixed how the Azure OAuth LLM proxy handles tool/function calls so tool-using requests work correctly again. This helps tool-based workflows complete successfully instead of failing or behaving unexpectedly.
+- **Task permissions** - Fixed permission issues on tasks to ensure proper access control.
 
-- **Keycloak user creation** - Fixed the Keycloak API-key authenticator so user creation works correctly during registration events, with automated tests and CI coverage to prevent regressions. This helps ensure new users can be created reliably.
-
-- **Pretty view spacing** - Fixed the "Pretty" conversation view so markdown no longer shows extra whitespace, while preserving pre-wrapped whitespace behavior in the "Raw" view and non-markdown messages. This helps conversations render as intended and remain readable in both views.
-
-- **Task listing access** - Removed an extra permission check when listing project tasks and relied on filtering instead. This helps prevent task lists from failing due to an unnecessary permission gate while still limiting results appropriately.
-
-- **Chart tooltip labels** - Adjusted evaluation chart tooltip label formatting to safely handle non-string or empty labels. This helps prevent tooltip rendering issues in dashboard charts.
-
-- **Test case terminology** - Updated dataset page UI text to use "test case" instead of "testcase" for improved consistency and clarity.
+- **Chart tooltips** - Improved tooltip rendering in evaluation charts.
