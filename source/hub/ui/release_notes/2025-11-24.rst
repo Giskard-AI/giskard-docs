@@ -97,8 +97,3 @@ What's fixed?
 ~~~~~~~~~~~~~
 
 - **Email Reliability** - More robust TLS handling for outbound email
-
-Hub SDK
--------
-
-No changes yet.

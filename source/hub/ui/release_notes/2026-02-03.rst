@@ -67,9 +67,3 @@ What's fixed?
 - **Chart tooltip labels** - Adjusted evaluation chart tooltip label formatting to safely handle non-string or empty labels. This helps prevent tooltip rendering issues in dashboard charts.
 
 - **Test case terminology** - Updated dataset page UI text to use "test case" instead of "testcase" for improved consistency and clarity.
-
-
-Hub SDK
--------
-
-No changes yet.

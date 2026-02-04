@@ -11,8 +11,3 @@ What's fixed?
 
 - **Task editing** - Fixed an issue that prevented tasks from being saved while in edit mode.
 
-Hub SDK
--------
-
-No changes yet.
-
