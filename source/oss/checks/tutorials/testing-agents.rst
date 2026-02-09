@@ -142,7 +142,7 @@ Verify that the agent selects appropriate tools:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn, EqualityCheck
+   from giskard.checks import scenario, from_fn, Equality
 
    agent = SimpleAgent()
 
@@ -162,7 +162,7 @@ Verify that the agent selects appropriate tools:
                )
            )
            .check(
-               EqualityCheck(
+               Equality(
                    name="selected_calculator",
                    expected="calculator",
                    key="trace.last.outputs.steps[0].tool"

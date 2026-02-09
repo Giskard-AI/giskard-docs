@@ -146,8 +146,8 @@ Test that the system answers questions correctly:
    from giskard.agents.generators import Generator
    from giskard.checks import (
        scenario,
-       StringMatchingCheck,
-       EqualityCheck,
+       StringMatching,
+       Equality,
        from_fn,
        set_default_generator
    )
@@ -164,7 +164,7 @@ Test that the system answers questions correctly:
            )
            # Check that answer mentions Paris
            .check(
-               StringMatchingCheck(
+               StringMatching(
                    name="mentions_paris",
                    content="Paris",
                    key="trace.last.outputs.answer"
@@ -207,7 +207,7 @@ Verify that answers are grounded in retrieved context:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, Groundedness, StringMatchingCheck
+   from giskard.checks import scenario, Groundedness, StringMatching
 
    async def test_groundedness():
        tc = (
@@ -223,7 +223,7 @@ Verify that answers are grounded in retrieved context:
                )
            )
            .check(
-               StringMatchingCheck(
+               StringMatching(
                    name="mentions_year",
                    content="1889",
                    key="trace.last.outputs.answer"
@@ -365,7 +365,7 @@ Test a conversational RAG that handles follow-up questions:
        Groundedness,
        from_fn,
        LLMJudge,
-       StringMatchingCheck
+       StringMatching
    )
 
    class ConversationalRAG(SimpleRAG):
@@ -410,7 +410,7 @@ Test a conversational RAG that handles follow-up questions:
        )
        .check(Groundedness(name="first_answer_grounded"))
        .check(
-           StringMatchingCheck(
+           StringMatching(
                name="first_mentions_paris",
                content="Paris",
                key="trace.last.outputs.answer"
@@ -492,7 +492,7 @@ Combine all tests into a comprehensive suite:
                        outputs=lambda q: self.rag.answer(q)
                    )
                    .check(
-                       StringMatchingCheck(
+                       StringMatching(
                            name=f"contains_{expected_content}",
                            content=expected_content,
                            key="trace.last.outputs.answer"

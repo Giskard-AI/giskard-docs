@@ -141,7 +141,7 @@ Test a simple greeting and name exchange:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn, StringMatchingCheck
+   from giskard.checks import scenario, from_fn, StringMatching
 
    bot = SimpleChatbot()
 
@@ -153,7 +153,7 @@ Test a simple greeting and name exchange:
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
-           StringMatchingCheck(
+           StringMatching(
                name="polite_greeting",
                content="help",
                key="trace.last.outputs.message"
@@ -166,7 +166,7 @@ Test a simple greeting and name exchange:
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
-           StringMatchingCheck(
+           StringMatching(
                name="acknowledges_name",
                content="Alice",
                key="trace.last.outputs.message"
@@ -187,7 +187,7 @@ Test a simple greeting and name exchange:
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
-           StringMatchingCheck(
+           StringMatching(
                name="recalls_name",
                content="Alice",
                key="trace.last.outputs.message"
@@ -216,7 +216,7 @@ Verify the chatbot handles different conversation types:
    from giskard.checks import (
        scenario,
        LLMJudge,
-       EqualityCheck,
+       Equality,
        set_default_generator
    )
 
@@ -232,7 +232,7 @@ Verify the chatbot handles different conversation types:
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
-           EqualityCheck(
+           Equality(
                name="casual_context",
                expected="casual",
                key="trace.last.outputs.context.conversation_type"
@@ -245,7 +245,7 @@ Verify the chatbot handles different conversation types:
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
-           EqualityCheck(
+           Equality(
                name="support_context",
                expected="support",
                key="trace.last.outputs.context.conversation_type"
@@ -272,7 +272,7 @@ Verify the chatbot handles different conversation types:
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
-           EqualityCheck(
+           Equality(
                name="sales_context",
                expected="sales",
                key="trace.last.outputs.context.conversation_type"
@@ -345,7 +345,7 @@ Test the chatbot's ability to extract and remember user information:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn, EqualityCheck
+   from giskard.checks import scenario, from_fn, Equality
 
    bot = SimpleChatbot()
 
@@ -357,7 +357,7 @@ Test the chatbot's ability to extract and remember user information:
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
-           EqualityCheck(
+           Equality(
                name="extracted_name",
                expected="Bob",
                key="trace.last.outputs.context.user_name"
@@ -370,7 +370,7 @@ Test the chatbot's ability to extract and remember user information:
            outputs=lambda inputs: bot.chat(inputs)
        )
        .check(
-           EqualityCheck(
+           Equality(
                name="extracted_email",
                expected="bob.johnson@example.com",
                key="trace.last.outputs.context.user_email"
@@ -477,7 +477,7 @@ Test complex stateful interactions:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn, LLMJudge, StringMatchingCheck
+   from giskard.checks import scenario, from_fn, LLMJudge, StringMatching
 
    class StatefulChatbot(SimpleChatbot):
        def __init__(self):
@@ -530,7 +530,7 @@ Test complex stateful interactions:
            )
        )
        .check(
-           StringMatchingCheck(
+           StringMatching(
                name="asks_confirmation",
                content="confirm",
                key="trace.last.outputs.message"

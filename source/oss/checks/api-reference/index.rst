@@ -6,7 +6,7 @@ Complete API documentation for Giskard Checks.
 
 .. toctree::
    :maxdepth: 2
-   
+
    core
    builtin-checks
    scenarios
@@ -38,23 +38,31 @@ Quick Reference
        CheckStatus,
        Interaction,
        Trace,
-       
+
        # Interaction specs
        InteractionSpec,
        BaseInteractionSpec,
-       
+
        # Scenarios
        Scenario,
        TestCase,
-       
+
        # Built-in checks
        from_fn,
-       StringMatchingCheck,
-       EqualityCheck,
+       StringMatching,
+       Equals,
+       NotEquals,
+       LesserThan,
+       GreaterThan,
+       LesserThanEquals,
+       GreaterEquals,
        Groundedness,
        Conformity,
        LLMJudge,
-       
+       SemanticSimilarity,
+       BaseLLMCheck,
+       LLMCheckResult,
+
        # Configuration
        set_default_generator,
        get_default_generator,
@@ -79,11 +87,11 @@ Package Structure
    ├── builtin/
    │   ├── fn.py             # from_fn
    │   ├── string_matching.py
-   │   ├── equality.py
+   │   ├── comparison.py
    │   ├── groundedness.py
    │   ├── conformity.py
    │   ├── judge.py          # LLMJudge
-   │   └── extraction_check.py
+   │   └── semantic_similarity.py
    │
    ├── scenarios/
    │   └── runner.py         # ScenarioRunner
@@ -91,4 +99,3 @@ Package Structure
    └── testing/
        ├── runner.py         # TestCaseRunner
        └── spy.py            # WithSpy
-

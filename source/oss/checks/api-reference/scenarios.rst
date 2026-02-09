@@ -78,7 +78,7 @@ TestCase
 
 .. code-block:: python
 
-   from giskard.checks import scenario, StringMatchingCheck
+   from giskard.checks import scenario, StringMatching
 
    test_scenario = (
        scenario("qa_test")
@@ -87,7 +87,7 @@ TestCase
            outputs=lambda inputs: "Paris"
        )
        .check(
-           StringMatchingCheck(
+           StringMatching(
                name="contains_paris",
                content="Paris",
                key="trace.last.outputs"

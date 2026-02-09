@@ -48,37 +48,36 @@ Check class created by ``from_fn``.
 String Matching
 ---------------
 
-StringMatchingCheck
+StringMatching
 ~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: StringMatchingCheck
+.. autoclass:: StringMatching
    :members:
    :undoc-members:
    :show-inheritance:
 
-Check if text contains, starts with, ends with, or exactly matches a pattern.
+Check if a keyword appears within a text string.
 
 **Example:**
 
 .. code-block:: python
 
-   from giskard.checks import StringMatchingCheck
+   from giskard.checks import StringMatching
 
-   check = StringMatchingCheck(
+   check = StringMatching(
        name="contains_answer",
-       content="Paris",
-       key="trace.last.outputs.answer",
-       evaluation_mode="contains"  # or "exact", "starts_with", "ends_with"
+       keyword="Paris",
+       text_key="trace.last.outputs.answer"
    )
 
 
-Equality Checks
----------------
+Comparison Checks
+-----------------
 
-EqualityCheck
-~~~~~~~~~~~~~
+Equals
+~~~~~~
 
-.. autoclass:: EqualityCheck
+.. autoclass:: Equals
    :members:
    :undoc-members:
    :show-inheritance:
@@ -89,27 +88,123 @@ Check if extracted value equals expected value.
 
 .. code-block:: python
 
-   from giskard.checks import EqualityCheck
+   from giskard.checks import Equals
 
-   check = EqualityCheck(
+   check = Equals(
        name="correct_confidence",
-       expected=0.95,
+       expected_value=0.95,
        key="trace.last.outputs.confidence"
    )
 
+NotEquals
+~~~~~~~~~
 
-Extraction Checks
------------------
-
-ExtractionCheck
-~~~~~~~~~~~~~~~
-
-.. autoclass:: ExtractionCheck
+.. autoclass:: NotEquals
    :members:
    :undoc-members:
    :show-inheritance:
 
-Base class for checks that extract values from traces using JSONPath.
+Check if extracted value does not equal expected value.
+
+**Example:**
+
+.. code-block:: python
+
+   from giskard.checks import NotEquals
+
+   check = NotEquals(
+       name="non_empty_answer",
+       expected_value="",
+       key="trace.last.outputs.answer"
+   )
+
+GreaterThan
+~~~~~~~~~~~
+
+.. autoclass:: GreaterThan
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Check if extracted value is greater than expected value.
+
+**Example:**
+
+.. code-block:: python
+
+   from giskard.checks import GreaterThan
+
+   check = GreaterThan(
+       name="min_latency_ms",
+       expected_value=250,
+       key="trace.last.metadata.latency_ms"
+   )
+
+GreaterEquals
+~~~~~~~~~~~~~
+
+.. autoclass:: GreaterEquals
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Check if extracted value is greater than or equal to expected value.
+
+**Example:**
+
+.. code-block:: python
+
+   from giskard.checks import GreaterEquals
+
+   check = GreaterEquals(
+       name="meets_threshold",
+       expected_value=0.8,
+       key="trace.last.outputs.score"
+   )
+
+LesserThan
+~~~~~~~~~~
+
+.. autoclass:: LesserThan
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Check if extracted value is less than expected value.
+
+**Example:**
+
+.. code-block:: python
+
+   from giskard.checks import LesserThan
+
+   check = LesserThan(
+       name="max_tokens",
+       expected_value=512,
+       key="trace.last.metadata.token_count"
+   )
+
+LesserThanEquals
+~~~~~~~~~~~~~~~~
+
+.. autoclass:: LesserThanEquals
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Check if extracted value is less than or equal to expected value.
+
+**Example:**
+
+.. code-block:: python
+
+   from giskard.checks import LesserThanEquals
+
+   check = LesserThanEquals(
+       name="max_cost",
+       expected_value=0.02,
+       key="trace.last.metadata.cost"
+   )
 
 
 LLM-Based Checks
@@ -166,7 +261,8 @@ Check if outputs conform to instructions or specifications.
 
    check = Conformity(
        name="follows_instructions",
-       description="Ensure response follows the given instructions"
+       description="Ensure response follows the given instructions",
+       rule="Always respond in JSON"
    )
 
 
@@ -196,6 +292,28 @@ Custom LLM-based evaluation with user-defined prompt.
 
        Return 'passed: true' if professional, 'passed: false' otherwise.
        """
+   )
+
+SemanticSimilarity
+~~~~~~~~~~~~~~~~~
+
+.. autoclass:: SemanticSimilarity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Check if text is semantically similar to the expected content.
+
+**Example:**
+
+.. code-block:: python
+
+   from giskard.checks import SemanticSimilarity
+
+   check = SemanticSimilarity(
+       name="answer_similarity",
+       reference_text="Paris is the capital of France.",
+       threshold=0.9
    )
 
 

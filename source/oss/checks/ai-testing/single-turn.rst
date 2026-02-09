@@ -56,7 +56,7 @@ Basic RAG Test
    from giskard.checks import (
        scenario,
        Groundedness,
-       StringMatchingCheck,
+       StringMatching,
        set_default_generator
    )
 
@@ -155,7 +155,7 @@ For classification tasks, validate both the predicted class and confidence:
 .. code-block:: python
 
    from pydantic import BaseModel
-   from giskard.checks import scenario, EqualityCheck, from_fn
+   from giskard.checks import scenario, Equality, from_fn
 
    class Classification(BaseModel):
        label: str
@@ -362,7 +362,7 @@ Test systems that return structured data:
 .. code-block:: python
 
    from pydantic import BaseModel, Field
-   from giskard.checks import scenario, EqualityCheck, from_fn
+   from giskard.checks import scenario, Equality, from_fn
 
    class PersonInfo(BaseModel):
        name: str
@@ -420,7 +420,7 @@ Use test fixtures for reusable test data:
 .. code-block:: python
 
    import pytest
-   from giskard.checks import scenario, StringMatchingCheck
+   from giskard.checks import scenario, StringMatching
 
    @pytest.fixture
    def qa_test_cases():
@@ -461,7 +461,7 @@ Evaluate multiple test cases and aggregate results:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, StringMatchingCheck
+   from giskard.checks import scenario, StringMatching
 
    test_cases = [
        ("How long do we retain KYC records?", "5 years"),
@@ -480,7 +480,7 @@ Evaluate multiple test cases and aggregate results:
                    outputs=lambda inputs, exp=expected: my_system(inputs)
                )
                .check(
-                   StringMatchingCheck(
+                   StringMatching(
                        name="contains_answer",
                        content=expected,
                        key="trace.last.outputs"
