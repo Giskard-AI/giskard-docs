@@ -6,7 +6,6 @@
    oss/sdk/index
    oss/sdk/security
    oss/sdk/business
-   oss/sdk/legacy
    oss/notebooks/index
    oss/sdk/reference/index
    Release notes <https://github.com/Giskard-AI/giskard/releases>
