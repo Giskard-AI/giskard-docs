@@ -45,8 +45,34 @@ Giskard Hub
 
    Ready to unlock the full potential of enterprise-grade AI testing? Try **Giskard Hub** with a free trial and discover advanced team collaboration, continuous red teaming, and enterprise security features.
 
-   `Start your free enterprise trial <start/enterprise-trial.html>`_ and see how Giskard Hub can transform your AI testing workflow.
+   :doc:`Start your free enterprise trial </start/enterprise-trial>` and see how Giskard Hub can transform your AI testing workflow.
+Open source
+-----------
 
+**Giskard Open Source** is a Python library for LLM testing and evaluation. It is available on `GitHub <https://github.com/Giskard-AI/giskard>`_ and formed the basis for our course on Red Teaming LLM Applications on `Deeplearning.AI <https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/>`_.
+
+The library provides a set of tools for testing and evaluating LLMs, including:
+
+* Automated detection of security vulnerabilities using LLM Scan.
+* Automated detection of business logic failures using RAG Evaluation Toolkit.
+
+.. grid:: 1 1 2 2
+
+   .. grid-item-card:: Giskard Open Source
+      :link: oss/sdk/index
+      :link-type: doc
+
+      As a developer, you can use the Open Source SDK to get familiar with basic testset generation for business and security failures.
+
+   .. grid-item-card:: Deeplearning.AI
+      :link: https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/
+
+      Our course on red teaming LLM applications on Deeplearning.AI helps you understand how to test, red team and evaluate LLM applications.
+
+.. tip::
+   **⚖️ Unsure about the difference between Open Source and Hub?**
+
+   Check out our :doc:`/start/comparison` guide to learn more about the different features.
 Open research
 -------------
 
@@ -76,46 +102,10 @@ Some work has been funded by the `the European Commission <https://commission.eu
 
       - `RealPerformance website <https://realperformance.giskard.ai/>`_
 
-.. note::
+.. tip::
 
    Are you interested in supporting our research? Check out our `Open Collective funding page for Phare <https://opencollective.com/phare-llm-benchmark>`_.
-
-.. toctree::
-   :caption: Getting Started
-   :hidden:
-   :maxdepth: 3
-
-   self
-   start/comparison
-   start/enterprise-trial
-   start/glossary/index
-   Contact us <https://www.giskard.ai/contact>
-   Blogs <https://www.giskard.ai/knowledge-categories/blog>
-
-.. toctree::
-   :caption: Giskard Hub UI
-   :hidden:
-   :maxdepth: 2
-
-   hub/ui/index
-   hub/ui/scan/index
-   hub/ui/datasets/index
-   hub/ui/annotate
-   hub/ui/evaluations
-   hub/ui/evaluations-compare
-   hub/ui/continuous-red-teaming
-   hub/ui/access-rights
-
-.. toctree::
-   :caption: Giskard Hub SDK
-   :hidden:
-   :maxdepth: 4
-
-   hub/sdk/index
-   hub/sdk/projects
-   hub/sdk/scans
-   hub/sdk/datasets/index
-   hub/sdk/checks
-   hub/sdk/evaluations
-   hub/sdk/reference/index
-   GitHub <https://github.com/Giskard-AI/giskard-hub>
+.. include:: toctree.rst
+.. include:: toctree_hub_ui.rst
+.. include:: toctree_hub_sdk.rst
+.. include:: toctree_oss.rst

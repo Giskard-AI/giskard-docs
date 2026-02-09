@@ -1,5 +1,5 @@
-:og:title: Giskard Hub - Enterprise Agent Testing - Access Rights
-:og:description: Configure role-based access control, manage user permissions, and ensure secure collaboration across your organization's LLM agent testing projects.
+:og:title: Giskard Hub UI - Access Rights and User Management
+:og:description: Configure role-based access control, manage user permissions, and ensure secure collaboration across your organization's LLM agent testing projects with enterprise-grade security.
 
 ==================
 Set access rights
@@ -16,7 +16,7 @@ Configure users and groups
 
    .. tab-item:: User-level permissions
 
-      To manage user-level permissions, click the "Account" icon in the upper right corner of the screen, then select "Settings." From the left panel, choose "Users" and then press "Users" in the dropdown.
+      To manage user-level permissions, click the "Settings" icon in the left panel, then select press the dropdown for the "Users" sections. Within the dropdown, you can go to the "Users" section.
 
       .. image:: /_static/images/hub/access-settings.png
          :align: center
@@ -25,7 +25,7 @@ Configure users and groups
 
    .. tab-item:: Group-level permissions
 
-      To manage group-level permissions, click the "Account" icon in the upper right corner of the screen, then select "Settings." From the left panel, choose "Users" and then press "Groups" in the dropdown.
+      To manage group-level permissions, click the "Settings" icon in the left panel, then select press the dropdown for the "Users" sections. Within the dropdown, you can go to the "Groups" section.
 
       .. image:: /_static/images/hub/access-settings-group.png
          :align: center
@@ -49,7 +49,7 @@ Configure users and groups
 
 
 Configure Global Permissions
-____________________________
+----------------------------
 
 Global permissions apply access rights across all projects. You can configure Create, Read, Edit, and Delete permissions for each page or entity. This is available in the following pages: Project, Dataset, Agent, Knowledge Base, and Evaluation. Additionally, for features like the Playground, API Key Authentication, and Permission, you can enable or disable the users’ right to use it.
 
@@ -71,7 +71,7 @@ The rights are as follows:
    :width: 800
 
 Configure Scoped Permissions
-____________________________
+----------------------------
 
 Scoped permissions allow for granular control. For each project, you can specify which pages or entities users are allowed to access. An example of where this may be useful is if you want your users to read everything in a project but only allow a few people to edit the dataset.
 
@@ -80,6 +80,6 @@ Scoped permissions allow for granular control. For each project, you can specify
    :alt: "Set scope of permissions"
    :width: 800
 
-.. note::
+.. tip::
 
     Users need to log in first before an admin can give them any permissions in the Hub.

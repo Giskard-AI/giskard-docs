@@ -65,13 +65,13 @@ Giskard provides comprehensive tools to test and detect addition of information 
 .. grid:: 1 1 2 2
 
    .. grid-item-card:: Hub UI - Business Dataset Creation
-      :link: /hub/ui/datasets/business
+      :link: /hub/ui/datasets/knowledge_base
       :link-type: doc
 
       Use the Hub interface to generate document-based test cases for addition of information detection. The UI automatically generates queries based on your knowledge base and evaluates responses for extra information.
 
    .. grid-item-card:: Annotate test cases with test rules
-      :link: /hub/ui/annotate
+      :link: /hub/ui/annotate/overview
       :link-type: doc
 
       Annotate test cases with test rules to help the model understand the business boundaries.

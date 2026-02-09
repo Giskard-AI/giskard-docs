@@ -1,6 +1,8 @@
-===============================================
+:og:title: Giskard Hub UI - Review Scan Results and Security Analysis
+:og:description: Review comprehensive vulnerability scan results with detailed security analysis. Understand security grades, explore attack details, and take actionable steps to improve AI agent security.
+
 Review scan results
-===============================================
+===================
 
 Understand your AI agent's security vulnerabilities and take action to fix them.
 
@@ -49,14 +51,25 @@ This shows you:
 Take action on findings
 -----------------------
 
-For each detected issue, you can:
+For each detected issue, you have three main actions:
 
-**Mark as false positive**
-   If the identified issue doesn't represent a real risk in your context, mark it as a false positive. This updates your security grade automatically.
+- **Mark as false positive:**  
+  If the identified issue is not a real risk for your use case (for example, it is expected behavior or not relevant to your deployment), you can mark it as a false positive. This will immediately update your agent's security grade and help you track which findings require action.
 
-**Convert to test case**
-   Click **Send to dataset** to save the attack as a reproducible test case. This helps you:
+- **Convert to test case:**  
+  You can save the detected attack as a reproducible test case by clicking **Send to dataset**. This allows you to track fixes over time, build regression tests to make sure the issue doesn't reappear, and share concrete examples with your team for further analysis and improvement.
 
-   * Track fixes over time
-   * Build regression tests
-   * Share examples with your team
+- **Create a task:**  
+  You can create a task to track and assign work items for reviewing vulnerabilities. This is useful for organizing the review of issues found during scans and coordinating work among team members. To create a task, click on **Add task** button on the top right side of the screen when reviewing a specific probe. You can set the task priority, status, assignees, and provide a description of what needs to be done.
+
+.. tip:: 
+
+   To learn more about reviewing test cases, see :doc:`/hub/ui/annotate/review_test_results`.
+
+Next steps
+----------
+
+Now that you have reviewed the scan results, you can take action on the detected vulnerabilities.
+
+* **Review test cases** - :doc:`/hub/ui/annotate/index`
+* **Run and schedule evaluations** - :doc:`/hub/ui/evaluations/index`

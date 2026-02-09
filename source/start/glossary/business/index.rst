@@ -1,4 +1,4 @@
-AI Business Failures
+Business Failures
 ========================
 
 Business vulnerabilities are failures that affect the business logic, accuracy, and reliability of AI systems. These include issues that impact the model's ability to provide accurate, reliable, and appropriate responses in normal usage scenarios.
@@ -61,7 +61,7 @@ To begin testing your AI systems for business failures:
 .. grid:: 1 1 2 2
 
    .. grid-item-card:: Giskard Hub UI Business Dataset
-      :link: /hub/ui/datasets/business
+      :link: /hub/ui/datasets/knowledge_base
       :link-type: doc
 
       Our state-of-the-art enterprise-grade business failure testing.

@@ -1,0 +1,50 @@
+2.2.0 (2025-12-16)
+==================
+
+We are releasing a new version of the Hub UI that introduces scenario-based generation, bulk move operations from evaluations, improved list displays with search and filters, and two new probes. This helps you create more targeted test cases, efficiently build golden datasets, and better navigate your Hub resources.
+
+
+Hub UI
+------
+
+What's new?
+~~~~~~~~~~~
+
+.. raw:: html
+
+   <iframe width="100%" height="400" src="https://www.youtube.com/embed/g_fsrGyJF4E?si=6ohbPagZyCNU7OCp&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+**Scenario-based generation**
+   Scenario-based generation replaces the previous Adversarial generation in the Giskard Hub. You can now choose between three test generation modes in the Hub: LLM vulnerability scanner (run 50+ probes), Knowledge base generation, and Scenario-based. Users are able to create more targeted, business-specific tests without editing the agent description. This helps to generate more realistic test cases. Users provide a description and rules. For example: Persona using slang/emojis asking about loans; rules enforce professional tone and refusal to do interest calculations.
+
+**Bulk move from evaluations**
+   You can now select specific conversations directly from an evaluation run and move or duplicate them into a specific dataset. This simplifies the process of curating high-quality examples for regression testing.
+
+
+
+**Better display of lists**
+   To improve navigability, we have introduced a search bar and dedicated filters across the platform. You can now easily search and filter through datasets, agents, knowledge bases, and checks , making it faster to locate specific assets in complex workspaces.
+
+**Enhanced Scans**
+   Improved scanning capabilities with new probes and better rendering:
+
+   * **New Built-in Probes** - Two new built-in probes added to the scanning toolkit
+      - **ChatInject** (OWASP LLM 01 - Prompt Injection) - This probe tests whether agents can be manipulated through malicious instructions formatted to match their native chat templates. Unlike traditional plain-text injection attacks, ChatInject exploits the structured role-based formatting (system, user, assistant tags) that agents use internally. By wrapping attack payloads with forged chat template tokens, mimicking the model's own instruction hierarchy, attackers can bypass defenses that rely on role priority. The probe includes a multi-turn variant that sends persuasive conversation, delimited with adequate separation tokens, inside one message to confuse the agent under test. This technique achieves significantly higher success rates than standard injection methods and transfers effectively across models, even when the target model's exact template structure is unknown.
+      - **CoT Forgery** (OWASP LLM 01 - Prompt Injection) - This probe implements the Chain-of-Thought (CoT) forgery attack strategy, which appends realistic and compliant reasoning traces to harmful requests that mimic the format and tone of legitimate reasoning steps, causing the model to continue the compliant reasoning pattern and answer requests it should refuse.
+   * **Improved Markdown rendering** - Enhanced Markdown rendering in Scan results
+
+What's fixed?
+~~~~~~~~~~~~~
+
+- **Permission fix for "Add checks" button** - Fixed permission issue for test case creation
+- **Permission fix for "Add task" button** - Fixed permission issue for task creation
+- **Better handling of LiteLLM-specific embedding exceptions** - Improved error handling for embedding generation errors
+- **Improved Scan error handling** - Enhanced error handling for vulnerability scan errors
+- **Export fixes**:
+   - Added missing parameters to export options
+   - Fixed metadata display in evaluation results
+
+Hub SDK
+-------
+
+No changes yet.

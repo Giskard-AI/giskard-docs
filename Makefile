@@ -4,9 +4,10 @@
 # You can set these variables from the command line, and also
 # from the environment for the first two.
 SPHINXOPTS    ?=
-SPHINXBUILD   ?= sphinx-build
+SPHINXBUILD   ?= uv run sphinx-build
 SOURCEDIR     = source
 BUILDDIR      = build
+LIDAR_RELEASE = main
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -29,11 +30,17 @@ pre-commit-install: ## Setup pre-commit hooks
 	uv tool run pre-commit install
 .PHONY: pre-commit-install
 
+generate-probe-docs: ## Generate probe documentation from lidar
+	@if [ ! -d .venv-probe-docs ]; then uv venv .venv-probe-docs; fi
+	uv pip install --python .venv-probe-docs/bin/python "git+https://github.com/Giskard-AI/lidar@$(LIDAR_RELEASE)"
+	.venv-probe-docs/bin/python scripts/generate_probe_docs.py
+.PHONY: generate-probe-docs
+
 dev: ## Start development server
-	uv run sphinx-autobuild source build
+	uv run sphinx-autobuild source build --ignore "source/_templates/sidebars/**"
 .PHONY: dev
 
 doc: clean html ## Build the doc
 	rm -rf ./docs && mkdir -p ./docs && touch ./docs/.nojekyll && mv ./build/html/* ./docs
 	echo docs.giskard.ai > ./docs/CNAME
-.PHONY: setup
+.PHONY: doc

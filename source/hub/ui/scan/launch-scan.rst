@@ -1,6 +1,8 @@
-===============================================
-Launch a red teaming scan
-===============================================
+:og:title: Giskard Hub UI - Launch Vulnerability Scans
+:og:description: Launch comprehensive vulnerability scans for your AI agents. Configure scan parameters, select vulnerability categories, and monitor real-time progress with intuitive visual tools.
+
+Launch a scan
+=============
 
 Start testing your AI agent for security vulnerabilities.
 
@@ -8,7 +10,7 @@ How to launch a scan
 --------------------
 
 1. **Navigate to the scan page**
-   Click **Scan** in the left sidebar, then **Launch Scan**
+   Click **Scan** in the left sidebar
 
 2. **Select your agent**
    Choose which AI agent you want to test from the dropdown
@@ -38,3 +40,10 @@ Once started, you can track the scan's progress in real-time:
    :width: 800
 
 The scan typically takes 5-15 minutes depending on your agent's complexity and the number of categories selected.
+
+Next steps
+----------
+
+Now that you have launched a scan, you can review the scan results and take action on the detected vulnerabilities.
+
+* **Review scan results** - :doc:`/hub/ui/scan/review-scan-results`

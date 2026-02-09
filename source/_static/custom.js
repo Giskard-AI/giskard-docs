@@ -1,44 +1,148 @@
 /**
  * Custom functionality for Giskard documentation
- * Left sidebar scroll to current item on page load
- * Enterprise trial banner management
+ * Minimal implementation to prevent sidebar jitter
  */
-(function() {
+(function () {
   'use strict';
 
-  function scrollToCurrentItem() {
-    // Find the left sidebar
+  // Expand parent sections that contain the current page - runs BEFORE Alpine initializes
+  function preExpandCurrentSections() {
     const sidebar = document.querySelector('#left-sidebar');
     if (!sidebar) return;
 
-    // Find the current/active item with multiple selector fallbacks
-    const currentItem = sidebar.querySelector('a.current') ||
-                       sidebar.querySelector('.current a') ||
-                       sidebar.querySelector('li.current a') ||
-                       sidebar.querySelector('.toctree-l1.current a') ||
-                       sidebar.querySelector('[aria-current="page"]');
+    const currentPath = window.location.pathname.replace(/\/$/, '') || '/index.html';
 
-    if (currentItem) {
-      // Small delay to ensure DOM is fully rendered
-      setTimeout(() => {
-        // Get the position of the current item relative to the sidebar
-        const sidebarRect = sidebar.getBoundingClientRect();
-        const itemRect = currentItem.getBoundingClientRect();
-        const relativeTop = itemRect.top - sidebarRect.top;
-        const sidebarHeight = sidebar.clientHeight;
+    // Find the link matching current page - prefer links within toctree items
+    const navLinks = sidebar.querySelectorAll('li[class*="toctree-"] a[href]');
+    let currentLink = null;
+    let bestMatchLength = -1;
 
-        // Calculate the scroll position to center the item in the sidebar
-        const scrollTop = sidebar.scrollTop + relativeTop - (sidebarHeight / 2) + (itemRect.height / 2);
+    for (const link of navLinks) {
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('http')) continue;
 
-        // Scroll only the sidebar, not the entire page
-        sidebar.scrollTo({
-          top: scrollTop,
-          behavior: 'smooth'
-        });
-      }, 100);
+      const linkPath = href.split('#')[0].replace(/\/$/, '') || '/index.html';
+
+      // Exact match always wins
+      if (currentPath === linkPath) {
+        currentLink = link;
+        break;
+      }
+
+      // Otherwise look for longest matching path
+      if (currentPath.endsWith(linkPath) && linkPath.length > bestMatchLength) {
+        currentLink = link;
+        bestMatchLength = linkPath.length;
+      }
+    }
+
+    if (!currentLink) return;
+
+    // Mark the current link
+    currentLink.classList.add('current');
+
+    // Mark all parent <li> elements to be expanded BEFORE Alpine.js initializes
+    let parentLi = currentLink.closest('li');
+    while (parentLi) {
+      if (parentLi.hasAttribute('x-data')) {
+        // Modify the x-data attribute to start expanded ONLY if not already true
+        const currentXData = parentLi.getAttribute('x-data');
+        if (currentXData && currentXData.includes('expanded: false')) {
+          parentLi.setAttribute('x-data', currentXData.replace('expanded: false', 'expanded: true'));
+        }
+        // Also mark the parent's link as current for highlighting
+        const parentLink = parentLi.querySelector(':scope > a');
+        if (parentLink) {
+          parentLink.classList.add('current');
+        }
+      }
+      parentLi.classList.add('current');
+      parentLi = parentLi.parentElement?.closest('li');
     }
   }
 
+  // Save expanded state and scroll position before navigation
+  function saveExpandedState() {
+    const sidebar = document.querySelector('#left-sidebar');
+    if (!sidebar) return;
+
+    // Save scroll position
+    sessionStorage.setItem('sidebarScrollTop', sidebar.scrollTop);
+
+    // Save expanded dropdowns by checking if the child <ul> is visible
+    // This is safer than accessing Alpine's internal _x_dataStack
+    const expandedHrefs = [];
+    sidebar.querySelectorAll('[x-data]').forEach(element => {
+      const link = element.querySelector('a');
+      if (!link || !link.href) return;
+
+      // Check if the child <ul> with x-show is visible
+      // When x-show="expanded" is true, the element should be visible (not display: none)
+      const childUl = element.querySelector(':scope > ul[x-show]');
+      if (childUl) {
+        const style = window.getComputedStyle(childUl);
+        if (style.display !== 'none' && style.visibility !== 'hidden') {
+          expandedHrefs.push(link.href);
+        }
+      }
+    });
+
+    if (expandedHrefs.length > 0) {
+      sessionStorage.setItem('expandedDropdowns', JSON.stringify(expandedHrefs));
+    }
+  }
+
+  // Restore expanded state after navigation
+  function restoreExpandedState() {
+    const sidebar = document.querySelector('#left-sidebar');
+    if (!sidebar) return;
+
+    const savedState = sessionStorage.getItem('expandedDropdowns');
+    if (!savedState) return;
+
+    const expandedHrefs = new Set(JSON.parse(savedState));
+
+    sidebar.querySelectorAll('[x-data]').forEach(element => {
+      const link = element.querySelector('a');
+      if (link && expandedHrefs.has(link.href)) {
+        // Modify x-data before Alpine initializes ONLY if it's currently false
+        const currentXData = element.getAttribute('x-data');
+        if (currentXData && currentXData.includes('expanded: false')) {
+          element.setAttribute('x-data', currentXData.replace('expanded: false', 'expanded: true'));
+        }
+      }
+    });
+  }
+
+  // Restore scroll position
+  function restoreScrollPosition() {
+    const sidebar = document.querySelector('#left-sidebar');
+    if (!sidebar) return;
+
+    const savedScrollTop = sessionStorage.getItem('sidebarScrollTop');
+    if (savedScrollTop !== null) {
+      sidebar.scrollTop = parseInt(savedScrollTop, 10);
+    }
+  }
+
+  // Run BEFORE Alpine.js initializes to prevent jitter
+  preExpandCurrentSections();
+  restoreExpandedState();
+
+  // Restore scroll position immediately
+  restoreScrollPosition();
+
+  // Save state on navigation
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('a[href*=".html"]')) {
+      const href = e.target.getAttribute('href');
+      if (href && !href.startsWith('http') && !href.startsWith('mailto:')) {
+        saveExpandedState();
+      }
+    }
+  });
+
+  // Enterprise trial banner management
   function createEnterpriseTrialBanner() {
     // Check if banner already exists to avoid duplicates
     if (document.querySelector('.enterprise-trial-banner')) {
@@ -53,9 +157,8 @@
     // Create banner element
     const banner = document.createElement('div');
     banner.className = 'enterprise-trial-banner';
-    const baseUrl = window.location.origin;
     banner.innerHTML = `
-      <span>🚀 Ready to scale your AI testing? <a href="${baseUrl}/start/enterprise-trial.html">Request your free enterprise trial today! 🛡️</a> </span>
+      <span>📄 Learn about the research behind our Red Teaming: <a href="https://www.giskard.ai/knowledge/llm-security-50-adversarial-attacks-for-ai-red-teaming" target="_blank">Download our LLM Security Attacks Whitepaper</a></span>
       <button class="close-btn" aria-label="Close banner">×</button>
     `;
 
@@ -105,66 +208,54 @@
     });
   }
 
-  // Handle Sphinx navigation events to ensure banner persists
-  function handleSphinxNavigation() {
-    // Small delay to ensure DOM is ready after navigation
-    setTimeout(() => {
-      // Only create banner if it wasn't previously closed in this tab
-      if (sessionStorage.getItem('enterprise-trial-banner-closed') !== 'true') {
-        createEnterpriseTrialBanner();
-      }
-    }, 100);
+  // Initialize banner on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    createEnterpriseTrialBanner();
+  });
+
+  // Handle banner persistence on navigation
+  if (sessionStorage.getItem('enterprise-trial-banner-closed') !== 'true') {
+    createEnterpriseTrialBanner();
   }
 
-  // Listen for Sphinx navigation events
-  document.addEventListener('DOMContentLoaded', () => {
-    // Initial banner creation
-    createEnterpriseTrialBanner();
+  // Fix Mermaid node colors in dark mode - ensure all nodes use green color scheme
+  function fixMermaidDarkModeColors() {
+    if (!document.documentElement.classList.contains('dark')) {
+      return; // Only apply in dark mode
+    }
 
-    // Initial sidebar scroll
-    scrollToCurrentItem();
-
-    // Listen for all navigation events more comprehensively
-    document.addEventListener('click', (e) => {
-      // Check if this is a documentation link
-      if (e.target.matches('a[href*=".html"], a[href*="#"], a[href*="/"]')) {
-        // Don't handle external links or anchor-only links
-        const href = e.target.getAttribute('href');
-        if (href && !href.startsWith('http') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
-          setTimeout(handleSphinxNavigation, 300);
+    const mermaidDiagrams = document.querySelectorAll('.mermaid svg');
+    mermaidDiagrams.forEach(svg => {
+      // Find all node shapes (rect, polygon, circle, ellipse, path)
+      const nodeShapes = svg.querySelectorAll('.node rect, .node polygon, .node circle, .node ellipse, .node path');
+      nodeShapes.forEach(shape => {
+        // Override fill color to ensure green color scheme
+        const currentFill = shape.getAttribute('fill');
+        // Only override if it's not already the correct color and not transparent/none
+        if (currentFill &&
+            currentFill !== '#004040' &&
+            currentFill !== 'none' &&
+            currentFill !== 'transparent' &&
+            !currentFill.includes('rgb(0, 64, 64)')) {
+          shape.setAttribute('fill', '#004040');
         }
-      }
-    });
-
-    // Listen for popstate events (browser back/forward)
-    window.addEventListener('popstate', () => {
-      setTimeout(handleSphinxNavigation, 200);
-    });
-
-    // Listen for Sphinx's internal navigation more aggressively
-    const observer = new MutationObserver((mutations) => {
-      let shouldRecreateBanner = false;
-
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList') {
-          // Check if this looks like a page navigation
-          const hasNewContent = Array.from(mutation.addedNodes).some(node =>
-            node.nodeType === Node.ELEMENT_NODE &&
-            (node.classList?.contains('document') ||
-             node.querySelector?.('.document') ||
-             node.classList?.contains('section') ||
-             node.querySelector?.('.section'))
-          );
-
-          if (hasNewContent) {
-            shouldRecreateBanner = true;
-          }
+        // Also ensure stroke is correct
+        const currentStroke = shape.getAttribute('stroke');
+        if (currentStroke && !currentStroke.includes('198, 255, 255')) {
+          shape.setAttribute('stroke', 'rgba(198, 255, 255, 0.2)');
         }
       });
+    });
+  }
 
-      if (shouldRecreateBanner) {
-        setTimeout(handleSphinxNavigation, 100);
-      }
+  // Run after Mermaid diagrams are rendered
+  function observeMermaidDiagrams() {
+    // Run immediately in case diagrams are already rendered
+    fixMermaidDarkModeColors();
+
+    // Watch for new Mermaid diagrams being added
+    const observer = new MutationObserver(() => {
+      fixMermaidDarkModeColors();
     });
 
     observer.observe(document.body, {
@@ -172,33 +263,28 @@
       subtree: true
     });
 
-    // Also listen for URL changes
-    let currentUrl = window.location.href;
-    setInterval(() => {
-      if (window.location.href !== currentUrl) {
-        currentUrl = window.location.href;
-        setTimeout(handleSphinxNavigation, 200);
-      }
-    }, 100);
+    // Also run after a short delay to catch async renders
+    setTimeout(fixMermaidDarkModeColors, 1000);
+    setTimeout(fixMermaidDarkModeColors, 2000);
+  }
 
-    // Listen for Sphinx's page load events
-    document.addEventListener('DOMContentLoaded', handleSphinxNavigation, true);
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', observeMermaidDiagrams);
+  } else {
+    observeMermaidDiagrams();
+  }
 
-    // Listen for Sphinx's navigation completion
-    if (window.SphinxRtdTheme) {
-      // For ReadTheDocs theme
-      document.addEventListener('click', (e) => {
-        if (e.target.matches('a[href*=".html"]')) {
-          setTimeout(handleSphinxNavigation, 500);
-        }
-      });
+  // Re-run when theme changes to dark mode
+  const themeObserver = new MutationObserver(() => {
+    if (document.documentElement.classList.contains('dark')) {
+      setTimeout(fixMermaidDarkModeColors, 100);
     }
   });
 
-  // Also handle cases where DOM is already loaded
-  if (document.readyState !== 'loading') {
-    createEnterpriseTrialBanner();
-    scrollToCurrentItem();
-  }
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
 
 })();
