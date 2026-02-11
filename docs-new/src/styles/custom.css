@@ -30,10 +30,16 @@
   /* Light Mode Colors */
   --sl-color-bg: #FFFFFF;
   --sl-color-text: #0F1729;
-  --sl-color-text-accent: #0284C9;
-  --sl-color-accent-high: #026aa1;
-  --sl-color-accent-low: #e0f2fe;
-  /* Light blue for backgrounds */
+  --sl-color-text-accent: #0F1729;
+  /* Removed blue in light mode */
+  --sl-color-accent-high: #0F1729;
+  --sl-color-accent: #0F1729;
+  --sl-color-accent-low: #f1f5f9;
+  /* Subtle gray for active sidebar items */
+
+  /* Sidebar/Navbar Light Mode Defaults */
+  --sl-color-bg-nav: #FFFFFF;
+  --sl-color-bg-sidebar: #FFFFFF;
 
   /* Fonts */
   --sl-font-headers: 'Osmose', system-ui, -apple-system, sans-serif;
@@ -44,10 +50,122 @@
   /* Dark Mode Colors */
   --sl-color-bg: #002929;
   --sl-color-text: #C6FFFF;
-  --sl-color-text-accent: #C6FFFF;
-  --sl-color-accent-high: #a5f3fc;
-  --sl-color-accent-low: #0f4040;
-  /* Darker teal for backgrounds */
+  --sl-color-text-accent: #05d939;
+  /* Matched to old docs accent color */
+  --sl-color-accent-high: #05d939;
+  --sl-color-accent: #05d939;
+  --sl-color-accent-low: rgba(5, 217, 57, 0.1);
+
+  /* Border Alignment */
+  --sl-color-hairline: rgba(64, 222, 223, 0.13);
+  --sl-color-hairline-light: rgba(64, 222, 223, 0.2);
+  --sl-color-hairline-shade: rgba(64, 222, 223, 0.1);
+}
+
+/* Starlight Layout Overrides */
+:root {
+  --sl-nav-height: 4rem;
+}
+
+header {
+  background-color: var(--sl-color-bg) !important;
+  border-bottom: 1px solid var(--sl-color-hairline) !important;
+}
+
+.sidebar-pane {
+  background-color: var(--sl-color-bg) !important;
+  border-inline-end: 1px solid var(--sl-color-hairline) !important;
+}
+
+/* Navbar Menu Options */
+.nav-link {
+  color: rgba(15, 23, 41, 0.6) !important;
+  transition: color 0.2s ease;
+}
+
+:root[data-theme='dark'] .nav-link {
+  color: rgba(225, 231, 239, 0.6) !important;
+}
+
+.nav-link:hover {
+  opacity: 1 !important;
+}
+
+:root:not([data-theme='dark']) .nav-link:hover {
+  color: #0f1729 !important;
+}
+
+:root[data-theme='dark'] .nav-link:hover {
+  color: rgba(225, 231, 239, 0.8) !important;
+}
+
+.nav-link[aria-current="page"] {
+  color: #0f1729 !important;
+  /* Dark text for active in light mode */
+  opacity: 1 !important;
+}
+
+:root[data-theme='dark'] .nav-link[aria-current="page"] {
+  color: #05d939 !important;
+  /* Green text for active in dark mode */
+}
+
+/* Sidebar Active State Overrides */
+[aria-current="page"] {
+  border-radius: 6px !important;
+}
+
+:root:not([data-theme='dark']) a[aria-current="page"]:not(.nav-link) {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+:root[data-theme='dark'] a[aria-current="page"]:not(.nav-link) {
+  background-color: transparent !important;
+  color: #05d939 !important;
+}
+
+/* Social Icons & Other Accents in Light Mode */
+:root:not([data-theme='dark']) .social-icons a,
+:root:not([data-theme='dark']) .social-icons svg,
+:root:not([data-theme='dark']) .social-icons svg path,
+:root:not([data-theme='dark']) .right-sidebar a[aria-current="true"],
+:root:not([data-theme='dark']) .right-sidebar a:hover {
+  color: #0f1729 !important;
+  fill: #0f1729 !important;
+}
+
+:root:not([data-theme='dark']) .right-sidebar a {
+  color: rgba(15, 23, 41, 0.6) !important;
+}
+
+/* Global Hover Overrides for Light Mode */
+:root:not([data-theme='dark']) a:hover {
+  color: #0f1729 !important;
+}
+
+:root:not([data-theme='dark']) .nav-link:hover {
+  color: #0f1729 !important;
+  opacity: 1 !important;
+}
+
+/* Logo & Title Tweaks */
+.site-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none !important;
+}
+
+.site-title span {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: var(--sl-color-text) !important;
+}
+
+.site-title img {
+  height: 32px !important;
+  width: auto !important;
 }
 
 /* Custom Utilities similar to Sphinx */
@@ -56,19 +174,6 @@
   border-left: 4px solid var(--sl-color-text-accent);
   padding: 1rem;
   margin-bottom: 1rem;
-}
-
-/* Widen Search Bar */
-site-search .pagefind-ui__search-input {
-  width: 100%;
-  min-width: 200px;
-  /* Adjust as needed */
-}
-
-@media (min-width: 50rem) {
-  site-search {
-    min-width: 300px;
-  }
 }
 
 /* Force Font Usage */
@@ -80,4 +185,65 @@ h4,
 h5,
 h6 {
   font-family: 'Osmose', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Pagination Buttons Alignment */
+.pagination-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  /* Align to right by default like 'Next' buttons */
+  margin-top: 3rem;
+  border-top: 1px solid var(--sl-color-hairline);
+  padding-top: 2rem;
+}
+
+.pagination-links a {
+  display: inline-flex !important;
+  flex-direction: column;
+  align-items: flex-end;
+  text-decoration: none !important;
+  padding: 8px 16px !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  background-color: transparent !important;
+  width: auto !important;
+  min-width: 150px;
+  gap: 0.25rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+:root[data-theme='dark'] .pagination-links a {
+  border-color: rgba(64, 222, 223, 0.13) !important;
+}
+
+.pagination-links a:hover {
+  background-color: var(--sl-color-accent-low) !important;
+}
+
+/* Pagination Labels */
+.pagination-links .link-title {
+  color: #0F1729 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+:root[data-theme='dark'] .pagination-links .link-title {
+  color: #c6ffff !important;
+}
+
+.pagination-links .link-label {
+  color: rgba(15, 23, 41, 0.6) !important;
+  font-size: 12px !important;
+  text-transform: none !important;
+}
+
+:root[data-theme='dark'] .pagination-links .link-label {
+  color: rgba(198, 255, 255, 0.6) !important;
+}
+
+/* Adjust for Previous link if exists */
+.pagination-links a[rel="prev"] {
+  align-items: flex-start;
+  margin-right: auto;
 }

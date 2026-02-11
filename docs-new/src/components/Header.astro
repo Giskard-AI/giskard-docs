@@ -1,5 +1,4 @@
 ---
-import type { Props } from '@astrojs/starlight/props';
 import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
 import Search from '@astrojs/starlight/components/Search.astro';
 import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
@@ -7,14 +6,14 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 ---
 
 <div class="header sl-flex">
-	<div class="title-wrapper sl-flex">
+	<div class="sl-flex">
 		<SiteTitle {...Astro.props} />
 	</div>
     <div class="nav-links sl-flex">
         <a href="https://docs.giskard.ai/" class="nav-link">Overview</a>
         <a href="https://docs.giskard.ai/hub/ui" class="nav-link">Hub UI</a>
         <a href="https://docs.giskard.ai/hub/sdk" class="nav-link">Hub SDK</a>
-        <a href="/oss/checks/" class="nav-link">Checks</a>
+        <a href="/oss/checks/" class="nav-link" aria-current={Astro.url.pathname.startsWith('/oss/checks') ? 'page' : undefined}>Checks</a>
     </div>
 	<div class="sl-flex">
 		<Search {...Astro.props} />
@@ -31,11 +30,6 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 		justify-content: space-between;
 		align-items: center;
 		height: 100%;
-	}
-
-	.title-wrapper {
-		/* Prevent long titles from overflowing */
-		overflow: hidden;
 	}
 
     .nav-links {
