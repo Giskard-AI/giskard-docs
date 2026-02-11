@@ -65,6 +65,7 @@
 /* Starlight Layout Overrides */
 :root {
   --sl-nav-height: 4rem;
+  --sl-nav-pad-x: 1rem;
 }
 
 header {

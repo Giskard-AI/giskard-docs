@@ -6,7 +6,7 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 ---
 
 <div class="header sl-flex">
-	<div class="sl-flex">
+	<div class="logo-container sl-flex">
 		<SiteTitle {...Astro.props} />
 	</div>
     <div class="nav-links sl-flex">
@@ -15,7 +15,7 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
         <a href="https://docs.giskard.ai/hub/sdk" class="nav-link">Hub SDK</a>
         <a href="/oss/checks/" class="nav-link" aria-current={Astro.url.pathname.startsWith('/oss/checks') ? 'page' : undefined}>Checks</a>
     </div>
-	<div class="sl-flex">
+	<div class="search-container sl-flex">
 		<Search {...Astro.props} />
 	</div>
 	<div class="sl-hidden md:sl-flex right-group">
@@ -26,11 +26,19 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 
 <style>
 	.header {
-		gap: var(--sl-nav-gap);
-		justify-content: space-between;
+		gap: 2rem;
+		justify-content: flex-start;
 		align-items: center;
 		height: 100%;
+        padding-inline-end: var(--sl-nav-pad-x);
 	}
+
+    .logo-container {
+        flex-shrink: 0;
+        /* Aligns the menu start with the sidebar border */
+        /* Formula: sidebar-width - header-padding - gap */
+        width: calc(var(--sl-sidebar-width) - var(--sl-nav-pad-x) - 2rem);
+    }
 
     .nav-links {
         gap: 1.5rem;
@@ -76,9 +84,24 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
         color: #05d939 !important;
     }
 
+    .search-container {
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-end;
+        margin-left: 2rem;
+        margin-right: 2rem;
+    }
+
+    .search-container :global(button) {
+        width: 320px !important;
+        max-width: 100% !important;
+        justify-content: flex-start !important;
+    }
+
 	.right-group {
 		gap: 1rem;
 		align-items: center;
+        flex-shrink: 0;
 	}
 
 	@media (min-width: 50rem) {
@@ -90,7 +113,7 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 		}
 		.header {
 			--__sidebar-width: max(0rem, var(--sl-content-inline-start, 0rem) - var(--sl-nav-pad-x));
-			padding-inline-start: max(var(--sl-nav-pad-x), var(--__sidebar-width));
+			padding-inline-start: var(--sl-nav-pad-x) !important;
 		}
 	}
 </style>
