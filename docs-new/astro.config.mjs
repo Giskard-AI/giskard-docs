@@ -38,6 +38,7 @@ export default defineConfig({
 			components: {
 				Header: './src/components/Header.astro',
 				Pagination: './src/components/Pagination.astro',
+				MarkdownContent: './src/components/MarkdownContent.astro',
 			},
 			plugins: [
 				starlightAutoSidebar()

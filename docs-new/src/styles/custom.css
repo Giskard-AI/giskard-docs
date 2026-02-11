@@ -111,14 +111,6 @@ header {
   color: #0f1729 !important;
 }
 
-/* Custom Utilities similar to Sphinx */
-.admonition.note {
-  background-color: var(--sl-color-accent-low);
-  border-left: 4px solid var(--sl-color-text-accent);
-  padding: 1rem;
-  margin-bottom: 1rem;
-}
-
 /* Force Font Usage */
 body,
 h1,
