@@ -1,5 +1,5 @@
 ---
-import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
+import SiteTitle from './SiteTitle.astro';
 import Search from '@astrojs/starlight/components/Search.astro';
 import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
 import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
@@ -44,14 +44,36 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
     }
 
     .nav-link {
-        color: var(--sl-color-text);
+        color: rgba(15, 23, 41, 0.6) !important;
         text-decoration: none;
         font-weight: 600;
         font-size: var(--sl-text-sm);
+        transition: color 0.2s ease;
     }
     
+    :global(:root[data-theme='dark']) .nav-link {
+        color: rgba(225, 231, 239, 0.6) !important;
+    }
+
     .nav-link:hover {
-        color: var(--sl-color-text-accent);
+        opacity: 1 !important;
+    }
+
+    :global(:root:not([data-theme='dark'])) .nav-link:hover {
+        color: #0f1729 !important;
+    }
+
+    :global(:root[data-theme='dark']) .nav-link:hover {
+        color: rgba(225, 231, 239, 0.8) !important;
+    }
+
+    .nav-link[aria-current="page"] {
+        color: #0f1729 !important;
+        opacity: 1 !important;
+    }
+
+    :global(:root[data-theme='dark']) .nav-link[aria-current="page"] {
+        color: #05d939 !important;
     }
 
 	.right-group {

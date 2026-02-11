@@ -1,0 +1,27 @@
+---
+import Default from '@astrojs/starlight/components/SiteTitle.astro';
+---
+
+<div class="site-title-wrapper">
+    <Default {...Astro.props} />
+</div>
+
+<style>
+    .site-title-wrapper :global(.site-title) {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none !important;
+    }
+
+    .site-title-wrapper :global(.site-title span) {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        color: var(--sl-color-text) !important;
+    }
+
+    .site-title-wrapper :global(.site-title img) {
+        height: 32px !important;
+        width: auto !important;
+    }
+</style>

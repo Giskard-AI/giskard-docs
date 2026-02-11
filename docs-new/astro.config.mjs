@@ -11,7 +11,7 @@ export default defineConfig({
 	site: 'https://docs.giskard.ai',
 	integrations: [
 		starlight({
-	        favicon: '/favicon.ico',
+			favicon: '/favicon.ico',
 			title: 'Giskard Documentation',
 			logo: {
 				light: './src/assets/logo.png',
@@ -37,6 +37,7 @@ export default defineConfig({
 			},
 			components: {
 				Header: './src/components/Header.astro',
+				Pagination: './src/components/Pagination.astro',
 			},
 			plugins: [
 				starlightAutoSidebar()

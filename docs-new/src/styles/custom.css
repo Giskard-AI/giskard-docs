@@ -77,39 +77,6 @@ header {
   border-inline-end: 1px solid var(--sl-color-hairline) !important;
 }
 
-/* Navbar Menu Options */
-.nav-link {
-  color: rgba(15, 23, 41, 0.6) !important;
-  transition: color 0.2s ease;
-}
-
-:root[data-theme='dark'] .nav-link {
-  color: rgba(225, 231, 239, 0.6) !important;
-}
-
-.nav-link:hover {
-  opacity: 1 !important;
-}
-
-:root:not([data-theme='dark']) .nav-link:hover {
-  color: #0f1729 !important;
-}
-
-:root[data-theme='dark'] .nav-link:hover {
-  color: rgba(225, 231, 239, 0.8) !important;
-}
-
-.nav-link[aria-current="page"] {
-  color: #0f1729 !important;
-  /* Dark text for active in light mode */
-  opacity: 1 !important;
-}
-
-:root[data-theme='dark'] .nav-link[aria-current="page"] {
-  color: #05d939 !important;
-  /* Green text for active in dark mode */
-}
-
 /* Sidebar Active State Overrides */
 [aria-current="page"] {
   border-radius: 6px !important;
@@ -144,30 +111,6 @@ header {
   color: #0f1729 !important;
 }
 
-:root:not([data-theme='dark']) .nav-link:hover {
-  color: #0f1729 !important;
-  opacity: 1 !important;
-}
-
-/* Logo & Title Tweaks */
-.site-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none !important;
-}
-
-.site-title span {
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  color: var(--sl-color-text) !important;
-}
-
-.site-title img {
-  height: 32px !important;
-  width: auto !important;
-}
-
 /* Custom Utilities similar to Sphinx */
 .admonition.note {
   background-color: var(--sl-color-accent-low);
@@ -185,65 +128,4 @@ h4,
 h5,
 h6 {
   font-family: 'Osmose', system-ui, -apple-system, sans-serif !important;
-}
-
-/* Pagination Buttons Alignment */
-.pagination-links {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  /* Align to right by default like 'Next' buttons */
-  margin-top: 3rem;
-  border-top: 1px solid var(--sl-color-hairline);
-  padding-top: 2rem;
-}
-
-.pagination-links a {
-  display: inline-flex !important;
-  flex-direction: column;
-  align-items: flex-end;
-  text-decoration: none !important;
-  padding: 8px 16px !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 6px !important;
-  background-color: transparent !important;
-  width: auto !important;
-  min-width: 150px;
-  gap: 0.25rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-:root[data-theme='dark'] .pagination-links a {
-  border-color: rgba(64, 222, 223, 0.13) !important;
-}
-
-.pagination-links a:hover {
-  background-color: var(--sl-color-accent-low) !important;
-}
-
-/* Pagination Labels */
-.pagination-links .link-title {
-  color: #0F1729 !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-}
-
-:root[data-theme='dark'] .pagination-links .link-title {
-  color: #c6ffff !important;
-}
-
-.pagination-links .link-label {
-  color: rgba(15, 23, 41, 0.6) !important;
-  font-size: 12px !important;
-  text-transform: none !important;
-}
-
-:root[data-theme='dark'] .pagination-links .link-label {
-  color: rgba(198, 255, 255, 0.6) !important;
-}
-
-/* Adjust for Previous link if exists */
-.pagination-links a[rel="prev"] {
-  align-items: flex-start;
-  margin-right: auto;
 }
