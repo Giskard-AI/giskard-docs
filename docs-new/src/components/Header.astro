@@ -1,0 +1,80 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import SiteTitle from '@astrojs/starlight/components/SiteTitle.astro';
+import Search from '@astrojs/starlight/components/Search.astro';
+import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
+import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+---
+
+<div class="header sl-flex">
+	<div class="title-wrapper sl-flex">
+		<SiteTitle {...Astro.props} />
+	</div>
+    <div class="nav-links sl-flex">
+        <a href="https://docs.giskard.ai/" class="nav-link">Overview</a>
+        <a href="https://docs.giskard.ai/hub/ui" class="nav-link">Hub UI</a>
+        <a href="https://docs.giskard.ai/hub/sdk" class="nav-link">Hub SDK</a>
+        <a href="/oss/checks/" class="nav-link">Checks</a>
+    </div>
+	<div class="sl-flex">
+		<Search {...Astro.props} />
+	</div>
+	<div class="sl-hidden md:sl-flex right-group">
+		<SocialIcons {...Astro.props} />
+		<ThemeSelect {...Astro.props} />
+	</div>
+</div>
+
+<style>
+	.header {
+		gap: var(--sl-nav-gap);
+		justify-content: space-between;
+		align-items: center;
+		height: 100%;
+	}
+
+	.title-wrapper {
+		/* Prevent long titles from overflowing */
+		overflow: hidden;
+	}
+
+    .nav-links {
+        gap: 1.5rem;
+        display: none;
+    }
+
+    @media (min-width: 50rem) {
+        .nav-links {
+            display: flex;
+        }
+    }
+
+    .nav-link {
+        color: var(--sl-color-text);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: var(--sl-text-sm);
+    }
+    
+    .nav-link:hover {
+        color: var(--sl-color-text-accent);
+    }
+
+	.right-group {
+		gap: 1rem;
+		align-items: center;
+	}
+
+	@media (min-width: 50rem) {
+		:global(:root[data-has-sidebar]) {
+			--__sidebar-pad: calc(2 * var(--sl-nav-pad-x));
+		}
+		:global(:root:not([data-has-sidebar])) {
+			--__sidebar-pad: var(--sl-nav-pad-x);
+		}
+		.header {
+			--__sidebar-width: max(0rem, var(--sl-content-inline-start, 0rem) - var(--sl-nav-pad-x));
+			padding-inline-start: max(var(--sl-nav-pad-x), var(--__sidebar-width));
+		}
+	}
+</style>

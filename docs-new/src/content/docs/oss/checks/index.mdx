@@ -1,0 +1,59 @@
+---
+title: What are Giskard Checks?
+sidebar:
+  order: 1
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Giskard Checks is a lightweight Python library for testing and
+evaluating non-deterministic applications such as LLM-based systems.
+
+## Introduction
+
+**Giskard Checks** provides a flexible and powerful framework for
+testing AI applications including RAG systems, agents, summarization
+models, and more. Whether you're building chatbots, question-answering
+systems, or complex multi-step workflows, Giskard Checks helps you
+ensure quality and reliability.
+
+### Key Features
+
+- **Built-in Check Library**: Ready-to-use checks including
+  LLM-as-a-judge evaluations, string matching, equality assertions, and
+  more
+- **Flexible Testing Framework**: Support for both single-turn and
+  multi-turn scenarios with stateful trace management
+- **Type-Safe & Modern**: Built on Pydantic for full type safety and
+  validation
+- **Async-First**: Native async/await support for efficient concurrent
+  testing
+- **Highly Customizable**: Easy extension points for custom checks and
+  interaction patterns
+- **Serializable Results**: Immutable, JSON-serializable results for
+  easy storage and analysis
+
+## Quick Links
+
+<CardGrid>
+  <LinkCard title="🚀 Quickstart" description="Installation, configuration, and your first test" href="/oss/checks/testing/quickstart/" />
+  <LinkCard title="📚 AI Testing Guide" description="Learn core concepts, single-turn and multi-turn testing" href="/oss/checks/testing/core-concepts/" />
+  <LinkCard title="💡 Tutorials" description="Practical examples for RAG, agents, and more" href="/oss/checks/tutorials/" />
+  <LinkCard title="🔧 API Reference" description="Complete API documentation"  href="/oss/checks/api-reference/" />
+</CardGrid>
+
+
+## Use Cases
+
+Giskard Checks is designed for:
+
+- **RAG Evaluation**: Test groundedness, relevance, and context usage in
+  retrieval-augmented generation systems
+- **Agent Testing**: Validate multi-step agent workflows with tool calls
+  and complex reasoning
+- **Quality Assurance**: Ensure consistent output quality across model
+  updates and deployments
+- **LLM Guardrails**: Implement safety checks, content moderation, and
+  compliance validation
+- **Regression Testing**: Track model behavior changes over time with
+  reproducible test suites

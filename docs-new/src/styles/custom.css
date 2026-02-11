@@ -1,0 +1,83 @@
+/* Custom CSS for Giskard Docs */
+
+/* Font Faces */
+@font-face {
+  font-family: 'Osmose';
+  src: url('/fonts/osmose-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Osmose';
+  src: url('/fonts/osmose-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Osmose';
+  src: url('/fonts/osmose-light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Starlight Variable Overrides */
+:root {
+  /* Light Mode Colors */
+  --sl-color-bg: #FFFFFF;
+  --sl-color-text: #0F1729;
+  --sl-color-text-accent: #0284C9;
+  --sl-color-accent-high: #026aa1;
+  --sl-color-accent-low: #e0f2fe;
+  /* Light blue for backgrounds */
+
+  /* Fonts */
+  --sl-font-headers: 'Osmose', system-ui, -apple-system, sans-serif;
+  --sl-font-body: 'Osmose', system-ui, -apple-system, sans-serif;
+}
+
+:root[data-theme='dark'] {
+  /* Dark Mode Colors */
+  --sl-color-bg: #002929;
+  --sl-color-text: #C6FFFF;
+  --sl-color-text-accent: #C6FFFF;
+  --sl-color-accent-high: #a5f3fc;
+  --sl-color-accent-low: #0f4040;
+  /* Darker teal for backgrounds */
+}
+
+/* Custom Utilities similar to Sphinx */
+.admonition.note {
+  background-color: var(--sl-color-accent-low);
+  border-left: 4px solid var(--sl-color-text-accent);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Widen Search Bar */
+site-search .pagefind-ui__search-input {
+  width: 100%;
+  min-width: 200px;
+  /* Adjust as needed */
+}
+
+@media (min-width: 50rem) {
+  site-search {
+    min-width: 300px;
+  }
+}
+
+/* Force Font Usage */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Osmose', system-ui, -apple-system, sans-serif !important;
+}
