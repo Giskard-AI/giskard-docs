@@ -125,13 +125,6 @@ html_css_files = ["pygments-dark.css", "custom.css"]
 html_js_files = ["custom.js"]
 html_favicon = "_static/favicon.ico"
 
-html_sidebars = {
-    "oss/checks/**": [
-        "sidebar_main_nav_links.html",
-        "sidebars/sidebar_oss_checks.html",
-    ],
-}
-
 # Do not execute the notebooks when building the docs
 docs_version = os.getenv("READTHEDOCS_VERSION", "latest")
 if docs_version == "latest" or docs_version == "stable":
@@ -166,7 +159,12 @@ rediraffe_redirects = {
 }
 
 # Use wildcard patterns to support any nested path within the specified routes
+# oss/checks/** must come before oss/** for correct pattern matching
 html_sidebars: dict[str, list[str]] = {
+    "oss/checks/**": [
+        "sidebar_main_nav_links.html",
+        "sidebars/sidebar_oss_checks.html",
+    ],
     "hub/ui/**": ["sidebars/sidebar_hub_ui.html"],
     "hub/sdk/**": ["sidebars/sidebar_hub_sdk.html"],
     "oss/**": ["sidebars/sidebar_oss_sdk.html"],
