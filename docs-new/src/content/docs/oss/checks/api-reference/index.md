@@ -6,12 +6,6 @@ sidebar:
 
 Complete API documentation for Giskard Checks.
 
-<div class="toctree" maxdepth="2">
-
-core builtin-checks scenarios testing
-
-</div>
-
 ## Introduction
 
 Giskard Checks provides a comprehensive API for testing and evaluating
