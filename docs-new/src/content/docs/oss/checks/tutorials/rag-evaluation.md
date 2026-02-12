@@ -7,7 +7,7 @@ sidebar:
 This tutorial shows how to build a comprehensive test suite for a
 Retrieval-Augmented Generation (RAG) system.
 
-## Overview
+## Introduction
 
 We'll test a RAG system that answers questions by:
 
@@ -622,6 +622,6 @@ Collect and test with actual user questions from logs.
 
 ## Next Steps
 
-- See `testing-agents` for agent-specific testing patterns
-- Explore `chatbot-testing` for conversational testing
-- Review `../ai-testing/multi-turn` for advanced scenarios
+- See [Testing Agents](/oss/checks/tutorials/testing-agents/) for agent-specific testing patterns
+- Explore [Chatbot Testing](/oss/checks/tutorials/chatbot-testing/) for conversational testing
+- Review [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/) for advanced scenarios

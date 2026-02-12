@@ -7,7 +7,7 @@ sidebar:
 This tutorial covers testing conversational AI systems, including
 context handling, tone consistency, and multi-turn dialogue flows.
 
-## Overview
+## Introduction
 
 We'll test a chatbot that:
 
@@ -686,6 +686,6 @@ Test with unusual inputs:
 
 ## Next Steps
 
-- See `content-moderation` for safety and filtering
-- Explore `testing-agents` for tool-using chatbots
-- Review `../ai-testing/multi-turn` for complex flows
+- See [Content Moderation](/oss/checks/tutorials/content-moderation/) for safety and filtering
+- Explore [Testing Agents](/oss/checks/tutorials/testing-agents/) for tool-using chatbots
+- Review [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/) for complex flows

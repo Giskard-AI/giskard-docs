@@ -7,7 +7,7 @@ sidebar:
 This tutorial demonstrates how to test AI agents that use tools, perform
 multi-step reasoning, and maintain state across interactions.
 
-## Overview
+## Introduction
 
 We'll build and test an agent that can:
 
@@ -734,6 +734,6 @@ checks = [
 
 ## Next Steps
 
-- See `chatbot-testing` for conversational agent patterns
-- Explore `rag-evaluation` for knowledge-grounded agents
-- Review `../ai-testing/multi-turn` for complex workflows
+- See [Chatbot Testing](/oss/checks/tutorials/chatbot-testing/) for conversational agent patterns
+- Explore [RAG Evaluation](/oss/checks/tutorials/rag-evaluation/) for knowledge-grounded agents
+- Review [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/) for complex workflows
