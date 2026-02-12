@@ -1,5 +1,4 @@
 ---
-import type { Props } from '@astrojs/starlight/props';
 import Default from '@astrojs/starlight/components/MarkdownContent.astro';
 ---
 
@@ -39,5 +38,72 @@ import Default from '@astrojs/starlight/components/MarkdownContent.astro';
 
     :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--note .starlight-aside__icon) {
         color: #60a5fa !important;
+    }
+
+    /* Aside/Tip Styles */
+    .content-wrapper :global(aside.starlight-aside--tip) {
+        border: 1px solid #05d939 !important;
+        border-radius: 8px !important;
+        background-color: rgba(5, 217, 57, 0.06) !important;
+        font-size: 14px !important;
+        color: #022c22 !important;
+        padding: 1rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--tip) {
+        background-color: rgba(5, 217, 57, 0.12) !important;
+        color: #c6ffff !important;
+        border-color: #05d939 !important;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--tip .starlight-aside__title) {
+        color: inherit !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--tip .starlight-aside__icon) {
+        color: #05d939 !important;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--tip .starlight-aside__icon) {
+        color: #05d939 !important;
+    }
+
+    /* Aside/Warning Styles */
+    .content-wrapper :global(aside.starlight-aside--warning),
+    .content-wrapper :global(aside.starlight-aside--caution) {
+        border: 1px solid #f97316 !important;
+        border-radius: 8px !important;
+        background-color: #fff7ed !important;
+        font-size: 14px !important;
+        color: #7c2d12 !important;
+        padding: 1rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--warning),
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--caution) {
+        background-color: rgba(248, 148, 64, 0.12) !important;
+        color: #ffedd5 !important;
+        border-color: #f97316 !important;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--warning .starlight-aside__title),
+    .content-wrapper :global(aside.starlight-aside--caution .starlight-aside__title) {
+        color: inherit !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--warning .starlight-aside__icon),
+    .content-wrapper :global(aside.starlight-aside--caution .starlight-aside__icon) {
+        color: #f97316 !important;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--warning .starlight-aside__icon),
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--caution .starlight-aside__icon) {
+        color: #fdba74 !important;
     }
 </style>
