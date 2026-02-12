@@ -51,10 +51,10 @@
   --sl-color-bg: #002929;
   --sl-color-text: #C6FFFF;
   --sl-color-text-accent: #05d939;
-  /* Matched to old docs accent color */
+
   --sl-color-accent-high: #05d939;
   --sl-color-accent: #05d939;
-  --sl-color-accent-low: rgba(5, 217, 57, 0.1);
+  --sl-color-accent-low: #0D3636;
 
   /* Border Alignment */
   --sl-color-hairline: rgba(64, 222, 223, 0.13);
@@ -121,4 +121,29 @@ h4,
 h5,
 h6 {
   font-family: 'Osmose', system-ui, -apple-system, sans-serif !important;
+}
+
+
+/* Link colors */
+:root[data-theme='dark'] a:not([class*="astro"]):not(.sl-anchor-link) {
+  color: #40dedf !important;
+}
+
+/* Anchor links */
+:root[data-theme='dark'] .sl-anchor-link {
+  color: #ffffff !important;
+}
+
+:root[data-theme='dark'] .sl-link-card {
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  background-color: #024040 !important;
+
+  &:hover {
+    border: 1px solid #40dedf !important;
+  }
+
+  .description {
+    color: #E1E8EF !important;
+  }
 }
