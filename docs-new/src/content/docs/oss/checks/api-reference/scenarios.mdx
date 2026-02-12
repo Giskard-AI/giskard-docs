@@ -1,0 +1,493 @@
+---
+title: Scenarios
+sidebar:
+  order: 4
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+Multi-step workflow testing with scenario builders and runners.
+
+---
+
+## `scenario()`
+
+Create a new scenario builder for fluent API construction.
+
+**Module:** `giskard.checks.scenarios.builder`
+
+### Description
+
+The `scenario()` function is the recommended entry point for creating test scenarios. It returns a `ScenarioBuilder` that provides a fluent API for building multi-step test workflows.
+
+### Creating Scenarios
+
+```python
+from giskard.checks import scenario, StringMatching, Equals
+
+# Basic scenario
+test_scenario = (
+    scenario("greeting_test")
+    .interact(inputs="Hello", outputs="Hi there!")
+    .check(StringMatching(pattern="Hi", key="trace.last.outputs"))
+)
+
+# Run the scenario
+result = await test_scenario.run()
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `name` | `str \| None` | `None` | Scenario name for identification (defaults to "Unnamed Scenario") |
+| `trace_type` | `type[TraceType] \| None` | `None` | Optional custom trace type for advanced use cases |
+
+**Returns:**
+- `ScenarioBuilder`: A builder instance ready for configuration
+
+### Multi-step Scenarios
+
+```python
+from giskard.checks import scenario, from_fn, Equals
+
+# Create a conversational flow
+conversation_test = (
+    scenario("customer_support")
+    # First interaction
+    .interact(
+        inputs="I need help with my account",
+        outputs="I'd be happy to help! What's your account number?"
+    )
+    # Validate greeting
+    .check(from_fn(
+        lambda trace: "help" in trace.last.outputs.lower(),
+        name="helpful_response"
+    ))
+    # Second interaction
+    .interact(
+        inputs="12345",
+        outputs="Thank you! I've found your account."
+    )
+    # Validate account lookup
+    .check(Equals(
+        expected_value=True,
+        key="trace.last.metadata.account_found"
+    ))
+)
+
+result = await conversation_test.run()
+```
+
+### Dynamic Interactions
+
+```python
+# Use callables for dynamic generation
+def generate_response(inputs):
+    # Custom logic to generate response
+    if "weather" in inputs:
+        return "It's sunny today!"
+    return "I don't understand."
+
+test_scenario = (
+    scenario("dynamic_test")
+    .interact(
+        inputs="What's the weather?",
+        outputs=generate_response
+    )
+    .check(StringMatching(
+        pattern="sunny",
+        key="trace.last.outputs"
+    ))
+)
+```
+
+### Context-aware Interactions
+
+```python
+# Access trace context in interactions
+test_scenario = (
+    scenario("context_test")
+    .interact(inputs="Hello", outputs="Hi! I'm Alice.")
+    .interact(
+        inputs=lambda trace: f"Nice to meet you, {trace.last.outputs.split()[-1][:-1]}!",
+        outputs="Nice to meet you too!"
+    )
+)
+```
+
+---
+
+## `ScenarioBuilder`
+
+Builder for creating scenarios with a fluent API.
+
+**Module:** `giskard.checks.scenarios.builder`
+
+### Description
+
+`ScenarioBuilder` provides a chainable interface for constructing multi-step test scenarios. Each method returns `self`, allowing for method chaining.
+
+### Methods
+
+#### `interact(inputs, outputs, metadata=None)`
+
+Add an interaction to the scenario.
+
+**Parameters:**
+- `inputs`: Static value or callable `(trace) -> value`
+- `outputs`: Static value, callable `(inputs) -> value`, or callable `(trace, inputs) -> value`
+- `metadata`: Optional metadata dictionary
+
+**Returns:** `self` (for chaining)
+
+```python
+# Static values
+builder.interact(
+    inputs="test input",
+    outputs="test output",
+    metadata={"model": "gpt-4"}
+)
+
+# Dynamic outputs
+builder.interact(
+    inputs="query",
+    outputs=lambda inputs: my_model(inputs)
+)
+
+# Full context access
+builder.interact(
+    inputs=lambda trace: generate_input(trace),
+    outputs=lambda trace, inputs: generate_output(trace, inputs)
+)
+```
+
+#### `check(check: Check)`
+
+Add a validation check to the scenario.
+
+**Parameters:**
+- `check`: A Check instance to validate the trace
+
+**Returns:** `self` (for chaining)
+
+```python
+from giskard.checks import Equals, GreaterThan
+
+builder.check(Equals(
+    expected_value="success",
+    key="trace.last.outputs.status"
+))
+```
+
+#### `add_interaction(interaction: Interaction)`
+
+Add a pre-constructed Interaction object.
+
+**Parameters:**
+- `interaction`: An Interaction instance
+
+**Returns:** `self` (for chaining)
+
+```python
+from giskard.checks import Interaction
+
+interaction = Interaction(
+    inputs="Hello",
+    outputs="Hi",
+    metadata={"timestamp": "2024-01-01"}
+)
+
+builder.add_interaction(interaction)
+```
+
+#### `add_spec(spec: BaseInteractionSpec)`
+
+Add a custom interaction specification.
+
+**Parameters:**
+- `spec`: A BaseInteractionSpec instance
+
+**Returns:** `self` (for chaining)
+
+```python
+from giskard.checks.core.interaction import InteractionSpec
+
+spec = InteractionSpec(inputs="test", outputs="result")
+builder.add_spec(spec)
+```
+
+#### `build() -> Scenario`
+
+Build and return the Scenario instance.
+
+**Returns:** `Scenario` ready for execution
+
+```python
+scenario_obj = builder.build()
+result = await scenario_obj.run()
+```
+
+#### `run() -> ScenarioResult`
+
+Build and immediately execute the scenario.
+
+**Returns:** `ScenarioResult` with execution details
+
+```python
+# Shorthand for build().run()
+result = await builder.run()
+```
+
+---
+
+## `Scenario`
+
+Low-level scenario class for direct instantiation.
+
+**Module:** `giskard.checks.core.scenario`
+
+### Description
+
+The `Scenario` class represents an ordered sequence of components (Interactions, InteractionSpecs, and Checks) that share a trace. For most use cases, use the `scenario()` fluent API instead.
+
+### Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `name` | `str` | Scenario identifier |
+| `sequence` | `Sequence[Component]` | Sequential steps to execute |
+| `trace_type` | `type[TraceType] \| None` | Optional custom trace type |
+
+### Direct Instantiation (Advanced)
+
+```python
+from giskard.checks import Scenario, InteractionSpec, Equals
+
+scenario_obj = Scenario(
+    name="multi_step_test",
+    sequence=[
+        InteractionSpec(inputs="Hello", outputs="Hi"),
+        Equals(expected="Hi", key="trace.last.outputs"),
+        InteractionSpec(inputs="Goodbye", outputs="See you!"),
+    ]
+)
+
+result = await scenario_obj.run()
+```
+
+:::note[Recommended Approach]
+Use the `scenario()` fluent API for better readability:
+```python
+result = await (
+    scenario("multi_step_test")
+    .interact("Hello", "Hi")
+    .check(Equals(expected="Hi", key="trace.last.outputs"))
+    .interact("Goodbye", "See you!")
+    .run()
+)
+```
+:::
+
+### Methods
+
+#### `run(return_exception=False) -> ScenarioResult`
+
+Execute the scenario components sequentially.
+
+**Parameters:**
+- `return_exception` (`bool`): If True, return results even when exceptions occur instead of raising
+
+**Returns:** `ScenarioResult` with status, trace, and check results
+
+```python
+result = await scenario_obj.run()
+
+print(f"Status: {result.status}")
+print(f"Trace: {result.trace}")
+print(f"Check results: {result.check_results}")
+```
+
+---
+
+## `ScenarioResult`
+
+Result of scenario execution with trace and check results.
+
+**Module:** `giskard.checks.core.result`
+
+### Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `status` | `CheckStatus` | Overall scenario status (PASS/FAIL/ERROR) |
+| `trace` | `Trace` | Complete trace of all interactions |
+| `check_results` | `list[CheckResult]` | Results from all checks executed |
+| `message` | `str \| None` | Optional summary message |
+| `details` | `dict[str, Any]` | Additional execution details |
+
+### Accessing Results
+
+```python
+result = await test_scenario.run()
+
+# Check overall status
+if result.status == CheckStatus.PASS:
+    print("✓ All checks passed!")
+
+# Access trace
+print(f"Total interactions: {len(result.trace.interactions)}")
+last_output = result.trace.last.outputs
+
+# Review check results
+for i, check_result in enumerate(result.check_results):
+    print(f"Check {i}: {check_result.status}")
+    if check_result.failed:
+        print(f"  Failed: {check_result.message}")
+```
+
+---
+
+## `ScenarioRunner`
+
+Low-level runner for executing scenarios.
+
+**Module:** `giskard.checks.scenarios.runner`
+
+### Description
+
+`ScenarioRunner` provides the execution engine for running scenarios. Most users should use `scenario().run()` rather than using ScenarioRunner directly.
+
+### Execution Model
+
+Components are processed sequentially:
+1. **Interaction/InteractionSpec components**: Add interactions to the trace
+2. **Check components**: Validate the current trace state. Execution stops on first failure or error
+
+### Methods
+
+#### `run(scenario, return_exception=False) -> ScenarioResult`
+
+Execute a scenario with shared trace.
+
+**Parameters:**
+- `scenario` (`Scenario`): The scenario to execute
+- `return_exception` (`bool`): If True, return results even when exceptions occur
+
+**Returns:** `ScenarioResult` with execution details
+
+```python
+from giskard.checks.scenarios.runner import ScenarioRunner
+
+runner = ScenarioRunner()
+result = await runner.run(scenario_obj)
+```
+
+### `get_runner()`
+
+Get the default process-wide ScenarioRunner instance.
+
+**Module:** `giskard.checks.scenarios.runner`
+
+```python
+from giskard.checks.scenarios.runner import get_runner
+
+runner = get_runner()
+result = await runner.run(scenario_obj)
+```
+
+:::note[Singleton Pattern]
+`get_runner()` returns a singleton runner instance that is reused across all executions within a process.
+:::
+
+---
+
+## Usage Patterns
+
+### Multiple Test Cases
+
+```python
+from giskard.checks import scenario, Equals
+
+# Define reusable test scenarios
+greeting_test = (
+    scenario("greeting")
+    .interact("Hello", "Hi!")
+    .check(Equals(expected="Hi!", key="trace.last.outputs"))
+)
+
+farewell_test = (
+    scenario("farewell")
+    .interact("Goodbye", "See you!")
+    .check(Equals(expected="See you!", key="trace.last.outputs"))
+)
+
+# Run all tests
+results = await asyncio.gather(
+    greeting_test.run(),
+    farewell_test.run()
+)
+
+# Check all passed
+all_passed = all(r.status == CheckStatus.PASS for r in results)
+```
+
+### Error Handling
+
+```python
+# Graceful error handling
+result = await test_scenario.run(return_exception=True)
+
+if result.status == CheckStatus.ERROR:
+    print(f"Error occurred: {result.message}")
+    print(f"Details: {result.details}")
+```
+
+### Complex Workflows
+
+```python
+from giskard.checks import scenario, from_fn, GreaterThan
+
+# Multi-step workflow with multiple checks
+workflow = (
+    scenario("user_onboarding")
+    # Step 1: Registration
+    .interact(
+        inputs={"action": "register", "email": "user@example.com"},
+        outputs={"status": "success", "user_id": 12345}
+    )
+    .check(Equals(expected="success", key="trace.last.outputs.status"))
+    .check(GreaterThan(expected_value=0, key="trace.last.outputs.user_id"))
+    
+    # Step 2: Verification
+    .interact(
+        inputs=lambda trace: {
+            "action": "verify",
+            "user_id": trace.last.outputs["user_id"]
+        },
+        outputs={"verified": True}
+    )
+    .check(Equals(expected=True, key="trace.last.outputs.verified"))
+    
+    # Step 3: Welcome message
+    .interact(
+        inputs="Welcome",
+        outputs=lambda inputs: f"{inputs} to our platform!"
+    )
+    .check(from_fn(
+        lambda trace: "Welcome" in trace.last.outputs,
+        name="welcome_check"
+    ))
+)
+
+result = await workflow.run()
+```
+
+---
+
+## See Also
+
+- [Core API](/oss/checks/api-reference/core/) - Scenario, Trace, and Interaction details
+- [Built-in Checks](/oss/checks/api-reference/builtin-checks/) - Checks to use in scenarios
+- [Testing](/oss/checks/api-reference/testing/) - Test runners and utilities
+- [Tutorials](/oss/checks/tutorials/) - Complete scenario examples

@@ -1,0 +1,129 @@
+---
+title: API Reference
+sidebar:
+  order: 1
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+Complete API documentation for Giskard Checks - a comprehensive testing framework for AI applications.
+
+## API Modules
+
+Explore the Giskard Checks API organized by functionality:
+
+<CardGrid>
+  <LinkCard 
+    title="⚙️ Core" 
+    description="Base classes and fundamental types: Check, Trace, Interaction, Scenario, TestCase" 
+    href="/oss/checks/api-reference/core/" 
+  />
+  <LinkCard 
+    title="✅ Built-in Checks" 
+    description="Ready-to-use validation checks: string matching, comparisons, LLM-based checks" 
+    href="/oss/checks/api-reference/builtin-checks/" 
+  />
+  <LinkCard 
+    title="🎬 Scenarios" 
+    description="Multi-step workflow testing with scenario builders and runners" 
+    href="/oss/checks/api-reference/scenarios/" 
+  />
+  <LinkCard 
+    title="🧪 Testing" 
+    description="Testing utilities: test runners, spies, and debugging helpers" 
+    href="/oss/checks/api-reference/testing/" 
+  />
+  <LinkCard 
+    title="🔧 Generators" 
+    description="Input generators for creating dynamic test data and scenarios" 
+    href="/oss/checks/api-reference/generators/" 
+  />
+  <LinkCard 
+    title="🛠️ Utilities" 
+    description="Helper functions for normalization, value providers, and parameter injection" 
+    href="/oss/checks/api-reference/utils/" 
+  />
+</CardGrid>
+
+## Quick Reference
+
+**Most Common Imports**
+
+``` python
+from giskard.checks import (
+    # Core types
+    Check,
+    CheckResult,
+    CheckStatus,
+    Interaction,
+    Trace,
+
+    # Interaction specs
+    InteractionSpec,
+    BaseInteractionSpec,
+
+    # Scenarios
+    Scenario,
+    TestCase,
+
+    # Built-in checks
+    from_fn,
+    StringMatching,
+    Equals,
+    NotEquals,
+    LesserThan,
+    GreaterThan,
+    LesserThanEquals,
+    GreaterEquals,
+    Groundedness,
+    Conformity,
+    LLMJudge,
+    SemanticSimilarity,
+    BaseLLMCheck,
+    LLMCheckResult,
+
+    # Configuration
+    set_default_generator,
+    get_default_generator,
+)
+```
+
+## Package Structure
+
+``` text
+giskard.checks/
+├── core/                 # Base classes and fundamental types
+│   ├── check.py          # Check base class
+│   ├── trace.py          # Trace and Interaction
+│   ├── interaction.py    # InteractionSpec
+│   ├── result.py         # CheckResult, CheckStatus
+│   ├── scenario.py       # Scenario
+│   ├── testcase.py       # TestCase
+│   └── extraction.py     # Extractors
+│
+├── builtin/              # Ready-to-use checks
+│   ├── fn.py             # from_fn, FnCheck
+│   ├── string_matching.py # StringMatching
+│   ├── comparison.py     # Equals, NotEquals, etc.
+│   ├── groundedness.py   # Groundedness check
+│   ├── conformity.py     # Conformity check
+│   ├── judge.py          # LLMJudge
+│   └── semantic_similarity.py # SemanticSimilarity
+│
+├── scenarios/            # Multi-step workflows
+│   ├── builder.py        # Scenario builder
+│   └── runner.py         # ScenarioRunner
+│
+├── testing/              # Testing utilities
+│   ├── runner.py         # TestCaseRunner
+│   └── spy.py            # WithSpy
+│
+├── generators/           # Input generators
+│   └── user.py           # User input generators
+│
+└── utils/                # Helper utilities
+    ├── generator.py      # Generator utilities
+    ├── normalization.py  # Value normalization
+    ├── parameter_injection.py # Parameter injection
+    └── value_provider.py # Value providers
+```
