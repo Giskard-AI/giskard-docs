@@ -504,6 +504,6 @@ async def run_batch_evaluation():
 
 ## Next Steps
 
-- Learn about `multi-turn` scenarios for testing conversations
-- See `custom-checks` to build domain-specific validation
-- Explore `../tutorials/index` for complete examples
+- Learn about [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/) for testing conversations
+- See [Custom Checks](/oss/checks/testing/custom-checks/) to build domain-specific validation
+- Explore [Tutorials](/oss/checks/tutorials/) for complete examples

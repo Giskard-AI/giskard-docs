@@ -18,7 +18,7 @@ contains one or more **Interactions**, where each Interaction
 corresponds to a single turn (inputs + outputs).
 
 :::note
-For detailed explanations of these concepts, see `core-concepts`.
+For detailed explanations of these concepts, see [Core Concepts](/oss/checks/testing/core-concepts/).
 :::
 
 For our simple Q&A bot, we can represent a single turn as a trace with
@@ -135,7 +135,7 @@ test_scenario = (
 
 No need to precompute outputs anymore. This is especially useful in
 multi-turn scenarios, where inputs or outputs depend on earlier
-interactions (see `multi-turn`).
+interactions (see [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/)).
 
 ## Structuring the interactions
 
@@ -204,5 +204,5 @@ result
 
 This will give us a result object with the results of the checks.
 
-Check out the `multi-turn` guide for more details on how to test
+Check out the [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/) guide for more details on how to test
 multi-turn scenarios.

@@ -303,8 +303,9 @@ class ConsistencyTracker(Check):
         )
 ```
 
-**Note:** Stateful checks can make tests harder to reason about.
-Consider passing state through the trace instead when possible.
+:::note
+Stateful checks can make tests harder to reason about. Consider passing state through the trace instead when possible.
+:::
 
 ## Composing Checks
 
@@ -535,6 +536,6 @@ class DocumentedCheck(Check):
 
 ## Next Steps
 
-- Apply custom checks in `../tutorials/index`
-- Review `single-turn` and `multi-turn` for usage patterns
-- See the `core-concepts` for architecture details
+- Apply custom checks in [Tutorials](/oss/checks/tutorials/)
+- Review [Single-Turn Evaluation](/oss/checks/testing/single-turn/) and [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/) for usage patterns
+- See the [Core Concepts](/oss/checks/testing/core-concepts/) for architecture details

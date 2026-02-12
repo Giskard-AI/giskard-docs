@@ -137,23 +137,21 @@ test_scenario = (
 result = await test_scenario.run()
 ```
 
-> [!NOTE]
-> The `run()` method is asynchronous. When running in a script, use
-> `asyncio.run()`:
->
-> ``` python
-> import asyncio
->
-> async def main():
->     result = await test_scenario.run()
->     return result
->
-> result = asyncio.run(main())
-> ```
->
-> In async contexts (like pytest with `@pytest.mark.asyncio`), you can
-> use `await` directly.
+:::note
+The `run()` method is asynchronous. When running in a script, use `asyncio.run()`:
 
+``` python
+import asyncio
+
+async def main():
+    result = await test_scenario.run()
+    return result
+
+result = asyncio.run(main())
+```
+
+In async contexts (like pytest with `@pytest.mark.asyncio`), you can  use `await` directly.
+:::
 This will give us a result object with the results of the checks.
 
 ## Fluent API Mapping
@@ -185,4 +183,4 @@ import asyncio
 result = await test_scenario.run()  # or: result = asyncio.run(test_scenario.run())
 ```
 
-For a practical introduction to the fluent API, see `quickstart`.
+For a practical introduction to the fluent API, see [Quickstart](/oss/checks/testing/quickstart/).

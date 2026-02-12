@@ -553,6 +553,6 @@ from_fn(
 
 # Next Steps
 
-- Learn how to write `custom-checks` for domain-specific validation
-- Explore `../tutorials/index` for complete examples
-- See `single-turn` for single-interaction patterns
+- Learn how to write [Custom Checks](/oss/checks/testing/custom-checks/) for domain-specific validation
+- Explore [Tutorials](/oss/checks/tutorials/) for complete examples
+- See [Single-Turn Evaluation](/oss/checks/testing/single-turn/) for single-interaction patterns
