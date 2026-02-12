@@ -25,13 +25,13 @@ export default defineConfig({
               './src/styles/custom.css',
           ],
           social: [
-              { label: 'GitHub', href: 'https://github.com/Giskard-AI/giskard', icon: 'github' },
-              { label: 'Discord', href: 'https://discord.gg/fUfP5S3m', icon: 'discord' },
+              { label: 'GitHub', href: 'https://github.com/Giskard-AI/giskard-oss', icon: 'github' },
+              { label: 'Discord', href: 'https://discord.com/invite/ABvfpbu69R', icon: 'discord' },
           ],
           sidebar: [
               // Open Source sidebar
               {
-                  label: 'Introduction',
+                  label: 'Giskard Library',
                   slug: 'oss',
               },
               {
