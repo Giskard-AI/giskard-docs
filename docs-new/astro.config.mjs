@@ -26,11 +26,17 @@ export default defineConfig({
 				{ label: 'Discord', href: 'https://discord.gg/fUfP5S3m', icon: 'discord' },
 			],
 			sidebar: [
+				// Open Source sidebar
+				{
+					label: 'Introduction',
+					slug: 'oss',
+				},
 				{
 					label: 'Checks',
 					autogenerate: { directory: 'oss/checks', collapsed: false },
 				},
 			],
+			routeMiddleware: './src/routeData.ts',
 			expressiveCode: {
 				// Configure expressive code if needed, defaults are usually good
 				themes: ['dracula', 'github-light'],
