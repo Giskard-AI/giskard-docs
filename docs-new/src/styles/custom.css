@@ -201,9 +201,13 @@ h6 {
 .sidebar-content details details>summary .large {
   font-weight: normal !important;
   font-size: var(--sl-text-sm) !important;
+
+  & :hover {
+    text-decoration: underline !important;
+  }
 }
 
-/* Current page link: Bold */
-.sidebar-content a[aria-current="page"] {
-  font-weight: bold !important;
+/* Border for current page link */
+:root:not([data-theme='dark']) .sidebar-content a[aria-current="page"] {
+  border: 1px solid hsl(241, 31.8%, 91.4%) !important;
 }
