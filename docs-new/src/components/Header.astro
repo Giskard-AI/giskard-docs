@@ -92,10 +92,33 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
         margin-right: 2rem;
     }
 
+    @media (max-width: 50rem) {
+        .search-container {
+            margin-left: 0.5rem;
+            margin-right: 0.5rem;
+        }
+    }
+
     .search-container :global(button) {
         width: 320px !important;
         max-width: 100% !important;
         justify-content: flex-start !important;
+    }
+
+    @media (max-width: 50rem) {
+        .search-container :global(button) {
+            width: 40px !important;
+            padding: 0 !important;
+            justify-content: center !important;
+        }
+        
+        .search-container :global(button span) {
+            display: none !important;
+        }
+
+        .search-container :global(button svg) {
+            margin: 0 !important;
+        }
     }
 
 	.right-group {

@@ -50,6 +50,7 @@ export default defineConfig({
                 Header: './src/components/Header.astro',
                 Pagination: './src/components/Pagination.astro',
                 MarkdownContent: './src/components/MarkdownContent.astro',
+                Sidebar: './src/components/Sidebar.astro',
             },
             plugins: [
                 starlightAutoSidebar()

@@ -60,6 +60,10 @@
   --sl-color-hairline: rgba(64, 222, 223, 0.13);
   --sl-color-hairline-light: rgba(64, 222, 223, 0.2);
   --sl-color-hairline-shade: rgba(64, 222, 223, 0.1);
+
+  /* Fix for mobile TOC background */
+  --sl-color-bg-nav: var(--sl-color-bg);
+  --sl-color-bg-sidebar: var(--sl-color-bg);
 }
 
 /* Starlight Layout Overrides */
@@ -105,6 +109,16 @@ header {
 
 :root:not([data-theme='dark']) .right-sidebar a {
   color: rgba(15, 23, 41, 0.6) !important;
+}
+
+/* Table of Contents (Right Sidebar) Refinements for Dark Mode */
+:root[data-theme='dark'] .right-sidebar a {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+:root[data-theme='dark'] .right-sidebar a:hover,
+:root[data-theme='dark'] .right-sidebar a[aria-current="true"] {
+  color: #05d939 !important;
 }
 
 /* Global Hover Overrides for Light Mode */
@@ -209,5 +223,15 @@ h6 {
 
 /* Border for current page link */
 :root:not([data-theme='dark']) .sidebar-content a[aria-current="page"] {
-  border: 1px solid hsl(241, 31.8%, 91.4%) !important;
+  border: 1px solid #e2e8f0 !important;
+  background-color: #f8fafc !important;
+}
+
+/* Responsive Sidebar Refinements */
+@media (max-width: 50rem) {
+
+  .sidebar-content a,
+  .sidebar-content summary {
+    padding-block: 0.75rem !important;
+  }
 }
