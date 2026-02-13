@@ -147,3 +147,63 @@ h6 {
     color: #E1E8EF !important;
   }
 }
+
+/* Sidebar Design Refinement */
+
+/* 1. Remove vertical hairline from sidebar items */
+.sidebar-content li {
+  border-left: none !important;
+  border-inline-start: none !important;
+}
+
+/* 2. Reset spacing for nested lists to allow custom alignment */
+.sidebar-content ul ul li {
+  margin-inline-start: 0 !important;
+  padding-inline-start: 0 !important;
+}
+
+/* 3. Align root group elements flush with the parent heading text */
+.sidebar-content ul>li>details>ul>li>a,
+.sidebar-content ul>li>details>ul>li>details>summary {
+  padding-inline-start: 0.5rem !important;
+}
+
+/* 4. Keep nested elements (items inside nested groups) indented */
+.sidebar-content ul>li>details>ul>li>details>ul a,
+.sidebar-content ul>li>details>ul>li>details>ul summary {
+  padding-inline-start: 1.5rem !important;
+}
+
+/* Sidebar Improvements: Chevrons & Typography */
+
+/* 1. Remove chevrons from root level groups */
+.sidebar-content details:not(details details)>summary svg.caret {
+  display: none !important;
+}
+
+/* 2. Make root level groups non-clickable (they should be always open) */
+.sidebar-content details:not(details details)>summary {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+/* 3. Typography: Root group labels and active page should be bold, others normal */
+
+/* Root group labels: Bold */
+.sidebar-content details:not(details details)>summary {
+  font-weight: bold !important;
+  color: var(--sl-color-text) !important;
+}
+
+/* All sidebar links and nested summaries: Normal weight and smaller font size */
+.sidebar-content a,
+.sidebar-content details details>summary,
+.sidebar-content details details>summary .large {
+  font-weight: normal !important;
+  font-size: var(--sl-text-sm) !important;
+}
+
+/* Current page link: Bold */
+.sidebar-content a[aria-current="page"] {
+  font-weight: bold !important;
+}
