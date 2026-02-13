@@ -99,15 +99,13 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
         }
     }
 
-    .search-container :global(button) {
-        width: 320px !important;
-        max-width: 100% !important;
+    .search-container :global(button):not(.pagefind-ui__search-clear) {
+        max-width: 320px !important;
         justify-content: flex-start !important;
     }
 
     @media (max-width: 50rem) {
         .search-container :global(button) {
-            width: 40px !important;
             padding: 0 !important;
             justify-content: center !important;
         }
