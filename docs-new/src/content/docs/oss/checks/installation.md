@@ -38,4 +38,4 @@ We use the `giskard-agents` library to handle LLM generations.
 
 ## Next Steps
 
-Head to the [Quickstart](/oss/checks/testing/quickstart) to write your first test!
+Head to the [Quickstart](/oss/checks/quickstart) to write your first test!

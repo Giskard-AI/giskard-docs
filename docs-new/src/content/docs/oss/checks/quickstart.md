@@ -1,7 +1,7 @@
 ---
 title: Quickstart
 sidebar:
-  order: 1
+  order: 3
 ---
 
 This guide will walk you through creating your first scenario with
@@ -74,7 +74,7 @@ result = await test_scenario.run()
 result
 ```
 
-![Rich display for a ScenarioResult with trace and check results](../../../../../assets/images/oss/checks/quickstart-simple_example_result.png)
+![Rich display for a ScenarioResult with trace and check results](../../../../assets/images/oss/checks/quickstart-simple_example_result.png)
 
 :::note
 The `run()` method is asynchronous. In a script, wrap it with
@@ -200,7 +200,7 @@ result = await test_scenario.run()
 result
 ```
 
-![Rich display for a structured interaction scenario result](../../../../../assets/images/oss/checks/quickstart-structured_interactions.png)
+![Rich display for a structured interaction scenario result](../../../../assets/images/oss/checks/quickstart-structured_interactions.png)
 
 This will give us a result object with the results of the checks.
 

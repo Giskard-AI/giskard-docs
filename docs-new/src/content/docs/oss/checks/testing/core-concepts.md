@@ -183,4 +183,4 @@ import asyncio
 result = await test_scenario.run()  # or: result = asyncio.run(test_scenario.run())
 ```
 
-For a practical introduction to the fluent API, see [Quickstart](/oss/checks/testing/quickstart/).
+For a practical introduction to the fluent API, see [Quickstart](/oss/checks/quickstart/).
