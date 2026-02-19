@@ -101,22 +101,22 @@ from giskard.checks import StringMatching
 
 # Check if output contains specific text
 check = StringMatching(
-    pattern="success",
-    key="trace.last.outputs",
+    keyword="success",
+    text_key="trace.last.outputs",
     match_type="contains"
 )
 
 # Check with regex pattern
 check = StringMatching(
-    pattern=r"\d{3}-\d{3}-\d{4}",  # Phone number pattern
-    key="trace.last.outputs.phone",
+    keyword=r"\d{3}-\d{3}-\d{4}",  # Phone number pattern
+    text_key="trace.last.outputs.phone",
     match_type="regex"
 )
 
 # Case-insensitive matching
 check = StringMatching(
-    pattern="error",
-    key="trace.last.outputs",
+    keyword="error",
+    text_key="trace.last.outputs",
     match_type="contains",
     case_sensitive=False
 )
@@ -126,8 +126,8 @@ check = StringMatching(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `pattern` | `str` | required | Pattern to match (string or regex) |
-| `key` | `str` | required | JSONPath to extract value from trace |
+| `keyword` | `str` | required | Pattern to match (string or regex) |
+| `text_key` | `str` | required | JSONPath to extract value from trace |
 | `match_type` | `str` | `"contains"` | Match type: "contains", "equals", "startswith", "endswith", "regex" |
 | `case_sensitive` | `bool` | `True` | Whether matching is case-sensitive |
 
