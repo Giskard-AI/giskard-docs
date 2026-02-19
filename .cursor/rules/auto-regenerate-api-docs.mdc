@@ -1,0 +1,39 @@
+---
+description: Auto-trigger API reference regeneration when dependencies change in pyproject.toml
+globs: pyproject.toml
+alwaysApply: false
+---
+
+# Auto API Reference Regeneration
+
+When `pyproject.toml` is modified and saved, automatically check if any giskard dependencies have been updated.
+
+## Detection Rules
+
+Check if changes include modifications to any of these dependency lines:
+- `giskard-checks`
+
+## Automatic Action
+
+**If dependencies were updated:**
+
+1. Immediately trigger the API reference generator subagent using the Task tool
+2. Use: `subagent_type="api-reference-generator"`
+3. Provide a prompt like: "Regenerate API reference for [package-name] using the updated dependencies"
+
+**Example:**
+
+```
+When the user saves pyproject.toml with updated giskard-checks dependency:
+→ Automatically call Task tool with:
+  - subagent_type: "api-reference-generator"
+  - prompt: "Regenerate API reference for giskard-checks using the updated dependencies from pyproject.toml"
+  - description: "Auto-regenerate giskard-checks API docs"
+```
+
+## Important Notes
+
+- Only trigger if the dependencies section actually changed
+- Inform the user that auto-regeneration was triggered
+- Let the subagent handle the full regeneration workflow
+- Do not ask for permission - just trigger automatically
