@@ -19,9 +19,9 @@ Explore the Giskard Checks API organized by functionality:
     href="/oss/checks/reference/core/" 
   />
   <LinkCard 
-    title="✅ Built-in Checks" 
+    title="✅ Checks" 
     description="Ready-to-use validation checks: string matching, comparisons, LLM-based checks" 
-    href="/oss/checks/reference/builtin-checks/" 
+    href="/oss/checks/reference/checks/" 
   />
   <LinkCard 
     title="🎬 Scenarios" 
@@ -75,16 +75,20 @@ from giskard.checks import (
     GreaterThan,
     LesserThanEquals,
     GreaterEquals,
-    Groundedness,
-    Conformity,
-    LLMJudge,
-    SemanticSimilarity,
-    BaseLLMCheck,
-    LLMCheckResult,
 
     # Configuration
     set_default_generator,
     get_default_generator,
+)
+
+# LLM-based checks
+from giskard.checks import (
+    BaseLLMCheck,
+    LLMCheckResult,
+    Groundedness,
+    Conformity,
+    LLMJudge,
+    SemanticSimilarity,
 )
 ```
 
@@ -95,7 +99,7 @@ giskard.checks/
 ├── core/                 # Base classes and fundamental types
 │   ├── check.py          # Check base class
 │   ├── trace.py          # Trace and Interaction
-│   ├── interaction.py    # InteractionSpec
+│   ├── interaction.py    # InteractionSpec, BaseInteractionSpec
 │   ├── result.py         # CheckResult, CheckStatus
 │   ├── scenario.py       # Scenario
 │   ├── testcase.py       # TestCase
@@ -105,10 +109,13 @@ giskard.checks/
 │   ├── fn.py             # from_fn, FnCheck
 │   ├── string_matching.py # StringMatching
 │   ├── comparison.py     # Equals, NotEquals, etc.
+│   └── semantic_similarity.py # SemanticSimilarity
+│
+├── judges/               # LLM-based checks
+│   ├── base.py           # BaseLLMCheck, LLMCheckResult
 │   ├── groundedness.py   # Groundedness check
 │   ├── conformity.py     # Conformity check
-│   ├── judge.py          # LLMJudge
-│   └── semantic_similarity.py # SemanticSimilarity
+│   └── judge.py          # LLMJudge
 │
 ├── scenarios/            # Multi-step workflows
 │   ├── builder.py        # Scenario builder
@@ -120,6 +127,9 @@ giskard.checks/
 │
 ├── generators/           # Input generators
 │   └── user.py           # User input generators
+│
+├── interaction/          # Interaction specifications
+│   └── __init__.py       # InteractionSpec
 │
 └── utils/                # Helper utilities
     ├── generator.py      # Generator utilities
