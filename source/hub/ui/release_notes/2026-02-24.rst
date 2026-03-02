@@ -1,0 +1,35 @@
+2.4.0 (2026-02-24)
+==================
+
+Hub v2.4.0 introduces performance enhancements for large datasets, new interactive actions in the Playground, and a more robust groundedness evaluation pipeline. This version also shifts entirely to our modern v2 API for improved reliability and long-term stability.
+
+
+Hub UI
+------
+
+What's new?
+~~~~~~~~~~~
+
+**Server-backed dataset management**
+   Dataset test cases now load via a server-backed table, significantly improving performance for large datasets. You can now filter, sort, and paginate through thousands of test cases without slowing down your browser. Additionally, a new bulk action preview shows you exactly how many items will be affected before you apply changes, making large-scale edits safer and more predictable.
+
+**Enhanced Playground interactivity**
+   The Playground now features quick actions to streamline your prompt engineering workflow. You can instantly remove the last conversation turn, re-generate the assistant's previous answer, and toggle between "Pretty" and "Raw" Markdown rendering. Your display preference is saved in your browser, ensuring a consistent experience across sessions.
+
+**Advanced 3-step Groundedness pipeline**
+   Groundedness evaluation has been upgraded to a multi-step pipeline that extracts evidence and re-checks borderline claims for higher accuracy. You can now view detailed, per-claim groundedness reasons directly in the results and comparison views, presented in a clear Markdown format. This helps you understand exactly why a response was flagged and reduces false positives.
+
+**Improved task stability**
+   Task management has been updated to provide stricter validation and more predictable behavior. This ensures that tasks are always linked to valid entities, improving the reliability of your organizational workflows.
+
+What's fixed?
+~~~~~~~~~~~~~
+
+- **Large Knowledge Base uploads** - Increased the upload limit to prevent Knowledge Base files larger than 10MB from failing. This ensures that comprehensive documentation sets can be imported without interruption.
+
+- **Evaluation log clarity** - Reduced noise in system logs by suppressing internal warnings during evaluation. This makes it easier to identify and troubleshoot actual results in your runs.
+
+Hub SDK
+-------
+
+No changes yet.
