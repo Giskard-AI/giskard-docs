@@ -35,9 +35,10 @@ You can import data in **JSON or JSONL format**, containing an array of conversa
 
 Each conversation must be defined as a JSON object with a ``messages`` field containing the chat messages in OpenAI format. You can also specify these optional attributes:
 
-- ``demo_output``: an object presenting the output of the agent at some point
+- ``demo_output``: an object presenting the output of the agent at some point, with an optional ``metadata`` field
 - ``tags``: a list of tags to categorize the conversation
 - ``checks``: a list of checks to evaluate the conversation, they can be built-in or custom ones
+- ``status``: optional status of the conversation. Accepted values are ``draft`` or ``active`` (active conversations are considered published). If omitted, the conversation is active unless no checks are enabled, in which case it will be imported as draft.
 
 .. tip::
 
@@ -65,7 +66,8 @@ Here's an example of the structure and content in a dataset:
                 {"identifier": "conformity", "params": {"rules": ["The agent should not do X"]}},
                 {"identifier": "metadata", "params": {"json_path_rules": [{"json_path": "$.tool", "expected_value": "calculator", "expected_value_type": "string"}]}},
                 {"identifier": "semantic_similarity", "params": {"reference": "How can I help you?", "threshold": 0.8}},
-            ]
+            ],
+            "status": "draft"
         }
     ]
 
@@ -83,13 +85,15 @@ Each CSV must contain a ``user_message`` column representing the message from th
 - ``rule*``: the list of rules the agent should follow (i.e. rule_1,rule_2,...)
 - ``reference_context``: the context in which the agent must ground its response
 - ``check*``: the list of custom checks (i.e. check_1,check_2,...)
+- ``bot_metadata``: the metadata of the bot message in JSON-like format (need to be escaped, if CSV is comma separated)
+- ``status``: a column to indicate the status of the conversation. Accepted values are ``draft`` or ``active``. If omitted, the conversation is active unless no checks are enabled, in which case it will be imported as draft.
 
 Here's an example of the structure and content in a dataset:
 
 .. code-block:: text
 
-    user_message,bot_message,tag_1,tag_2,expected_output,rule_1,rule_2,check_1,check_2
-    Hi agent!,How can I help you?,greetings,assistance,How can I help you?,The agent should not do X,The agent should be polite,u_greet,u_polite
+    user_message,bot_message,tag_1,tag_2,expected_output,rule_1,rule_2,check_1,check_2,bot_metadata,status
+    Hi bot!,How can I help you?,greetings,assistance,How can I help you?,The agent should not do X,The agent should be polite,u_greet,u_polite,"{""metadata1"":""metadata1"",""response_time"":60.0}",draft
 
 Next steps
 ----------
