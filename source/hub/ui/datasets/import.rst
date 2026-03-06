@@ -38,7 +38,7 @@ Each conversation must be defined as a JSON object with a ``messages`` field con
 - ``demo_output``: an object presenting the output of the agent at some point, with an optional ``metadata`` field
 - ``tags``: a list of tags to categorize the conversation
 - ``checks``: a list of checks to evaluate the conversation, they can be built-in or custom ones
-- ``status``: optional status of the conversation. Accepted values are ``draft`` or ``active`` (active conversations are considered published). If omitted, the conversation is active unless no checks are enabled, in which case it will be imported as draft.
+- ``status``: optional status of the conversation. Accepted values are ``draft`` or ``active`` (considered published). If omitted, the status defaults to ``active`` if checks are enabled, and ``draft`` otherwise.
 
 .. tip::
 
@@ -86,7 +86,7 @@ Each CSV must contain a ``user_message`` column representing the message from th
 - ``reference_context``: the context in which the agent must ground its response
 - ``check*``: the list of custom checks (i.e. check_1,check_2,...)
 - ``bot_metadata``: the metadata of the bot message in JSON-like format (need to be escaped, if CSV is comma separated)
-- ``status``: a column to indicate the status of the conversation. Accepted values are ``draft`` or ``active``. If omitted, the conversation is active unless no checks are enabled, in which case it will be imported as draft.
+- ``status``: a column to indicate the status of the conversation. Accepted values are ``draft`` or ``active`` (considered published). If omitted, the status defaults to ``active`` if checks are enabled, and ``draft`` otherwise.
 
 Here's an example of the structure and content in a dataset:
 
