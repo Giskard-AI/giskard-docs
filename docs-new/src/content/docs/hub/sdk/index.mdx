@@ -1,0 +1,44 @@
+---
+title: Introduction
+description: Python SDK for the Giskard Hub — evaluate, scan, and monitor your LLM agents programmatically.
+sidebar:
+  order: 1
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+The **Giskard Hub Python SDK** (`giskard-hub`) gives you programmatic access to everything the Hub can do: define agents, build evaluation datasets, run evaluations and vulnerability scans, schedule recurring runs, and manage your entire quality workflow from code.
+
+```bash
+pip install giskard-hub
+```
+
+```python
+from giskard_hub import HubClient
+
+hub = HubClient()  # reads GISKARD_HUB_BASE_URL and GISKARD_HUB_API_KEY from env
+
+project = hub.projects.list().data[0]
+evaluation = hub.evaluations.create(
+    agent_id="<agent-id>",
+    dataset_id="<dataset-id>",
+    project_id=project.id,
+    name="My first evaluation",
+)
+```
+
+## Where to start
+
+<CardGrid>
+  <LinkCard title="Quickstart" href="/hub/sdk/quickstart" description="Install the SDK, set up authentication, and run your first evaluation in minutes." />
+  <LinkCard title="Core Concepts" href="/hub/sdk/concepts" description="Understand how Projects, Agents, Datasets, Evaluations, and Scans fit together." />
+  <LinkCard title="How-to Guides" href="/hub/sdk/guides/projects-and-agents" description="Step-by-step guides for every feature: datasets, evaluations, scans, scheduling, and more." />
+  <LinkCard title="API Reference" href="/hub/sdk/reference" description="Full reference for every resource, method, and type exported by the SDK." />
+</CardGrid>
+
+## Need Help?
+
+- **Documentation**: Browse the [How-to Guides](/hub/sdk/guides/projects-and-agents) for step-by-step walkthroughs of every feature
+- **Examples**: Check our [GitHub repository](https://github.com/Giskard-AI/giskard-hub-python) for runnable examples and notebooks
+- **Community**: Join our [Discord](https://discord.com/invite/ABvfpbu69R) for support and discussions
+- **Enterprise**: Need on-premise deployment or dedicated support? [Contact us](https://www.giskard.ai/contact)

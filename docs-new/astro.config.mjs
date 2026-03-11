@@ -29,6 +29,11 @@ export default defineConfig({
                 { label: 'Discord', href: 'https://discord.com/invite/ABvfpbu69R', icon: 'discord' },
             ],
             sidebar: [
+                // Hub SDK sidebar
+                {
+                    label: 'Hub SDK',
+                    autogenerate: { directory: 'hub/sdk', collapsed: false },
+                },
                 // Open Source sidebar
                 {
                     label: 'Get Started',

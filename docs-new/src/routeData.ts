@@ -6,6 +6,7 @@ import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
  */
 function getCurrentSection(pathname: string): string | null {
 	if (pathname.startsWith('/oss')) return 'oss';
+	if (pathname.startsWith('/hub/sdk')) return 'hub/sdk';
 	// Add more sections here as needed
 	return null;
 }
