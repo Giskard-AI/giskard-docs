@@ -156,28 +156,25 @@ for probe in probes:
     attempts = hub.scans.probes.list_attempts(probe.id).data
 
     for attempt in attempts:
-        # severity > 0 means the attack succeeded — the agent misbehaved
+        # severity > 0 means the agent misbehaved
         if attempt.severity > 0:
             hub.test_cases.create(
                 dataset_id=dataset.id,
                 messages=[{"role": m.role, "content": m.content} for m in attempt.messages[:-1]],
-                checks=[{"identifier": "no_harmful_content"}],  # or any relevant check
+                demo_output={"role": "assistant", "content": attempt.messages[-1].content},
+                checks=[{"identifier": "no-harmful-content"}],  # or any relevant check
                 tags=[probe.probe_category],
             )
 
-print(f"Imported failing attacks into dataset {dataset.id}")
+print(f"Imported attacks into dataset {dataset.id}")
 ```
-
-:::tip
-Use a custom check (see [Checks & Metrics](/hub/sdk/guides/checks)) that matches the vulnerability category — for example, a `conformity` check that flags prompt injection compliance failures.
-:::
 
 ---
 
 ## List and manage scans
 
 ```python
-scans = hub.scans.list(agent_id="agent-id").data
+scans = hub.scans.list(project_id="project-id").data
 
 hub.scans.delete("scan-id")
 
@@ -190,10 +187,10 @@ hub.scans.bulk_delete(scan_ids=["scan-id-1", "scan-id-2"])
 
 | Grade | Meaning |
 |---|---|
-| **A** | No significant vulnerabilities detected |
+| **A** | No vulnerabilities detected |
 | **B** | Minor issues — low severity findings only |
-| **C** | Moderate issues — some medium severity findings |
-| **D** | Serious issues — high or critical severity findings |
+| **C** | Moderate issues — some high severity findings |
+| **D** | Serious issues — critical severity findings |
 | **N/A** | Insufficient data to compute a grade |
 
 Grades are computed from the proportion and severity of probes that successfully elicited harmful or undesired behaviour from the agent.
