@@ -95,18 +95,24 @@ You can also define **custom checks** via `hub.checks.create()` — a named, reu
 
 ---
 
-## Datasets & Test Cases
+## Datasets
 
-A **Dataset** is a named collection of **Test Cases**. A test case represents a single conversation: a sequence of `{role, content}` messages (with optional metadata) exchanged between a user and an agent. The conversation does not have to end with an agent message — it can be as short as a single user turn. A list of checks is applied to the agent's actual response at evaluation time.
-
-Datasets can be built in several ways:
+A **Dataset** is a named collection of **Test Cases**. Datasets can be built in several ways:
 
 - **Manually** — create test cases one by one via `hub.test_cases.create()`, useful when you have precise, hand-crafted scenarios.
 - **From real conversation logs** — import a JSONL or JSON file of recorded conversations with `hub.datasets.upload()`, turning production traffic into a regression suite.
 - **From Project Scenarios** — define personas or behaviour patterns (scenarios) in your project and let the Hub auto-generate diverse test cases via `hub.datasets.generate_scenario_based()`.
 - **From a Knowledge Base** — the Hub generates test cases whose questions and answers are grounded in your documents via `hub.datasets.generate_document_based()`, ideal for RAG agents.
 
-**SDK resources:** `hub.datasets`, `hub.test_cases`, `hub.test_cases.comments`
+**SDK resource:** `hub.datasets`
+
+---
+
+## Test Cases
+
+A **Test Case** represents a single conversation: a sequence of `{role, content}` messages (with optional metadata) exchanged between a user and an agent. The conversation does not have to end with an agent message — it can be as short as a single user turn. A list of checks is applied to the agent's actual response at evaluation time.
+
+**SDK resources:** `hub.test_cases`, `hub.test_cases.comments`
 
 ---
 
