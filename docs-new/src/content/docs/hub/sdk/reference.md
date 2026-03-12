@@ -99,7 +99,7 @@ from giskard_hub.types import Agent, AgentOutput, ChatMessage
 
 **`Agent` fields:** `id`, `name`, `description`, `url`, `project_id`, `supported_languages`, `headers`, `status`, `created_at`, `updated_at`
 
-**`AgentOutput` fields:** `message` (`ChatMessage`), `metadata` (dict)
+**`AgentOutput` fields:** `response` (`ChatMessage`), `metadata` (dict)
 
 **`ChatMessage` fields:** `role` (`"user"` | `"assistant"` | `"system"`), `content`
 
@@ -116,7 +116,7 @@ from giskard_hub.types import AuditAPIResource, AuditDisplayAPIResource
 | `search(**params)` | `APIPaginatedResponse[list[AuditAPIResource], None]` | Search audit events with filters |
 | `list_entities(entity_id, entity_type, **params)` | `APIPaginatedResponse[list[AuditDisplayAPIResource], None]` | Audit history for a specific resource |
 
-**Search params:** `project_id`, `entity_type`, `entity_id`, `action`, `user_id`, `created_after`, `created_before`, `limit`, `offset`
+**Search params:** `filters` (dict — keys: `project_id`, `entity_type`, `entity_id`, `action`, `user_id`, each with `{"selected_options": [...]}` shape; `created_at` with `{"from": ..., "to": ...}` shape), `limit`, `offset`
 
 ---
 
@@ -190,7 +190,7 @@ from giskard_hub.types import EvaluationAPIResource, Metric, OutputAnnotation
 
 **`create` params:** `project_id`, `agent_id`, `criteria` (dict with `dataset_id`), `name`, `tags` (filter by test case tags), `run_count`
 
-**`create_local` params:** `project_id`, `agent_fn` (callable), `criteria` (dict with `dataset_id`), `name`, `tags`, `run_count`
+**`create_local` params:** `agent` (dict with `name`, `description`), `criteria` (list of dicts with `dataset_id`), `name`, `tags`, `run_count`
 
 ### `hub.evaluations.results`
 
@@ -235,7 +235,7 @@ from giskard_hub.types import (
 
 **`KnowledgeBase` fields:** `id`, `name`, `description`, `project_id`, `status`, `document_count`, `created_at`
 
-**`create` params:** `project_id`, `name`, `description`, `documents` (list of `{text, topic}`)
+**`create` params:** `project_id`, `name`, `description`, `file` (a `(filename, bytes)` tuple for in-memory data, or a `pathlib.Path` for a file on disk — JSON/JSONL where each record has `text` and optional `topic`)
 
 ---
 
@@ -291,7 +291,7 @@ from giskard_hub.types import ScanResult, ScanCategory, ScanProbeResult
 
 **`ScanResult` fields:** `id`, `status`, `grade`, `agent_id`, `knowledge_base_id`, `tags`, `created_at`
 
-**`create` params:** `agent_id`, `knowledge_base_id` (optional), `tags` (list of OWASP/Giskard tag strings)
+**`create` params:** `project_id`, `agent_id`, `knowledge_base_id` (optional), `tags` (list of OWASP/Giskard tag strings)
 
 ### `hub.scans.probes`
 
@@ -379,9 +379,9 @@ from giskard_hub.types import TestCase, TestCaseComment, TestCaseCheckConfig, Ch
 | `bulk_update(**params)` | `APIResponse[list[TestCase]]` | Update multiple test cases |
 | `bulk_move(**params)` | `APIResponse[None]` | Move test cases to another dataset |
 
-**`TestCase` fields:** `id`, `dataset_id`, `messages`, `expected_output`, `checks`, `tags`, `created_at`
+**`TestCase` fields:** `id`, `dataset_id`, `messages`, `demo_output`, `checks`, `tags`, `created_at`
 
-**`create` params:** `dataset_id`, `messages` (list of `{role, content}`), `expected_output`, `checks` (list of `{identifier, params}`), `tags`
+**`create` params:** `dataset_id`, `messages` (list of `{role, content}`), `demo_output` (`{role, content}`), `checks` (list of `{identifier, assertions}`), `tags`
 
 ### `hub.test_cases.comments`
 
