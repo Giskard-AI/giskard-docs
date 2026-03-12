@@ -499,8 +499,10 @@ Evaluate multiple test cases and aggregate results:
        for question, result in results:
            if not result.passed:
                print(f"Failed: {question}")
-               for check_result in result.results:
-                   print(f"  - {check_result.message}")
+               for step in result.steps:
+                   for check_result in step.results:
+                       if not check_result.passed:
+                           print(f"  - {check_result.message}")
 
 
 Next Steps

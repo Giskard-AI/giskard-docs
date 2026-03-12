@@ -131,8 +131,7 @@ Saving and Loading Results
    with open("result.json", "r") as f:
        data = json.load(f)
 
-   # Note: Can't directly validate back to TestCaseResult
-   # but data is preserved
+   # Note: result is a ScenarioResult; data is preserved for replay/inspection
 
 
 Custom Test Fixtures
@@ -262,13 +261,13 @@ Tracking Metrics
                "duration_ms": result.duration_ms,
            }
 
-           # Collect check-specific metrics
-           for check_result in result.results:
-               if check_result.metrics:
-                   test_metrics.update({
-                       f"{check_result.name}_{k}": v
-                       for k, v in check_result.metrics.items()
-                   })
+           # Collect check-specific metrics (result is ScenarioResult: iterate steps)
+           for step in result.steps:
+               for check_result in step.results:
+                   if check_result.metrics:
+                       check_name = check_result.details.get("check_name", "check")
+                       for m in check_result.metrics:
+                           test_metrics[f"{check_name}_{m.name}"] = m.value
 
            self.metrics.append(test_metrics)
            return result

@@ -623,10 +623,12 @@ Combine all tests into a comprehensive suite:
                print(f"{status} [{test_type}] {name}")
 
                if not result.passed:
-                   if hasattr(result, 'results'):
-                       for check_result in result.results:
-                           if not check_result.passed:
-                               print(f"    → {check_result.name}: {check_result.message}")
+                   if hasattr(result, 'steps'):
+                       for step in result.steps:
+                           for check_result in step.results:
+                               if not check_result.passed:
+                                   name = check_result.details.get("check_name", "Unknown")
+                                   print(f"    → {name}: {check_result.message}")
 
    # Usage
    async def main():

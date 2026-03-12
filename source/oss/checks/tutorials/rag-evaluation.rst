@@ -192,8 +192,10 @@ Test that the system answers questions correctly:
        result = await tc.run()
 
        print(f"Test passed: {result.passed}")
-       for check_result in result.results:
-           print(f"  {check_result.name}: {check_result.status.value}")
+       for step in result.steps:
+           for check_result in step.results:
+               name = check_result.details.get("check_name", "check")
+               print(f"  {name}: {check_result.status.value}")
 
    # Run the test
    import asyncio
@@ -579,9 +581,11 @@ Combine all tests into a comprehensive suite:
                status = "✓" if result.passed else "✗"
                print(f"  {status} {name}")
                if not result.passed:
-                   for check_result in result.results:
-                       if not check_result.passed:
-                           print(f"      - {check_result.name}: {check_result.message}")
+                   for step in result.steps:
+                       for check_result in step.results:
+                           if not check_result.passed:
+                               name = check_result.details.get("check_name", "Unknown")
+                               print(f"      - {name}: {check_result.message}")
 
            return results
 

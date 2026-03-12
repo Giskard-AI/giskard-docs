@@ -145,7 +145,7 @@ A ``Scenario`` is a list of steps (interactions and checks) that are executed se
 
    In async contexts (like pytest with ``@pytest.mark.asyncio``), you can use ``await`` directly.
 
-This will give us a result object with the results of the checks.
+This returns a ``ScenarioResult`` with ``steps`` (each step is a ``TestCaseResult`` with ``results``: a list of ``CheckResult``). Use ``result.steps`` and ``step.results`` to inspect individual check outcomes.
 
 
 Fluent API Mapping

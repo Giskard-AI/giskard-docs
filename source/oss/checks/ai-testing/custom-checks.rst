@@ -35,7 +35,7 @@ For more control, create a custom check class:
 
 .. code-block:: python
 
-   from giskard.checks import Check, CheckResult, Trace
+   from giskard.checks import Check, CheckResult, CheckStatus, Metric, Trace
 
    @Check.register("min_length")
    class MinLengthCheck(Check):
@@ -89,7 +89,7 @@ Checks can return numeric metrics for analysis:
 
 .. code-block:: python
 
-   from giskard.checks import Check, CheckResult, Trace
+   from giskard.checks import Check, CheckResult, CheckStatus, Metric, Trace
 
    @Check.register("readability")
    class ReadabilityCheck(Check):
@@ -102,14 +102,16 @@ Checks can return numeric metrics for analysis:
            grade_level = calculate_readability(text)
 
            if grade_level <= self.max_grade_level:
-               return CheckResult.success(
+               return CheckResult(
+                   status=CheckStatus.PASS,
                    message=f"Readability grade {grade_level:.1f} is acceptable",
-                   metrics={"grade_level": grade_level}
+                   metrics=[Metric(name="grade_level", value=grade_level)]
                )
 
-           return CheckResult.failure(
+           return CheckResult(
+               status=CheckStatus.FAIL,
                message=f"Readability grade {grade_level:.1f} exceeds maximum {self.max_grade_level}",
-               metrics={"grade_level": grade_level}
+               metrics=[Metric(name="grade_level", value=grade_level)]
            )
 
    def calculate_readability(text: str) -> float:
@@ -132,9 +134,11 @@ The metrics can be used for tracking, analysis, and visualization:
 .. code-block:: python
 
    result = await tc.run()
-   for check_result in result.results:
-       if check_result.metrics:
-           print(f"{check_result.name}: {check_result.metrics}")
+   for step in result.steps:
+       for check_result in step.results:
+           if check_result.metrics:
+               name = check_result.details.get("check_name", "check")
+               print(f"{name}: {[f'{m.name}={m.value}' for m in check_result.metrics]}")
 
 
 Extracting Values with JSONPath
@@ -144,7 +148,7 @@ Use JSONPath to extract values from complex structures:
 
 .. code-block:: python
 
-   from giskard.checks import Check, CheckResult, Trace, JsonPathExtractor
+   from giskard.checks import Check, CheckResult, CheckStatus, Metric, Trace, JsonPathExtractor
 
    @Check.register("field_validator")
    class FieldValidatorCheck(Check):
@@ -184,7 +188,7 @@ Build domain-specific LLM-based checks:
 
    from pydantic import BaseModel
    from giskard.agents.workflow import TemplateReference
-   from giskard.checks import BaseLLMCheck, Check, CheckResult, Trace
+   from giskard.checks import BaseLLMCheck, Check, CheckResult, CheckStatus, Metric, Trace
 
    class ToneEvaluation(BaseModel):
        is_professional: bool
@@ -232,14 +236,16 @@ Build domain-specific LLM-based checks:
            trace: Trace,
        ) -> CheckResult:
            if output_value.passed:
-               return CheckResult.success(
+               return CheckResult(
+                   status=CheckStatus.PASS,
                    message=f"Tone is appropriate: {output_value.reasoning}",
-                   metrics={"tone_score": output_value.tone_score}
+                   metrics=[Metric(name="tone_score", value=output_value.tone_score)]
                )
 
-           return CheckResult.failure(
+           return CheckResult(
+               status=CheckStatus.FAIL,
                message=f"Tone issues: {output_value.reasoning}",
-               metrics={"tone_score": output_value.tone_score},
+               metrics=[Metric(name="tone_score", value=output_value.tone_score)],
                details={
                    "is_professional": output_value.is_professional,
                    "is_empathetic": output_value.is_empathetic
@@ -255,7 +261,7 @@ Checks can be async for I/O operations:
 .. code-block:: python
 
    import httpx
-   from giskard.checks import Check, CheckResult, Trace
+   from giskard.checks import Check, CheckResult, CheckStatus, Metric, Trace
 
    @Check.register("api_validation")
    class APIValidationCheck(Check):
@@ -291,7 +297,7 @@ Checks can maintain state across scenarios (use with caution):
 
 .. code-block:: python
 
-   from giskard.checks import Check, CheckResult, Trace
+   from giskard.checks import Check, CheckResult, CheckStatus, Metric, Trace
 
    @Check.register("consistency_tracker")
    class ConsistencyTracker(Check):
@@ -308,9 +314,10 @@ Checks can maintain state across scenarios (use with caution):
                )
 
            self.seen_values.add(output)
-           return CheckResult.success(
+           return CheckResult(
+               status=CheckStatus.PASS,
                message="Output is unique",
-               metrics={"unique_count": len(self.seen_values)}
+               metrics=[Metric(name="unique_count", value=len(self.seen_values))]
            )
 
 **Note:** Stateful checks can make tests harder to reason about. Consider passing state through the trace instead when possible.
@@ -323,7 +330,7 @@ Build complex checks by composing simpler ones:
 
 .. code-block:: python
 
-   from giskard.checks import Check, CheckResult, Trace
+   from giskard.checks import Check, CheckResult, CheckStatus, Metric, Trace
 
    @Check.register("composite_quality")
    class CompositeQualityCheck(Check):
@@ -355,12 +362,13 @@ Build complex checks by composing simpler ones:
                    details={"issues": issues}
                )
 
-           return CheckResult.success(
+           return CheckResult(
+               status=CheckStatus.PASS,
                message="All quality checks passed",
-               metrics={
-                   "length": len(output),
-                   "keywords_found": len(self.required_keywords) - len(missing_keywords)
-               }
+               metrics=[
+                   Metric(name="length", value=len(output)),
+                   Metric(name="keywords_found", value=len(self.required_keywords) - len(missing_keywords))
+               ]
            )
 
 
@@ -372,7 +380,7 @@ Medical Transcript Validation
 
 .. code-block:: python
 
-   from giskard.checks import Check, CheckResult, Trace
+   from giskard.checks import Check, CheckResult, CheckStatus, Metric, Trace
 
    @Check.register("medical_transcript")
    class MedicalTranscriptCheck(Check):
@@ -407,7 +415,7 @@ Financial Report Validation
 .. code-block:: python
 
    import re
-   from giskard.checks import Check, CheckResult, Trace
+   from giskard.checks import Check, CheckResult, CheckStatus, Metric, Trace
 
    @Check.register("financial_report")
    class FinancialReportCheck(Check):

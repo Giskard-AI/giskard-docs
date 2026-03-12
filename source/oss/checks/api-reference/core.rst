@@ -30,7 +30,7 @@ Base class for all checks. Subclass and register with ``@Check.register("kind")`
 
        async def run(self, trace: Trace) -> CheckResult:
            # Your check logic
-           return CheckResult.success("Check passed")
+           return CheckResult.success(message="Check passed")
 
 
 CheckResult
@@ -41,7 +41,7 @@ CheckResult
    :undoc-members:
    :show-inheritance:
 
-Result of a check execution with status, message, and optional metrics.
+Result of a check execution with status, message, optional metrics (list of ``Metric``), and details dict.
 
 **Example:**
 
@@ -50,7 +50,7 @@ Result of a check execution with status, message, and optional metrics.
    # Success
    result = CheckResult.success(
        message="Check passed",
-       metrics={"score": 0.95}
+       details={"key": "value"}
    )
 
    # Failure
@@ -58,6 +58,10 @@ Result of a check execution with status, message, and optional metrics.
        message="Check failed",
        details={"reason": "threshold not met"}
    )
+
+   # Skip or error (e.g. precondition not met)
+   result = CheckResult.skip(message="Skipped")
+   result = CheckResult.error(message="Unexpected error")
 
 
 CheckStatus
@@ -67,7 +71,7 @@ CheckStatus
    :members:
    :undoc-members:
 
-Enumeration of possible check statuses: ``PASSED``, ``FAILED``, ``ERROR``.
+Enumeration of possible check statuses: ``PASS``, ``FAIL``, ``ERROR``, ``SKIP`` (values: ``"pass"``, ``"fail"``, ``"error"``, ``"skip"``).
 
 
 Interaction
@@ -122,7 +126,7 @@ Immutable history of all interactions in a scenario.
 
    # After running, access the trace
    result = await test_scenario.run()
-   last = result.trace.last
+   last = result.final_trace.last
 
 
 InteractionSpec

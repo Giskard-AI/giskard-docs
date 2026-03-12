@@ -56,11 +56,12 @@ Result of scenario execution.
 
 **Attributes:**
 
-* ``passed``: Whether all checks passed
-* ``trace``: Final trace with all interactions
-* ``results``: List of CheckResult objects
+* ``scenario_name``: Name of the scenario that was executed
+* ``steps``: List of ``TestCaseResult`` (one per step); each step has ``results`` (list of ``CheckResult``)
+* ``final_trace``: Final trace with all interactions
 * ``duration_ms``: Total execution time in milliseconds
-* ``error``: Optional error message if execution failed
+* ``passed``, ``failed``, ``errored``, ``skipped``: Boolean properties derived from ``status``
+* ``status``: Aggregated outcome (``ScenarioStatus``)
 
 
 TestCase
@@ -107,14 +108,15 @@ TestCaseResult
    :undoc-members:
    :show-inheritance:
 
-Result of test case execution.
+Result of test case execution (one step within a scenario).
 
 **Attributes:**
 
-* ``passed``: Whether all checks passed
-* ``results``: List of CheckResult objects
-* ``duration_ms``: Total execution time
-* ``error``: Optional error message
+* ``passed``, ``failed``, ``errored``, ``skipped``: Boolean properties derived from ``status``
+* ``results``: List of ``CheckResult`` objects
+* ``duration_ms``: Total execution time in milliseconds
+* ``status``: Aggregated outcome (``TestCaseStatus``)
+* ``format_failures()``: Returns a list of formatted failure messages
 
 
 Runners
@@ -219,9 +221,13 @@ Error Handling
    try:
        result = await tc.run()
        if not result.passed:
-           print(f"Test failed: {result.error or 'See individual check results'}")
-           for check_result in result.results:
-               if not check_result.passed:
-                   print(f"  - {check_result.name}: {check_result.message}")
+           for step in result.steps:
+               for failure_msg in step.format_failures():
+                   print(f"  - {failure_msg}")
+               # Or iterate check results manually:
+               for check_result in step.results:
+                   if not check_result.passed:
+                       name = check_result.details.get("check_name", "Unknown")
+                       print(f"  - {name}: {check_result.message}")
    except Exception as e:
        print(f"Test execution error: {e}")

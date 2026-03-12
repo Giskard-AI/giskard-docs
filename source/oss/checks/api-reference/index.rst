@@ -36,6 +36,7 @@ Quick Reference
        Check,
        CheckResult,
        CheckStatus,
+       Metric,
        Interaction,
        Trace,
 
@@ -43,9 +44,12 @@ Quick Reference
        InteractionSpec,
        BaseInteractionSpec,
 
-       # Scenarios
+       # Scenarios and results
        Scenario,
+       ScenarioResult,
        TestCase,
+       TestCaseResult,
+       SuiteResult,
 
        # Built-in checks
        from_fn,
@@ -79,7 +83,7 @@ Package Structure
    │   ├── check.py          # Check base class
    │   ├── trace.py          # Trace and Interaction
    │   ├── interaction.py    # InteractionSpec
-   │   ├── result.py         # CheckResult, CheckStatus
+   │   ├── result.py         # CheckResult, CheckStatus, Metric, ScenarioResult, TestCaseResult
    │   ├── scenario.py       # Scenario
    │   ├── testcase.py       # TestCase
    │   └── extraction.py     # Extractors
