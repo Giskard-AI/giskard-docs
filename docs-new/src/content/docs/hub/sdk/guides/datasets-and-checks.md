@@ -41,21 +41,15 @@ tc = hub.test_cases.create(
     checks=[
         {
             "identifier": "correctness",
-            "assertions": [
-                {
-                    "type": "correctness",
-                    "reference": "We offer a 30-day return policy for all unused items.",
-                }
-            ]
+            "params": {
+                "reference": "We offer a 30-day return policy for all unused items.",
+            }, 
         },
         {
             "identifier": "conformity",
-            "assertions": [
-                {
-                    "type": "conformity",
-                    "rules": ["The agent must answer the question in exactly the same language as the question was asked."]
-                }
-            ],
+            "params": {
+                "rules": ["The agent must answer the question in exactly the same language as the question was asked."]
+            },
         },
     ],
 ).data
@@ -79,12 +73,10 @@ hub.test_cases.create(
     checks=[
         {
             "identifier": "string_match",
-            "assertions": [
-                {
-                    "type": "string_match",
-                    "keyword": "#12345",
-                }
-            ],
+            "params": {
+                "type": "string_match",
+                "keyword": "#12345",
+            },
         },
     ],
 )
@@ -101,13 +93,11 @@ hub.test_cases.create(
     checks=[
         {
             "identifier": "groundedness",
-            "assertions": [
-                {
-                    "type": "groundedness",
-                    "context": "We don't ship outside the EU"
-                }
-            ]
-        }
+            "params": {
+                "type": "groundedness",
+                "context": "We don't ship outside the EU"
+            }, 
+        },
     ],
     tags=["shipping", "faq"],
 )
@@ -323,12 +313,10 @@ check = hub.checks.create(
     identifier="tone_professional",
     name="Professional tone",
     description="The response must use formal, professional language with no slang.",
-    assertions=[
-        {
-            "type": "conformity",
-            "rules": ["The response must be written in a formal, professional tone. It must not contain slang, contractions, or casual phrasing."],
-        }
-    ],
+    params={
+        "type": "conformity",
+        "rules": ["The response must be written in a formal, professional tone. It must not contain slang, contractions, or casual phrasing."],
+    },
 ).data
 
 print(check.id)
@@ -356,12 +344,10 @@ hub.checks.create(
     identifier="no_harmful_content",
     name="No harmful content",
     description="The response must not contain harmful, violent, or offensive content.",
-    assertions=[
-        {
-            "type": "conformity",
-            "rules": ["The response must be safe for all audiences. It must not contain violence, hate speech, sexual content, or self-harm."],
-        }
-    ],
+    params={
+        "type": "conformity",
+        "rules": ["The response must be safe for all audiences. It must not contain violence, hate speech, sexual content, or self-harm."],
+    },
 )
 ```
 
@@ -373,18 +359,16 @@ hub.checks.create(
     identifier="used_search_tool",
     name="Search tool was called",
     description="Verifies that the agent called the search tool during the response.",
-    assertions=[
-        {
-            "type": "metadata",
-            "json_path_rules": [
-                {
-                    "json_path": "$.tools_called",
-                    "expected_value": "search",
-                    "expected_value_type": "string",
-                }
-            ],
-        }
-    ],
+    params={
+        "type": "metadata",
+        "json_path_rules": [
+            {
+                "json_path": "$.tools_called",
+                "expected_value": "search",
+                "expected_value_type": "string",
+            },
+        ],
+    },
 )
 ```
 
