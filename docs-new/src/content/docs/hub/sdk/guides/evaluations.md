@@ -24,6 +24,8 @@ evaluation = hub.evaluations.create(
     name="v2.1 regression run",
 ).data
 
+print(evaluation.id)
+
 # Poll until complete
 while evaluation.status.state == "running":
     time.sleep(5)
@@ -110,7 +112,7 @@ for result_id, data in results_included_data.items():
 results = hub.evaluations.results.list("evaluation-id").data
 
 for result in results:
-    print(f"{result.test_case.id}: {result.state}")
+    print(f"{result.id}: {result.state}")
     for check in result.results:
         verdict = "✓" if check.passed else "✗"
         print(f"  {verdict} {check.name}")
@@ -210,11 +212,10 @@ if evaluation.status.state == "error":
     print("Evaluation encountered errors.")
     sys.exit(1)
 
-results = hub.evaluations.results.list(evaluation.id).data
-failed = [r for r in results if r.state == "failed"]
-pass_rate = (len(results) - len(failed)) / len(results) * 100
+global_metrics = [m for m in evaluation.metrics if m.name == "global"][0]
+pass_rate = global_metrics.passed / global_metrics.total * 100
 
-print(f"Pass rate: {pass_rate:.1f}% ({len(results) - len(failed)}/{len(results)})")
+print(f"Pass rate: {pass_rate:.2f}% ({global_metrics.passed}/{global_metrics.total})")
 
 THRESHOLD = 90.0
 if pass_rate < THRESHOLD:

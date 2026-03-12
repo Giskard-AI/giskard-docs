@@ -20,6 +20,8 @@ scan = hub.scans.create(
     agent_id="agent-id",
 ).data
 
+print(scan.id)
+
 # Poll until complete
 while scan.status.state == "running":
     time.sleep(10)
@@ -94,12 +96,12 @@ See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases#knowle
 ### List probes for a scan
 
 ```python
-probes = hub.scans.list_probes(scan.id).data
+probes = hub.scans.list_probes("scan-id").data
 
 for probe in probes:
     if probe.status.state == "skipped":
         continue
-    print(f"{probe.probe_category} — {probe.probe_name}: {probe.metrics[0].severity} ({probe.status.state})")
+    print(f"{probe.probe_category} — {probe.probe_name}: {probe.metrics} ({probe.status.state})")
 ```
 
 ### Retrieve a specific probe
@@ -133,7 +135,6 @@ from giskard_hub.types import ReviewStatus
 hub.scans.attempts.update(
     "probe-attempt-id",
     review_status="ignored",
-    review_comment="False positive — the agent's response is acceptable in context.",
 )
 ```
 
@@ -145,11 +146,11 @@ When a probe attempt succeeds (the attack elicited an undesired response), you c
 
 ```python
 # Fetch all probes for a completed scan
-probes = hub.scans.list_probes(scan.id).data
+probes = hub.scans.list_probes("scan-id").data
 
 dataset = hub.datasets.create(
     project_id="project-id",
-    name=f"Regression tests from scan {scan.id}",
+    name=f"Regression tests from scan {'scan-id'}",
 ).data
 
 for probe in probes:
@@ -188,7 +189,6 @@ hub.scans.bulk_delete(scan_ids=["scan-id-1", "scan-id-2"])
 Use scans as a security gate in your CI/CD pipeline. Exit with a non-zero code if the scan grade falls below your acceptable threshold:
 
 ```python
-import os
 import sys
 import time
 from giskard_hub import HubClient

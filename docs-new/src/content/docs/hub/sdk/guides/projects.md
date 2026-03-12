@@ -50,13 +50,15 @@ hub.projects.delete("project-id")
 
 ```python
 scenario = hub.projects.scenarios.create(
-    project.id,
+    "project-id",
     name="Angry customer asking for refund",
     description="The user is frustrated and demands an immediate refund for a defective product.",
     rules=[
         "The agent should not ask for the user's credit card number",
     ],
 ).data
+
+print(scenario.id)
 ```
 
 ### Preview generated questions from a scenario
@@ -65,7 +67,7 @@ Before generating a full dataset, you can preview a single sample conversation t
 
 ```python
 preview = hub.projects.scenarios.preview(
-    project.id,
+    "project-id",
     agent_id="agent-id",
     description="The user is frustrated and demands an immediate refund for a defective product.",
 ).data
@@ -76,9 +78,9 @@ print(preview.conversation)
 ### List and manage scenarios
 
 ```python
-scenarios = hub.projects.scenarios.list(project.id).data
+scenarios = hub.projects.scenarios.list("project-id").data
 
-hub.projects.scenarios.update(scenario.id, project_id=project.id, name="Updated name")
+hub.projects.scenarios.update("scenario-id", project_id="project-id", name="Updated name")
 
-hub.projects.scenarios.delete(scenario.id, project_id=project.id)
+hub.projects.scenarios.delete("scenario-id", project_id="project-id")
 ```

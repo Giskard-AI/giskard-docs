@@ -21,6 +21,8 @@ dataset = hub.datasets.create(
     name="Core Q&A Suite v1",
     description="Baseline correctness and tone checks",
 ).data
+
+print(dataset.id)
 ```
 
 ---
@@ -31,7 +33,7 @@ Each test case pairs a conversation with a list of checks. Reference any built-i
 
 ```python
 tc = hub.test_cases.create(
-    dataset_id=dataset.id,
+    dataset_id="dataset-id",
     messages=[
         {"role": "user", "content": "What is your refund policy?"},
     ],
@@ -57,6 +59,8 @@ tc = hub.test_cases.create(
         },
     ],
 ).data
+
+print(tc.id)
 ```
 
 ### Multi-turn conversations
@@ -65,7 +69,7 @@ Include prior assistant turns to test multi-turn behaviour:
 
 ```python
 hub.test_cases.create(
-    dataset_id=dataset.id,
+    dataset_id="dataset-id",
     messages=[
         {"role": "user", "content": "I ordered a jacket last week."},
         {"role": "assistant", "content": "Happy to help! What's your order number?"},
@@ -92,7 +96,7 @@ Tags let you filter test cases during evaluation runs:
 
 ```python
 hub.test_cases.create(
-    dataset_id=dataset.id,
+    dataset_id="dataset-id",
     messages=[{"role": "user", "content": "Do you ship internationally?"}],
     checks=[
         {
@@ -117,15 +121,17 @@ You can annotate test cases with comments for team collaboration:
 
 ```python
 comment = hub.test_cases.comments.add(
-    tc.id,
+    "test-case-id",
     comment="This test case needs a stronger expected output — the current one is too vague.",
 ).data
 
+print(comment.id)
+
 # Edit a comment
-hub.test_cases.comments.edit(comment.id, test_case_id=tc.id, comment="Updated comment text.")
+hub.test_cases.comments.edit("comment-id", test_case_id="test-case-id", comment="Updated comment text.")
 
 # Delete a comment
-hub.test_cases.comments.delete(comment.id, test_case_id=tc.id)
+hub.test_cases.comments.delete("comment-id", test_case_id="test-case-id")
 ```
 
 ---
@@ -176,14 +182,6 @@ If you have an existing `QATestset` from the Giskard open-source library, conver
 from giskard.rag import QATestset
 
 testset = QATestset.load("my_testset.jsonl")
-
-for item in testset.to_pandas().itertuples():
-    hub.test_cases.create(
-        dataset_id=dataset.id,
-        messages=[{"role": "user", "content": item.question}],
-        demo_output={"role": "assistant", "content": item.reference_answer},
-        checks=[{"identifier": "correctness"}, {"identifier": "groundedness"}],
-    )
 
 for sample in testset.samples:
     checks = []
@@ -332,6 +330,8 @@ check = hub.checks.create(
         }
     ],
 ).data
+
+print(check.id)
 ```
 
 Once created, reference your custom check by its `identifier` in any test case within the same project — no need to repeat the params:

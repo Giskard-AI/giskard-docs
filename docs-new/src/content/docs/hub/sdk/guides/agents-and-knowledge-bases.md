@@ -17,7 +17,7 @@ from giskard_hub import HubClient
 hub = HubClient()
 
 agent = hub.agents.create(
-    project_id=project.id,
+    project_id="project-id",
     name="Support Bot v2",
     description="GPT-4o chatbot with RAG over the product knowledge base",
     url="https://your-app.example.com/api/chat",
@@ -49,7 +49,7 @@ You can invoke a registered agent directly from the SDK without running a full e
 
 ```python
 output = hub.agents.generate_completion(
-    agent.id,
+    "agent-id",
     messages=[
         {"role": "user", "content": "What is the capital of France?"},
     ],
@@ -64,8 +64,8 @@ print(output.metadata)  # any metadata returned by your agent
 If your agent's description is missing or stale, the Hub can generate one by observing how the agent behaves:
 
 ```python
-description = hub.agents.autofill_description(agent.id).data
-hub.agents.update(agent.id, description=description)
+description = hub.agents.autofill_description("agent-id").data
+hub.agents.update("agent-id", description=description)
 ```
 
 ### Using a local Python function as an agent
@@ -75,11 +75,11 @@ For evaluations where you don't want to expose an HTTP endpoint — for example,
 ### List, update, and delete agents
 
 ```python
-agents = hub.agents.list(project_id=project.id).data
+agents = hub.agents.list(project_id="project-id").data
 
-hub.agents.update(agent.id, name="Support Bot v2.1")
+hub.agents.update("agent-id", name="Support Bot v2.1")
 
-hub.agents.delete(agent.id)
+hub.agents.delete("agent-id")
 ```
 
 ---
@@ -162,7 +162,7 @@ for doc in results:
 
 ```python
 doc = hub.knowledge_bases.retrieve_document("kb-id", "document-id").data
-print(doc.text)
+print(doc.content)
 ```
 
 ## List and delete knowledge bases
@@ -182,7 +182,7 @@ Once your KB is ready, pass its ID to `hub.datasets.generate_document_based()` t
 ```python
 dataset = hub.datasets.generate_document_based(
     project_id="project-id",
-    knowledge_base_id=kb.id,
+    knowledge_base_id="kb-id",
     agent_id="agent-id",
     dataset_name="FAQ-based test suite",
     n_examples=20,
@@ -205,7 +205,7 @@ Pass a `knowledge_base_id` when creating a scan to run probes that are grounded 
 scan = hub.scans.create(
     project_id="project-id",
     agent_id="agent-id",
-    knowledge_base_id=kb.id,
+    knowledge_base_id="kb-id",
     tags=["gsk:threat-type='hallucination'"], # Hallucination
 ).data
 ```

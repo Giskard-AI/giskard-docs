@@ -59,10 +59,10 @@ print(f"{len(open_tasks)} open tasks")
 
 ```python
 # Pick up a task
-hub.tasks.update(task.id, status="in_progress")
+hub.tasks.update("task-id", status="in_progress")
 
 # Resolve it
-hub.tasks.update(task.id, status="resolved")
+hub.tasks.update("task-id", status="resolved")
 ```
 
 ---
@@ -106,7 +106,7 @@ while evaluation.status.state == "running":
 
 failed_results = hub.evaluations.results.search(
     evaluation.id,
-    status="failed",
+    filters={"sample_success": {"selected_options": ["fail"]}},
 ).data
 
 for result in failed_results:
