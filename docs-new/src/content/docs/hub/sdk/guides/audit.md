@@ -67,6 +67,14 @@ history = hub.audit.list_entities(
 
 for entry in history:
     print(f"[{entry.created_at}] {entry.action}")
+    print("Diff:")
+    for diff in entry.diffs:
+        print(f"  {diff.kind} {diff.scope} {diff.root}")
+        if diff.before_str:
+            print(f"    before: {diff.before_str}")
+        if diff.after_str:
+            print(f"    after: {diff.after_str}")
+    print("---")
 ```
 
 ---
