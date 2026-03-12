@@ -83,7 +83,7 @@ agent = hub.agents.create(
     headers={},
 ).data
 output = hub.agents.generate_completion(agent.id, messages=[...]).data
-print(output.message.content)
+print(output.response)
 ```
 
 ### 4. `hub.chat_test_cases` → `hub.test_cases`
@@ -133,7 +133,7 @@ while evaluation.status.state == "running":
 results = hub.evaluations.results.list(evaluation.id).data
 ```
 
-For local Python agents, use `create_local()`:
+For local Python agents, use `create_local()`. Unlike v2.x, v3.x requires you to manually fetch the test cases and submit outputs for each one:
 
 ```python
 # v2.x — passing a local function
@@ -145,15 +145,28 @@ eval_run = hub.evaluate(model=my_agent, dataset=my_dataset, name="local run")
 # v3.x
 from giskard_hub.types import ChatMessage
 
-def my_agent(messages: list[ChatMessage]) -> str:
-    return "Hello from local model"
+def my_agent(messages: list[ChatMessage]) -> ChatMessage:
+    return ChatMessage(role="assistant", content="Hello from local model")
 
 evaluation = hub.evaluations.create_local(
-    project_id=project_id,
-    agent_fn=my_agent,
-    dataset_id=dataset_id,
+    agent={"name": "my_agent", "description": "A simple local agent"},
+    criteria=[{"dataset_id": dataset_id}],
     name="local run",
 ).data
+
+results_included_data = hub.evaluations.results.list(
+    evaluation_id=evaluation.id,
+    include=["test_case"],
+).included
+
+for result_id, data in results_included_data.items():
+    messages = data["test_case"].data.messages
+    agent_output = my_agent(messages)
+    hub.evaluations.results.submit_local_output(
+        evaluation_id=evaluation.id,
+        result_id=result_id,
+        output={"response": agent_output},
+    )
 ```
 
 ### 6. Response objects are now Pydantic models
@@ -180,14 +193,25 @@ CSV files are no longer accepted when creating knowledge bases. Use JSON/JSONL o
 # v2.x (CSV no longer supported even in v2.0.0+)
 # hub.knowledge_bases.create(..., data="my_kb.csv")  # ❌
 
-# v3.x
+# v3.x — from a Python list
+import json
+
 hub.knowledge_bases.create(
     project_id=project_id,
     name="My KB",
-    documents=[
+    file=("documents.json", json.dumps([
         {"text": "Document text here.", "topic": "Topic A"},
-    ],
-)
+    ]).encode("utf-8")),
+).data
+
+# v3.x — from a file on disk
+from pathlib import Path
+
+hub.knowledge_bases.create(
+    project_id=project_id,
+    name="My KB",
+    file=Path("documents.json"),
+).data
 ```
 
 ### 8. `model_id` → `agent_id`, and `dataset_id` moved into `criteria`
@@ -234,7 +258,7 @@ print(f"Pass rate: {passed / total * 100:.1f}%")
 | `hub.datasets.create(...)` | `hub.datasets.create(...).data` |
 | `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...).data` |
 | `hub.evaluate(model=, dataset=, name=)` | `hub.evaluations.create(agent_id=, criteria={"dataset_id": ...}, ...).data` |
-| `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent_fn=fn, dataset_id=, ...).data` |
+| `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent=..., criteria=[...], ...).data` + manual output submission loop — see [Local evaluations](/hub/sdk/guides/evaluations#local-evaluations) |
 | `eval_run.wait_for_completion()` | Poll `hub.evaluations.retrieve(id).data.status` |
 | `eval_run.print_metrics()` | Compute from `hub.evaluations.results.list(id).data` |
 | `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...).data` |
