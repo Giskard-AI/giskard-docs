@@ -30,7 +30,7 @@ Base class for all checks. Subclass and register with ``@Check.register("kind")`
 
        async def run(self, trace: Trace) -> CheckResult:
            # Your check logic
-           return CheckResult.success("Check passed")
+           return CheckResult.success(message="Check passed")
 
 
 CheckResult
@@ -50,7 +50,15 @@ Result of a check execution with status, message, and optional metrics.
    # Success
    result = CheckResult.success(
        message="Check passed",
-       metrics={"score": 0.95}
+       details={"score": 0.95}
+   )
+
+   # With metrics (use constructor)
+   from giskard.checks import CheckStatus, Metric
+   result = CheckResult(
+       status=CheckStatus.PASS,
+       message="Check passed",
+       metrics=[Metric(name="score", value=0.95)]
    )
 
    # Failure
@@ -67,7 +75,7 @@ CheckStatus
    :members:
    :undoc-members:
 
-Enumeration of possible check statuses: ``PASSED``, ``FAILED``, ``ERROR``.
+Enumeration of possible check statuses: ``PASS``, ``FAIL``, ``ERROR``, ``SKIP``.
 
 
 Interaction
@@ -84,11 +92,11 @@ A single exchange between inputs and outputs.
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    # Interactions are created through the fluent builder
    test_case = (
-       scenario("example")
+       Scenario("example")
        .interact(
            inputs="What is 2+2?",
            outputs="4",
@@ -115,14 +123,14 @@ Immutable history of all interactions in a scenario.
 
    # Create a scenario with multiple interactions
    test_scenario = (
-       scenario("example_trace")
+       Scenario("example_trace")
        .interact(inputs="Hello", outputs="Hi!")
        .interact(inputs="How are you?", outputs="I'm well!")
    )
 
    # After running, access the trace
    result = await test_scenario.run()
-   last = result.trace.last
+   last = result.final_trace.last
 
 
 InteractionSpec
@@ -139,11 +147,11 @@ Declarative specification for generating interactions.
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    # Static values
    test_case = (
-       scenario("static_example")
+       Scenario("static_example")
        .interact(
            inputs="test input",
            outputs="test output"
@@ -152,7 +160,7 @@ Declarative specification for generating interactions.
 
    # Callable outputs
    test_case = (
-       scenario("dynamic_example")
+       Scenario("dynamic_example")
        .interact(
            inputs="test",
            outputs=lambda inputs: my_function(inputs)
@@ -185,10 +193,10 @@ Ordered sequence of interaction specs and checks with shared trace.
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn
+   from giskard.checks import Scenario, from_fn
 
    test_scenario = (
-       scenario("test_flow")
+       Scenario("test_flow")
        .interact(inputs="hello", outputs="hi")
        .check(from_fn(lambda trace: True, name="check1"))
        .interact(inputs="bye", outputs="goodbye")
@@ -206,16 +214,16 @@ TestCase
    :show-inheritance:
 
 .. note::
-   **Internal Implementation Detail**: ``TestCase`` is an internal implementation detail. Users should always use ``scenario()`` to create scenarios, which internally uses TestCase. The ``scenario()`` function creates a Scenario (a list of steps) and is the primary user-facing API.
+   **Internal Implementation Detail**: ``TestCase`` is an internal implementation detail. Users should always use ``Scenario(...)`` to create scenarios, which internally uses TestCase. The ``Scenario`` class is the primary user-facing API.
 
-**Example using scenario() (recommended):**
+**Example using Scenario() (recommended):**
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn
+   from giskard.checks import Scenario, from_fn
 
    test_scenario = (
-       scenario("my_test")
+       Scenario("my_test")
        .interact(inputs="test", outputs="result")
        .check(from_fn(lambda trace: True, name="check1"))
        .check(from_fn(lambda trace: True, name="check2"))

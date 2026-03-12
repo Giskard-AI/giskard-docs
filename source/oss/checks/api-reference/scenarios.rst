@@ -15,12 +15,12 @@ Scenario
    :undoc-members:
    :show-inheritance:
 
-A Scenario is a list of steps (interactions and checks) executed sequentially with a shared trace. You create scenarios using the ``scenario()`` function, which is the primary user-facing API. Scenarios work for both single-turn and multi-turn tests - the distinction is conceptual, not API-based.
+A Scenario is a list of steps (interactions and checks) executed sequentially with a shared trace. You create scenarios using the ``Scenario(...)`` constructor, which is the primary user-facing API. Scenarios work for both single-turn and multi-turn tests - the distinction is conceptual, not API-based.
 
 **Attributes:**
 
 * ``name``: Scenario name
-* ``sequence``: List of components (InteractionSpecs and Checks)
+* ``steps``: List of components (InteractionSpecs and Checks)
 
 **Methods:**
 
@@ -30,10 +30,10 @@ A Scenario is a list of steps (interactions and checks) executed sequentially wi
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn
+   from giskard.checks import Scenario, from_fn
 
    test_scenario = (
-       scenario("conversation_flow")
+       Scenario("conversation_flow")
        .interact(inputs="Hello", outputs="Hi!")
        .check(from_fn(lambda trace: "Hi" in trace.last.outputs, name="check1"))
        .interact(inputs="How are you?", outputs="I'm well!")
@@ -57,10 +57,10 @@ Result of scenario execution.
 **Attributes:**
 
 * ``passed``: Whether all checks passed
-* ``trace``: Final trace with all interactions
-* ``results``: List of CheckResult objects
+* ``final_trace``: Final trace with all interactions
+* ``steps``: List of ``TestCaseResult``; each step has ``results`` (list of ``CheckResult``)
 * ``duration_ms``: Total execution time in milliseconds
-* ``error``: Optional error message if execution failed
+* ``scenario_name``: Name of the scenario that was executed
 
 
 TestCase
@@ -72,16 +72,16 @@ TestCase
    :show-inheritance:
 
 .. note::
-   **Internal Implementation Detail**: ``TestCase`` is an internal implementation detail. Users should always use ``scenario()`` to create scenarios, which internally uses TestCase. The ``scenario()`` function creates a Scenario (a list of steps) and is the primary user-facing API.
+   **Internal Implementation Detail**: ``TestCase`` is an internal implementation detail. Users should always use ``Scenario(...)`` to create scenarios, which internally uses TestCase. The ``Scenario`` class is the primary user-facing API.
 
-**Example using scenario() (recommended):**
+**Example using Scenario() (recommended):**
 
 .. code-block:: python
 
-   from giskard.checks import scenario, StringMatching
+   from giskard.checks import Scenario, StringMatching
 
    test_scenario = (
-       scenario("qa_test")
+       Scenario("qa_test")
        .interact(
            inputs="What is the capital of France?",
            outputs=lambda inputs: "Paris"
@@ -160,16 +160,16 @@ Running Multiple Test Cases
 .. code-block:: python
 
    import asyncio
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    test_cases = [
        (
-           scenario("test1")
+           Scenario("test1")
            .interact(...)
            .check(...)
        ),
        (
-           scenario("test2")
+           Scenario("test2")
            .interact(...)
            .check(...)
        ),
@@ -192,14 +192,14 @@ Scenario with Dynamic Interactions
 
 .. code-block:: python
 
-   from giskard.checks import scenario, Trace
+   from giskard.checks import Scenario, Trace
 
    async def dynamic_input(trace: Trace):
        count = len(trace.interactions)
        return f"Message #{count + 1}"
 
    test_scenario = (
-       scenario("dynamic_flow")
+       Scenario("dynamic_flow")
        .interact(
            inputs=dynamic_input,
            outputs=lambda inputs: f"Echo: {inputs}"
@@ -219,9 +219,11 @@ Error Handling
    try:
        result = await tc.run()
        if not result.passed:
-           print(f"Test failed: {result.error or 'See individual check results'}")
-           for check_result in result.results:
-               if not check_result.passed:
-                   print(f"  - {check_result.name}: {check_result.message}")
+           print("Test failed: see individual check results")
+           for step in result.steps:
+               for check_result in step.results:
+                   if not check_result.passed:
+                       name = check_result.details.get("check_name", "check")
+                       print(f"  - {name}: {check_result.message}")
    except Exception as e:
        print(f"Test execution error: {e}")

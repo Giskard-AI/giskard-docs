@@ -462,7 +462,7 @@ wheels = [
 [[package]]
 name = "giskard-agents"
 version = "1.0.0a1"
-source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-agents&rev=feature%2Fgiskard-v3#81e424bf0575691f4b5c18c59d500ccb54d4c343" }
+source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-agents&rev=main#0e481995f9856b79453facdf4adcade985680bcc" }
 dependencies = [
     { name = "giskard-core" },
     { name = "griffe" },
@@ -478,7 +478,7 @@ dependencies = [
 [[package]]
 name = "giskard-checks"
 version = "1.0.0a1"
-source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-checks&rev=feature%2Fgiskard-v3#81e424bf0575691f4b5c18c59d500ccb54d4c343" }
+source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-checks&rev=main#0e481995f9856b79453facdf4adcade985680bcc" }
 dependencies = [
     { name = "giskard-agents" },
     { name = "giskard-core" },
@@ -492,7 +492,7 @@ dependencies = [
 [[package]]
 name = "giskard-core"
 version = "1.0.0a1"
-source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-core&rev=feature%2Fgiskard-v3#81e424bf0575691f4b5c18c59d500ccb54d4c343" }
+source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-core&rev=main#0e481995f9856b79453facdf4adcade985680bcc" }
 dependencies = [
     { name = "pydantic" },
 ]
@@ -526,9 +526,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "giskard-agents", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-agents&rev=feature%2Fgiskard-v3" },
-    { name = "giskard-checks", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-checks&rev=feature%2Fgiskard-v3" },
-    { name = "giskard-core", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-core&rev=feature%2Fgiskard-v3" },
+    { name = "giskard-agents", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-agents&rev=main" },
+    { name = "giskard-checks", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-checks&rev=main" },
+    { name = "giskard-core", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-core&rev=main" },
 ]
 
 [package.metadata.requires-dev]

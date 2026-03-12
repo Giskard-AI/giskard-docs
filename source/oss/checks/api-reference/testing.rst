@@ -41,13 +41,13 @@ Spying on Model Calls
 
 .. code-block:: python
 
-   from giskard.checks import scenario, WithSpy, from_fn
+   from giskard.checks import Scenario, WithSpy, from_fn
 
    # Wrap your model
    model_spy = WithSpy(my_llm_model)
 
    tc = (
-       scenario("spy_test")
+       Scenario("spy_test")
        .interact(
            inputs="test input",
            outputs=lambda inputs: model_spy(inputs)
@@ -112,11 +112,11 @@ Saving and Loading Results
 .. code-block:: python
 
    import json
-   from giskard.checks import scenario, CheckResult
+   from giskard.checks import Scenario, CheckResult
 
    # Run test
    tc = (
-       scenario("example")
+       Scenario("example")
        .interact(...)
        .check(...)
    )
@@ -144,7 +144,7 @@ Reusable Test Setup
 .. code-block:: python
 
    from typing import List
-   from giskard.checks import scenario, Check
+   from giskard.checks import Scenario, Check
 
    class TestFixture:
        def __init__(self, system_under_test):
@@ -157,7 +157,7 @@ Reusable Test Setup
            checks: List[Check]
        ):
            """Factory for creating test cases."""
-           tc = scenario(name).interact(
+           tc = Scenario(name).interact(
                inputs=input_text,
                outputs=lambda inputs: self.sut(inputs)
            )
@@ -183,7 +183,7 @@ Parameterized Tests
 .. code-block:: python
 
    import pytest
-   from giskard.checks import scenario, StringMatching
+   from giskard.checks import Scenario, StringMatching
 
    test_data = [
        ("What is 2+2?", "4"),
@@ -195,7 +195,7 @@ Parameterized Tests
    @pytest.mark.asyncio
    async def test_calculator(question, expected):
        tc = (
-           scenario(f"calc_{expected}")
+           Scenario(f"calc_{expected}")
            .interact(
                inputs=question,
                outputs=lambda inputs: calculator(inputs)
@@ -221,7 +221,7 @@ Measuring Execution Time
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    async def benchmark_test(tc, iterations: int = 10):
        """Run test multiple times and track performance."""
@@ -245,7 +245,7 @@ Tracking Metrics
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
    from typing import Dict, List
 
    class MetricsCollector:
@@ -262,13 +262,12 @@ Tracking Metrics
                "duration_ms": result.duration_ms,
            }
 
-           # Collect check-specific metrics
-           for check_result in result.results:
-               if check_result.metrics:
-                   test_metrics.update({
-                       f"{check_result.name}_{k}": v
-                       for k, v in check_result.metrics.items()
-                   })
+           # Collect check-specific metrics (metrics are list of Metric(name, value))
+           for step in result.steps:
+               for check_result in step.results:
+                   for m in check_result.metrics:
+                       check_name = check_result.details.get("check_name", "check")
+                       test_metrics[f"{check_name}_{m.name}"] = m.value
 
            self.metrics.append(test_metrics)
            return result

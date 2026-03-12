@@ -145,9 +145,9 @@ Test that the system answers questions correctly:
 
    from giskard.agents.generators import Generator
    from giskard.checks import (
-       scenario,
+       Scenario,
        StringMatching,
-       Equality,
+       Equals,
        from_fn,
        set_default_generator
    )
@@ -157,7 +157,7 @@ Test that the system answers questions correctly:
 
    async def test_basic_qa():
        tc = (
-           scenario("basic_qa_france_capital")
+           Scenario("basic_qa_france_capital")
            .interact(
                inputs="What is the capital of France?",
                outputs=lambda inputs: rag.answer(inputs)
@@ -192,8 +192,10 @@ Test that the system answers questions correctly:
        result = await tc.run()
 
        print(f"Test passed: {result.passed}")
-       for check_result in result.results:
-           print(f"  {check_result.name}: {check_result.status.value}")
+       for step in result.steps:
+           for check_result in step.results:
+               name = check_result.details.get("check_name", "check")
+               print(f"  {name}: {check_result.status.value}")
 
    # Run the test
    import asyncio
@@ -207,11 +209,11 @@ Verify that answers are grounded in retrieved context:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, Groundedness, StringMatching
+   from giskard.checks import Scenario, Groundedness, StringMatching
 
    async def test_groundedness():
        tc = (
-           scenario("groundedness_eiffel_tower")
+           Scenario("groundedness_eiffel_tower")
            .interact(
                inputs="When was the Eiffel Tower completed?",
                outputs=lambda inputs: rag.answer(inputs)
@@ -241,7 +243,7 @@ Test that the right documents are retrieved:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn
+   from giskard.checks import Scenario, from_fn
 
    def check_retrieved_topics(trace) -> bool:
        """Verify retrieved docs are about the right topic."""
@@ -250,7 +252,7 @@ Test that the right documents are retrieved:
        return "Eiffel Tower" in topics or "France" in topics
 
    tc = (
-       scenario("retrieval_quality")
+       Scenario("retrieval_quality")
        .interact(
            inputs="Tell me about the Eiffel Tower",
            outputs=lambda inputs: rag.answer(inputs)
@@ -281,10 +283,10 @@ Test how the system handles questions it can't answer:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, LLMJudge, from_fn
+   from giskard.checks import Scenario, LLMJudge, from_fn
 
    tc = (
-       scenario("out_of_scope_handling")
+       Scenario("out_of_scope_handling")
        .interact(
            inputs="What is the weather in Tokyo today?",
            outputs=lambda inputs: rag.answer(inputs)
@@ -321,10 +323,10 @@ Use an LLM to evaluate answer quality comprehensively:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, LLMJudge
+   from giskard.checks import Scenario, LLMJudge
 
    tc = (
-       scenario("comprehensive_quality_check")
+       Scenario("comprehensive_quality_check")
        .interact(
            inputs="What is machine learning?",
            outputs=lambda inputs: rag.answer(inputs)
@@ -361,7 +363,7 @@ Test a conversational RAG that handles follow-up questions:
 .. code-block:: python
 
    from giskard.checks import (
-       scenario,
+       Scenario,
        Groundedness,
        from_fn,
        LLMJudge,
@@ -402,7 +404,7 @@ Test a conversational RAG that handles follow-up questions:
    conv_rag = ConversationalRAG(documents=knowledge_base)
 
    test_scenario = (
-       scenario("conversational_rag_flow")
+       Scenario("conversational_rag_flow")
        # First question
        .interact(
            inputs="What is the capital of France?",
@@ -486,7 +488,7 @@ Combine all tests into a comprehensive suite:
            tests = []
            for question, expected_content in test_data:
                tc = (
-                   scenario(f"qa_{expected_content.replace(' ', '_')}")
+                   Scenario(f"qa_{expected_content.replace(' ', '_')}")
                    .interact(
                        inputs=question,
                        outputs=lambda q: self.rag.answer(q)
@@ -520,7 +522,7 @@ Combine all tests into a comprehensive suite:
            tests = []
            for question in questions:
                tc = (
-                   scenario(f"groundedness_{question[:20]}")
+                   Scenario(f"groundedness_{question[:20]}")
                    .interact(
                        inputs=question,
                        outputs=lambda q: self.rag.answer(q)
@@ -543,7 +545,7 @@ Combine all tests into a comprehensive suite:
            tests = []
            for question, case_name in edge_cases:
                tc = (
-                   scenario(f"edge_case_{case_name}")
+                   Scenario(f"edge_case_{case_name}")
                    .interact(
                        inputs=question,
                        outputs=lambda q: self.rag.answer(q)
@@ -579,9 +581,11 @@ Combine all tests into a comprehensive suite:
                status = "✓" if result.passed else "✗"
                print(f"  {status} {name}")
                if not result.passed:
-                   for check_result in result.results:
-                       if not check_result.passed:
-                           print(f"      - {check_result.name}: {check_result.message}")
+                   for step in result.steps:
+                       for check_result in step.results:
+                           if not check_result.passed:
+                               name = check_result.details.get("check_name", "check")
+                               print(f"      - {name}: {check_result.message}")
 
            return results
 
