@@ -2,7 +2,7 @@
 title: Evaluations
 description: Run remote and local evaluations, schedule recurring runs, inspect results, rerun errors, and integrate with CI/CD pipelines.
 sidebar:
-  order: 6
+  order: 5
 ---
 
 An **Evaluation** runs an agent against all test cases in a dataset, applies the configured checks to each response, and produces a per-test-case result with a pass/fail verdict.
@@ -40,9 +40,8 @@ Run the evaluation only against test cases with specific tags:
 evaluation = hub.evaluations.create(
     project_id="project-id",
     agent_id="agent-id",
-    criteria={"dataset_id": "dataset-id"},
+    criteria={"dataset_id": "dataset-id", "tags": ["shipping"]},
     name="Shipping-only run",
-    tags=["shipping"],
 ).data
 ```
 
@@ -64,27 +63,42 @@ evaluation = hub.evaluations.create(
 
 ## Local evaluations
 
-A local evaluation runs inference using a Python function in your process rather than an HTTP endpoint. This is ideal for evaluating models during development without exposing an API.
+A local evaluation lets you run inference using a Python function in your process rather than an HTTP endpoint. This is ideal for evaluating models during development without exposing an API.
 
-Define a function that accepts a list of `ChatMessage` objects and returns a string:
+The flow is manual: create the evaluation, fetch the results (which contain the test cases), call your agent for each one, and submit the outputs back to the Hub.
 
 ```python
 from giskard_hub.types import ChatMessage
 
-def my_agent(messages: list[ChatMessage]) -> str:
+def my_agent(messages: list[ChatMessage]) -> ChatMessage:
     # Call your local model or chain here
-    user_input = messages[-1].content
-    return f"Echo: {user_input}"  # replace with real inference
+    user_input = messages[-1]["content"]
+
+    return ChatMessage(
+        role="assistant",
+        content=f"Echo: {user_input}"  # replace with real inference
+    )
 
 evaluation = hub.evaluations.create_local(
-    project_id="project-id",
-    agent_fn=my_agent,
-    dataset_id="dataset-id",
-    name="Local agent evaluation",
+    agent={"name": "my_agent", "description": "A simple echo agent"},
+    criteria=[{"dataset_id": "dataset-id"}],
+    name="Local evaluation",
 ).data
-```
 
-The SDK handles the evaluation loop: it fetches each test case, calls `my_agent`, submits the output to the Hub, and triggers check evaluation. Progress and results are stored in the Hub UI just like remote evaluations.
+results_included_data = hub.evaluations.results.list(
+    evaluation_id=evaluation.id,
+    include=["test_case"],
+).included
+
+for result_id, data in results_included_data.items():
+    messages = data["test_case"].data.messages
+    agent_output = my_agent(messages)
+    hub.evaluations.results.submit_local_output(
+        evaluation_id=evaluation.id,
+        result_id=result_id,
+        output={"response": agent_output},
+    )
+```
 
 ---
 
@@ -105,34 +119,37 @@ for result in results:
 ### Search and filter results
 
 ```python
-page = hub.evaluations.results.search(
+results_search = hub.evaluations.results.search(
     "evaluation-id",
-    status="failed",
+    filters={"sample_success": {"selected_options": ["fail"]}},
     limit=50,
 ).data
 ```
 
-### Retrieve a single result with its test case
+### Retrieve a single result
 
 ```python
 result = hub.evaluations.results.retrieve(
     "result-id",
     evaluation_id="evaluation-id",
-    include=["test_case"],
 ).data
 
-print(result.data.state)
-print(result.included)  # the associated TestCase
+print(result.state)
 ```
 
-### Update a result (manual review)
+### Update the failure category of result (manual review)
+
+The full list of available failure categories for a project can be retrieved via `hub.projects.retrieve("project-id").data.failure_categories`.
 
 ```python
 hub.evaluations.results.update(
     "result-id",
     evaluation_id="evaluation-id",
-    reviewed=True,
-    review_comment="Checked manually — response is correct despite the failed judge.",
+    failure_category={
+        "identifier": "contradiction",
+        "title": "Contradiction",
+        "description": "The agent incorrectly provides an answer that contradicts the information given in the context (for groundedness checks) or in the reference (for correctness checks)."
+    }
 )
 ```
 
@@ -144,7 +161,7 @@ You can hide individual results from the default view (for example, noisy outlie
 hub.evaluations.results.update_visibility(
     "result-id",
     evaluation_id="evaluation-id",
-    visible=False,
+    hidden=True,
 )
 ```
 
@@ -205,6 +222,28 @@ if pass_rate < THRESHOLD:
     sys.exit(1)
 
 print("Quality gate passed.")
+```
+
+---
+
+## Run a single test case ad hoc
+
+You can evaluate a single (input, output) pair against a set of checks without running a full evaluation. This is useful for debugging or CI gates on individual responses:
+
+```python
+from giskard_hub.types import ChatMessage
+
+results = hub.evaluations.run_single(
+    project_id="project-id",
+    agent_output={"response": ChatMessage(role="assistant", content="You can return anything within 30 days.")},
+    messages=[{"role": "user", "content": "What is your return policy?"}],
+    checks=[
+        {"identifier": "tone_professional"},
+    ],
+).data
+
+for check in results:
+    print(f"{check.name}: {'passed' if check.passed else 'failed'}")
 ```
 
 ---
@@ -278,32 +317,31 @@ hub.scheduled_evaluations.create(
 schedules = hub.scheduled_evaluations.list(project_id="project-id").data
 
 for s in schedules:
-    print(f"{s.name} — {s.frequency} — next run: {s.next_run_at}")
+    print(f"{s.name} — {s.frequency} — last execution: {s.last_execution_at}")
 ```
 
 ### Retrieve a schedule with its recent runs
 
 ```python
-schedule = hub.scheduled_evaluations.retrieve(
+scheduled_response = hub.scheduled_evaluations.retrieve(
     "scheduled-evaluation-id",
     include=["evaluations"],
-).data
+)
 
-print(f"Schedule: {schedule.data.name}")
-for run in schedule.included:
-    print(f"  Run {run.id}: {run.status} at {run.created_at}")
+print(f"Schedule: {scheduled_response.data.name}")
+for evaluation_run in next(iter(scheduled_response.included.values()))["evaluations"]:
+    print(f"  Run {evaluation_run.data.id}: {evaluation_run.data.status.state} at {evaluation_run.data.created_at}")
 ```
 
 ### List past evaluation runs
 
 ```python
-runs = hub.scheduled_evaluations.list_evaluations(
+evaluation_runs = hub.scheduled_evaluations.list_evaluations(
     "scheduled-evaluation-id",
-    limit=10,
 ).data
 
-for run in runs:
-    print(f"Run: {run.id} — {run.status} — {run.created_at}")
+for run in evaluation_runs:
+    print(f"Run: {run.id} — {run.status.state} — {run.created_at}")
 ```
 
 ### Update and delete scheduled evaluations

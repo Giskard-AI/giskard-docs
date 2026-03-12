@@ -2,7 +2,7 @@
 title: Tasks
 description: Create and manage tasks to track issues found during evaluations and scans.
 sidebar:
-  order: 7
+  order: 6
 ---
 
 **Tasks** are a lightweight issue tracker built into the Hub. When an evaluation or scan surfaces a problem, you can create a task to track the fix, assign it to a team member, and mark it as resolved — all from the SDK.
@@ -16,10 +16,11 @@ hub = HubClient()
 
 task = hub.tasks.create(
     project_id="project-id",
-    title="Agent gives wrong shipping estimate",
-    description="Test case #tc-123 shows the agent quoting 3-5 days when the correct answer is 1-2 days.",
-    status="open",
     priority="high",
+    status="open",
+    description="Evaluation result #eval-result-id shows the agent quoting 3-5 days when the correct answer is 1-2 days.",
+    evaluation_result_id="eval-result-id",
+    assignee_ids=["user-id-1", "user-id-2"],
 ).data
 
 print(f"Task created: {task.id}")
@@ -40,7 +41,6 @@ print(f"Task created: {task.id}")
 | `"low"` | Nice-to-fix, no urgency |
 | `"medium"` | Should be addressed in the next cycle |
 | `"high"` | Needs attention soon |
-| `"critical"` | Blocking — fix immediately |
 
 ---
 
@@ -53,16 +53,6 @@ open_tasks = [t for t in tasks if t.status == "open"]
 print(f"{len(open_tasks)} open tasks")
 ```
 
-Filter by status or priority:
-
-```python
-critical_tasks = hub.tasks.list(
-    project_id="project-id",
-    status="open",
-    priority="critical",
-).data
-```
-
 ---
 
 ## Update a task
@@ -72,11 +62,7 @@ critical_tasks = hub.tasks.list(
 hub.tasks.update(task.id, status="in_progress")
 
 # Resolve it
-hub.tasks.update(
-    task.id,
-    status="resolved",
-    resolution_note="Fixed in agent v2.3 — now uses real-time carrier API for shipping estimates.",
-)
+hub.tasks.update(task.id, status="resolved")
 ```
 
 ---
@@ -85,7 +71,7 @@ hub.tasks.update(
 
 ```python
 task = hub.tasks.retrieve("task-id").data
-print(task.title, task.status, task.priority)
+print(task.description, task.status, task.priority)
 ```
 
 ---
@@ -126,11 +112,11 @@ failed_results = hub.evaluations.results.search(
 for result in failed_results:
     hub.tasks.create(
         project_id="project-id",
-        title=f"Failed check in evaluation {evaluation.id}",
         description=f"Test case {result.test_case.id} failed checks: "
                     + ", ".join(c.name for c in result.results if not c.passed),
         status="open",
         priority="medium",
+        evaluation_result_id=result.id,
     )
 
 print(f"Created {len(failed_results)} tasks from failed results.")

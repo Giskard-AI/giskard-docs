@@ -1,9 +1,90 @@
 ---
-title: Knowledge Bases
-description: Create and manage knowledge bases, upload documents, and use them to generate datasets or run targeted vulnerability scans.
+title: Agents & Knowledge Bases
+description: Register agents, manage knowledge bases, and use them together for evaluations, dataset generation, and vulnerability scans.
 sidebar:
   order: 2
 ---
+
+## Agents
+
+An **Agent** is your LLM application. The Hub calls your agent's HTTP endpoint during evaluations and scans.
+
+### Register a remote agent
+
+```python
+from giskard_hub import HubClient
+
+hub = HubClient()
+
+agent = hub.agents.create(
+    project_id=project.id,
+    name="Support Bot v2",
+    description="GPT-4o chatbot with RAG over the product knowledge base",
+    url="https://your-app.example.com/api/chat",
+    supported_languages=["en", "fr"],
+    headers=[{"name": "Authorization", "value": "Bearer <token>"}],
+).data
+
+print(agent.id)
+```
+
+The Hub sends a POST request to `url` with a JSON body containing a `messages` array of `{role, content}` objects. Your endpoint must return a JSON object with a `message` field.
+
+### Test the connection
+
+Before running an evaluation, verify your agent endpoint is reachable and responds correctly:
+
+```python
+ping = hub.agents.test_connection(
+    url="https://your-app.example.com/api/chat",
+    headers={"Authorization": "Bearer <token>"},
+).data
+
+print(ping.response)
+```
+
+### Generate a completion
+
+You can invoke a registered agent directly from the SDK without running a full evaluation:
+
+```python
+output = hub.agents.generate_completion(
+    agent.id,
+    messages=[
+        {"role": "user", "content": "What is the capital of France?"},
+    ],
+).data
+
+print(output.response)
+print(output.metadata)  # any metadata returned by your agent
+```
+
+### Auto-generate a description
+
+If your agent's description is missing or stale, the Hub can generate one by observing how the agent behaves:
+
+```python
+description = hub.agents.autofill_description(agent.id).data
+hub.agents.update(agent.id, description=description)
+```
+
+### Using a local Python function as an agent
+
+For evaluations where you don't want to expose an HTTP endpoint — for example, when evaluating a model locally during development — pass a Python callable to `hub.evaluations.create_local()`. See [Evaluations](/hub/sdk/guides/evaluations#local-evaluations) for details.
+
+### List, update, and delete agents
+
+```python
+agents = hub.agents.list(project_id=project.id).data
+
+hub.agents.update(agent.id, name="Support Bot v2.1")
+
+hub.agents.delete(agent.id)
+```
+
+---
+
+## Knowledge Bases
 
 A **Knowledge Base** is an indexed collection of text documents. It has three primary uses in the Hub:
 
@@ -19,9 +100,6 @@ Documents are provided as a JSON or JSONL file where each record has a `text` fi
 
 ```python
 import json
-from giskard_hub import HubClient
-
-hub = HubClient()
 
 documents = [
     {"text": "Our return policy allows returns within 30 days of purchase.", "topic": "Returns"},
@@ -115,7 +193,7 @@ print(f"Generated dataset: {dataset.id} ({dataset.name})")
 
 The Hub samples documents from the KB, crafts questions whose answers are grounded in those documents, and creates test cases with a `groundedness` check pre-configured.
 
-See [Datasets](/hub/sdk/guides/datasets#generate-document-based-test-cases) for more detail.
+See [Datasets, Test Cases & Checks](/hub/sdk/guides/datasets#generate-document-based-test-cases) for more detail.
 
 ---
 

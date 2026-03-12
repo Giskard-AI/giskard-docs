@@ -14,9 +14,9 @@ Project
 ├── Agents            (your LLM applications)
 ├── Knowledge Bases   (document collections)
 ├── Scans             (automated vulnerability probing)
-├── Checks            (built-in and custom LLM-judge criteria)
 ├── Datasets          (test case collections)
 │   └── Test Cases    (individual conversation + checks)
+├── Checks            (built-in and custom criteria)
 ├── Evaluations       (run an agent against a dataset)
 │   └── Results       (per-test-case outcomes)
 ├── Scheduled Evaluations

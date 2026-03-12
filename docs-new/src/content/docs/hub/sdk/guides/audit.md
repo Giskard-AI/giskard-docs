@@ -2,7 +2,7 @@
 title: Audit Log
 description: Search and retrieve audit log events for compliance reporting, change history, and debugging.
 sidebar:
-  order: 9
+  order: 8
 ---
 
 Every significant action in the Hub — creating, updating, or deleting a resource — is recorded in the **Audit Log**. Use the SDK to query these events for compliance reporting, change history, or debugging unexpected changes.
@@ -15,7 +15,7 @@ from giskard_hub import HubClient
 hub = HubClient()
 
 events = hub.audit.search(
-    project_id="project-id",
+    filters={"project_id": {"selected_options": ["project-id"]}},
     limit=50,
 ).data
 
@@ -28,11 +28,12 @@ for event in events:
 ```python
 from datetime import datetime, timedelta, timezone
 
+# ISO 8601
 since = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+now = datetime.now(timezone.utc).isoformat()
 
 events = hub.audit.search(
-    project_id="project-id",
-    created_after=since,
+    filters={"created_at": {"from": since, "to": now}},
     limit=200,
 ).data
 ```
@@ -41,9 +42,11 @@ events = hub.audit.search(
 
 ```python
 events = hub.audit.search(
-    project_id="project-id",
-    entity_type="evaluation",
-    action="delete",
+    filters={
+        "project_id": {"selected_options": ["project-id"]},
+        "entity_type": {"selected_options": ["evaluation"]},
+        "action": {"selected_options": ["delete"]},
+    },
 ).data
 
 for event in events:
@@ -58,14 +61,12 @@ If you want to see every change made to a particular resource — for example, a
 
 ```python
 history = hub.audit.list_entities(
-    entity_id="agent-id",
-    entity_type="agent",
+    entity_id="dataset-id",
+    entity_type="dataset",
 ).data
 
 for entry in history:
     print(f"[{entry.created_at}] {entry.action}")
-    if entry.diff:
-        print(f"  Changed fields: {entry.diff}")
 ```
 
 ---
@@ -76,31 +77,21 @@ for entry in history:
 
 ```python
 from datetime import datetime, timezone
-import calendar
 
 now = datetime.now(timezone.utc)
 start_of_month = now.replace(day=1, hour=0, minute=0, second=0).isoformat()
 
 deletions = hub.audit.search(
-    project_id="project-id",
-    entity_type="evaluation",
-    action="delete",
-    created_after=start_of_month,
+    filters={
+        "project_id": {"selected_options": ["project-id"]},
+        "entity_type": {"selected_options": ["evaluation"]},
+        "action": {"selected_options": ["delete"]},
+        "created_at": {"from": start_of_month},
+    },
     limit=500,
 ).data
 
 print(f"{len(deletions)} evaluations deleted this month:")
 for event in deletions:
     print(f"  {event.entity_id} — by {event.user_id} at {event.created_at}")
-```
-
-**Debug why an agent changed:**
-
-```python
-history = hub.audit.list_entities("agent-id", entity_type="agent").data
-
-for entry in history:
-    if entry.action == "update":
-        print(f"Updated at {entry.created_at} by {entry.user_id}")
-        print(f"  Changes: {entry.diff}")
 ```

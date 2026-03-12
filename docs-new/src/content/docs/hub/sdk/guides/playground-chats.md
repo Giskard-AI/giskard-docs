@@ -2,7 +2,7 @@
 title: Playground Chats
 description: Access and export conversations captured from the Giskard Hub playground.
 sidebar:
-  order: 8
+  order: 7
 ---
 
 The Hub's **Playground** lets you chat with registered agents interactively from the UI. Each conversation is automatically saved as a **Playground Chat**, which you can then access programmatically for analysis, export, or import into a dataset.
@@ -17,7 +17,7 @@ hub = HubClient()
 chats = hub.playground_chats.list(project_id="project-id").data
 
 for chat in chats:
-    print(f"{chat.id} — agent: {chat.agent_id} — {chat.created_at}")
+    print(f"{chat.id} — agent: {chat.agent.name} — {chat.created_at}")
 ```
 
 ---
@@ -27,12 +27,11 @@ for chat in chats:
 ```python
 chat = hub.playground_chats.retrieve(
     "chat-id",
-    include=["agent"],
 ).data
 
-print(f"Chat with: {chat.included.name}")
+print(f"Chat with: {chat.agent.name}")
 
-for msg in chat.data.messages:
+for msg in chat.messages:
     print(f"[{msg.role}] {msg.content}")
 ```
 
@@ -51,12 +50,11 @@ dataset = hub.datasets.create(
 ).data
 
 for chat in chats:
-    full_chat = hub.playground_chats.retrieve(chat.id).data
-    messages = [{"role": m.role, "content": m.content} for m in full_chat.data.messages]
+    messages = chat.messages
 
     # If the conversation ends with an assistant turn, treat it as the demo_output
     demo_output = None
-    if messages and messages[-1]["role"] == "assistant":
+    if messages and messages[-1].role == "assistant":
         demo_output = messages.pop()
 
     if messages:
@@ -64,7 +62,7 @@ for chat in chats:
             dataset_id=dataset.id,
             messages=messages,
             demo_output=demo_output,
-            checks=[{"identifier": "correctness"}],
+            checks=[{"identifier": "no-harmful-content"}],
         )
 
 print(f"Imported {len(chats)} conversations into dataset {dataset.id}")

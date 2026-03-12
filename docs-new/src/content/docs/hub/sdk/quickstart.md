@@ -79,7 +79,7 @@ print(f"Agent registered: {agent.id}")
 ```
 
 :::note
-Your agent endpoint must accept a JSON body with a `messages` array and return a response in the format the Hub expects. See [Projects & Agents](/hub/sdk/guides/projects-and-agents) for details on local Python agents.
+Your agent endpoint must accept a JSON body with a `messages` array and return a response in the format the Hub expects. See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases) for details on local Python agents.
 :::
 
 ## 5. Run a vulnerability scan

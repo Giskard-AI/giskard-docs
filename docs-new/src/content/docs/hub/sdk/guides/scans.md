@@ -85,7 +85,7 @@ scan = hub.scans.create(
 ).data
 ```
 
-See [Knowledge Bases](/hub/sdk/guides/knowledge-bases) for how to create and populate a KB.
+See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases#knowledge-bases) for how to create and populate a KB.
 
 ---
 
@@ -179,6 +179,44 @@ scans = hub.scans.list(project_id="project-id").data
 hub.scans.delete("scan-id")
 
 hub.scans.bulk_delete(scan_ids=["scan-id-1", "scan-id-2"])
+```
+
+---
+
+## CI/CD integration
+
+Use scans as a security gate in your CI/CD pipeline. Exit with a non-zero code if the scan grade falls below your acceptable threshold:
+
+```python
+import os
+import sys
+import time
+from giskard_hub import HubClient
+
+hub = HubClient()
+
+scan = hub.scans.create(
+    project_id="project-id",
+    agent_id="agent-id",
+).data
+
+while scan.status.state == "running":
+    time.sleep(10)
+    scan = hub.scans.retrieve(scan.id).data
+
+if scan.status.state == "error":
+    print("Scan encountered errors.")
+    sys.exit(1)
+
+print(f"Scan grade: {scan.grade}")
+
+ACCEPTABLE_GRADES = ["A", "B"]
+
+if scan.grade not in ACCEPTABLE_GRADES:
+    print(f"Security gate failed: grade {scan.grade} is not enough.")
+    sys.exit(1)
+
+print("Security gate passed.")
 ```
 
 ---
