@@ -108,13 +108,13 @@ from giskard_hub.types import Agent, AgentOutput, ChatMessage
 ## `hub.audit`
 
 ```python
-from giskard_hub.types import AuditAPIResource, AuditDisplayAPIResource
+from giskard_hub.types import Audit, AuditDisplay
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `search(**params)` | `APIPaginatedResponse[list[AuditAPIResource], None]` | Search audit events with filters |
-| `list_entities(entity_id, entity_type, **params)` | `APIPaginatedResponse[list[AuditDisplayAPIResource], None]` | Audit history for a specific resource |
+| `search(**params)` | `APIPaginatedResponse[list[Audit], None]` | Search audit events with filters |
+| `list_entities(entity_id, entity_type, **params)` | `APIPaginatedResponse[list[AuditDisplay], None]` | Audit history for a specific resource |
 
 **Search params:** `filters` (dict — keys: `project_id`, `entity_type`, `entity_id`, `action`, `user_id`, each with `{"selected_options": [...]}` shape; `created_at` with `{"from": ..., "to": ...}` shape), `limit`, `offset`
 
@@ -124,7 +124,7 @@ from giskard_hub.types import AuditAPIResource, AuditDisplayAPIResource
 
 ```python
 from giskard_hub.types import (
-    CheckAPIResource,
+    Check,
     CorrectnessParams, ConformityParams, GroundednessParams,
     StringMatchParams, MetadataParams, SemanticSimilarityParams,
 )
@@ -132,14 +132,14 @@ from giskard_hub.types import (
 
 | Method | Returns | Description |
 |---|---|---|
-| `create(**params)` | `APIResponse[CheckAPIResource]` | Create a custom check |
-| `retrieve(check_id)` | `APIResponse[CheckAPIResource]` | Get a check by ID |
-| `update(check_id, **params)` | `APIResponse[CheckAPIResource]` | Update check fields |
-| `list(**params)` | `APIResponse[list[CheckAPIResource]]` | List checks, optionally filtered by `project_id` |
+| `create(**params)` | `APIResponse[Check]` | Create a custom check |
+| `retrieve(check_id)` | `APIResponse[Check]` | Get a check by ID |
+| `update(check_id, **params)` | `APIResponse[Check]` | Update check fields |
+| `list(**params)` | `APIResponse[list[Check]]` | List checks, optionally filtered by `project_id` |
 | `delete(check_id)` | `APIResponse[None]` | Delete a check |
 | `bulk_delete(**params)` | `APIResponse[None]` | Delete multiple checks |
 
-**`CheckAPIResource` fields:** `id`, `identifier`, `name`, `description`, `project_id`, `params`
+**`Check` fields:** `id`, `identifier`, `name`, `description`, `project_id`, `params`
 
 ---
 
@@ -171,22 +171,22 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
 ## `hub.evaluations`
 
 ```python
-from giskard_hub.types import EvaluationAPIResource, Metric, OutputAnnotation
+from giskard_hub.types import Evaluation, Metric, OutputAnnotation
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `create(**params)` | `APIResponse[EvaluationAPIResource]` | Start a remote evaluation |
-| `create_local(**params)` | `APIResponse[EvaluationAPIResource]` | Start a local (in-process) evaluation |
-| `retrieve(evaluation_id, **params)` | `APIResponseWithIncluded[EvaluationAPIResource, ...]` | Get evaluation by ID, optionally include agent/dataset |
-| `update(evaluation_id, **params)` | `APIResponse[EvaluationAPIResource]` | Update evaluation metadata |
-| `list(**params)` | `APIResponseWithIncluded[list[EvaluationAPIResource], ...]` | List evaluations |
+| `create(**params)` | `APIResponse[Evaluation]` | Start a remote evaluation |
+| `create_local(**params)` | `APIResponse[Evaluation]` | Start a local (in-process) evaluation |
+| `retrieve(evaluation_id, **params)` | `APIResponseWithIncluded[Evaluation, ...]` | Get evaluation by ID, optionally include agent/dataset |
+| `update(evaluation_id, **params)` | `APIResponse[Evaluation]` | Update evaluation metadata |
+| `list(**params)` | `APIResponseWithIncluded[list[Evaluation], ...]` | List evaluations |
 | `delete(evaluation_id)` | `APIResponse[None]` | Delete an evaluation |
 | `bulk_delete(**params)` | `APIResponse[None]` | Delete multiple evaluations |
-| `rerun_errored_results(evaluation_id)` | `APIResponse[EvaluationAPIResource]` | Rerun all errored results |
-| `run_single(**params)` | `APIResponse[list[CheckAPIResource]]` | Evaluate a single (input, output) pair ad hoc |
+| `rerun_errored_results(evaluation_id)` | `APIResponse[Evaluation]` | Rerun all errored results |
+| `run_single(**params)` | `APIResponse[list[Check]]` | Evaluate a single (input, output) pair ad hoc |
 
-**`EvaluationAPIResource` fields:** `id`, `name`, `status` (object with `.state`), `agent_id`, `project_id`, `run_count`, `tags`, `metrics`, `created_at`
+**`Evaluation` fields:** `id`, `name`, `status` (object with `.state`), `agent_id`, `project_id`, `run_count`, `tags`, `metrics`, `created_at`
 
 **`create` params:** `project_id`, `agent_id`, `criteria` (dict with `dataset_id`), `name`, `tags` (filter by test case tags), `run_count`
 
@@ -195,20 +195,20 @@ from giskard_hub.types import EvaluationAPIResource, Metric, OutputAnnotation
 ### `hub.evaluations.results`
 
 ```python
-from giskard_hub.types.evaluations import TestCaseEvaluationAPIResource, TaskState, FailureCategory
+from giskard_hub.types.evaluation import TestCaseEvaluation, TaskState, FailureCategory
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `retrieve(result_id, *, evaluation_id, **params)` | `APIResponseWithIncluded[TestCaseEvaluationAPIResource, ...]` | Get a single result |
-| `update(result_id, *, evaluation_id, **params)` | `APIResponse[TestCaseEvaluationAPIResource]` | Update result (review, comment) |
-| `list(evaluation_id, **params)` | `APIResponseWithIncluded[list[TestCaseEvaluationAPIResource], ...]` | List results for an evaluation |
-| `search(evaluation_id, **params)` | `APIPaginatedResponse[TestCaseEvaluationAPIResource, ...]` | Search/filter results |
-| `rerun_test_case(result_id, *, evaluation_id)` | `APIResponse[TestCaseEvaluationAPIResource]` | Rerun a single result |
-| `submit_local_output(result_id, *, evaluation_id, **params)` | `APIResponse[TestCaseEvaluationAPIResource]` | Submit output for a local evaluation step |
-| `update_visibility(result_id, *, evaluation_id, **params)` | `APIResponse[TestCaseEvaluationAPIResource]` | Show/hide a result |
+| `retrieve(result_id, *, evaluation_id, **params)` | `APIResponseWithIncluded[TestCaseEvaluation, ...]` | Get a single result |
+| `update(result_id, *, evaluation_id, **params)` | `APIResponse[TestCaseEvaluation]` | Update result (review, comment) |
+| `list(evaluation_id, **params)` | `APIResponseWithIncluded[list[TestCaseEvaluation], ...]` | List results for an evaluation |
+| `search(evaluation_id, **params)` | `APIPaginatedResponse[TestCaseEvaluation, ...]` | Search/filter results |
+| `rerun_test_case(result_id, *, evaluation_id)` | `APIResponse[TestCaseEvaluation]` | Rerun a single result |
+| `submit_local_output(result_id, *, evaluation_id, **params)` | `APIResponse[TestCaseEvaluation]` | Submit output for a local evaluation step |
+| `update_visibility(result_id, *, evaluation_id, **params)` | `APIResponse[TestCaseEvaluation]` | Show/hide a result |
 
-**`TestCaseEvaluationAPIResource` fields:** `id`, `evaluation_id`, `test_case` (nested object with `.id`), `state`, `results` (list of check results with `.name` and `.passed`), `output`, `reviewed`, `visible`, `created_at`
+**`TestCaseEvaluation` fields:** `id`, `evaluation_id`, `test_case` (nested object with `.id`), `state`, `results` (list of check results with `.name` and `.passed`), `output`, `reviewed`, `visible`, `created_at`
 
 ---
 
@@ -217,8 +217,8 @@ from giskard_hub.types.evaluations import TestCaseEvaluationAPIResource, TaskSta
 ```python
 from giskard_hub.types import (
     KnowledgeBase,
-    KnowledgeBaseDocumentRowAPIResource,
-    KnowledgeBaseDocumentDetailAPIResource,
+    KnowledgeBaseDocumentRow,
+    KnowledgeBaseDocumentDetail,
 )
 ```
 
@@ -230,8 +230,8 @@ from giskard_hub.types import (
 | `list(**params)` | `APIResponse[list[KnowledgeBase]]` | List knowledge bases by `project_id` |
 | `delete(knowledge_base_id)` | `APIResponse[None]` | Delete a knowledge base |
 | `bulk_delete(**params)` | `APIResponse[None]` | Delete multiple knowledge bases |
-| `search_documents(knowledge_base_id, **params)` | `APIPaginatedResponse[list[KnowledgeBaseDocumentRowAPIResource], None]` | Semantic search over documents |
-| `retrieve_document(knowledge_base_id, document_id)` | `APIResponse[KnowledgeBaseDocumentDetailAPIResource]` | Get a specific document |
+| `search_documents(knowledge_base_id, **params)` | `APIPaginatedResponse[list[KnowledgeBaseDocumentRow], None]` | Semantic search over documents |
+| `retrieve_document(knowledge_base_id, document_id)` | `APIResponse[KnowledgeBaseDocumentDetail]` | Get a specific document |
 
 **`KnowledgeBase` fields:** `id`, `name`, `description`, `project_id`, `status`, `document_count`, `created_at`
 
@@ -242,34 +242,34 @@ from giskard_hub.types import (
 ## `hub.projects`
 
 ```python
-from giskard_hub.types import ProjectAPIResource
+from giskard_hub.types import Project
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `create(**params)` | `APIResponse[ProjectAPIResource]` | Create a project |
-| `retrieve(project_id)` | `APIResponse[ProjectAPIResource]` | Get a project by ID |
-| `update(project_id, **params)` | `APIResponse[ProjectAPIResource]` | Update project fields |
-| `list()` | `APIResponse[list[ProjectAPIResource]]` | List all accessible projects |
+| `create(**params)` | `APIResponse[Project]` | Create a project |
+| `retrieve(project_id)` | `APIResponse[Project]` | Get a project by ID |
+| `update(project_id, **params)` | `APIResponse[Project]` | Update project fields |
+| `list()` | `APIResponse[list[Project]]` | List all accessible projects |
 | `delete(project_id)` | `APIResponse[None]` | Delete a project |
 | `bulk_delete(**params)` | `APIResponse[None]` | Delete multiple projects |
 
-**`ProjectAPIResource` fields:** `id`, `name`, `description`, `created_at`, `updated_at`
+**`Project` fields:** `id`, `name`, `description`, `created_at`, `updated_at`
 
 ### `hub.projects.scenarios`
 
 ```python
-from giskard_hub.types import ScenarioAPIResource, ScenarioPreviewAPIResource
+from giskard_hub.types import Scenario, ScenarioPreview
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `create(project_id, **params)` | `APIResponse[ScenarioAPIResource]` | Create a scenario |
-| `retrieve(scenario_id, *, project_id)` | `APIResponse[ScenarioAPIResource]` | Get a scenario |
-| `update(scenario_id, *, project_id, **params)` | `APIResponse[ScenarioAPIResource]` | Update a scenario |
-| `list(project_id)` | `APIResponse[list[ScenarioAPIResource]]` | List scenarios for a project |
+| `create(project_id, **params)` | `APIResponse[Scenario]` | Create a scenario |
+| `retrieve(scenario_id, *, project_id)` | `APIResponse[Scenario]` | Get a scenario |
+| `update(scenario_id, *, project_id, **params)` | `APIResponse[Scenario]` | Update a scenario |
+| `list(project_id)` | `APIResponse[list[Scenario]]` | List scenarios for a project |
 | `delete(scenario_id, *, project_id)` | `APIResponse[None]` | Delete a scenario |
-| `preview(project_id, **params)` | `APIResponse[ScenarioPreviewAPIResource]` | Preview generated questions for a scenario |
+| `preview(project_id, **params)` | `APIResponse[ScenarioPreview]` | Preview generated questions for a scenario |
 
 ---
 
@@ -296,7 +296,7 @@ from giskard_hub.types import ScanResult, ScanCategory, ScanProbeResult
 ### `hub.scans.probes`
 
 ```python
-from giskard_hub.types.scans import ScanProbeResult, ScanProbeAttempt
+from giskard_hub.types.scan import ScanProbeResult, ScanProbeAttempt
 ```
 
 | Method | Returns | Description |
@@ -307,7 +307,7 @@ from giskard_hub.types.scans import ScanProbeResult, ScanProbeAttempt
 ### `hub.scans.attempts`
 
 ```python
-from giskard_hub.types.scans import ScanProbeAttempt, ReviewStatus, Severity
+from giskard_hub.types.scan import ScanProbeAttempt, ReviewStatus, Severity
 ```
 
 | Method | Returns | Description |
@@ -334,7 +334,7 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
 | `list(**params)` | `APIResponseWithIncluded[list[ScheduledEvaluation], ...]` | List schedules |
 | `delete(scheduled_evaluation_id)` | `APIResponse[None]` | Delete a schedule |
 | `bulk_delete(**params)` | `APIResponse[None]` | Delete multiple schedules |
-| `list_evaluations(scheduled_evaluation_id, **params)` | `APIResponseWithIncluded[list[EvaluationAPIResource], ...]` | List past evaluation runs for a schedule |
+| `list_evaluations(scheduled_evaluation_id, **params)` | `APIResponseWithIncluded[list[Evaluation], ...]` | List past evaluation runs for a schedule |
 
 **`create` params:** `project_id`, `agent_id`, `dataset_id`, `name`, `frequency` (`"daily"` | `"weekly"` | `"monthly"`), `time`, `day_of_week`, `day_of_month`
 
@@ -343,15 +343,15 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
 ## `hub.tasks`
 
 ```python
-from giskard_hub.types import TaskAPIResource, TaskStatus, TaskPriority
+from giskard_hub.types import Task, TaskStatus, TaskPriority
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `create(**params)` | `APIResponse[TaskAPIResource]` | Create a task |
-| `retrieve(task_id)` | `APIResponse[TaskAPIResource]` | Get a task by ID |
-| `update(task_id, **params)` | `APIResponse[TaskAPIResource]` | Update task fields |
-| `list(**params)` | `APIResponse[list[TaskAPIResource]]` | List tasks, optionally filtered |
+| `create(**params)` | `APIResponse[Task]` | Create a task |
+| `retrieve(task_id)` | `APIResponse[Task]` | Get a task by ID |
+| `update(task_id, **params)` | `APIResponse[Task]` | Update task fields |
+| `list(**params)` | `APIResponse[list[Task]]` | List tasks, optionally filtered |
 | `delete(task_id)` | `APIResponse[None]` | Delete a task |
 | `bulk_delete(**params)` | `APIResponse[None]` | Delete multiple tasks |
 
@@ -359,7 +359,7 @@ from giskard_hub.types import TaskAPIResource, TaskStatus, TaskPriority
 
 **`TaskPriority` values:** `"low"`, `"medium"`, `"high"`, `"critical"`
 
-**`TaskAPIResource` fields:** `id`, `title`, `description`, `status`, `priority`, `project_id`, `created_at`, `updated_at`
+**`Task` fields:** `id`, `title`, `description`, `status`, `priority`, `project_id`, `created_at`, `updated_at`
 
 ---
 
@@ -396,13 +396,13 @@ from giskard_hub.types import TestCase, TestCaseComment, TestCaseCheckConfig, Ch
 ## `hub.playground_chats`
 
 ```python
-from giskard_hub.types import PlaygroundChatAPIResource
+from giskard_hub.types import PlaygroundChat
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `list(**params)` | `APIResponseWithIncluded[list[PlaygroundChatAPIResource], ...]` | List playground chats |
-| `retrieve(chat_id, **params)` | `APIResponseWithIncluded[PlaygroundChatAPIResource, ...]` | Get a chat by ID, optionally include agent |
+| `list(**params)` | `APIResponseWithIncluded[list[PlaygroundChat], ...]` | List playground chats |
+| `retrieve(chat_id, **params)` | `APIResponseWithIncluded[PlaygroundChat, ...]` | Get a chat by ID, optionally include agent |
 | `delete(chat_id)` | `APIResponse[None]` | Delete a chat |
 | `bulk_delete(**params)` | `APIResponse[None]` | Delete multiple chats |
 

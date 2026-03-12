@@ -128,7 +128,7 @@ for attempt in attempts:
 If a flagged attempt is a false positive, update its review status:
 
 ```python
-from giskard_hub.types.scans import ReviewStatus
+from giskard_hub.types import ReviewStatus
 
 hub.scans.attempts.update(
     "probe-attempt-id",
