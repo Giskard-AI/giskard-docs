@@ -17,7 +17,7 @@ hub = HubClient()
 events = hub.audit.search(
     filters={"project_id": {"selected_options": ["project-id"]}},
     limit=50,
-).data
+)
 
 for event in events:
     print(f"[{event.created_at}] {event.action} on {event.entity_type} {event.entity_id} by {event.user_id}")
@@ -35,7 +35,7 @@ now = datetime.now(timezone.utc).isoformat()
 events = hub.audit.search(
     filters={"created_at": {"from": since, "to": now}},
     limit=200,
-).data
+)
 ```
 
 ### Filter by entity type and action
@@ -47,7 +47,7 @@ events = hub.audit.search(
         "entity_type": {"selected_options": ["evaluation"]},
         "action": {"selected_options": ["delete"]},
     },
-).data
+)
 
 for event in events:
     print(f"Evaluation {event.entity_id} deleted by {event.user_id} at {event.created_at}")
@@ -63,7 +63,7 @@ If you want to see every change made to a particular resource — for example, a
 history = hub.audit.list_entities(
     entity_id="dataset-id",
     entity_type="dataset",
-).data
+)
 
 for entry in history:
     print(f"[{entry.created_at}] {entry.action}")
@@ -97,7 +97,7 @@ deletions = hub.audit.search(
         "created_at": {"from": start_of_month},
     },
     limit=500,
-).data
+)
 
 print(f"{len(deletions)} evaluations deleted this month:")
 for event in deletions:

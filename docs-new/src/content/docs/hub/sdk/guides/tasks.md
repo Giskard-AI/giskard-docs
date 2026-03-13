@@ -21,7 +21,7 @@ task = hub.tasks.create(
     description="Evaluation result #eval-result-id shows the agent quoting 3-5 days when the correct answer is 1-2 days.",
     evaluation_result_id="eval-result-id",
     assignee_ids=["user-id-1", "user-id-2"],
-).data
+)
 
 print(f"Task created: {task.id}")
 ```
@@ -47,7 +47,7 @@ print(f"Task created: {task.id}")
 ## List tasks
 
 ```python
-tasks = hub.tasks.list(project_id="project-id").data
+tasks = hub.tasks.list(project_id="project-id")
 
 open_tasks = [t for t in tasks if t.status == "open"]
 print(f"{len(open_tasks)} open tasks")
@@ -70,7 +70,7 @@ hub.tasks.update("task-id", status="resolved")
 ## Retrieve a task
 
 ```python
-task = hub.tasks.retrieve("task-id").data
+task = hub.tasks.retrieve("task-id")
 print(task.description, task.status, task.priority)
 ```
 
@@ -98,16 +98,16 @@ evaluation = hub.evaluations.create(
     agent_id="agent-id",
     criteria={"dataset_id": "dataset-id"},
     name="CI run",
-).data
+)
 
 while evaluation.status.state == "running":
     time.sleep(5)
-    evaluation = hub.evaluations.retrieve(evaluation.id).data
+    evaluation = hub.evaluations.retrieve(evaluation.id)
 
 failed_results = hub.evaluations.results.search(
     evaluation.id,
     filters={"sample_success": {"selected_options": ["fail"]}},
-).data
+)
 
 for result in failed_results:
     hub.tasks.create(

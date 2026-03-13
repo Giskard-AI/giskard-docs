@@ -20,7 +20,7 @@ dataset = hub.datasets.create(
     project_id="project-id",
     name="Core Q&A Suite v1",
     description="Baseline correctness and tone checks",
-).data
+)
 
 print(dataset.id)
 ```
@@ -52,7 +52,7 @@ tc = hub.test_cases.create(
             },
         },
     ],
-).data
+)
 
 print(tc.id)
 ```
@@ -113,7 +113,7 @@ You can annotate test cases with comments for team collaboration:
 comment = hub.test_cases.comments.add(
     "test-case-id",
     comment="This test case needs a stronger expected output — the current one is too vague.",
-).data
+)
 
 print(comment.id)
 
@@ -147,7 +147,7 @@ dataset = hub.datasets.upload(
     project_id="project-id",
     name="Imported Suite",
     file=("test_cases.json", json.dumps(test_cases).encode("utf-8")),
-).data
+)
 
 print(dataset.id)
 ```
@@ -161,7 +161,7 @@ dataset = hub.datasets.upload(
     project_id="project-id",
     name="Imported Suite",
     file=Path("import_data.jsonl"),
-).data
+)
 ```
 
 ### Import from a Giskard RAGET QATestset
@@ -207,7 +207,7 @@ dataset = hub.datasets.generate_scenario_based(
     scenario_id="scenario-id",
     dataset_name="Scenario-generated suite",
     n_examples=10,
-).data
+)
 
 print(f"Generated {dataset.id}")
 ```
@@ -225,7 +225,7 @@ dataset = hub.datasets.generate_document_based(
     knowledge_base_id="kb-id",
     dataset_name="FAQ-grounded suite",
     n_examples=25,
-).data
+)
 ```
 
 See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases#knowledge-bases) for how to create and populate a Knowledge Base.
@@ -235,7 +235,7 @@ See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases#knowle
 ## List test cases in a dataset
 
 ```python
-test_cases = hub.datasets.list_test_cases("dataset-id").data
+test_cases = hub.datasets.list_test_cases("dataset-id")
 
 # Paginated search with filters
 search_result = hub.datasets.search_test_cases(
@@ -243,7 +243,7 @@ search_result = hub.datasets.search_test_cases(
     search="payment",
     limit=20,
     offset=0,
-).data
+)
 ```
 
 ---
@@ -272,7 +272,7 @@ hub.test_cases.bulk_delete(test_case_ids=["tc-id-1", "tc-id-2"])
 ## List tags used in a dataset
 
 ```python
-tags = hub.datasets.list_tags("dataset-id").data
+tags = hub.datasets.list_tags("dataset-id")
 print(tags)  # ["shipping", "faq", "reviewed"]
 ```
 
@@ -317,7 +317,7 @@ check = hub.checks.create(
         "type": "conformity",
         "rules": ["The response must be written in a formal, professional tone. It must not contain slang, contractions, or casual phrasing."],
     },
-).data
+)
 
 print(check.id)
 ```
@@ -375,7 +375,7 @@ hub.checks.create(
 ### Manage checks
 
 ```python
-checks = hub.checks.list(project_id="project-id").data
+checks = hub.checks.list(project_id="project-id")
 
 hub.checks.update("check-id", name="Updated name")
 

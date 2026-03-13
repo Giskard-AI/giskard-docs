@@ -14,7 +14,7 @@ from giskard_hub import HubClient
 
 hub = HubClient()
 
-chats = hub.playground_chats.list(project_id="project-id").data
+chats = hub.playground_chats.list(project_id="project-id")
 
 for chat in chats:
     print(f"{chat.id} — agent: {chat.agent.name} — {chat.created_at}")
@@ -27,7 +27,7 @@ for chat in chats:
 ```python
 chat = hub.playground_chats.retrieve(
     "chat-id",
-).data
+)
 
 print(f"Chat with: {chat.agent.name}")
 
@@ -42,12 +42,12 @@ for msg in chat.messages:
 A common use case is to promote interesting playground conversations into a dataset as new test cases:
 
 ```python
-chats = hub.playground_chats.list(project_id="project-id").data
+chats = hub.playground_chats.list(project_id="project-id")
 
 dataset = hub.datasets.create(
     project_id="project-id",
     name="Playground-sourced test cases",
-).data
+)
 
 for chat in chats:
     messages = chat.messages

@@ -17,7 +17,7 @@ hub = HubClient()
 project = hub.projects.create(
     name="My LLM App",
     description="Evaluation workspace for the production chatbot",
-).data
+)
 
 print(project.id)
 ```
@@ -26,10 +26,10 @@ print(project.id)
 
 ```python
 # List all projects you have access to
-projects = hub.projects.list().data
+projects = hub.projects.list()
 
 # Retrieve a specific project by ID
-project = hub.projects.retrieve("project-id").data
+project = hub.projects.retrieve("project-id")
 ```
 
 ### Update and delete a project
@@ -56,7 +56,7 @@ scenario = hub.projects.scenarios.create(
     rules=[
         "The agent should not ask for the user's credit card number",
     ],
-).data
+)
 
 print(scenario.id)
 ```
@@ -70,7 +70,7 @@ preview = hub.projects.scenarios.preview(
     "project-id",
     agent_id="agent-id",
     description="The user is frustrated and demands an immediate refund for a defective product.",
-).data
+)
 
 print(preview.conversation)
 ```
@@ -78,7 +78,7 @@ print(preview.conversation)
 ### List and manage scenarios
 
 ```python
-scenarios = hub.projects.scenarios.list("project-id").data
+scenarios = hub.projects.scenarios.list("project-id")
 
 hub.projects.scenarios.update("scenario-id", project_id="project-id", name="Updated name")
 

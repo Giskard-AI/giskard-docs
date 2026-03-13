@@ -81,8 +81,8 @@ agent = hub.agents.create(
     url="https://...",
     supported_languages=["en"],
     headers={},
-).data
-output = hub.agents.generate_completion(agent.id, messages=[...]).data
+)
+output = hub.agents.generate_completion(agent.id, messages=[...])
 print(output.response)
 ```
 
@@ -124,13 +124,13 @@ evaluation = hub.evaluations.create(
     agent_id=agent_id,
     criteria={"dataset_id": dataset_id},
     name="run",
-).data
+)
 
 while evaluation.status.state == "running":
     time.sleep(5)
-    evaluation = hub.evaluations.retrieve(evaluation.id).data
+    evaluation = hub.evaluations.retrieve(evaluation.id)
 
-results = hub.evaluations.results.list(evaluation.id).data
+results = hub.evaluations.results.list(evaluation.id)
 ```
 
 For local Python agents, use `create_local()`. Unlike v2.x, v3.x requires you to manually fetch the test cases and submit outputs for each one:
@@ -152,26 +152,25 @@ evaluation = hub.evaluations.create_local(
     agent={"name": "my_agent", "description": "A simple local agent"},
     criteria=[{"dataset_id": dataset_id}],
     name="local run",
-).data
+)
 
-results_included_data = hub.evaluations.results.list(
+results = hub.evaluations.results.list(
     evaluation_id=evaluation.id,
     include=["test_case"],
-).included
+)
 
-for result_id, data in results_included_data.items():
-    messages = data["test_case"].data.messages
-    agent_output = my_agent(messages)
+for result in results:
+    agent_output = my_agent(result.test_case.messages)
     hub.evaluations.results.submit_local_output(
         evaluation_id=evaluation.id,
-        result_id=result_id,
+        result_id=result.id,
         output={"response": agent_output},
     )
 ```
 
 ### 6. Response objects are now Pydantic models
 
-In v2.x, most responses were plain Python objects with simple attribute access. In v3.x, all responses are wrapped in `APIResponse[T]`, `APIPaginatedResponse[T, M]`, or `APIResponseWithIncluded[T, I]`. Access the actual data via `.data`:
+In v2.x, most responses were plain Python objects with simple attribute access. In v3.x, all responses are wrapped in `pydantic.BaseModel`:
 
 ```python
 # v2.x
@@ -179,7 +178,7 @@ project = hub.projects.retrieve(project_id)
 print(project.name)
 
 # v3.x
-project = hub.projects.retrieve(project_id).data
+project = hub.projects.retrieve(project_id)
 print(project.name)
 ```
 
@@ -202,7 +201,7 @@ hub.knowledge_bases.create(
     file=("documents.json", json.dumps([
         {"text": "Document text here.", "topic": "Topic A"},
     ]).encode("utf-8")),
-).data
+)
 
 # v3.x — from a file on disk
 from pathlib import Path
@@ -211,7 +210,7 @@ hub.knowledge_bases.create(
     project_id=project_id,
     name="My KB",
     file=Path("documents.json"),
-).data
+)
 ```
 
 ### 8. `model_id` → `agent_id`, and `dataset_id` moved into `criteria`
@@ -237,8 +236,8 @@ for metric in eval_run.metrics:
     print(f"{metric.name}: {metric.percentage}%")
 
 # v3.x
-evaluation = hub.evaluations.retrieve(evaluation_id).data
-results = hub.evaluations.results.list(evaluation_id).data
+evaluation = hub.evaluations.retrieve(evaluation_id)
+results = hub.evaluations.results.list(evaluation_id)
 
 total = len(results)
 passed = sum(1 for r in results if r.state == "passed")
@@ -251,22 +250,22 @@ print(f"Pass rate: {passed / total * 100:.1f}%")
 
 | v2.x feature | v3.x equivalent |
 |---|---|
-| `hub.projects.list()` | `hub.projects.list().data` |
-| `hub.projects.create(name=, description=)` | `hub.projects.create(name=, description=).data` |
-| `hub.models.create(...)` | `hub.agents.create(...).data` |
-| `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...]).data` |
-| `hub.datasets.create(...)` | `hub.datasets.create(...).data` |
-| `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...).data` |
-| `hub.evaluate(model=, dataset=, name=)` | `hub.evaluations.create(agent_id=, criteria={"dataset_id": ...}, ...).data` |
-| `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent=..., criteria=[...], ...).data` + manual output submission loop — see [Local evaluations](/hub/sdk/guides/evaluations#local-evaluations) |
-| `eval_run.wait_for_completion()` | Poll `hub.evaluations.retrieve(id).data.status` |
-| `eval_run.print_metrics()` | Compute from `hub.evaluations.results.list(id).data` |
-| `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...).data` |
-| `kb.wait_for_completion()` | Poll `hub.knowledge_bases.retrieve(id).data.status` |
+| `hub.projects.list()` | `hub.projects.list()` |
+| `hub.projects.create(name=, description=)` | `hub.projects.create(name=, description=)` |
+| `hub.models.create(...)` | `hub.agents.create(...)` |
+| `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...])` |
+| `hub.datasets.create(...)` | `hub.datasets.create(...)` |
+| `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
+| `hub.evaluate(model=, dataset=, name=)` | `hub.evaluations.create(agent_id=, criteria={"dataset_id": ...}, ...)` |
+| `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent=..., criteria=[...], ...)` + manual output submission loop — see [Local evaluations](/hub/sdk/guides/evaluations#local-evaluations) |
+| `eval_run.wait_for_completion()` | Poll `hub.evaluations.retrieve(id).status` |
+| `eval_run.print_metrics()` | Compute from `hub.evaluations.results.list(id)` |
+| `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...)` |
+| `kb.wait_for_completion()` | Poll `hub.knowledge_bases.retrieve(id).status` |
 | `hub.evaluations.create(model_id=, ...)` | `hub.evaluations.create(agent_id=, ...)` |
 | `hub.scans.create(model_id=, ...)` | `hub.scans.create(agent_id=, ...)` |
-| `hub.scheduled_evaluations.create(...)` | `hub.scheduled_evaluations.create(...).data` |
-| `hub.checks.create(...)` | `hub.checks.create(...).data` |
+| `hub.scheduled_evaluations.create(...)` | `hub.scheduled_evaluations.create(...)` |
+| `hub.checks.create(...)` | `hub.checks.create(...)` |
 
 ---
 

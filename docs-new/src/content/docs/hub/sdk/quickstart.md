@@ -52,10 +52,10 @@ Projects are the top-level container for all your resources. Create one or retri
 project = hub.projects.create(
     name="Customer Support Bot",
     description="Evaluation project for our support chatbot",
-).data
+)
 
 # Or list existing projects and pick one
-projects = hub.projects.list().data
+projects = hub.projects.list()
 project = projects[0]
 
 print(f"Using project: {project.name} ({project.id})")
@@ -73,7 +73,7 @@ agent = hub.agents.create(
     url="https://your-app.example.com/api/chat",
     supported_languages=["en"],
     headers=[{"name": "Authorization", "value": "Bearer <your-app-token>"}],
-).data
+)
 
 print(f"Agent registered: {agent.id}")
 ```
@@ -93,13 +93,13 @@ scan = hub.scans.create(
     project_id=project.id,
     agent_id=agent.id,
     tags=["gsk:threat-type='prompt-injection'"],
-).data
+)
 
 print(f"Scan started: {scan.id}")
 
 while scan.status.state == "running":
     time.sleep(10)
-    scan = hub.scans.retrieve(scan.id).data
+    scan = hub.scans.retrieve(scan.id)
 
 print(f"Scan complete. Grade: {scan.grade}")
 ```
@@ -115,7 +115,7 @@ dataset = hub.datasets.create(
     project_id=project.id,
     name="Core Q&A Suite",
     description="Basic correctness and tone checks",
-).data
+)
 
 # Add a test case
 hub.test_cases.create(
@@ -123,16 +123,14 @@ hub.test_cases.create(
     messages=[
         {"role": "user", "content": "What is your return policy?"},
     ],
-    expected_output="We offer a 30-day return policy for all items.",
+    demo_output="We offer a 30-day return policy for all items.",
     checks=[
         {
             "identifier": "correctness",
-            "assertions": [
-                {
-                    "type": "correctness",
-                    "reference": "We offer a 30-day return policy for all items."
-                }
-            ]
+            "params": {
+                "type": "correctness",
+                "reference": "We offer a 30-day return policy for all items."
+            },
         },
     ],
 )
@@ -154,14 +152,14 @@ evaluation = hub.evaluations.create(
         "dataset_id": dataset.id,
     },
     name="v1 baseline",
-).data
+)
 
 print(f"Evaluation started: {evaluation.id}")
 
 # Poll until the evaluation completes
 while evaluation.status.state == "running":
     time.sleep(5)
-    evaluation = hub.evaluations.retrieve(evaluation.id).data
+    evaluation = hub.evaluations.retrieve(evaluation.id)
 
 print("Evaluation complete!")
 ```
@@ -171,10 +169,10 @@ print("Evaluation complete!")
 Once complete, fetch the per-test-case results and inspect the metrics:
 
 ```python
-evaluation_results = hub.evaluations.results.list(evaluation.id).data
+evaluation_results = hub.evaluations.results.list(evaluation.id)
 
 for eval_result in evaluation_results:
-    print(f"Test case {eval_result.test_case.id}: {eval_result.state}") # "passed", "failed", "error"
+    print(f"Test case {eval_result.test_case.id}: {eval_result.state}")
     for check_result in eval_result.results:
         print(f"  {check_result.name}: {'✓' if check_result.passed else '✗'}")
 ```

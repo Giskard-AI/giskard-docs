@@ -22,14 +22,14 @@ evaluation = hub.evaluations.create(
     agent_id="agent-id",
     criteria={"dataset_id": "dataset-id"},
     name="v2.1 regression run",
-).data
+)
 
 print(evaluation.id)
 
 # Poll until complete
 while evaluation.status.state == "running":
     time.sleep(5)
-    evaluation = hub.evaluations.retrieve(evaluation.id).data
+    evaluation = hub.evaluations.retrieve(evaluation.id)
 
 print(f"Evaluation finished with status: {evaluation.status.state}")
 ```
@@ -44,7 +44,7 @@ evaluation = hub.evaluations.create(
     agent_id="agent-id",
     criteria={"dataset_id": "dataset-id", "tags": ["shipping"]},
     name="Shipping-only run",
-).data
+)
 ```
 
 ### Run multiple times
@@ -58,7 +58,7 @@ evaluation = hub.evaluations.create(
     criteria={"dataset_id": "dataset-id"},
     run_count=3,
     name="Consistency check — 3x",
-).data
+)
 ```
 
 ---
@@ -85,12 +85,12 @@ evaluation = hub.evaluations.create_local(
     agent={"name": "my_agent", "description": "A simple echo agent"},
     criteria=[{"dataset_id": "dataset-id"}],
     name="Local evaluation",
-).data
+)
 
 results = hub.evaluations.results.list(
     evaluation_id=evaluation.id,
     include=["test_case"],
-).data
+)
 
 for result in results:
     messages = result.test_case.messages
@@ -109,7 +109,7 @@ for result in results:
 ### List all results
 
 ```python
-results = hub.evaluations.results.list("evaluation-id").data
+results = hub.evaluations.results.list("evaluation-id")
 
 for result in results:
     print(f"{result.id}: {result.state}")
@@ -125,7 +125,7 @@ results_search = hub.evaluations.results.search(
     "evaluation-id",
     filters={"sample_success": {"selected_options": ["fail"]}},
     limit=50,
-).data
+)
 ```
 
 ### Retrieve a single result
@@ -134,14 +134,14 @@ results_search = hub.evaluations.results.search(
 result = hub.evaluations.results.retrieve(
     "result-id",
     evaluation_id="evaluation-id",
-).data
+)
 
 print(result.state)
 ```
 
 ### Update the failure category of result (manual review)
 
-The full list of available failure categories for a project can be retrieved via `hub.projects.retrieve("project-id").data.failure_categories`.
+The full list of available failure categories for a project can be retrieved via `hub.projects.retrieve("project-id").failure_categories`.
 
 ```python
 hub.evaluations.results.update(
@@ -202,11 +202,11 @@ evaluation = hub.evaluations.create(
     agent_id="agent-id",
     criteria={"dataset_id": "dataset-id"},
     name=f"CI run — {os.environ.get('CI_COMMIT_SHA', 'local')}",
-).data
+)
 
 while evaluation.status.state == "running":
     time.sleep(10)
-    evaluation = hub.evaluations.retrieve(evaluation.id).data
+    evaluation = hub.evaluations.retrieve(evaluation.id)
 
 if evaluation.status.state == "error":
     print("Evaluation encountered errors.")
@@ -241,7 +241,7 @@ results = hub.evaluations.run_single(
     checks=[
         {"identifier": "tone_professional"},
     ],
-).data
+)
 
 for check in results:
     print(f"{check.name}: {'passed' if check.passed else 'failed'}")
@@ -252,7 +252,7 @@ for check in results:
 ## List and manage evaluations
 
 ```python
-evaluations = hub.evaluations.list(project_id="project-id").data
+evaluations = hub.evaluations.list(project_id="project-id")
 
 hub.evaluations.update("evaluation-id", name="Renamed evaluation")
 
@@ -276,7 +276,7 @@ schedule = hub.scheduled_evaluations.create(
     frequency="weekly",
     time="09:00",       # UTC time of day
     day_of_week=1,      # 1 = Monday, 7 = Sunday
-).data
+)
 
 print(f"Scheduled evaluation created: {schedule.id}")
 ```
@@ -315,7 +315,7 @@ hub.scheduled_evaluations.create(
 ### List scheduled evaluations
 
 ```python
-schedules = hub.scheduled_evaluations.list(project_id="project-id").data
+schedules = hub.scheduled_evaluations.list(project_id="project-id")
 
 for s in schedules:
     print(f"{s.name} — {s.frequency} — last execution: {s.last_execution_at}")
@@ -327,7 +327,7 @@ for s in schedules:
 scheduled_evaluation = hub.scheduled_evaluations.retrieve(
     "scheduled-evaluation-id",
     include=["evaluations"],
-).data
+)
 
 print(f"Schedule: {scheduled_evaluation.name}")
 for evaluation in scheduled_evaluation.evaluations:
@@ -339,7 +339,7 @@ for evaluation in scheduled_evaluation.evaluations:
 ```python
 evaluation_runs = hub.scheduled_evaluations.list_evaluations(
     "scheduled-evaluation-id",
-).data
+)
 
 for run in evaluation_runs:
     print(f"Run: {run.id} — {run.status.state} — {run.created_at}")

@@ -23,7 +23,7 @@ agent = hub.agents.create(
     url="https://your-app.example.com/api/chat",
     supported_languages=["en", "fr"],
     headers=[{"name": "Authorization", "value": "Bearer <token>"}],
-).data
+)
 
 print(agent.id)
 ```
@@ -38,7 +38,7 @@ Before running an evaluation, verify your agent endpoint is reachable and respon
 ping = hub.agents.test_connection(
     url="https://your-app.example.com/api/chat",
     headers={"Authorization": "Bearer <token>"},
-).data
+)
 
 print(ping.response)
 ```
@@ -53,7 +53,7 @@ output = hub.agents.generate_completion(
     messages=[
         {"role": "user", "content": "What is the capital of France?"},
     ],
-).data
+)
 
 print(output.response)
 print(output.metadata)  # any metadata returned by your agent
@@ -64,7 +64,7 @@ print(output.metadata)  # any metadata returned by your agent
 If your agent's description is missing or stale, the Hub can generate one by observing how the agent behaves:
 
 ```python
-description = hub.agents.autofill_description("agent-id").data
+description = hub.agents.autofill_description("agent-id")
 hub.agents.update("agent-id", description=description)
 ```
 
@@ -75,7 +75,7 @@ For evaluations where you don't want to expose an HTTP endpoint — for example,
 ### List, update, and delete agents
 
 ```python
-agents = hub.agents.list(project_id="project-id").data
+agents = hub.agents.list(project_id="project-id")
 
 hub.agents.update("agent-id", name="Support Bot v2.1")
 
@@ -112,7 +112,7 @@ kb = hub.knowledge_bases.create(
     name="Product Documentation",
     description="Official product docs and FAQs",
     file=("documents.json", json.dumps(documents).encode("utf-8")),
-).data
+)
 
 print(kb.id)
 ```
@@ -127,7 +127,7 @@ kb = hub.knowledge_bases.create(
     name="Product Documentation",
     description="Official product docs and FAQs",
     file=Path("documents.json"),
-).data
+)
 ```
 
 :::note
@@ -137,7 +137,7 @@ After creation, the Hub indexes the documents asynchronously. Depending on the s
 ## Retrieve and update a knowledge base
 
 ```python
-kb = hub.knowledge_bases.retrieve("kb-id").data
+kb = hub.knowledge_bases.retrieve("kb-id")
 print(kb.name, kb.status.state)
 
 hub.knowledge_bases.update("kb-id", name="Updated Name")
@@ -152,7 +152,7 @@ results = hub.knowledge_bases.search_documents(
     "kb-id",
     search="return policy",
     limit=5,
-).data
+)
 
 for doc in results:
     print(doc.snippet)
@@ -161,14 +161,14 @@ for doc in results:
 ## Retrieve a specific document
 
 ```python
-doc = hub.knowledge_bases.retrieve_document("kb-id", "document-id").data
+doc = hub.knowledge_bases.retrieve_document("kb-id", "document-id")
 print(doc.content)
 ```
 
 ## List and delete knowledge bases
 
 ```python
-kbs = hub.knowledge_bases.list(project_id="project-id").data
+kbs = hub.knowledge_bases.list(project_id="project-id")
 
 hub.knowledge_bases.delete("kb-id")
 ```
@@ -186,7 +186,7 @@ dataset = hub.datasets.generate_document_based(
     agent_id="agent-id",
     dataset_name="FAQ-based test suite",
     n_examples=20,
-).data
+)
 
 print(f"Generated dataset: {dataset.id} ({dataset.name})")
 ```
@@ -207,7 +207,7 @@ scan = hub.scans.create(
     agent_id="agent-id",
     knowledge_base_id="kb-id",
     tags=["gsk:threat-type='hallucination'"], # Hallucination
-).data
+)
 ```
 
 See [Vulnerability Scanning](/hub/sdk/guides/scans) for the full list of tags and scan options.

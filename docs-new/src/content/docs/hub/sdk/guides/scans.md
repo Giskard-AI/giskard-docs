@@ -18,14 +18,14 @@ hub = HubClient()
 scan = hub.scans.create(
     project_id="project-id",
     agent_id="agent-id",
-).data
+)
 
 print(scan.id)
 
 # Poll until complete
 while scan.status.state == "running":
     time.sleep(10)
-    scan = hub.scans.retrieve(scan.id).data
+    scan = hub.scans.retrieve(scan.id)
 
 print(f"Scan complete. Grade: {scan.grade}")
 ```
@@ -60,7 +60,7 @@ scan = hub.scans.create(
         "gsk:threat-type='prompt-injection'",
         "gsk:threat-type='hallucination'",
     ],
-).data
+)
 ```
 
 ### Discover available categories
@@ -68,7 +68,7 @@ scan = hub.scans.create(
 Use `hub.scans.list_categories()` to retrieve the authoritative, up-to-date list of all available categories and their tags at runtime:
 
 ```python
-categories = hub.scans.list_categories().data
+categories = hub.scans.list_categories()
 for cat in categories:
     print(cat.title, cat.owasp_id)
 ```
@@ -84,7 +84,7 @@ scan = hub.scans.create(
     project_id="project-id",
     agent_id="agent-id",
     knowledge_base_id="kb-id",
-).data
+)
 ```
 
 See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases#knowledge-bases) for how to create and populate a KB.
@@ -96,7 +96,7 @@ See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases#knowle
 ### List probes for a scan
 
 ```python
-probes = hub.scans.list_probes("scan-id").data
+probes = hub.scans.list_probes("scan-id")
 
 for probe in probes:
     if probe.status.state == "skipped":
@@ -107,7 +107,7 @@ for probe in probes:
 ### Retrieve a specific probe
 
 ```python
-probe = hub.scans.probes.retrieve("probe-result-id").data
+probe = hub.scans.probes.retrieve("probe-result-id")
 print(probe.probe_description)
 ```
 
@@ -116,7 +116,7 @@ print(probe.probe_description)
 Each probe may generate multiple adversarial prompt attempts. Inspect them to understand exactly what the agent was asked and how it responded:
 
 ```python
-attempts = hub.scans.probes.list_attempts("probe-result-id").data
+attempts = hub.scans.probes.list_attempts("probe-result-id")
 
 for attempt in attempts:
     print(f"Prompt: {[m.content for m in attempt.messages[:-1]]}")
@@ -146,15 +146,15 @@ When a probe attempt succeeds (the attack elicited an undesired response), you c
 
 ```python
 # Fetch all probes for a completed scan
-probes = hub.scans.list_probes("scan-id").data
+probes = hub.scans.list_probes("scan-id")
 
 dataset = hub.datasets.create(
     project_id="project-id",
     name=f"Regression tests from scan {'scan-id'}",
-).data
+)
 
 for probe in probes:
-    attempts = hub.scans.probes.list_attempts(probe.id).data
+    attempts = hub.scans.probes.list_attempts(probe.id)
 
     for attempt in attempts:
         # severity > 0 means the agent misbehaved
@@ -175,7 +175,7 @@ print(f"Imported attacks into dataset {dataset.id}")
 ## List and manage scans
 
 ```python
-scans = hub.scans.list(project_id="project-id").data
+scans = hub.scans.list(project_id="project-id")
 
 hub.scans.delete("scan-id")
 
@@ -198,11 +198,11 @@ hub = HubClient()
 scan = hub.scans.create(
     project_id="project-id",
     agent_id="agent-id",
-).data
+)
 
 while scan.status.state == "running":
     time.sleep(10)
-    scan = hub.scans.retrieve(scan.id).data
+    scan = hub.scans.retrieve(scan.id)
 
 if scan.status.state == "error":
     print("Scan encountered errors.")

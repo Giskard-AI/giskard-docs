@@ -164,21 +164,3 @@ The Hub's UI includes a **Playground** where you can chat with registered agents
 Every significant action in the Hub (create, update, delete) is recorded in an **Audit Log**. You can search events by time range, user, entity type, or action, and retrieve the history for a specific resource.
 
 **SDK resource:** `hub.audit`
-
----
-
-## Response wrappers
-
-All SDK methods return a typed wrapper rather than plain dicts:
-
-| Type | When used |
-|---|---|
-| `APIResponse[T]` | Single-item responses — access the data via `.data` |
-| `APIResponseWithIncluded[T, I]` | Single-item response with side-loaded related resources — `.data` for the main resource, `.included` for related ones |
-| `APIPaginatedResponse[T, I]` | Paginated lists — `.data` (list of items), `.metadata` (`.count`, `.offset`, `.limit`, `.total`), optional `.included` |
-
-```python
-response = hub.agents.retrieve("agent-id")
-agent = response.data          # typed Agent object
-print(agent.name, agent.url)
-```
