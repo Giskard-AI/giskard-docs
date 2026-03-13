@@ -22,10 +22,8 @@ scan = hub.scans.create(
 
 print(scan.id)
 
-# Poll until complete
-while scan.status.state == "running":
-    time.sleep(10)
-    scan = hub.scans.retrieve(scan.id)
+# Wait for completion
+scan = hub.helpers.wait_for_completion(scan)
 
 print(f"Scan complete. Grade: {scan.grade}")
 ```
@@ -99,9 +97,9 @@ See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases#knowle
 probes = hub.scans.list_probes("scan-id")
 
 for probe in probes:
-    if probe.status.state == "skipped":
+    if probe.state == "skipped":
         continue
-    print(f"{probe.probe_category} — {probe.probe_name}: {probe.metrics} ({probe.status.state})")
+    print(f"{probe.probe_category} — {probe.probe_name}: {probe.metrics} ({probe.state})")
 ```
 
 ### Retrieve a specific probe
@@ -200,11 +198,9 @@ scan = hub.scans.create(
     agent_id="agent-id",
 )
 
-while scan.status.state == "running":
-    time.sleep(10)
-    scan = hub.scans.retrieve(scan.id)
-
-if scan.status.state == "error":
+try:
+    scan = hub.helpers.wait_for_completion(scan)
+except Exception as e:
     print("Scan encountered errors.")
     sys.exit(1)
 

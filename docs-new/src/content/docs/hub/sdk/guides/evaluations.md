@@ -26,12 +26,10 @@ evaluation = hub.evaluations.create(
 
 print(evaluation.id)
 
-# Poll until complete
-while evaluation.status.state == "running":
-    time.sleep(5)
-    evaluation = hub.evaluations.retrieve(evaluation.id)
+# Wait for completion
+evaluation = hub.helpers.wait_for_completion(evaluation)
 
-print(f"Evaluation finished with status: {evaluation.status.state}")
+print(f"Evaluation completed with state: {evaluation.state}")
 ```
 
 ### Filter by tags
@@ -204,11 +202,9 @@ evaluation = hub.evaluations.create(
     name=f"CI run — {os.environ.get('CI_COMMIT_SHA', 'local')}",
 )
 
-while evaluation.status.state == "running":
-    time.sleep(10)
-    evaluation = hub.evaluations.retrieve(evaluation.id)
-
-if evaluation.status.state == "error":
+try:
+    evaluation = hub.helpers.wait_for_completion(evaluation)
+except Exception as e:
     print("Evaluation encountered errors.")
     sys.exit(1)
 
@@ -331,7 +327,7 @@ scheduled_evaluation = hub.scheduled_evaluations.retrieve(
 
 print(f"Schedule: {scheduled_evaluation.name}")
 for evaluation in scheduled_evaluation.evaluations:
-    print(f"  Run {evaluation.id}: {evaluation.status.state} at {evaluation.created_at}")
+    print(f"  Run {evaluation.id}: {evaluation.state} at {evaluation.created_at}")
 ```
 
 ### List past evaluation runs
@@ -342,7 +338,7 @@ evaluation_runs = hub.scheduled_evaluations.list_evaluations(
 )
 
 for run in evaluation_runs:
-    print(f"Run: {run.id} — {run.status.state} — {run.created_at}")
+    print(f"Run: {run.id} — {run.state} — {run.created_at}")
 ```
 
 ### Update and delete scheduled evaluations

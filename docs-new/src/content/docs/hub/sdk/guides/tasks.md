@@ -100,9 +100,7 @@ evaluation = hub.evaluations.create(
     name="CI run",
 )
 
-while evaluation.status.state == "running":
-    time.sleep(5)
-    evaluation = hub.evaluations.retrieve(evaluation.id)
+evaluation = hub.helpers.wait_for_completion(evaluation)
 
 failed_results = hub.evaluations.results.search(
     evaluation.id,

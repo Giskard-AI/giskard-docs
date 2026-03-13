@@ -138,7 +138,7 @@ After creation, the Hub indexes the documents asynchronously. Depending on the s
 
 ```python
 kb = hub.knowledge_bases.retrieve("kb-id")
-print(kb.name, kb.status.state)
+print(kb.name, kb.state)
 
 hub.knowledge_bases.update("kb-id", name="Updated Name")
 ```

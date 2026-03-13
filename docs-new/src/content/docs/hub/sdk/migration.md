@@ -49,6 +49,7 @@ export GISKARD_HUB_API_KEY="gsk_..."
 | `HubClient(url=..., token=...)` | `HubClient(base_url=..., api_key=...)` |
 
 ```python
+# main.py
 # v2.x
 from giskard_hub import HubClient
 hub = HubClient(url="https://...", token="gsk_...")
@@ -63,6 +64,7 @@ hub = HubClient(base_url="https://...", api_key="gsk_...")
 The resource for LLM applications was renamed from `models` to `agents`, and the corresponding type from `ModelOutput` to `AgentOutput`.
 
 ```python
+# main.py
 # v2.x
 model = hub.models.create(
     project_id=project_id,
@@ -91,6 +93,7 @@ print(output.response)
 The resource for creating and managing test cases was renamed.
 
 ```python
+# main.py
 # v2.x
 hub.chat_test_cases.create(
     dataset_id=dataset_id,
@@ -111,6 +114,7 @@ hub.test_cases.create(
 In v2.x, there was a top-level `hub.evaluate()` shortcut that combined evaluation creation and polling. In v3.x, these steps are explicit.
 
 ```python
+# main.py
 # v2.x
 eval_run = hub.evaluate(model=my_model, dataset=my_dataset, name="run")
 eval_run.wait_for_completion()
@@ -126,9 +130,7 @@ evaluation = hub.evaluations.create(
     name="run",
 )
 
-while evaluation.status.state == "running":
-    time.sleep(5)
-    evaluation = hub.evaluations.retrieve(evaluation.id)
+evaluation = hub.helpers.wait_for_completion(evaluation)
 
 results = hub.evaluations.results.list(evaluation.id)
 ```
@@ -136,6 +138,7 @@ results = hub.evaluations.results.list(evaluation.id)
 For local Python agents, use `create_local()`. Unlike v2.x, v3.x requires you to manually fetch the test cases and submit outputs for each one:
 
 ```python
+# main.py
 # v2.x — passing a local function
 def my_agent(messages):
     return "Hello from local model"
@@ -173,6 +176,7 @@ for result in results:
 In v2.x, most responses were plain Python objects with simple attribute access. In v3.x, all responses are wrapped in `pydantic.BaseModel`:
 
 ```python
+# main.py
 # v2.x
 project = hub.projects.retrieve(project_id)
 print(project.name)
@@ -189,6 +193,7 @@ All data objects are Pydantic models, so you can use `.model_dump()`, `.model_du
 CSV files are no longer accepted when creating knowledge bases. Use JSON/JSONL or a list of dicts:
 
 ```python
+# main.py
 # v2.x (CSV no longer supported even in v2.0.0+)
 # hub.knowledge_bases.create(..., data="my_kb.csv")  # ❌
 
@@ -218,6 +223,7 @@ hub.knowledge_bases.create(
 In v2.x, the evaluation resource used `model_id` to refer to the agent and `dataset_id` as a direct parameter. In v3.x, use `agent_id` and wrap `dataset_id` inside a `criteria` dict:
 
 ```python
+# main.py
 # v2.x
 hub.evaluations.create(model_id=model_id, dataset_id=dataset_id, ...)
 
@@ -230,14 +236,15 @@ hub.evaluations.create(agent_id=agent_id, criteria={"dataset_id": dataset_id}, .
 In v2.x, `eval_run.metrics` was a list of `Metric` objects with `.name` and `.percentage`. In v3.x, metrics are available on the `EvaluationAPIResource` object and the individual results:
 
 ```python
+# main.py
 # v2.x
 eval_run.wait_for_completion()
 for metric in eval_run.metrics:
     print(f"{metric.name}: {metric.percentage}%")
 
 # v3.x
-evaluation = hub.evaluations.retrieve(evaluation_id)
-results = hub.evaluations.results.list(evaluation_id)
+evaluation = hub.helpers.wait_for_completion(evaluation)
+results = hub.evaluations.results.list(evaluation.id)
 
 total = len(results)
 passed = sum(1 for r in results if r.state == "passed")
@@ -250,15 +257,13 @@ print(f"Pass rate: {passed / total * 100:.1f}%")
 
 | v2.x feature | v3.x equivalent |
 |---|---|
-| `hub.projects.list()` | `hub.projects.list()` |
-| `hub.projects.create(name=, description=)` | `hub.projects.create(name=, description=)` |
 | `hub.models.create(...)` | `hub.agents.create(...)` |
 | `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...])` |
 | `hub.datasets.create(...)` | `hub.datasets.create(...)` |
 | `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
 | `hub.evaluate(model=, dataset=, name=)` | `hub.evaluations.create(agent_id=, criteria={"dataset_id": ...}, ...)` |
 | `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent=..., criteria=[...], ...)` + manual output submission loop — see [Local evaluations](/hub/sdk/guides/evaluations#local-evaluations) |
-| `eval_run.wait_for_completion()` | Poll `hub.evaluations.retrieve(id).status` |
+| `eval_run.wait_for_completion()` | `eval_run = hub.helpers.wait_for_completion(eval_run)` |
 | `eval_run.print_metrics()` | Compute from `hub.evaluations.results.list(id)` |
 | `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...)` |
 | `kb.wait_for_completion()` | Poll `hub.knowledge_bases.retrieve(id).status` |
