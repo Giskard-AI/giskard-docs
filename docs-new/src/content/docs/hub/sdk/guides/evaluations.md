@@ -74,7 +74,7 @@ from giskard_hub.types import ChatMessage
 
 def my_agent(messages: list[ChatMessage]) -> ChatMessage:
     # Call your local model or chain here
-    user_input = messages[-1]["content"]
+    user_input = messages[-1].content
 
     return ChatMessage(
         role="assistant",
@@ -87,17 +87,17 @@ evaluation = hub.evaluations.create_local(
     name="Local evaluation",
 ).data
 
-results_included_data = hub.evaluations.results.list(
+results = hub.evaluations.results.list(
     evaluation_id=evaluation.id,
     include=["test_case"],
-).included
+).data
 
-for result_id, data in results_included_data.items():
-    messages = data["test_case"].data.messages
+for result in results:
+    messages = result.test_case.messages
     agent_output = my_agent(messages)
     hub.evaluations.results.submit_local_output(
         evaluation_id=evaluation.id,
-        result_id=result_id,
+        result_id=result.id,
         output={"response": agent_output},
     )
 ```
@@ -324,14 +324,14 @@ for s in schedules:
 ### Retrieve a schedule with its recent runs
 
 ```python
-scheduled_response = hub.scheduled_evaluations.retrieve(
+scheduled_evaluation = hub.scheduled_evaluations.retrieve(
     "scheduled-evaluation-id",
     include=["evaluations"],
-)
+).data
 
-print(f"Schedule: {scheduled_response.data.name}")
-for evaluation_run in next(iter(scheduled_response.included.values()))["evaluations"]:
-    print(f"  Run {evaluation_run.data.id}: {evaluation_run.data.status.state} at {evaluation_run.data.created_at}")
+print(f"Schedule: {scheduled_evaluation.name}")
+for evaluation in scheduled_evaluation.evaluations:
+    print(f"  Run {evaluation.id}: {evaluation.status.state} at {evaluation.created_at}")
 ```
 
 ### List past evaluation runs
