@@ -111,29 +111,30 @@ hub.test_cases.create(
 
 ### 5. `hub.evaluate()` convenience method removed
 
-In v2.x, there was a top-level `hub.evaluate()` shortcut that combined evaluation creation and polling. In v3.x, these steps are explicit.
+In v2.x, there was a top-level `hub.evaluate()` shortcut that combined evaluation creation and polling. In v3.x, this shortcut was moved to `hub.helpers.evaluate()`.
+The `model` param was renamed to `agent`, and a `project` parameter is required when running a remote evaluation.
 
 ```python
 # main.py
-# v2.x
-eval_run = hub.evaluate(model=my_model, dataset=my_dataset, name="eval run")
-eval_run.wait_for_completion()
-eval_run.print_metrics()
+# v2.x — remote evaluation
+remote_eval = hub.evaluate(model=my_model, dataset=my_dataset, name="eval run")
+remote_eval.wait_for_completion()
+remote_eval.print_metrics()
 
-# v3.x — remote evaluation
-evaluation = hub.evaluations.create(
+# v3.x
+remote_eval = hub.evaluations.create(
     name="eval run",
-    project_id=project_id,
-    agent_id=agent_id,
-    dataset_id=dataset_id,
+    project=my_project, # my_project.id
+    agent=my_agent, # or my_agent.id
+    dataset=my_dataset, # or my_dataset.id
 )
 
-evaluation = hub.helpers.wait_for_completion(evaluation)
+remote_eval = hub.helpers.wait_for_completion(evaluation)
 
-results = hub.evaluations.results.list(evaluation.id)
+hub.evaluations.results.list(remote_eval.id)
 ```
 
-For local Python agents, use `create_local()`. Unlike v2.x, v3.x requires you to manually fetch the test cases and submit outputs for each one:
+For local Python agents, use `hub.helpers.evaluate()` passing a `Callable` as `agent`:
 
 ```python
 # main.py
@@ -141,32 +142,15 @@ For local Python agents, use `create_local()`. Unlike v2.x, v3.x requires you to
 def my_agent(messages):
     return "Hello from local model"
 
-eval_run = hub.evaluate(model=my_agent, dataset=my_dataset, name="local run")
+local_eval = hub.evaluate(model=my_agent, dataset=my_dataset, name="local run")
 
 # v3.x
-from giskard_hub.types import ChatMessage
+from giskard_hub.types import ChatMessage, AgentOutput
 
-def my_agent(messages: list[ChatMessage]) -> ChatMessage:
-    return ChatMessage(role="assistant", content="Hello from local model")
+def my_agent(messages: list[ChatMessage]) -> str | ChatMessage | AgentOutput:
+    return "Hello from local model"
 
-evaluation = hub.evaluations.create_local(
-    name="local run",
-    agent_info={"name": "my_agent", "description": "A simple local agent"},
-    dataste_id="dataset_id",
-)
-
-results = hub.evaluations.results.list(
-    evaluation_id=evaluation.id,
-    include=["test_case"],
-)
-
-for result in results:
-    agent_output = my_agent(result.test_case.messages)
-    hub.evaluations.results.submit_local_output(
-        evaluation_id=evaluation.id,
-        result_id=result.id,
-        output={"response": agent_output},
-    )
+eval_run = hub.helpers.evaluate(agent=my_agent, dataset=my_dataset, name="local run")
 ```
 
 ### 6. Response objects are now Pydantic models
@@ -182,9 +166,10 @@ print(project.name)
 # v3.x
 project = hub.projects.retrieve(project_id)
 print(project.name)
+print(project.model_dump()["name"])
 ```
 
-All data objects are Pydantic models, so you can use `.model_dump()`, `.model_dump_json()`, and standard Pydantic introspection.
+All data objects are now Pydantic models. This means you have access to convenient methods like `.model_dump()`, `.model_dump_json()`, and the full range of Pydantic introspection features. Note that you cannot access properties using square bracket syntax (e.g., `my_object["key"]`); instead, use `.model_dump()` to convert the object to a dictionary if you need key-based access.
 
 ### 7. Knowledge base creation — CSV support removed (since v2.0.0)
 
@@ -258,16 +243,15 @@ print(f"Pass rate: {passed / total * 100:.1f}%")
 | `hub.models.create(...)` | `hub.agents.create(...)` |
 | `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...])` |
 | `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
-| `hub.evaluate(model=, dataset=, name=)` | `hub.evaluations.create(project_id=, name=, agent_id=, dataset_id=, )` |
-| `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent_info={...}, dataset_id=, name=)` + manual output submission loop — see [Local evaluations](/hub/sdk/guides/evaluations#local-evaluations) |
+| `hub.evaluate(model=, dataset=, name=)` | `hub.helpers.evaluate(project=, agent=, dataset=, name=)` |
+| `hub.evaluate(model=fn, dataset=, name=)` | `hub.helpers.evaluate(agent=fn, dataset_id=, name=)` |
 | `eval_run.wait_for_completion()` | `eval_run = hub.helpers.wait_for_completion(eval_run)` |
 | `eval_run.print_metrics()` | Compute from `hub.evaluations.results.list(id)` |
 | `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...)` |
-| `kb.wait_for_completion()` | Poll `hub.knowledge_bases.retrieve(id).status` |
+| `kb.wait_for_completion()` | Poll `kb = hub.helpers.wait_for_completion(kb)` |
 | `hub.evaluations.create(model_id=, ...)` | `hub.evaluations.create(agent_id=, ...)` |
 | `hub.scans.create(model_id=, ...)` | `hub.scans.create(agent_id=, ...)` |
-| `hub.scheduled_evaluations.create(...)` | `hub.scheduled_evaluations.create(...)` |
-| `hub.checks.create(...)` | `hub.checks.create(...)` |
+| `hub.scheduled_evaluations.create(model_id=, ...)` | `hub.scheduled_evaluations.create(agent_id=, ...)` |
 
 ---
 

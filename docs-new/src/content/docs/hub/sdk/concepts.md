@@ -40,7 +40,7 @@ A **Project** is a workspace that groups all related resources: agents, datasets
 An **Agent** represents your LLM application. It can be:
 
 - A **remote agent** — an HTTP endpoint that the Hub calls with a list of chat messages and expects a response from.
-- A **local agent** — a Python function you pass directly when calling `hub.evaluations.create_local()`. Useful for evaluating models without exposing an HTTP endpoint.
+- A **local agent** — a Python function you pass directly when running a local evaluation. Useful for evaluating models without exposing an HTTP endpoint.
 
 Agents are configured with a URL, HTTP headers (for authentication), and the list of supported languages.
 
@@ -129,7 +129,7 @@ Each individual outcome is stored as a **Result** (`hub.evaluations.results`).
 
 ### Local evaluations
 
-You can also run evaluations against a local Python function using `hub.evaluations.create_local()`. Your local process calls the agent and collects its responses, then submits them to the Hub, which orchestrates the check runs and stores the results.
+You can also run evaluations against a local Python function using `hub.helpers.evaluate()`. Your local process calls the agent and collects its responses, then submits them to the Hub, which orchestrates the check runs and stores the results.
 
 **SDK resources:** `hub.evaluations`, `hub.evaluations.results`
 

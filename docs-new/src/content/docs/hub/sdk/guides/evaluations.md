@@ -31,6 +31,17 @@ evaluation = hub.helpers.wait_for_completion(evaluation)
 print(f"Evaluation completed with state: {evaluation.state}")
 ```
 
+Alternatively, you can run a remote evaluation using the convenient helper method:
+
+```python
+evaluation = hub.helpers.evaluate(
+    name="v2.2. regression run",
+    project=my_project, # giskard_hub.types.Project or str
+    dataset=my_dataset, # giskard_hub.types.Dataset or str
+    agent=my_agent,  # giskard_hub.types.Agent or str
+)
+```
+
 ### Filter by tags
 
 Run the evaluation only against test cases with specific tags:
@@ -65,12 +76,12 @@ evaluation = hub.evaluations.create(
 
 A local evaluation lets you run inference using a Python function in your process rather than an HTTP endpoint. This is ideal for evaluating models during development without exposing an API.
 
-The flow is manual: create the evaluation, fetch the results (which contain the test cases), call your agent for each one, and submit the outputs back to the Hub.
+Simply pass your callable as the `agent` parameter; this will automatically run a local evaluation.
 
 ```python
-from giskard_hub.types import ChatMessage
+from giskard_hub.types import ChatMessage, AgentOutput
 
-def my_agent(messages: list[ChatMessage]) -> ChatMessage:
+def my_agent(messages: list[ChatMessage]) -> str | ChatMessage | AgentOutput:
     # Call your local model or chain here
     user_input = messages[-1].content
 
@@ -79,25 +90,11 @@ def my_agent(messages: list[ChatMessage]) -> ChatMessage:
         content=f"Echo: {user_input}"  # replace with real inference
     )
 
-evaluation = hub.evaluations.create_local(
+evaluation = hub.helpers.evaluate(
+    dataset="dataset-id",
+    agent=my_agent,
     name="Local evaluation",
-    agent_info={"name": "my_agent", "description": "A simple echo agent"},
-    dataset_id="dataset-id",
 )
-
-results = hub.evaluations.results.list(
-    evaluation_id=evaluation.id,
-    include=["test_case"],
-)
-
-for result in results:
-    messages = result.test_case.messages
-    agent_output = my_agent(messages)
-    hub.evaluations.results.submit_local_output(
-        evaluation_id=evaluation.id,
-        result_id=result.id,
-        output={"response": agent_output},
-    )
 ```
 
 ---

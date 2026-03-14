@@ -70,7 +70,7 @@ hub.agents.update("agent-id", description=description)
 
 ### Using a local Python function as an agent
 
-For evaluations where you don't want to expose an HTTP endpoint — for example, when evaluating a model locally during development — pass a Python callable to `hub.evaluations.create_local()`. See [Evaluations](/hub/sdk/guides/evaluations#local-evaluations) for details.
+For evaluations where you don't want to expose an HTTP endpoint — for example, when evaluating a model locally during development — pass a Python callable to `hub.helpers.evaluate()`. See [Evaluations](/hub/sdk/guides/evaluations#local-evaluations) for details.
 
 ### List, update, and delete agents
 
