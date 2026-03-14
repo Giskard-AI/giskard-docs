@@ -18,10 +18,10 @@ from giskard_hub import HubClient
 hub = HubClient()
 
 evaluation = hub.evaluations.create(
+    name="v2.1 regression run",
     project_id="project-id",
     agent_id="agent-id",
-    criteria={"dataset_id": "dataset-id"},
-    name="v2.1 regression run",
+    dataset_id="dataset-id",
 )
 
 print(evaluation.id)
@@ -38,10 +38,11 @@ Run the evaluation only against test cases with specific tags:
 
 ```python
 evaluation = hub.evaluations.create(
+    name="Shipping-only run",
     project_id="project-id",
     agent_id="agent-id",
-    criteria={"dataset_id": "dataset-id", "tags": ["shipping"]},
-    name="Shipping-only run",
+    dataset_id="dataset-id",
+    tags=["shipping"],
 )
 ```
 
@@ -51,11 +52,11 @@ Set `run_count` to run each test case multiple times (useful for measuring consi
 
 ```python
 evaluation = hub.evaluations.create(
+    name="Consistency check — 3x",
     project_id="project-id",
     agent_id="agent-id",
-    criteria={"dataset_id": "dataset-id"},
+    dataset_id="dataset-id",
     run_count=3,
-    name="Consistency check — 3x",
 )
 ```
 
@@ -196,10 +197,10 @@ from giskard_hub import HubClient
 hub = HubClient()
 
 evaluation = hub.evaluations.create(
+    name=f"CI run — {os.environ.get('CI_COMMIT_SHA', 'local')}",
     project_id="project-id",
     agent_id="agent-id",
-    criteria={"dataset_id": "dataset-id"},
-    name=f"CI run — {os.environ.get('CI_COMMIT_SHA', 'local')}",
+    dataset_id="dataset-id",
 )
 
 try:

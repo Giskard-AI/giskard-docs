@@ -94,10 +94,10 @@ A common pattern is to automatically create tasks for every failed test case aft
 import time
 
 evaluation = hub.evaluations.create(
+    name="CI run",
     project_id="project-id",
     agent_id="agent-id",
-    criteria={"dataset_id": "dataset-id"},
-    name="CI run",
+    dataset_id="dataset-id",
 )
 
 evaluation = hub.helpers.wait_for_completion(evaluation)

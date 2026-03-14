@@ -116,7 +116,7 @@ In v2.x, there was a top-level `hub.evaluate()` shortcut that combined evaluatio
 ```python
 # main.py
 # v2.x
-eval_run = hub.evaluate(model=my_model, dataset=my_dataset, name="run")
+eval_run = hub.evaluate(model=my_model, dataset=my_dataset, name="eval run")
 eval_run.wait_for_completion()
 eval_run.print_metrics()
 
@@ -124,10 +124,10 @@ eval_run.print_metrics()
 import time
 
 evaluation = hub.evaluations.create(
+    name="eval run",
     project_id=project_id,
     agent_id=agent_id,
-    criteria={"dataset_id": dataset_id},
-    name="run",
+    dataset_id=dataset_id,
 )
 
 evaluation = hub.helpers.wait_for_completion(evaluation)
@@ -218,9 +218,9 @@ hub.knowledge_bases.create(
 )
 ```
 
-### 8. `model_id` → `agent_id`, and `dataset_id` moved into `criteria`
+### 8. `model_id` → `agent_id`
 
-In v2.x, the evaluation resource used `model_id` to refer to the agent and `dataset_id` as a direct parameter. In v3.x, use `agent_id` and wrap `dataset_id` inside a `criteria` dict:
+In v2.x, the evaluation resource used `model_id` to refer to the agent. In v3.x, use `agent_id`:
 
 ```python
 # main.py
@@ -228,7 +228,7 @@ In v2.x, the evaluation resource used `model_id` to refer to the agent and `data
 hub.evaluations.create(model_id=model_id, dataset_id=dataset_id, ...)
 
 # v3.x
-hub.evaluations.create(agent_id=agent_id, criteria={"dataset_id": dataset_id}, ...)
+hub.evaluations.create(agent_id=agent_id, dataset_id=dataset_id, ...)
 ```
 
 ### 9. `EvaluationRun.metrics` shape changed
@@ -259,9 +259,8 @@ print(f"Pass rate: {passed / total * 100:.1f}%")
 |---|---|
 | `hub.models.create(...)` | `hub.agents.create(...)` |
 | `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...])` |
-| `hub.datasets.create(...)` | `hub.datasets.create(...)` |
 | `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
-| `hub.evaluate(model=, dataset=, name=)` | `hub.evaluations.create(agent_id=, criteria={"dataset_id": ...}, ...)` |
+| `hub.evaluate(model=, dataset=, name=)` | `hub.evaluations.create(project_id=, name=, agent_id=, dataset_id=, )` |
 | `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent=..., criteria=[...], ...)` + manual output submission loop — see [Local evaluations](/hub/sdk/guides/evaluations#local-evaluations) |
 | `eval_run.wait_for_completion()` | `eval_run = hub.helpers.wait_for_completion(eval_run)` |
 | `eval_run.print_metrics()` | Compute from `hub.evaluations.results.list(id)` |
