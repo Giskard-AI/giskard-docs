@@ -81,9 +81,9 @@ def my_agent(messages: list[ChatMessage]) -> ChatMessage:
     )
 
 evaluation = hub.evaluations.create_local(
-    agent={"name": "my_agent", "description": "A simple echo agent"},
-    criteria=[{"dataset_id": "dataset-id"}],
     name="Local evaluation",
+    agent_info={"name": "my_agent", "description": "A simple echo agent"},
+    dataset_id="dataset-id",
 )
 
 results = hub.evaluations.results.list(

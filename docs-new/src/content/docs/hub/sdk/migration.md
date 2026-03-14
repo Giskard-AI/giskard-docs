@@ -152,9 +152,9 @@ def my_agent(messages: list[ChatMessage]) -> ChatMessage:
     return ChatMessage(role="assistant", content="Hello from local model")
 
 evaluation = hub.evaluations.create_local(
-    agent={"name": "my_agent", "description": "A simple local agent"},
-    criteria=[{"dataset_id": dataset_id}],
     name="local run",
+    agent_info={"name": "my_agent", "description": "A simple local agent"},
+    dataste_id="dataset_id",
 )
 
 results = hub.evaluations.results.list(
@@ -261,7 +261,7 @@ print(f"Pass rate: {passed / total * 100:.1f}%")
 | `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...])` |
 | `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
 | `hub.evaluate(model=, dataset=, name=)` | `hub.evaluations.create(project_id=, name=, agent_id=, dataset_id=, )` |
-| `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent=..., criteria=[...], ...)` + manual output submission loop — see [Local evaluations](/hub/sdk/guides/evaluations#local-evaluations) |
+| `hub.evaluate(model=fn, dataset=, name=)` | `hub.evaluations.create_local(agent_info={...}, dataset_id=, name=)` + manual output submission loop — see [Local evaluations](/hub/sdk/guides/evaluations#local-evaluations) |
 | `eval_run.wait_for_completion()` | `eval_run = hub.helpers.wait_for_completion(eval_run)` |
 | `eval_run.print_metrics()` | Compute from `hub.evaluations.results.list(id)` |
 | `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...)` |
