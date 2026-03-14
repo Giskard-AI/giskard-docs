@@ -121,8 +121,6 @@ eval_run.wait_for_completion()
 eval_run.print_metrics()
 
 # v3.x — remote evaluation
-import time
-
 evaluation = hub.evaluations.create(
     name="eval run",
     project_id=project_id,

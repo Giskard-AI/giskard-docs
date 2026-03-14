@@ -87,8 +87,6 @@ Your agent endpoint must accept a JSON body with a `messages` array and return a
 Before building a dataset, run a quick scan to surface security weaknesses in your agent:
 
 ```python
-import time
-
 scan = hub.scans.create(
     project_id=project.id,
     agent_id=agent.id,
@@ -97,9 +95,7 @@ scan = hub.scans.create(
 
 print(f"Scan started: {scan.id}")
 
-while scan.status.state == "running":
-    time.sleep(10)
-    scan = hub.scans.retrieve(scan.id)
+scan = hub.helpers.wait_for_completion(scan)
 
 print(f"Scan complete. Grade: {scan.grade}")
 ```
@@ -143,8 +139,6 @@ The `checks` field controls which criteria are applied to each agent response â€
 Now trigger an evaluation that sends every test case to your agent and scores the responses:
 
 ```python
-import time
-
 evaluation = hub.evaluations.create(
     project_id=project.id,
     agent_id=agent.id,
@@ -156,10 +150,7 @@ evaluation = hub.evaluations.create(
 
 print(f"Evaluation started: {evaluation.id}")
 
-# Poll until the evaluation completes
-while evaluation.status.state == "running":
-    time.sleep(5)
-    evaluation = hub.evaluations.retrieve(evaluation.id)
+evaluation = hub.helpers.wait_for_completion(evaluation)
 
 print("Evaluation complete!")
 ```

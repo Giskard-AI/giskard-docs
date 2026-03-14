@@ -10,7 +10,6 @@ A **Scan** runs a set of automated adversarial probes against your agent to dete
 ## Launch a scan
 
 ```python
-import time
 from giskard_hub import HubClient
 
 hub = HubClient()
@@ -188,7 +187,6 @@ Use scans as a security gate in your CI/CD pipeline. Exit with a non-zero code i
 
 ```python
 import sys
-import time
 from giskard_hub import HubClient
 
 hub = HubClient()

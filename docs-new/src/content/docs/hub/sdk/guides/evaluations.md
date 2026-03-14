@@ -12,7 +12,6 @@ An **Evaluation** runs an agent against all test cases in a dataset, applies the
 A remote evaluation calls your registered agent's HTTP endpoint for every test case in the dataset.
 
 ```python
-import time
 from giskard_hub import HubClient
 
 hub = HubClient()
@@ -191,7 +190,6 @@ Use evaluations as a quality gate in your CI/CD pipeline. Exit with a non-zero c
 ```python
 import os
 import sys
-import time
 from giskard_hub import HubClient
 
 hub = HubClient()

@@ -91,8 +91,6 @@ hub.tasks.bulk_delete(task_ids=["task-id-1", "task-id-2"])
 A common pattern is to automatically create tasks for every failed test case after an evaluation:
 
 ```python
-import time
-
 evaluation = hub.evaluations.create(
     name="CI run",
     project_id="project-id",
