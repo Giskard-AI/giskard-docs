@@ -109,10 +109,9 @@ hub.test_cases.create(
 )
 ```
 
-### 5. `hub.evaluate()` convenience method removed
+### 5. `hub.evaluate()`, `entity.wait_for_completion()` and `entity.print_metrics()` moved to `hub.helpers`
 
-In v2.x, there was a top-level `hub.evaluate()` shortcut that combined evaluation creation and polling. In v3.x, this shortcut was moved to `hub.helpers.evaluate()`.
-The `model` param was renamed to `agent`, and a `project` parameter is required when running a remote evaluation.
+In v2.x, there was a top-level `hub.evaluate()` shortcut for creating both remote and local evaluations. In v3.x, this shortcut has been moved to `hub.helpers.evaluate()`. The `model` parameter was renamed to `agent`, and a `project` parameter is now required when running a remote evaluation. Entity methods such as `wait_for_completion()` and `print_metrics()` have also been moved to `hub.helpers.wait_for_completion()` and `hub.helpers.print_metrics()`.
 
 ```python
 # main.py
@@ -128,10 +127,8 @@ remote_eval = hub.evaluations.create(
     agent=my_agent, # or my_agent.id
     dataset=my_dataset, # or my_dataset.id
 )
-
 remote_eval = hub.helpers.wait_for_completion(evaluation)
-
-hub.evaluations.results.list(remote_eval.id)
+hub.helpers.print_metrics(remote_eval)
 ```
 
 For local Python agents, use `hub.helpers.evaluate()` passing a `Callable` as `agent`:
@@ -147,15 +144,15 @@ local_eval = hub.evaluate(model=my_agent, dataset=my_dataset, name="local run")
 # v3.x
 from giskard_hub.types import ChatMessage, AgentOutput
 
-def my_agent(messages: list[ChatMessage]) -> str | ChatMessage | AgentOutput:
+def my_agent(messages):
     return "Hello from local model"
 
-eval_run = hub.helpers.evaluate(agent=my_agent, dataset=my_dataset, name="local run")
+local_eval = hub.helpers.evaluate(agent=my_agent, dataset=my_dataset, name="local run")
 ```
 
 ### 6. Response objects are now Pydantic models
 
-In v2.x, most responses were plain Python objects with simple attribute access. In v3.x, all responses are wrapped in `pydantic.BaseModel`:
+In v2.x, most responses were plain Python objects with simple attribute access. In v3.x, responses return as `pydantic.BaseModel`:
 
 ```python
 # main.py
@@ -222,16 +219,19 @@ In v2.x, `eval_run.metrics` was a list of `Metric` objects with `.name` and `.pe
 # main.py
 # v2.x
 eval_run.wait_for_completion()
+
 for metric in eval_run.metrics:
     print(f"{metric.name}: {metric.percentage}%")
 
-# v3.x
-evaluation = hub.helpers.wait_for_completion(evaluation)
-results = hub.evaluations.results.list(evaluation.id)
+eval_run.print_metrics()
 
-total = len(results)
-passed = sum(1 for r in results if r.state == "passed")
-print(f"Pass rate: {passed / total * 100:.1f}%")
+# v3.x
+eval_run = hub.helpers.wait_for_completion(eval_run)
+
+for metric in eval_run.metrics:
+    print(f"{metric.name}: {metric.success_rate * 100}%")
+
+hub.helpers.print_metrics(eval_run)
 ```
 
 ---
@@ -245,10 +245,10 @@ print(f"Pass rate: {passed / total * 100:.1f}%")
 | `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
 | `hub.evaluate(model=, dataset=, name=)` | `hub.helpers.evaluate(project=, agent=, dataset=, name=)` |
 | `hub.evaluate(model=fn, dataset=, name=)` | `hub.helpers.evaluate(agent=fn, dataset_id=, name=)` |
-| `eval_run.wait_for_completion()` | `eval_run = hub.helpers.wait_for_completion(eval_run)` |
-| `eval_run.print_metrics()` | Compute from `hub.evaluations.results.list(id)` |
+| `entity.wait_for_completion()` | `entity = hub.helpers.wait_for_completion(entity)` |
+| `entity.print_metrics()` | `hub.helpers.print_metrics(entity)` |
 | `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...)` |
-| `kb.wait_for_completion()` | Poll `kb = hub.helpers.wait_for_completion(kb)` |
+| `kb.wait_for_completion()` | `kb = hub.helpers.wait_for_completion(kb)` |
 | `hub.evaluations.create(model_id=, ...)` | `hub.evaluations.create(agent_id=, ...)` |
 | `hub.scans.create(model_id=, ...)` | `hub.scans.create(agent_id=, ...)` |
 | `hub.scheduled_evaluations.create(model_id=, ...)` | `hub.scheduled_evaluations.create(agent_id=, ...)` |
