@@ -56,7 +56,7 @@ import asyncio
 async def main():
     hub = AsyncHubClient()
     projects = await hub.projects.list()
-    print(projects.data)
+    print(projects)
 
 asyncio.run(main())
 ```
@@ -91,11 +91,11 @@ from giskard_hub.types import Agent, AgentOutput, ChatMessage
 | `test_connection(**params)` | `AgentOutput` | Test an agent endpoint without registering |
 | `generate_description(agent_id)` | `str` | AI-generate a description for the agent |
 
-**`Agent` fields:** `id`, `name`, `description`, `url`, `project_id`, `supported_languages`, `headers`, `status`, `created_at`, `updated_at`
+**`Agent` fields:** `id`, `name`, `description`, `url`, `project_id`, `supported_languages`, `headers`, `created_at`, `updated_at`
 
-**`AgentOutput` fields:** `response` (`ChatMessage`), `metadata` (dict)
+**`AgentOutput` fields:** `response` (`ChatMessage`), `error` (`ExecutionError | None`), `metadata` (`dict | None`)
 
-**`ChatMessage` fields:** `role` (`"user"` | `"assistant"` | `"system"`), `content`
+**`ChatMessage` fields:** `role`, `content`
 
 ---
 
@@ -108,9 +108,9 @@ from giskard_hub.types import Audit, AuditDisplay
 | Method | Returns | Description |
 |---|---|---|
 | `search(**params)` | `Union[list[Audit], Tuple[list[Audit], APIPaginatedMetadata]]` | Search audit events with filters |
-| `list_entities(entity_id, entity_type, **params)` | `list[AuditDisplay]` | Audit history for a specific resource |
+| `list_entities(entity_id, entity_type, **params)` | `Union[list[AuditDisplay], Tuple[list[AuditDisplay], APIPaginatedMetadata]]` | Audit history for a specific resource |
 
-**Search params:** `query`, `filters` (dict — keys: `project_id`, `entity_type`, `entity_id`, `action`, `user_id`, each with `{"selected_options": [...]}` shape; `created_at` with `{"from": ..., "to": ...}` shape), `limit`, `offset`
+**Search params:** `query`, `filters` (dict — keys: `project_id`, `entity_type`, `entity_id`, `action`, `user_id`, each with `{"selected_options": [...]}` shape; `created_at` with `{"from": ..., "to": ...}` shape), `limit`, `offset`, `include_metadata`
 
 ---
 
@@ -118,7 +118,7 @@ from giskard_hub.types import Audit, AuditDisplay
 
 ```python
 from giskard_hub.types import (
-    Check,
+    Check, CheckResult,
     CorrectnessParams, ConformityParams, GroundednessParams,
     StringMatchParams, MetadataParams, SemanticSimilarityParams,
 )
@@ -129,11 +129,11 @@ from giskard_hub.types import (
 | `create(**params)` | `Check` | Create a custom check |
 | `retrieve(check_id)` | `Check` | Get a check by ID |
 | `update(check_id, **params)` | `Check` | Update check fields |
-| `list(**params)` | `list[Check]` | List checks, optionally filtered by `project_id` |
+| `list(**params)` | `list[Check]` | List checks for a `project_id` |
 | `delete(check_id)` | `None` | Delete a check |
 | `bulk_delete(**params)` | `None` | Delete multiple checks |
 
-**`Check` fields:** `id`, `identifier`, `name`, `description`, `project_id`, `params`
+**`Check` fields:** `id`, `built_in`, `identifier`, `name`, `description`, `project_id`, `params`, `created_at`, `updated_at`
 
 ---
 
@@ -158,7 +158,7 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
 | `list_test_cases(dataset_id)` | `list[TestCase]` | List all test cases in a dataset |
 | `search_test_cases(dataset_id, **params)` | `Union[list[TestCase], Tuple[list[TestCase], APIPaginatedMetadata]]` | Search test cases with filters |
 
-**`Dataset` fields:** `id`, `name`, `description`, `project_id`, `created_at`, `updated_at`
+**`Dataset` fields:** `id`, `name`, `description`, `project_id`, `status` (`TaskProgress`), `tags`, `state` (computed), `created_at`, `updated_at`
 
 ---
 
@@ -173,36 +173,54 @@ from giskard_hub.types import Evaluation, CheckResult, Metric, OutputAnnotation
 | `create(**params)` | `Evaluation` | Start a remote evaluation |
 | `create_local(**params)` | `Evaluation` | Start a local (in-process) evaluation |
 | `retrieve(evaluation_id, **params)` | `Evaluation` | Get evaluation by ID, optionally include agent/dataset |
-| `update(evaluation_id, **params)` | `Evaluation` | Update evaluation metadata |
+| `update(evaluation_id, **params)` | `Evaluation` | Update evaluation name |
 | `list(**params)` | `list[Evaluation]` | List evaluations |
 | `delete(evaluation_id)` | `None` | Delete an evaluation |
 | `bulk_delete(**params)` | `None` | Delete multiple evaluations |
 | `rerun_errored_results(evaluation_id)` | `Evaluation` | Rerun all errored results |
 | `run_single(**params)` | `list[CheckResult]` | Evaluate a single (input, output) pair ad hoc |
 
-**`Evaluation` fields:** `id`, `name`, `status` (object with `.state`), `agent_id`, `project_id`, `run_count`, `tags`, `metrics`, `created_at`
+**`Evaluation` fields:** `id`, `name`, `agent`, `dataset`, `criteria`, `project_id`, `local`, `metrics` (`list[Metric]`), `tags` (`list[Metric]`), `failure_categories`, `status` (`TaskProgress`), `state` (computed), `created_at`, `updated_at`
 
-**`create` params:** `project_id`, `agent_id`, `criteria` (dict with `dataset_id`), `name`, `tags` (filter by test case tags), `run_count`
+**`create` params:** `project_id`, `agent_id`, `dataset_id` (or `old_evaluation_id` to reuse a previous evaluation's dataset), `name`, `tags`, `run_count`
 
-**`create_local` params:** `agent` (dict with `name`, `description`), `criteria` (list of dicts with `dataset_id`), `name`, `tags`, `run_count`
+**`create_local` params:** `agent_info` (`{"name": ..., "description": ...}`), `dataset_id`, `name`, `tags`
 
 ### `hub.evaluations.results`
 
 ```python
-from giskard_hub.types.evaluation import TestCaseEvaluation, TaskState, FailureCategory
+from giskard_hub.types.evaluation import TestCaseEvaluation, FailureCategory, TaskState
 ```
 
 | Method | Returns | Description |
 |---|---|---|
 | `retrieve(result_id, *, evaluation_id, **params)` | `TestCaseEvaluation` | Get a single result |
-| `update(result_id, *, evaluation_id, **params)` | `TestCaseEvaluation` | Update result (review, comment) |
+| `update(result_id, *, evaluation_id, **params)` | `TestCaseEvaluation` | Update result failure category |
 | `list(evaluation_id, **params)` | `list[TestCaseEvaluation]` | List results for an evaluation |
 | `search(evaluation_id, **params)` | `Union[list[TestCaseEvaluation], Tuple[list[TestCaseEvaluation], APIPaginatedMetadata]]` | Search/filter results |
 | `rerun_test_case(result_id, *, evaluation_id)` | `TestCaseEvaluation` | Rerun a single result |
 | `submit_local_output(result_id, *, evaluation_id, **params)` | `TestCaseEvaluation` | Submit output for a local evaluation step |
 | `update_visibility(result_id, *, evaluation_id, **params)` | `TestCaseEvaluation` | Show/hide a result |
 
-**`TestCaseEvaluation` fields:** `id`, `evaluation_id`, `test_case` (nested object with `.id`), `state`, `results` (list of check results with `.name` and `.passed`), `output`, `reviewed`, `visible`, `created_at`
+**`TestCaseEvaluation` fields:** `id`, `evaluation_id`, `test_case` (`TestCase | TestCaseReference`), `test_case_exists`, `state`, `results` (`list[Result]` — each with `.name`, `.passed`, `.reason`, `.status`), `output` (`AgentOutput | None`), `error`, `failure_category`, `hidden`, `created_at`, `updated_at`
+
+---
+
+## `hub.helpers`
+
+```python
+from giskard_hub.types import Evaluation, ChatMessage
+```
+
+| Method | Returns | Description |
+|---|---|---|
+| `wait_for_completion(entity, **params)` | entity type | Poll until entity leaves running state |
+| `evaluate(**params)` | `Evaluation` | Run evaluation with remote or local agent |
+| `print_metrics(entity)` | `None` | Print evaluation or scan metrics to console |
+
+**`wait_for_completion` params:** `poll_interval` (default `5.0`), `max_retries` (default `360`), `running_states`, `error_states`, `raise_on_error`
+
+**`evaluate` params:** `agent` (`str | Agent | Callable`), `dataset` (`str | Dataset`), `project` (required for remote agents), `name`, `tags`
 
 ---
 
@@ -224,12 +242,12 @@ from giskard_hub.types import (
 | `list(**params)` | `list[KnowledgeBase]` | List knowledge bases by `project_id` |
 | `delete(knowledge_base_id)` | `None` | Delete a knowledge base |
 | `bulk_delete(**params)` | `None` | Delete multiple knowledge bases |
-| `search_documents(knowledge_base_id, **params)` | `Union[list[KnowledgeBaseDocumentRow], Tuple[list[KnowledgeBaseDocumentRow], APIPaginatedMetadata]]` | Semantic search over documents |
+| `search_documents(knowledge_base_id, **params)` | `Union[list[KnowledgeBaseDocumentRow], Tuple[list[KnowledgeBaseDocumentRow], APIPaginatedMetadata]]` | Search over documents |
 | `retrieve_document(knowledge_base_id, document_id)` | `KnowledgeBaseDocumentDetail` | Get a specific document |
 
-**`KnowledgeBase` fields:** `id`, `name`, `description`, `project_id`, `status`, `document_count`, `created_at`
+**`KnowledgeBase` fields:** `id`, `name`, `description`, `filename`, `project_id`, `n_documents`, `status` (`TaskProgress`), `topics`, `state` (computed), `created_at`, `updated_at`
 
-**`create` params:** `project_id`, `name`, `description`, `file` (a `(filename, bytes)` tuple for in-memory data, or a `pathlib.Path` for a file on disk — JSON/JSONL where each record has `text` and optional `topic`)
+**`create` params:** `project_id`, `name`, `description`, `file` (a `(filename, bytes)` tuple for in-memory data, or a `pathlib.Path` for a file on disk — JSON/JSONL where each record has `text` and optional `topic`), `document_column`, `topic_column`
 
 ---
 
@@ -248,7 +266,7 @@ from giskard_hub.types import Project
 | `delete(project_id)` | `None` | Delete a project |
 | `bulk_delete(**params)` | `None` | Delete multiple projects |
 
-**`Project` fields:** `id`, `name`, `description`, `created_at`, `updated_at`
+**`Project` fields:** `id`, `name`, `description`, `failure_categories`, `created_at`, `updated_at`
 
 ### `hub.projects.scenarios`
 
@@ -283,7 +301,7 @@ from giskard_hub.types import Scan, ScanCategory, ScanProbe
 | `list_categories()` | `list[ScanCategory]` | List all available scan categories/tags |
 | `list_probes(scan_id)` | `list[ScanProbe]` | List probe results for a scan |
 
-**`Scan` fields:** `id`, `status`, `grade`, `agent_id`, `knowledge_base_id`, `tags`, `created_at`
+**`Scan` fields:** `id`, `agent`, `project_id`, `knowledge_base`, `grade` (`"A"` .. `"D"` or `None`), `status` (`TaskProgress`), `state` (computed), `created_at`, `updated_at`
 
 **`create` params:** `project_id`, `agent_id`, `knowledge_base_id` (optional), `tags` (list of OWASP/Giskard tag strings)
 
@@ -308,9 +326,9 @@ from giskard_hub.types.scan import ScanProbeAttempt, ReviewStatus, Severity
 |---|---|---|
 | `update(probe_attempt_id, **params)` | `ScanProbeAttempt` | Update review status or severity of an attempt |
 
-**`ReviewStatus` values:** `"pending"`, `"reviewed"`, `"false_positive"`
+**`ReviewStatus` values:** `"pending"`, `"ignored"`, `"acknowledged"`, `"corrected"`
 
-**`Severity` values:** `"low"`, `"medium"`, `"high"`, `"critical"`
+**`Severity` values:** `SAFE` (0), `MINOR` (10), `MAJOR` (20), `CRITICAL` (30) — `IntEnum`
 
 ---
 
@@ -330,7 +348,7 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
 | `bulk_delete(**params)` | `None` | Delete multiple schedules |
 | `list_evaluations(scheduled_evaluation_id, **params)` | `list[Evaluation]` | List past evaluation runs for a schedule |
 
-**`create` params:** `project_id`, `agent_id`, `dataset_id`, `name`, `frequency` (`"daily"` | `"weekly"` | `"monthly"`), `time`, `day_of_week`, `day_of_month`
+**`create` params:** `project_id`, `agent_id`, `dataset_id`, `name`, `frequency` (`"daily"` | `"weekly"` | `"monthly"`), `time`, `day_of_week`, `day_of_month`, `tags`, `run_count`
 
 ---
 
@@ -351,9 +369,9 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
 
 **`TaskStatus` values:** `"open"`, `"in_progress"`, `"resolved"`
 
-**`TaskPriority` values:** `"low"`, `"medium"`, `"high"`, `"critical"`
+**`TaskPriority` values:** `"low"`, `"medium"`, `"high"`
 
-**`Task` fields:** `id`, `title`, `description`, `status`, `priority`, `project_id`, `created_at`, `updated_at`
+**`Task` fields:** `id`, `description`, `status`, `priority`, `project_id`, `created_by`, `assignees`, `references`, `created_at`, `updated_at`
 
 ---
 
@@ -373,9 +391,9 @@ from giskard_hub.types import TestCase, TestCaseComment, TestCaseCheckConfig, Ch
 | `bulk_update(**params)` | `list[TestCase]` | Update multiple test cases |
 | `bulk_move(**params)` | `None` | Move test cases to another dataset |
 
-**`TestCase` fields:** `id`, `dataset_id`, `messages`, `demo_output`, `checks`, `tags`, `created_at`
+**`TestCase` fields:** `id`, `dataset_id`, `messages`, `demo_output`, `checks`, `comments`, `tags`, `created_at`, `updated_at`
 
-**`create` params:** `dataset_id`, `messages` (list of `{role, content}`), `demo_output` (`{role, content}`), `checks` (list of `{identifier, params}`), `tags`
+**`create` params:** `dataset_id`, `messages` (list of `{role, content}`), `demo_output` (`{role, content}`), `checks` (list of `{identifier, params, enabled}`), `tags`, `status` (`"active"` | `"draft"`)
 
 ### `hub.test_cases.comments`
 
@@ -429,7 +447,7 @@ from giskard_hub import HubClient, NotFoundError, AuthenticationError
 hub = HubClient()
 
 try:
-    agent = hub.agents.retrieve("nonexistent-id").data
+    agent = hub.agents.retrieve("nonexistent-id")
 except NotFoundError:
     print("Agent not found")
 except AuthenticationError:
