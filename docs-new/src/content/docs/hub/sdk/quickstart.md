@@ -142,9 +142,7 @@ Now trigger an evaluation that sends every test case to your agent and scores th
 evaluation = hub.evaluations.create(
     project_id=project.id,
     agent_id=agent.id,
-    criteria={
-        "dataset_id": dataset.id,
-    },
+    dataset_id=dataset.id,
     name="v1 baseline",
 )
 
