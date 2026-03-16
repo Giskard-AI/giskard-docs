@@ -4,9 +4,10 @@ sidebar:
   order: 6
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
-Input generators for creating dynamic test data and simulating user interactions.
+Input generators for creating dynamic test data and simulating user
+interactions.
 
 ---
 
@@ -18,15 +19,17 @@ Simulate user behavior in multi-turn conversations or workflows.
 
 ### Description
 
-`UserSimulator` uses an LLM to simulate realistic user inputs based on instructions and conversation context. This is particularly useful for testing conversational AI agents or chatbots with dynamic, realistic user interactions.
+`UserSimulator` uses an LLM to simulate realistic user inputs based on
+instructions and conversation context. This is particularly useful for testing
+conversational AI agents or chatbots with dynamic, realistic user interactions.
 
 ### Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `instructions` | `str` | required | Instructions defining the user's behavior and goals |
-| `max_steps` | `int` | `10` | Maximum number of interaction steps to generate |
-| `generator` | `BaseGenerator \| None` | `None` | LLM generator for simulating user behavior |
+| Attribute      | Type                    | Default  | Description                                         |
+| -------------- | ----------------------- | -------- | --------------------------------------------------- |
+| `instructions` | `str`                   | required | Instructions defining the user's behavior and goals |
+| `max_steps`    | `int`                   | `10`     | Maximum number of interaction steps to generate     |
+| `generator`    | `BaseGenerator \| None` | `None`   | LLM generator for simulating user behavior          |
 
 ### Creating User Simulators
 
@@ -44,7 +47,7 @@ user_sim = UserSimulator(
     - Be polite and patient
     """,
     max_steps=5,
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 ```
 
@@ -58,12 +61,14 @@ test_scenario = (
     Scenario("booking_flow")
     .interact(
         inputs=user_sim,  # Use simulator for inputs
-        outputs=lambda inputs: booking_agent(inputs)
+        outputs=lambda inputs: booking_agent(inputs),
     )
-    .check(from_fn(
-        lambda trace: "booked" in trace.last.outputs.lower(),
-        name="booking_completed"
-    ))
+    .check(
+        from_fn(
+            lambda trace: "booked" in trace.last.outputs.lower(),
+            name="booking_completed",
+        )
+    )
 )
 
 result = await test_scenario.run()
@@ -83,23 +88,24 @@ support_sim = UserSimulator(
     - Accept a solution if offered (refund or replacement)
     """,
     max_steps=10,
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 
 test_scenario = (
-    Scenario("support_escalation")
-    .interact(
-        inputs=support_sim,
-        outputs=lambda inputs: support_agent(inputs)
+    Scenario("support_escalation").interact(
+        inputs=support_sim, outputs=lambda inputs: support_agent(inputs)
     )
     # Check that issue was resolved
-    .check(from_fn(
-        lambda trace: any(
-            keyword in str(trace.last.metadata.get("resolution", "")).lower()
-            for keyword in ["refund", "replacement", "resolved"]
-        ),
-        name="issue_resolved"
-    ))
+    .check(
+        from_fn(
+            lambda trace: any(
+                keyword
+                in str(trace.last.metadata.get("resolution", "")).lower()
+                for keyword in ["refund", "replacement", "resolved"]
+            ),
+            name="issue_resolved",
+        )
+    )
 )
 
 result = await test_scenario.run()
@@ -118,15 +124,11 @@ goal_oriented_sim = UserSimulator(
     - Complete checkout
     """,
     max_steps=15,
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 
-test_scenario = (
-    Scenario("product_search")
-    .interact(
-        inputs=goal_oriented_sim,
-        outputs=lambda inputs: ecommerce_agent(inputs)
-    )
+test_scenario = Scenario("product_search").interact(
+    inputs=goal_oriented_sim, outputs=lambda inputs: ecommerce_agent(inputs)
 )
 
 result = await test_scenario.run()
@@ -148,10 +150,10 @@ Output format for user simulator results.
 
 ### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `goal_reached` | `bool` | Whether the simulator achieved its goal |
-| `message` | `str \| None` | Optional message about the simulation outcome |
+| Attribute      | Type          | Description                                   |
+| -------------- | ------------- | --------------------------------------------- |
+| `goal_reached` | `bool`        | Whether the simulator achieved its goal       |
+| `message`      | `str \| None` | Optional message about the simulation outcome |
 
 ### Accessing Simulator Output
 
@@ -182,13 +184,15 @@ Base class for creating custom input generators.
 
 ### Description
 
-`InputGenerator` is the abstract base class for all input generators. Extend it to create custom generators for dynamic test data generation.
+`InputGenerator` is the abstract base class for all input generators. Extend it
+to create custom generators for dynamic test data generation.
 
 ### Creating Custom Generators
 
 ```python
 from giskard.checks.core.input_generator import InputGenerator
 from giskard.checks import Scenario
+
 
 class SequentialInputGenerator(InputGenerator):
     """Generate sequential inputs from a list."""
@@ -206,19 +210,12 @@ class SequentialInputGenerator(InputGenerator):
         self.index += 1
         return input_value
 
-# Use custom generator
-gen = SequentialInputGenerator([
-    "Hello",
-    "How are you?",
-    "Goodbye"
-])
 
-test_scenario = (
-    Scenario("sequential_test")
-    .interact(
-        inputs=gen,
-        outputs=lambda inputs: chatbot(inputs)
-    )
+# Use custom generator
+gen = SequentialInputGenerator(["Hello", "How are you?", "Goodbye"])
+
+test_scenario = Scenario("sequential_test").interact(
+    inputs=gen, outputs=lambda inputs: chatbot(inputs)
 )
 ```
 
@@ -227,6 +224,7 @@ test_scenario = (
 ```python
 import random
 from giskard.checks.core.input_generator import InputGenerator
+
 
 class RandomQuestionGenerator(InputGenerator):
     """Generate random questions from a pool."""
@@ -238,12 +236,13 @@ class RandomQuestionGenerator(InputGenerator):
         """Generate a random question."""
         return random.choice(self.question_pool)
 
+
 # Use in testing
 questions = [
     "What's the weather like?",
     "Tell me a joke",
     "What time is it?",
-    "How can you help me?"
+    "How can you help me?",
 ]
 
 gen = RandomQuestionGenerator(questions)
@@ -251,10 +250,9 @@ gen = RandomQuestionGenerator(questions)
 test_scenario = (
     Scenario("random_qa")
     .interact(inputs=gen, outputs=lambda inputs: assistant(inputs))
-    .check(from_fn(
-        lambda trace: len(trace.last.outputs) > 0,
-        name="has_response"
-    ))
+    .check(
+        from_fn(lambda trace: len(trace.last.outputs) > 0, name="has_response")
+    )
 )
 ```
 
@@ -262,6 +260,7 @@ test_scenario = (
 
 ```python
 from giskard.checks.core.input_generator import InputGenerator
+
 
 class ContextAwareGenerator(InputGenerator):
     """Generate inputs based on conversation context."""
@@ -284,11 +283,11 @@ class ContextAwareGenerator(InputGenerator):
 
         return "Thank you"
 
+
 gen = ContextAwareGenerator(strategy="follow_up")
 
-test_scenario = (
-    Scenario("context_test")
-    .interact(inputs=gen, outputs=lambda inputs: agent(inputs))
+test_scenario = Scenario("context_test").interact(
+    inputs=gen, outputs=lambda inputs: agent(inputs)
 )
 ```
 
@@ -312,20 +311,21 @@ customer_sim = UserSimulator(
     - Accept a solution if reasonable
     """,
     max_steps=8,
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 
 test_flow = (
     Scenario("customer_service")
     .interact(
-        inputs=customer_sim,
-        outputs=lambda inputs: customer_service_bot(inputs)
+        inputs=customer_sim, outputs=lambda inputs: customer_service_bot(inputs)
     )
-    .check(from_fn(
-        lambda trace: "solution" in str(trace.last.metadata).lower() or
-                     "replacement" in str(trace.last.outputs).lower(),
-        name="solution_offered"
-    ))
+    .check(
+        from_fn(
+            lambda trace: "solution" in str(trace.last.metadata).lower()
+            or "replacement" in str(trace.last.outputs).lower(),
+            name="solution_offered",
+        )
+    )
 )
 
 result = await test_flow.run()
@@ -355,12 +355,11 @@ for persona in personas:
     sim = UserSimulator(
         instructions=persona["instructions"],
         max_steps=5,
-        generator=Generator(model="openai/gpt-4")
+        generator=Generator(model="openai/gpt-4"),
     )
 
-    test_scenario = (
-        Scenario(persona["name"])
-        .interact(inputs=sim, outputs=lambda inputs: agent(inputs))
+    test_scenario = Scenario(persona["name"]).interact(
+        inputs=sim, outputs=lambda inputs: agent(inputs)
     )
 
     results[persona["name"]] = await test_scenario.run()
@@ -384,16 +383,18 @@ rapid_fire_sim = UserSimulator(
     Be concise and move quickly between topics.
     """,
     max_steps=10,
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 
 stress_test = (
     Scenario("rapid_fire")
     .interact(inputs=rapid_fire_sim, outputs=lambda inputs: agent(inputs))
-    .check(from_fn(
-        lambda trace: len(trace.interactions) >= 5,
-        name="handled_multiple_questions"
-    ))
+    .check(
+        from_fn(
+            lambda trace: len(trace.interactions) >= 5,
+            name="handled_multiple_questions",
+        )
+    )
 )
 
 result = await stress_test.run()
@@ -403,6 +404,9 @@ result = await stress_test.run()
 
 ## See Also
 
-- [Core API](/oss/checks/reference/core/) - Trace, Interaction, and InteractionSpec
-- [Scenarios](/oss/checks/reference/scenarios/) - Building multi-step test workflows
-- [Built-in Checks](/oss/checks/reference/builtin-checks/) - Validation checks for generated interactions
+- [Core API](/oss/checks/reference/core/) - Trace, Interaction, and
+  InteractionSpec
+- [Scenarios](/oss/checks/reference/scenarios/) - Building multi-step test
+  workflows
+- [Built-in Checks](/oss/checks/reference/checks/) - Validation checks for
+  generated interactions

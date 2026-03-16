@@ -1,11 +1,13 @@
 ---
 title: Chatbot Testing
 sidebar:
-  order: 4
+  order: 3
 ---
 
-This tutorial covers testing conversational AI systems, including
-context handling, tone consistency, and multi-turn dialogue flows.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/use-cases/chatbot-testing.ipynb)
+
+This example walks through testing conversational AI systems, including context
+handling, tone consistency, and multi-turn dialogue flows.
 
 ## Introduction
 
@@ -25,15 +27,23 @@ Our tests will validate:
 
 ## Building a Chatbot
 
+To get started, we'll implement a chatbot that returns a structured
+`ChatResponse` rather than a plain string. This gives your checks access to the
+internal `ConversationContext` — so you can assert that the bot stored a name,
+detected a conversation type, or suggested an action, not just that it produced
+some text.
+
 First, let's create a simple chatbot:
 
-``` python
+```python
 from typing import Optional, Literal
 from pydantic import BaseModel
+
 
 class Message(BaseModel):
     role: Literal["user", "assistant", "system"]
     content: str
+
 
 class ConversationContext(BaseModel):
     user_name: Optional[str] = None
@@ -41,10 +51,12 @@ class ConversationContext(BaseModel):
     conversation_type: str = "casual"
     topic: Optional[str] = None
 
+
 class ChatResponse(BaseModel):
     message: str
     context: ConversationContext
     suggested_actions: list[str] = []
+
 
 class SimpleChatbot:
     def __init__(self, personality: str = "friendly"):
@@ -67,7 +79,7 @@ class SimpleChatbot:
         return ChatResponse(
             message=response_text,
             context=self.context.model_copy(),
-            suggested_actions=self._suggest_actions()
+            suggested_actions=self._suggest_actions(),
         )
 
     def _update_context(self, message: str):
@@ -85,37 +97,52 @@ class SimpleChatbot:
         # Extract email
         if "@" in message:
             import re
-            emails = re.findall(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', message)
+
+            pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+            emails = re.findall(pattern, message)
             if emails:
                 self.context.user_email = emails[0]
 
         # Detect conversation type
-        if any(word in message_lower for word in ["help", "support", "problem", "issue"]):
+        support_words = ["help", "support", "problem", "issue"]
+        sales_words = ["buy", "purchase", "price", "cost"]
+        if any(word in message_lower for word in support_words):
             self.context.conversation_type = "support"
-        elif any(word in message_lower for word in ["buy", "purchase", "price", "cost"]):
+        elif any(word in message_lower for word in sales_words):
             self.context.conversation_type = "sales"
 
     def _generate_response(self, message: str) -> str:
         """Generate appropriate response based on context."""
         # Greeting
-        if any(greeting in message.lower() for greeting in ["hello", "hi", "hey"]):
+        greetings = ["hello", "hi", "hey"]
+        if any(greeting in message.lower() for greeting in greetings):
             if self.context.user_name:
-                return f"Hello {self.context.user_name}! How can I help you today?"
+                return (
+                    f"Hello {self.context.user_name}! "
+                    "How can I help you today?"
+                )
             return "Hello! How can I help you today?"
 
         # Name recall
-        if "what is my name" in message.lower() or "do you know my name" in message.lower():
+        msg_lower = message.lower()
+        if "what is my name" in msg_lower or "do you know my name" in msg_lower:
             if self.context.user_name:
                 return f"Yes, your name is {self.context.user_name}."
             return "I don't believe you've told me your name yet."
 
         # Support queries
         if self.context.conversation_type == "support":
-            return "I understand you need help. Let me connect you with our support team. Could you describe your issue in detail?"
+            return (
+                "I understand you need help. Let me connect you with our "
+                "support team. Could you describe your issue in detail?"
+            )
 
         # Sales queries
         if self.context.conversation_type == "sales":
-            return "I'd be happy to help you find the right product. What are you looking for?"
+            return (
+                "I'd be happy to help you find the right product. "
+                "What are you looking for?"
+            )
 
         # Default
         return "I understand. Could you tell me more about that?"
@@ -127,7 +154,11 @@ class SimpleChatbot:
         if not self.context.user_name:
             actions.append("introduce_yourself")
 
-        if self.context.conversation_type == "support" and not self.context.user_email:
+        is_support_without_email = (
+            self.context.conversation_type == "support"
+            and not self.context.user_email
+        )
+        if is_support_without_email:
             actions.append("provide_email")
 
         return actions
@@ -135,9 +166,14 @@ class SimpleChatbot:
 
 ## Test 1: Basic Conversation Flow
 
+With the chatbot in place, we can now write our first scenario. This three-turn
+exchange tests greeting, name introduction, and recall in a single run — each
+`.interact()` builds on the previous one so the test reads like the actual
+conversation it simulates.
+
 Test a simple greeting and name exchange:
 
-``` python
+```python
 from giskard.checks import Scenario, from_fn, StringMatching
 
 bot = SimpleChatbot()
@@ -145,28 +181,23 @@ bot = SimpleChatbot()
 test_scenario = (
     Scenario("greeting_and_introduction")
     # User greets
-    .interact(
-        inputs="Hello",
-        outputs=lambda inputs: bot.chat(inputs)
-    )
+    .interact(inputs="Hello", outputs=lambda inputs: bot.chat(inputs))
     .check(
         StringMatching(
             name="polite_greeting",
             keyword="help",
-            text_key="trace.last.outputs.message"
+            text_key="trace.last.outputs.message",
         )
     )
-
     # User introduces themselves
     .interact(
-        inputs="My name is Alice",
-        outputs=lambda inputs: bot.chat(inputs)
+        inputs="My name is Alice", outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
         StringMatching(
             name="acknowledges_name",
             keyword="Alice",
-            text_key="trace.last.outputs.message"
+            text_key="trace.last.outputs.message",
         )
     )
     .check(
@@ -174,46 +205,47 @@ test_scenario = (
             lambda trace: trace.last.outputs.context.user_name == "Alice",
             name="stored_name",
             success_message="Chatbot stored the user's name",
-            failure_message="Chatbot failed to store name"
+            failure_message="Chatbot failed to store name",
         )
     )
-
     # Verify name recall
     .interact(
-        inputs="What is my name?",
-        outputs=lambda inputs: bot.chat(inputs)
+        inputs="What is my name?", outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
         StringMatching(
             name="recalls_name",
             keyword="Alice",
-            text_key="trace.last.outputs.message"
+            text_key="trace.last.outputs.message",
         )
     )
 )
 
 import asyncio
 
+
 async def test_basic_conversation():
     result = await test_scenario.run()
     assert result.passed
     print("✓ Basic conversation flow test passed")
+
 
 asyncio.run(test_basic_conversation())
 ```
 
 ## Test 2: Context Switching
 
+Building on Test 1, we now verify that the chatbot correctly reclassifies the
+conversation as it evolves. The `Equals` check on `context.conversation_type` is
+more precise than checking the response text — it tests the bot's internal state
+directly, catching regressions in context-detection logic even if the response
+wording changes.
+
 Verify the chatbot handles different conversation types:
 
-``` python
+```python
 from giskard.agents.generators import Generator
-from giskard.checks import (
-    Scenario,
-    LLMJudge,
-    Equals,
-    set_default_generator
-)
+from giskard.checks import Scenario, LLMJudge, Equals, set_default_generator
 
 set_default_generator(Generator(model="openai/gpt-5-mini"))
 
@@ -222,28 +254,24 @@ bot = SimpleChatbot()
 test_scenario = (
     Scenario("context_switching")
     # Start with casual conversation
-    .interact(
-        inputs="Hi there!",
-        outputs=lambda inputs: bot.chat(inputs)
-    )
+    .interact(inputs="Hi there!", outputs=lambda inputs: bot.chat(inputs))
     .check(
         Equals(
             name="casual_context",
             expected="casual",
-            key="trace.last.outputs.context.conversation_type"
+            key="trace.last.outputs.context.conversation_type",
         )
     )
-
     # Switch to support
     .interact(
         inputs="I'm having a problem with my account",
-        outputs=lambda inputs: bot.chat(inputs)
+        outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
         Equals(
             name="support_context",
             expected="support",
-            key="trace.last.outputs.context.conversation_type"
+            key="trace.last.outputs.context.conversation_type",
         )
     )
     .check(
@@ -257,20 +285,18 @@ test_scenario = (
 
             The response should be helpful and professional.
             Return 'passed: true' if appropriate.
-            """
+            """,
         )
     )
-
     # Switch to sales
     .interact(
-        inputs="How much does it cost?",
-        outputs=lambda inputs: bot.chat(inputs)
+        inputs="How much does it cost?", outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
         Equals(
             name="sales_context",
             expected="sales",
-            key="trace.last.outputs.context.conversation_type"
+            key="trace.last.outputs.context.conversation_type",
         )
     )
 )
@@ -278,9 +304,15 @@ test_scenario = (
 
 ## Test 3: Response Quality and Tone
 
+Next, we'll evaluate properties that can't be captured by pattern matching —
+specifically, whether the bot sounds professional and whether its response is
+actually complete. Two separate `LLMJudge` checks are used here rather than one
+combined prompt so that each dimension reports its result independently, making
+it easier to diagnose which aspect failed.
+
 Evaluate response quality using LLM-as-a-judge:
 
-``` python
+```python
 from giskard.checks import Scenario, LLMJudge
 
 bot = SimpleChatbot(personality="professional")
@@ -289,7 +321,7 @@ tc = (
     Scenario("response_quality_test")
     .interact(
         inputs="I need help understanding your pricing",
-        outputs=lambda inputs: bot.chat(inputs)
+        outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
         LLMJudge(
@@ -307,7 +339,7 @@ tc = (
             3. Does it address the user's question?
 
             Return 'passed: true' if tone is appropriate.
-            """
+            """,
         )
     )
     .check(
@@ -325,7 +357,7 @@ tc = (
             3. Offer to help further?
 
             Return 'passed: true' if response is complete.
-            """
+            """,
         )
     )
 )
@@ -333,9 +365,14 @@ tc = (
 
 ## Test 4: Information Extraction and Storage
 
+Now we'll verify that information shared across turns is actually persisted in
+the context. This test is intentionally structured to introduce name and email
+in separate turns — the final interaction then confirms both fields are still
+intact, ruling out extraction bugs that clear previous data.
+
 Test the chatbot's ability to extract and remember user information:
 
-``` python
+```python
 from giskard.checks import Scenario, from_fn, Equals
 
 bot = SimpleChatbot()
@@ -344,44 +381,42 @@ test_scenario = (
     Scenario("information_collection")
     # Collect name
     .interact(
-        inputs="Hi, I'm Bob Johnson",
-        outputs=lambda inputs: bot.chat(inputs)
+        inputs="Hi, I'm Bob Johnson", outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
         Equals(
             name="extracted_name",
             expected="Bob",
-            key="trace.last.outputs.context.user_name"
+            key="trace.last.outputs.context.user_name",
         )
     )
-
     # Collect email
     .interact(
         inputs="My email is bob.johnson@example.com",
-        outputs=lambda inputs: bot.chat(inputs)
+        outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
         Equals(
             name="extracted_email",
             expected="bob.johnson@example.com",
-            key="trace.last.outputs.context.user_email"
+            key="trace.last.outputs.context.user_email",
         )
     )
-
     # Verify information persists
     .interact(
         inputs="Can you remind me what information you have about me?",
-        outputs=lambda inputs: bot.chat(inputs)
+        outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
         from_fn(
             lambda trace: (
-                trace.last.outputs.context.user_name == "Bob" and
-                trace.last.outputs.context.user_email == "bob.johnson@example.com"
+                trace.last.outputs.context.user_name == "Bob"
+                and trace.last.outputs.context.user_email
+                == "bob.johnson@example.com"
             ),
             name="information_persisted",
             success_message="Chatbot retained user information",
-            failure_message="Chatbot lost user information"
+            failure_message="Chatbot lost user information",
         )
     )
 )
@@ -389,9 +424,14 @@ test_scenario = (
 
 ## Test 5: Edge Cases and Error Handling
 
+With normal flows verified, we now stress-test the boundaries. Each of the three
+scenarios below targets a different failure mode — empty input, excessive
+length, and nonsense — so you can confirm the bot handles all of them gracefully
+before shipping.
+
 Test how the chatbot handles unusual inputs:
 
-``` python
+```python
 from giskard.checks import Scenario, from_fn, LLMJudge
 
 bot = SimpleChatbot()
@@ -401,16 +441,20 @@ tc_empty = (
     Scenario("empty_input_handling")
     .interact(
         inputs="",
-        outputs=lambda inputs: bot.chat(inputs) if inputs else ChatResponse(
-            message="I didn't receive a message. Could you try again?",
-            context=bot.context
-        )
+        outputs=lambda inputs: (
+            bot.chat(inputs)
+            if inputs
+            else ChatResponse(
+                message="I didn't receive a message. Could you try again?",
+                context=bot.context,
+            )
+        ),
     )
     .check(
         from_fn(
             lambda trace: len(trace.last.outputs.message) > 0,
             name="provides_response",
-            success_message="Bot provided a response to empty input"
+            success_message="Bot provided a response to empty input",
         )
     )
 )
@@ -418,15 +462,12 @@ tc_empty = (
 # Test very long input
 tc_long = (
     Scenario("long_input_handling")
-    .interact(
-        inputs="Hello " * 1000,
-        outputs=lambda inputs: bot.chat(inputs)
-    )
+    .interact(inputs="Hello " * 1000, outputs=lambda inputs: bot.chat(inputs))
     .check(
         from_fn(
             lambda trace: len(trace.last.outputs.message) > 0,
             name="handles_long_input",
-            success_message="Bot handled long input"
+            success_message="Bot handled long input",
         )
     )
 )
@@ -436,7 +477,7 @@ tc_gibberish = (
     Scenario("gibberish_handling")
     .interact(
         inputs="asdfghjkl qwertyuiop zxcvbnm",
-        outputs=lambda inputs: bot.chat(inputs)
+        outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
         LLMJudge(
@@ -453,7 +494,7 @@ tc_gibberish = (
             3. Maybe ask for clarification
 
             Return 'passed: true' if handled well.
-            """
+            """,
         )
     )
 )
@@ -461,10 +502,16 @@ tc_gibberish = (
 
 ## Test 6: Conversation State Management
 
+Next, we'll test a confirmation flow — a pattern common in support bots where
+destructive actions require explicit user approval. The checks verify both
+directions: that confirmation is requested when it should be, and that the state
+is correctly cleared when the user cancels.
+
 Test complex stateful interactions:
 
-``` python
+```python
 from giskard.checks import Scenario, from_fn, LLMJudge, StringMatching
+
 
 class StatefulChatbot(SimpleChatbot):
     def __init__(self):
@@ -476,17 +523,26 @@ class StatefulChatbot(SimpleChatbot):
         # Handle confirmations
         if self.awaiting_confirmation:
             if user_message.lower() in ["yes", "confirm", "ok", "sure"]:
-                response_text = f"Great! I'll proceed with {self.pending_action}."
+                response_text = (
+                    f"Great! I'll proceed with {self.pending_action}."
+                )
                 self.awaiting_confirmation = False
                 self.pending_action = None
             elif user_message.lower() in ["no", "cancel", "nevermind"]:
-                response_text = "Okay, I won't do that. What else can I help with?"
+                response_text = (
+                    "Okay, I won't do that. What else can I help with?"
+                )
                 self.awaiting_confirmation = False
                 self.pending_action = None
             else:
-                response_text = "I'm waiting for your confirmation. Please say yes or no."
+                response_text = (
+                    "I'm waiting for your confirmation. "
+                    "Please say yes or no."
+                )
 
-            self.history.append(Message(role="assistant", content=response_text))
+            self.history.append(
+                Message(role="assistant", content=response_text)
+            )
             return ChatResponse(message=response_text, context=self.context)
 
         # Check for actions requiring confirmation
@@ -495,10 +551,13 @@ class StatefulChatbot(SimpleChatbot):
             self.pending_action = "deletion"
             response_text = "Are you sure you want to proceed? Please confirm."
 
-            self.history.append(Message(role="assistant", content=response_text))
+            self.history.append(
+                Message(role="assistant", content=response_text)
+            )
             return ChatResponse(message=response_text, context=self.context)
 
         return super().chat(user_message)
+
 
 stateful_bot = StatefulChatbot()
 
@@ -507,33 +566,31 @@ test_scenario = (
     # Request action requiring confirmation
     .interact(
         inputs="I want to delete my account",
-        outputs=lambda inputs: stateful_bot.chat(inputs)
+        outputs=lambda inputs: stateful_bot.chat(inputs),
     )
     .check(
         from_fn(
             lambda trace: stateful_bot.awaiting_confirmation,
             name="requested_confirmation",
-            success_message="Bot requested confirmation"
+            success_message="Bot requested confirmation",
         )
     )
     .check(
         StringMatching(
             name="asks_confirmation",
             keyword="confirm",
-            text_key="trace.last.outputs.message"
+            text_key="trace.last.outputs.message",
         )
     )
-
     # User cancels
     .interact(
-        inputs="No, nevermind",
-        outputs=lambda inputs: stateful_bot.chat(inputs)
+        inputs="No, nevermind", outputs=lambda inputs: stateful_bot.chat(inputs)
     )
     .check(
         from_fn(
             lambda trace: not stateful_bot.awaiting_confirmation,
             name="cleared_confirmation_state",
-            success_message="Bot cleared confirmation state"
+            success_message="Bot cleared confirmation state",
         )
     )
     .check(
@@ -546,7 +603,7 @@ test_scenario = (
             Bot: {{ interactions[1].outputs.message }}
 
             Return 'passed: true' if the bot handled cancellation well.
-            """
+            """,
         )
     )
 )
@@ -554,11 +611,17 @@ test_scenario = (
 
 ## Complete Chatbot Test Suite
 
+Now we'll bring all the individual scenarios and test cases together into a
+suite class. The `add_scenario` and `add_test` methods let you build the suite
+incrementally, and `run_all` executes both categories in sequence so the report
+shows the complete picture.
+
 Combine all tests into a comprehensive suite:
 
-``` python
+```python
 import asyncio
 from giskard.checks import Scenario
+
 
 class ChatbotTestSuite:
     def __init__(self, chatbot):
@@ -574,7 +637,7 @@ class ChatbotTestSuite:
 
     async def run_all(self):
         """Run all tests and report results."""
-        print("🤖 Running Chatbot Test Suite\n")
+        print("Running Chatbot Test Suite\n")
 
         results = []
 
@@ -608,10 +671,14 @@ class ChatbotTestSuite:
             print(f"{status} [{test_type}] {name}")
 
             if not result.passed:
-                if hasattr(result, 'results'):
+                if hasattr(result, "results"):
                     for check_result in result.results:
                         if not check_result.passed:
-                            print(f"    → {check_result.name}: {check_result.message}")
+                            print(
+                                f"    → {check_result.name}: "
+                                f"{check_result.message}"
+                            )
+
 
 # Usage
 async def main():
@@ -624,16 +691,20 @@ async def main():
 
     await suite.run_all()
 
+
 asyncio.run(main())
 ```
 
 ## Best Practices
 
+With the suite pattern established, here are a few guidelines that will help you
+maintain reliable chatbot tests as the bot evolves.
+
 **1. Test Conversation Flows Holistically**
 
 Don't just test individual responses—test complete conversation flows:
 
-``` python
+```python
 test_scenario = (
     Scenario("complete_support_flow")
     # Greeting -> Problem statement -> Information collection -> Resolution
@@ -645,13 +716,13 @@ test_scenario = (
 
 Ensure the chatbot remembers important information:
 
-``` python
+```python
 from_fn(
     lambda trace: (
-        trace.last.outputs.context.user_name and
-        trace.last.outputs.context.user_email
+        trace.last.outputs.context.user_name
+        and trace.last.outputs.context.user_email
     ),
-    name="retains_user_info"
+    name="retains_user_info",
 )
 ```
 
@@ -659,7 +730,7 @@ from_fn(
 
 Use LLM judges to verify tone remains consistent:
 
-``` python
+```python
 LLMJudge(
     name="consistent_tone",
     prompt="""
@@ -670,7 +741,7 @@ LLMJudge(
     {% endfor %}
 
     Return 'passed: true' if tone is consistent.
-    """
+    """,
 )
 ```
 
@@ -686,6 +757,9 @@ Test with unusual inputs:
 
 ## Next Steps
 
-- See [Content Moderation](/oss/checks/tutorials/content-moderation/) for safety and filtering
-- Explore [Testing Agents](/oss/checks/tutorials/testing-agents/) for tool-using chatbots
-- Review [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/) for complex flows
+- See [Content Moderation](/oss/checks/use-cases/content-moderation/) for safety
+  and filtering
+- Explore [Testing Agents](/oss/checks/use-cases/testing-agents/) for tool-using
+  chatbots
+- Review [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn/) for complex
+  flows

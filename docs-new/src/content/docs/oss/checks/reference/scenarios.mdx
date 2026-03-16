@@ -4,7 +4,7 @@ sidebar:
   order: 4
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
 Multi-step workflow testing with scenario builders and runners.
 
@@ -18,7 +18,8 @@ Create a new scenario for fluent API construction.
 
 ### Description
 
-The `Scenario` class is the recommended entry point for creating test scenarios. It provides a fluent API for building multi-step test workflows.
+The `Scenario` class is the recommended entry point for creating test scenarios.
+It provides a fluent API for building multi-step test workflows.
 
 ### Creating Scenarios
 
@@ -38,12 +39,13 @@ result = await test_scenario.run()
 
 **Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `name` | `str \| None` | `None` | Scenario name for identification (defaults to "Unnamed Scenario") |
-| `trace_type` | `type[TraceType] \| None` | `None` | Optional custom trace type for advanced use cases |
+| Parameter    | Type                      | Default | Description                                                       |
+| ------------ | ------------------------- | ------- | ----------------------------------------------------------------- |
+| `name`       | `str \| None`             | `None`  | Scenario name for identification (defaults to "Unnamed Scenario") |
+| `trace_type` | `type[TraceType] \| None` | `None`  | Optional custom trace type for advanced use cases                 |
 
 **Returns:**
+
 - `ScenarioBuilder`: A builder instance ready for configuration
 
 ### Multi-step Scenarios
@@ -57,23 +59,19 @@ conversation_test = (
     # First interaction
     .interact(
         inputs="I need help with my account",
-        outputs="I'd be happy to help! What's your account number?"
+        outputs="I'd be happy to help! What's your account number?",
     )
     # Validate greeting
-    .check(from_fn(
-        lambda trace: "help" in trace.last.outputs.lower(),
-        name="helpful_response"
-    ))
-    # Second interaction
-    .interact(
-        inputs="12345",
-        outputs="Thank you! I've found your account."
+    .check(
+        from_fn(
+            lambda trace: "help" in trace.last.outputs.lower(),
+            name="helpful_response",
+        )
     )
+    # Second interaction
+    .interact(inputs="12345", outputs="Thank you! I've found your account.")
     # Validate account lookup
-    .check(Equals(
-        expected_value=True,
-        key="trace.last.metadata.account_found"
-    ))
+    .check(Equals(expected_value=True, key="trace.last.metadata.account_found"))
 )
 
 result = await conversation_test.run()
@@ -89,16 +87,11 @@ def generate_response(inputs):
         return "It's sunny today!"
     return "I don't understand."
 
+
 test_scenario = (
     Scenario("dynamic_test")
-    .interact(
-        inputs="What's the weather?",
-        outputs=generate_response
-    )
-    .check(StringMatching(
-        pattern="sunny",
-        key="trace.last.outputs"
-    ))
+    .interact(inputs="What's the weather?", outputs=generate_response)
+    .check(StringMatching(pattern="sunny", key="trace.last.outputs"))
 )
 ```
 
@@ -111,7 +104,7 @@ test_scenario = (
     .interact(inputs="Hello", outputs="Hi! I'm Alice.")
     .interact(
         inputs=lambda trace: f"Nice to meet you, {trace.last.outputs.split()[-1][:-1]}!",
-        outputs="Nice to meet you too!"
+        outputs="Nice to meet you too!",
     )
 )
 ```
@@ -126,7 +119,8 @@ Builder for creating scenarios with a fluent API.
 
 ### Description
 
-`ScenarioBuilder` provides a chainable interface for constructing multi-step test scenarios. Each method returns `self`, allowing for method chaining.
+`ScenarioBuilder` provides a chainable interface for constructing multi-step
+test scenarios. Each method returns `self`, allowing for method chaining.
 
 ### Methods
 
@@ -135,8 +129,10 @@ Builder for creating scenarios with a fluent API.
 Add an interaction to the scenario.
 
 **Parameters:**
+
 - `inputs`: Static value or callable `(trace) -> value`
-- `outputs`: Static value, callable `(inputs) -> value`, or callable `(trace, inputs) -> value`
+- `outputs`: Static value, callable `(inputs) -> value`, or callable
+  `(trace, inputs) -> value`
 - `metadata`: Optional metadata dictionary
 
 **Returns:** `self` (for chaining)
@@ -144,21 +140,16 @@ Add an interaction to the scenario.
 ```python
 # Static values
 builder.interact(
-    inputs="test input",
-    outputs="test output",
-    metadata={"model": "gpt-4"}
+    inputs="test input", outputs="test output", metadata={"model": "gpt-4"}
 )
 
 # Dynamic outputs
-builder.interact(
-    inputs="query",
-    outputs=lambda inputs: my_model(inputs)
-)
+builder.interact(inputs="query", outputs=lambda inputs: my_model(inputs))
 
 # Full context access
 builder.interact(
     inputs=lambda trace: generate_input(trace),
-    outputs=lambda trace, inputs: generate_output(trace, inputs)
+    outputs=lambda trace, inputs: generate_output(trace, inputs),
 )
 ```
 
@@ -167,6 +158,7 @@ builder.interact(
 Add a validation check to the scenario.
 
 **Parameters:**
+
 - `check`: A Check instance to validate the trace
 
 **Returns:** `self` (for chaining)
@@ -174,10 +166,7 @@ Add a validation check to the scenario.
 ```python
 from giskard.checks import Equals, GreaterThan
 
-builder.check(Equals(
-    expected_value="success",
-    key="trace.last.outputs.status"
-))
+builder.check(Equals(expected_value="success", key="trace.last.outputs.status"))
 ```
 
 #### `add_interaction(interaction: Interaction)`
@@ -185,6 +174,7 @@ builder.check(Equals(
 Add a pre-constructed Interaction object.
 
 **Parameters:**
+
 - `interaction`: An Interaction instance
 
 **Returns:** `self` (for chaining)
@@ -193,9 +183,7 @@ Add a pre-constructed Interaction object.
 from giskard.checks import Interaction
 
 interaction = Interaction(
-    inputs="Hello",
-    outputs="Hi",
-    metadata={"timestamp": "2024-01-01"}
+    inputs="Hello", outputs="Hi", metadata={"timestamp": "2024-01-01"}
 )
 
 builder.add_interaction(interaction)
@@ -206,7 +194,9 @@ builder.add_interaction(interaction)
 Add a custom interaction specification (e.g. `Interact`, `WithSpy`).
 
 **Parameters:**
-- `spec`: An InteractionSpec instance (e.g. `Interact`, or `WithSpy` wrapping one)
+
+- `spec`: An InteractionSpec instance (e.g. `Interact`, or `WithSpy` wrapping
+  one)
 
 **Returns:** `self` (for chaining)
 
@@ -249,15 +239,17 @@ Low-level scenario class for direct instantiation.
 
 ### Description
 
-The `Scenario` class represents an ordered sequence of components (Interactions, InteractionSpecs, and Checks) that share a trace. For most use cases, use the `Scenario(name)` constructor with `.interact()` and `.check()` methods.
+The `Scenario` class represents an ordered sequence of components (Interactions,
+InteractionSpecs, and Checks) that share a trace. For most use cases, use the
+`Scenario(name)` constructor with `.interact()` and `.check()` methods.
 
 ### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `name` | `str` | Scenario identifier |
-| `sequence` | `Sequence[Component]` | Sequential steps to execute |
-| `trace_type` | `type[TraceType] \| None` | Optional custom trace type |
+| Attribute    | Type                      | Description                 |
+| ------------ | ------------------------- | --------------------------- |
+| `name`       | `str`                     | Scenario identifier         |
+| `sequence`   | `Sequence[Component]`     | Sequential steps to execute |
+| `trace_type` | `type[TraceType] \| None` | Optional custom trace type  |
 
 ### Direct Instantiation (Advanced)
 
@@ -270,14 +262,14 @@ scenario_obj = Scenario(
         InteractionSpec(inputs="Hello", outputs="Hi"),
         Equals(expected="Hi", key="trace.last.outputs"),
         InteractionSpec(inputs="Goodbye", outputs="See you!"),
-    ]
+    ],
 )
 
 result = await scenario_obj.run()
 ```
 
-:::note[Recommended Approach]
 Use the `Scenario()` fluent API for better readability:
+
 ```python
 result = await (
     Scenario("multi_step_test")
@@ -287,7 +279,6 @@ result = await (
     .run()
 )
 ```
-:::
 
 ### Methods
 
@@ -296,7 +287,9 @@ result = await (
 Execute the scenario components sequentially.
 
 **Parameters:**
-- `return_exception` (`bool`): If True, return results even when exceptions occur instead of raising
+
+- `return_exception` (`bool`): If True, return results even when exceptions
+  occur instead of raising
 
 **Returns:** `ScenarioResult` with status, trace, and check results
 
@@ -318,13 +311,13 @@ Result of scenario execution with trace and check results.
 
 ### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `status` | `CheckStatus` | Overall scenario status (PASS/FAIL/ERROR) |
-| `trace` | `Trace` | Complete trace of all interactions |
-| `check_results` | `list[CheckResult]` | Results from all checks executed |
-| `message` | `str \| None` | Optional summary message |
-| `details` | `dict[str, Any]` | Additional execution details |
+| Attribute       | Type                | Description                               |
+| --------------- | ------------------- | ----------------------------------------- |
+| `status`        | `CheckStatus`       | Overall scenario status (PASS/FAIL/ERROR) |
+| `trace`         | `Trace`             | Complete trace of all interactions        |
+| `check_results` | `list[CheckResult]` | Results from all checks executed          |
+| `message`       | `str \| None`       | Optional summary message                  |
+| `details`       | `dict[str, Any]`    | Additional execution details              |
 
 ### Accessing Results
 
@@ -356,13 +349,16 @@ Low-level runner for executing scenarios.
 
 ### Description
 
-`ScenarioRunner` provides the execution engine for running scenarios. Most users should use `Scenario(...).run()` rather than using ScenarioRunner directly.
+`ScenarioRunner` provides the execution engine for running scenarios. Most users
+should use `Scenario(...).run()` rather than using ScenarioRunner directly.
 
 ### Execution Model
 
 Components are processed sequentially:
+
 1. **Interaction/InteractionSpec components**: Add interactions to the trace
-2. **Check components**: Validate the current trace state. Execution stops on first failure or error
+2. **Check components**: Validate the current trace state. Execution stops on
+   first failure or error
 
 ### Methods
 
@@ -371,8 +367,10 @@ Components are processed sequentially:
 Execute a scenario with shared trace.
 
 **Parameters:**
+
 - `scenario` (`Scenario`): The scenario to execute
-- `return_exception` (`bool`): If True, return results even when exceptions occur
+- `return_exception` (`bool`): If True, return results even when exceptions
+  occur
 
 **Returns:** `ScenarioResult` with execution details
 
@@ -396,9 +394,8 @@ runner = get_runner()
 result = await runner.run(scenario_obj)
 ```
 
-:::note[Singleton Pattern]
-`get_runner()` returns a singleton runner instance that is reused across all executions within a process.
-:::
+`get_runner()` returns a singleton runner instance that is reused across all
+executions within a process.
 
 ---
 
@@ -423,10 +420,7 @@ farewell_test = (
 )
 
 # Run all tests
-results = await asyncio.gather(
-    greeting_test.run(),
-    farewell_test.run()
-)
+results = await asyncio.gather(greeting_test.run(), farewell_test.run())
 
 # Check all passed
 all_passed = all(r.status == CheckStatus.PASS for r in results)
@@ -454,30 +448,28 @@ workflow = (
     # Step 1: Registration
     .interact(
         inputs={"action": "register", "email": "user@example.com"},
-        outputs={"status": "success", "user_id": 12345}
+        outputs={"status": "success", "user_id": 12345},
     )
     .check(Equals(expected="success", key="trace.last.outputs.status"))
     .check(GreaterThan(expected_value=0, key="trace.last.outputs.user_id"))
-
     # Step 2: Verification
     .interact(
         inputs=lambda trace: {
             "action": "verify",
-            "user_id": trace.last.outputs["user_id"]
+            "user_id": trace.last.outputs["user_id"],
         },
-        outputs={"verified": True}
+        outputs={"verified": True},
     )
     .check(Equals(expected=True, key="trace.last.outputs.verified"))
-
     # Step 3: Welcome message
     .interact(
-        inputs="Welcome",
-        outputs=lambda inputs: f"{inputs} to our platform!"
+        inputs="Welcome", outputs=lambda inputs: f"{inputs} to our platform!"
     )
-    .check(from_fn(
-        lambda trace: "Welcome" in trace.last.outputs,
-        name="welcome_check"
-    ))
+    .check(
+        from_fn(
+            lambda trace: "Welcome" in trace.last.outputs, name="welcome_check"
+        )
+    )
 )
 
 result = await workflow.run()
@@ -487,7 +479,8 @@ result = await workflow.run()
 
 ## See Also
 
-- [Core API](/oss/checks/reference/core/) - Scenario, Trace, and Interaction details
-- [Built-in Checks](/oss/checks/reference/builtin-checks/) - Checks to use in scenarios
+- [Core API](/oss/checks/reference/core/) - Scenario, Trace, and Interaction
+  details
+- [Built-in Checks](/oss/checks/reference/checks/) - Checks to use in scenarios
 - [Testing Utilities](/oss/checks/reference/utils/) - Test runners and utilities
 - [Tutorials](/oss/checks/tutorials/) - Complete scenario examples

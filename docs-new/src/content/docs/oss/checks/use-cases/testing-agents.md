@@ -1,11 +1,13 @@
 ---
 title: Testing Agents
 sidebar:
-  order: 3
+  order: 2
 ---
 
-This tutorial demonstrates how to test AI agents that use tools, perform
-multi-step reasoning, and maintain state across interactions.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/use-cases/testing-agents.ipynb)
+
+This example shows how to test AI agents that use tools, perform multi-step
+reasoning, and maintain state across interactions.
 
 ## Introduction
 
@@ -26,15 +28,22 @@ Our tests will validate:
 
 ## Building a Simple Agent
 
+To get started, we'll implement a minimal agent that exposes both its reasoning
+steps and its final answer. Returning an `AgentResponse` that includes the full
+`steps` list is what makes tool selection and reasoning quality testable —
+without that structure, your checks can only inspect the final string.
+
 First, let's create an agent to test:
 
-``` python
+```python
 from typing import Literal, Optional
 from pydantic import BaseModel
+
 
 class Tool(BaseModel):
     name: str
     description: str
+
 
 class AgentStep(BaseModel):
     thought: str
@@ -42,25 +51,26 @@ class AgentStep(BaseModel):
     tool_input: str
     observation: str
 
+
 class AgentResponse(BaseModel):
     steps: list[AgentStep]
     final_answer: str
     success: bool
 
+
 class SimpleAgent:
     def __init__(self):
         self.tools = {
             "search": Tool(
-                name="search",
-                description="Search the internet for information"
+                name="search", description="Search the internet for information"
             ),
             "calculator": Tool(
                 name="calculator",
-                description="Perform mathematical calculations"
+                description="Perform mathematical calculations",
             ),
             "database": Tool(
                 name="database",
-                description="Query a database for structured data"
+                description="Query a database for structured data",
             ),
         }
         self.max_steps = 5
@@ -68,7 +78,10 @@ class SimpleAgent:
     def _use_tool(self, tool_name: str, tool_input: str) -> str:
         """Execute a tool (simplified for testing)."""
         if tool_name == "search":
-            return f"Search results for '{tool_input}': [Relevant information...]"
+            return (
+                f"Search results for '{tool_input}': "
+                "[Relevant information...]"
+            )
         elif tool_name == "calculator":
             try:
                 result = eval(tool_input)  # Don't do this in production!
@@ -84,22 +97,28 @@ class SimpleAgent:
         steps = []
 
         # Simplified agent logic
-        if "calculate" in task.lower() or any(c in task for c in "0123456789+-*/"):
+        has_math = "calculate" in task.lower() or any(
+            c in task for c in "0123456789+-*/"
+        )
+        if has_math:
             # Math task
             thought = "I need to use the calculator for this math problem"
             tool = "calculator"
             # Extract the calculation
             import re
-            calculation = re.findall(r'[\d+\-*/()]+', task)
+
+            calculation = re.findall(r"[\d+\-*/()]+", task)
             tool_input = calculation[0] if calculation else task
 
             observation = self._use_tool(tool, tool_input)
-            steps.append(AgentStep(
-                thought=thought,
-                tool=tool,
-                tool_input=tool_input,
-                observation=observation
-            ))
+            steps.append(
+                AgentStep(
+                    thought=thought,
+                    tool=tool,
+                    tool_input=tool_input,
+                    observation=observation,
+                )
+            )
 
             final_answer = f"The answer is {observation}"
             success = "Error" not in observation
@@ -111,12 +130,14 @@ class SimpleAgent:
             tool_input = task
 
             observation = self._use_tool(tool, tool_input)
-            steps.append(AgentStep(
-                thought=thought,
-                tool=tool,
-                tool_input=tool_input,
-                observation=observation
-            ))
+            steps.append(
+                AgentStep(
+                    thought=thought,
+                    tool=tool,
+                    tool_input=tool_input,
+                    observation=observation,
+                )
+            )
 
             final_answer = f"Based on my search: {observation}"
             success = True
@@ -128,41 +149,45 @@ class SimpleAgent:
             success = True
 
         return AgentResponse(
-            steps=steps,
-            final_answer=final_answer,
-            success=success
+            steps=steps, final_answer=final_answer, success=success
         )
 ```
 
 ## Test 1: Tool Selection
 
+With the agent built, we can now write our first test. This scenario verifies
+three things at once: that the agent invoked at least one tool, that it chose
+the right tool for a math task, and that it completed successfully. Checking all
+three together gives you a tight specification for the most basic agent
+behavior.
+
 Verify that the agent selects appropriate tools:
 
-``` python
+```python
 from giskard.checks import Scenario, from_fn, Equals
 
 agent = SimpleAgent()
+
 
 async def test_tool_selection():
     tc = (
         Scenario("tool_selection_calculator")
         .interact(
-            inputs="What is 15 * 23?",
-            outputs=lambda inputs: agent.run(inputs)
+            inputs="What is 15 * 23?", outputs=lambda inputs: agent.run(inputs)
         )
         .check(
             from_fn(
                 lambda trace: len(trace.last.outputs.steps) > 0,
                 name="used_tools",
                 success_message="Agent used tools",
-                failure_message="Agent didn't use any tools"
+                failure_message="Agent didn't use any tools",
             )
         )
         .check(
             Equals(
                 name="selected_calculator",
                 expected="calculator",
-                key="trace.last.outputs.steps[0].tool"
+                key="trace.last.outputs.steps[0].tool",
             )
         )
         .check(
@@ -170,7 +195,7 @@ async def test_tool_selection():
                 lambda trace: trace.last.outputs.success,
                 name="task_successful",
                 success_message="Agent completed task successfully",
-                failure_message="Agent failed to complete task"
+                failure_message="Agent failed to complete task",
             )
         )
     )
@@ -180,9 +205,14 @@ async def test_tool_selection():
 
 ## Test 2: Reasoning Quality
 
+Building on Test 1, we now evaluate whether the agent's internal thought process
+makes sense — not just whether the right tool was called. The `LLMJudge` check
+is the appropriate tool here because reasoning quality is a semantic property
+that can't be reduced to a string match.
+
 Evaluate the quality of the agent's reasoning:
 
-``` python
+```python
 from giskard.agents.generators import Generator
 from giskard.checks import Scenario, LLMJudge, from_fn, set_default_generator
 
@@ -192,7 +222,7 @@ tc = (
     Scenario("reasoning_quality_test")
     .interact(
         inputs="Find information about quantum computing",
-        outputs=lambda inputs: agent.run(inputs)
+        outputs=lambda inputs: agent.run(inputs),
     )
     .check(
         LLMJudge(
@@ -210,7 +240,7 @@ tc = (
             3. Does the thought explain why the tool was chosen?
 
             Return 'passed: true' if the reasoning is sound.
-            """
+            """,
         )
     )
     .check(
@@ -218,7 +248,7 @@ tc = (
             lambda trace: trace.last.outputs.steps[0].tool == "search",
             name="correct_tool_for_research",
             success_message="Selected search for research task",
-            failure_message="Wrong tool selected"
+            failure_message="Wrong tool selected",
         )
     )
 )
@@ -226,9 +256,15 @@ tc = (
 
 ## Test 3: Multi-Step Agent Workflow
 
+Next, we'll test an agent that must chain multiple tools in a specific order.
+The three `from_fn` checks assert that each required tool was used, while the
+`LLMJudge` check validates that the steps appeared in a logical sequence —
+catching cases where the agent calculates before it has gathered the data to
+calculate from.
+
 Test agents that perform multiple steps:
 
-``` python
+```python
 class MultiStepAgent(SimpleAgent):
     def run(self, task: str) -> AgentResponse:
         """Run agent with multi-step capability."""
@@ -237,31 +273,37 @@ class MultiStepAgent(SimpleAgent):
         # Example: Complex task requiring multiple tools
         if "research" in task.lower() and "calculate" in task.lower():
             # Step 1: Search
-            steps.append(AgentStep(
-                thought="First, I need to search for the data",
-                tool="search",
-                tool_input=task,
-                observation=self._use_tool("search", task)
-            ))
+            steps.append(
+                AgentStep(
+                    thought="First, I need to search for the data",
+                    tool="search",
+                    tool_input=task,
+                    observation=self._use_tool("search", task),
+                )
+            )
 
             # Step 2: Calculate
-            steps.append(AgentStep(
-                thought="Now I'll calculate based on the data",
-                tool="calculator",
-                tool_input="100 * 2",
-                observation=self._use_tool("calculator", "100 * 2")
-            ))
+            steps.append(
+                AgentStep(
+                    thought="Now I'll calculate based on the data",
+                    tool="calculator",
+                    tool_input="100 * 2",
+                    observation=self._use_tool("calculator", "100 * 2"),
+                )
+            )
 
-            final_answer = f"Based on my research and calculations: {steps[-1].observation}"
+            final_answer = (
+                "Based on my research and calculations: "
+                f"{steps[-1].observation}"
+            )
             success = True
         else:
             return super().run(task)
 
         return AgentResponse(
-            steps=steps,
-            final_answer=final_answer,
-            success=success
+            steps=steps, final_answer=final_answer, success=success
         )
+
 
 multi_agent = MultiStepAgent()
 
@@ -271,36 +313,34 @@ test_scenario = (
     Scenario("multi_step_agent_workflow")
     .interact(
         inputs="Research the market size and calculate projected growth",
-        outputs=lambda inputs: multi_agent.run(inputs)
+        outputs=lambda inputs: multi_agent.run(inputs),
     )
     .check(
         from_fn(
             lambda trace: len(trace.last.outputs.steps) >= 2,
             name="multiple_steps_taken",
             success_message="Agent performed multiple steps",
-            failure_message="Agent didn't perform enough steps"
+            failure_message="Agent didn't perform enough steps",
         )
     )
     .check(
         from_fn(
             lambda trace: any(
-                step.tool == "search"
-                for step in trace.last.outputs.steps
+                step.tool == "search" for step in trace.last.outputs.steps
             ),
             name="performed_research",
             success_message="Agent performed research",
-            failure_message="Agent skipped research step"
+            failure_message="Agent skipped research step",
         )
     )
     .check(
         from_fn(
             lambda trace: any(
-                step.tool == "calculator"
-                for step in trace.last.outputs.steps
+                step.tool == "calculator" for step in trace.last.outputs.steps
             ),
             name="performed_calculation",
             success_message="Agent performed calculation",
-            failure_message="Agent skipped calculation step"
+            failure_message="Agent skipped calculation step",
         )
     )
     .check(
@@ -316,7 +356,7 @@ test_scenario = (
             {% endfor %}
 
             Return 'passed: true' if steps are well-ordered.
-            """
+            """,
         )
     )
 )
@@ -324,9 +364,14 @@ test_scenario = (
 
 ## Test 4: Error Handling
 
+With happy-path tests in place, we now test the recovery path. The `RobustAgent`
+below attempts the calculator first and falls back to search when it fails — and
+our checks verify both that the fallback was triggered and that the agent
+ultimately succeeded despite the initial error.
+
 Verify that agents handle errors gracefully:
 
-``` python
+```python
 class RobustAgent(SimpleAgent):
     def run(self, task: str) -> AgentResponse:
         steps = []
@@ -334,23 +379,27 @@ class RobustAgent(SimpleAgent):
         # Try first approach
         thought = "I'll try using the calculator"
         observation = self._use_tool("calculator", task)
-        steps.append(AgentStep(
-            thought=thought,
-            tool="calculator",
-            tool_input=task,
-            observation=observation
-        ))
+        steps.append(
+            AgentStep(
+                thought=thought,
+                tool="calculator",
+                tool_input=task,
+                observation=observation,
+            )
+        )
 
         if "Error" in observation:
             # Fallback strategy
             thought = "Calculator failed, I'll search instead"
             observation = self._use_tool("search", task)
-            steps.append(AgentStep(
-                thought=thought,
-                tool="search",
-                tool_input=task,
-                observation=observation
-            ))
+            steps.append(
+                AgentStep(
+                    thought=thought,
+                    tool="search",
+                    tool_input=task,
+                    observation=observation,
+                )
+            )
             final_answer = f"After trying different approaches: {observation}"
             success = True
         else:
@@ -358,10 +407,9 @@ class RobustAgent(SimpleAgent):
             success = True
 
         return AgentResponse(
-            steps=steps,
-            final_answer=final_answer,
-            success=success
+            steps=steps, final_answer=final_answer, success=success
         )
+
 
 robust_agent = RobustAgent()
 
@@ -369,14 +417,14 @@ tc = (
     Scenario("error_handling_test")
     .interact(
         inputs="What is the meaning of life?",  # Not a valid calculation
-        outputs=lambda inputs: robust_agent.run(inputs)
+        outputs=lambda inputs: robust_agent.run(inputs),
     )
     .check(
         from_fn(
             lambda trace: len(trace.last.outputs.steps) > 1,
             name="tried_fallback",
             success_message="Agent tried fallback strategy",
-            failure_message="Agent didn't attempt recovery"
+            failure_message="Agent didn't attempt recovery",
         )
     )
     .check(
@@ -384,7 +432,7 @@ tc = (
             lambda trace: trace.interactions[-1].outputs.success,
             name="eventually_succeeded",
             success_message="Agent completed task despite initial failure",
-            failure_message="Agent failed to complete task"
+            failure_message="Agent failed to complete task",
         )
     )
     .check(
@@ -401,7 +449,7 @@ tc = (
             {% endfor %}
 
             Return 'passed: true' if the agent handled the error well.
-            """
+            """,
         )
     )
 )
@@ -409,9 +457,14 @@ tc = (
 
 ## Test 5: Stateful Agent Interactions
 
+Now we'll verify that an agent can reference information from an earlier turn.
+The scenario uses two `.interact()` calls, and the check on the second
+interaction examines `trace.last.outputs.final_answer` to confirm the agent
+correctly recalled what was discussed before.
+
 Test agents that maintain state across turns:
 
-``` python
+```python
 class StatefulAgent(SimpleAgent):
     def __init__(self):
         super().__init__()
@@ -427,31 +480,30 @@ class StatefulAgent(SimpleAgent):
                 observation = f"Previous task was: {prev_task}"
                 final_answer = f"I remember: {observation}"
 
-                steps = [AgentStep(
-                    thought=thought,
-                    tool="memory",
-                    tool_input="recall",
-                    observation=observation
-                )]
+                steps = [
+                    AgentStep(
+                        thought=thought,
+                        tool="memory",
+                        tool_input="recall",
+                        observation=observation,
+                    )
+                ]
 
-                self.conversation_history.append({
-                    "task": task,
-                    "response": final_answer
-                })
+                self.conversation_history.append(
+                    {"task": task, "response": final_answer}
+                )
 
                 return AgentResponse(
-                    steps=steps,
-                    final_answer=final_answer,
-                    success=True
+                    steps=steps, final_answer=final_answer, success=True
                 )
 
         # Handle new task
         response = super().run(task)
-        self.conversation_history.append({
-            "task": task,
-            "response": response.final_answer
-        })
+        self.conversation_history.append(
+            {"task": task, "response": response.final_answer}
+        )
         return response
+
 
 stateful_agent = StatefulAgent()
 
@@ -460,26 +512,25 @@ test_scenario = (
     # First interaction
     .interact(
         inputs="Search for Python tutorials",
-        outputs=lambda inputs: stateful_agent.run(inputs)
+        outputs=lambda inputs: stateful_agent.run(inputs),
     )
     .check(
         from_fn(
             lambda trace: trace.interactions[-1].outputs.success,
-            name="first_task_completed"
+            name="first_task_completed",
         )
     )
-
     # Second interaction references first
     .interact(
         inputs="What was my last request?",
-        outputs=lambda inputs: stateful_agent.run(inputs)
+        outputs=lambda inputs: stateful_agent.run(inputs),
     )
     .check(
         from_fn(
             lambda trace: "Python tutorials" in trace.last.outputs.final_answer,
             name="recalls_previous_task",
             success_message="Agent correctly recalled previous task",
-            failure_message="Agent failed to recall previous task"
+            failure_message="Agent failed to recall previous task",
         )
     )
     .check(
@@ -494,7 +545,7 @@ test_scenario = (
 
             The second response should reference the first task.
             Return 'passed: true' if context was maintained.
-            """
+            """,
         )
     )
 )
@@ -502,10 +553,16 @@ test_scenario = (
 
 ## Test 6: Task Completion Validation
 
+Building on the stateful agent pattern, we now test a more structured workflow
+where the agent tracks a task queue. This scenario walks through all four
+lifecycle steps — add, add, complete, status — and checks at each stage that the
+internal state matches what the responses claim.
+
 Verify that complex tasks are fully completed:
 
-``` python
+```python
 from giskard.checks import Scenario, LLMJudge, from_fn
+
 
 class TaskTrackingAgent(SimpleAgent):
     def __init__(self):
@@ -520,7 +577,7 @@ class TaskTrackingAgent(SimpleAgent):
             return AgentResponse(
                 steps=[],
                 final_answer=f"Added task: {task_desc}. Pending: {len(self.pending_tasks)}",
-                success=True
+                success=True,
             )
 
         elif "complete" in task.lower():
@@ -529,29 +586,32 @@ class TaskTrackingAgent(SimpleAgent):
                 self.completed_tasks.append(completed)
 
                 return AgentResponse(
-                    steps=[AgentStep(
-                        thought=f"Completing task: {completed}",
-                        tool="task_manager",
-                        tool_input=completed,
-                        observation="Task completed successfully"
-                    )],
+                    steps=[
+                        AgentStep(
+                            thought=f"Completing task: {completed}",
+                            tool="task_manager",
+                            tool_input=completed,
+                            observation="Task completed successfully",
+                        )
+                    ],
                     final_answer=f"Completed: {completed}",
-                    success=True
+                    success=True,
                 )
             return AgentResponse(
                 steps=[],
                 final_answer="No pending tasks to complete",
-                success=False
+                success=False,
             )
 
         elif "status" in task.lower():
             return AgentResponse(
                 steps=[],
                 final_answer=f"Pending: {len(self.pending_tasks)}, Completed: {len(self.completed_tasks)}",
-                success=True
+                success=True,
             )
 
         return super().run(task)
+
 
 task_agent = TaskTrackingAgent()
 
@@ -560,45 +620,42 @@ test_scenario = (
     # Add tasks
     .interact(
         inputs="add task: Write documentation",
-        outputs=lambda inputs: task_agent.run(inputs)
+        outputs=lambda inputs: task_agent.run(inputs),
     )
     .interact(
         inputs="add task: Review code",
-        outputs=lambda inputs: task_agent.run(inputs)
+        outputs=lambda inputs: task_agent.run(inputs),
     )
     .check(
         from_fn(
-            lambda trace: len(task_agent.pending_tasks) == 2,
-            name="tasks_added"
+            lambda trace: len(task_agent.pending_tasks) == 2, name="tasks_added"
         )
     )
-
     # Complete first task
     .interact(
         inputs="complete next task",
-        outputs=lambda inputs: task_agent.run(inputs)
+        outputs=lambda inputs: task_agent.run(inputs),
     )
     .check(
         from_fn(
             lambda trace: len(task_agent.completed_tasks) == 1,
-            name="task_completed"
+            name="task_completed",
         )
     )
-
     # Check status
     .interact(
         inputs="what's the status?",
-        outputs=lambda inputs: task_agent.run(inputs)
+        outputs=lambda inputs: task_agent.run(inputs),
     )
     .check(
         from_fn(
             lambda trace: (
-                "Pending: 1" in trace.last.outputs.final_answer and
-                "Completed: 1" in trace.last.outputs.final_answer
+                "Pending: 1" in trace.last.outputs.final_answer
+                and "Completed: 1" in trace.last.outputs.final_answer
             ),
             name="status_accurate",
             success_message="Agent tracking state correctly",
-            failure_message="Agent state tracking is incorrect"
+            failure_message="Agent state tracking is incorrect",
         )
     )
 )
@@ -606,12 +663,18 @@ test_scenario = (
 
 ## Complete Agent Test Suite
 
+Now we'll bring all the individual tests together into a reusable suite class.
+The `add_test` and `add_scenario` methods let you compose the suite
+incrementally, and `run_all` reports both categories in a single pass so you can
+see the full picture at a glance.
+
 Combine all tests into a comprehensive suite:
 
-``` python
+```python
 import asyncio
 from typing import List
 from giskard.checks import Scenario
+
 
 class AgentTestSuite:
     def __init__(self, agent):
@@ -649,7 +712,9 @@ class AgentTestSuite:
         passed = sum(1 for _, _, r in results if r.passed)
 
         print(f"\n{'='*60}")
-        print(f"Agent Test Suite Results: {passed}/{total} passed ({passed/total*100:.1f}%)")
+        print(
+            f"Agent Test Suite Results: {passed}/{total} passed ({passed/total*100:.1f}%)"
+        )
         print(f"{'='*60}\n")
 
         for test_type, name, result in results:
@@ -657,12 +722,15 @@ class AgentTestSuite:
             print(f"  {status} [{test_type}] {name}")
 
             if not result.passed:
-                if hasattr(result, 'results'):
+                if hasattr(result, "results"):
                     for check_result in result.results:
                         if not check_result.passed:
-                            print(f"      ↳ {check_result.name}: {check_result.message}")
-                elif hasattr(result, 'message'):
+                            print(
+                                f"      ↳ {check_result.name}: {check_result.message}"
+                            )
+                elif hasattr(result, "message"):
                     print(f"      ↳ {result.message}")
+
 
 # Usage
 async def main():
@@ -675,16 +743,20 @@ async def main():
 
     await suite.run_all()
 
+
 asyncio.run(main())
 ```
 
 ## Best Practices
 
+With the suite pattern established, here are a few guidelines for keeping agent
+tests reliable as the system grows.
+
 **1. Test Tool Selection Logic Independently**
 
 Before testing full workflows, validate tool selection:
 
-``` python
+```python
 def test_tool_selection_logic():
     test_cases = [
         ("Calculate 5 + 3", "calculator"),
@@ -701,10 +773,10 @@ def test_tool_selection_logic():
 
 Use LLM judges to evaluate reasoning quality:
 
-``` python
+```python
 LLMJudge(
     name="step_reasoning",
-    prompt="Is this reasoning step logical? {{ outputs.steps[0].thought }}"
+    prompt="Is this reasoning step logical? {{ outputs.steps[0].thought }}",
 )
 ```
 
@@ -712,7 +784,7 @@ LLMJudge(
 
 Ensure agents handle failures gracefully:
 
-``` python
+```python
 # Test with invalid tool inputs
 # Test with unavailable tools
 # Test with contradictory instructions
@@ -722,18 +794,21 @@ Ensure agents handle failures gracefully:
 
 Track token usage, API calls, and execution time:
 
-``` python
+```python
 checks = [
     from_fn(
         lambda trace: len(trace.last.outputs.steps) <= 5,
         name="reasonable_step_count",
-        success_message="Used reasonable number of steps"
+        success_message="Used reasonable number of steps",
     ),
 ]
 ```
 
 ## Next Steps
 
-- See [Chatbot Testing](/oss/checks/tutorials/chatbot-testing/) for conversational agent patterns
-- Explore [RAG Evaluation](/oss/checks/tutorials/rag-evaluation/) for knowledge-grounded agents
-- Review [Multi-Turn Scenarios](/oss/checks/testing/multi-turn/) for complex workflows
+- See [Chatbot Testing](/oss/checks/use-cases/chatbot-testing/) for
+  conversational agent patterns
+- Explore [RAG Evaluation](/oss/checks/use-cases/rag-evaluation/) for
+  knowledge-grounded agents
+- Review [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn/) for complex
+  workflows

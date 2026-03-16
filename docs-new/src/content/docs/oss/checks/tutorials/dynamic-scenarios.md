@@ -1,0 +1,210 @@
+---
+title: Dynamic Scenarios
+sidebar:
+  order: 4
+---
+
+Static test inputs cover known cases — dynamic inputs let your scenarios adapt
+to what the system actually says. This tutorial shows you how to make both
+inputs and outputs context-aware using callables that read from the trace.
+
+## Static vs. dynamic
+
+A static scenario fixes every value up front:
+
+```python
+from giskard.checks import Scenario, from_fn
+
+scenario = (
+    Scenario("static_greeting")
+    .interact(
+        inputs="Hello",
+        outputs="Hi there! How can I help?",
+    )
+    .check(
+        from_fn(
+            lambda trace: "Hi" in trace.last.outputs,
+            name="responds_with_greeting",
+        )
+    )
+)
+```
+
+This is fine when you know the exact input and can hard-code the output. But two
+situations call for something more flexible:
+
+- You want the **output** to come from a live function call rather than a string
+  literal.
+- You want the **input for turn 2** to reference what the system said in turn 1.
+
+Both are solved by passing a callable instead of a string.
+
+## Dynamic outputs
+
+The most common reason to switch from a static string to a callable is that you
+want the scenario to exercise your real model instead of a pre-written response.
+Pass a callable to `outputs` to call your function at run time:
+
+```python
+def my_model(user_message: str) -> str:
+    # Your chatbot, agent, or any callable
+    return f"Echo: {user_message}"
+
+
+scenario = (
+    Scenario("dynamic_output")
+    .interact(
+        inputs="Tell me your name.",
+        outputs=lambda inputs: my_model(inputs),
+    )
+    .check(
+        from_fn(
+            lambda trace: len(trace.last.outputs) > 0,
+            name="non_empty_response",
+        )
+    )
+)
+
+result = await scenario.run()
+```
+
+The lambda receives the current interaction's `inputs` string and must return
+the output value. At run time the framework evaluates it and stores the return
+value in the trace, exactly as it would a hard-coded string.
+
+## Dynamic inputs from trace
+
+Next, we'll tackle the second common need: making the input to turn 2 depend on
+what the system said in turn 1. Pass a callable to `inputs` to build the second
+turn's input from the first turn's output:
+
+```python
+scenario = (
+    Scenario("echo_followup")
+    .interact(
+        inputs="My favourite colour is blue.",
+        outputs=lambda inputs: my_model(inputs),
+    )
+    .interact(
+        # inputs callable receives the full trace
+        inputs=lambda trace: f"You said: {trace.last.outputs}. Is that right?",
+        outputs=lambda inputs: my_model(inputs),
+    )
+    .check(
+        from_fn(
+            lambda trace: len(trace.interactions) == 2,
+            name="two_turns_completed",
+        )
+    )
+)
+```
+
+The `inputs` callable receives the `Trace` object accumulated so far, so you can
+read any previous interaction via `trace.interactions[i]` or the shorthand
+`trace.last`.
+
+## Combining both
+
+With dynamic outputs and dynamic inputs covered separately, you can now combine
+both in a single scenario. Here is a two-turn conversation where turn 2's input
+depends on turn 1's output, and both turns call a live function:
+
+```python
+def chatbot(message: str) -> str:
+    responses = {
+        "start": "I have opened ticket #42 for you.",
+        "default": "Got it. I will look into that.",
+    }
+    if "start" in message.lower():
+        return responses["start"]
+    return responses["default"]
+
+
+scenario = (
+    Scenario("ticket_followup")
+    # Turn 1: fixed input, live output
+    .interact(
+        inputs="Please start a new support ticket.",
+        outputs=lambda inputs: chatbot(inputs),
+    ).check(
+        from_fn(
+            lambda trace: "#42" in trace.last.outputs,
+            name="ticket_id_present",
+            success_message="Ticket ID returned",
+            failure_message="No ticket ID in response",
+        )
+    )
+    # Turn 2: input built from turn 1's output
+    .interact(
+        inputs=lambda trace: (
+            f"I got '{trace.last.outputs}'. "
+            "Can you add a note to that ticket?"
+        ),
+        outputs=lambda inputs: chatbot(inputs),
+    )
+)
+
+result = await scenario.run()
+print(result.passed)
+```
+
+At run time the framework:
+
+1. Calls `chatbot("Please start a new support ticket.")` and stores the output
+   in the trace.
+2. Evaluates the `inputs` lambda with the current trace — the string it returns
+   becomes turn 2's input.
+3. Calls `chatbot(...)` with that input and stores the second output.
+
+## Checking dynamic results
+
+The scenario above runs both turns but does not assert anything about turn 2's
+output. Add a `.check()` after the dynamic turn to validate the context-aware
+output:
+
+```python
+from giskard.checks import StringMatching
+
+scenario = (
+    Scenario("ticket_followup_with_check")
+    .interact(
+        inputs="Please start a new support ticket.",
+        outputs=lambda inputs: chatbot(inputs),
+    )
+    .interact(
+        inputs=lambda trace: (
+            f"I got '{trace.last.outputs}'. "
+            "Can you add a note to that ticket?"
+        ),
+        outputs=lambda inputs: chatbot(inputs),
+    )
+    .check(
+        StringMatching(
+            name="acknowledgement",
+            keyword="Got it",
+            text_key="trace.last.outputs",
+        )
+    )
+)
+
+result = await scenario.run()
+print(result.passed)
+```
+
+The check runs after all interactions complete, so `trace.last` always refers to
+the final turn. If you need to assert on an earlier turn, use
+`trace.interactions[0]` to address it directly.
+
+## Next step
+
+You now know how to build scenarios that adapt to previous outputs. Once you
+have a collection of scenarios, see how to group them into a reusable suite:
+
+[Test Suites](/oss/checks/how-to/test-suites/)
+
+## See also
+
+- [ScenarioBuilder API](/oss/checks/reference/scenarios/) — full parameter
+  reference for `.interact()` and `.check()`
+- [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn/) — foundational
+  multi-step patterns this builds on

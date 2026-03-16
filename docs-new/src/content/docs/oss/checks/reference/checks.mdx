@@ -4,9 +4,11 @@ sidebar:
   order: 3
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
-Ready-to-use validation checks for common testing scenarios, including function-based checks, string matching, comparisons, and LLM-powered semantic validation.
+Ready-to-use validation checks for common testing scenarios, including
+function-based checks, string matching, comparisons, and LLM-powered semantic
+validation.
 
 ---
 
@@ -26,15 +28,16 @@ check = from_fn(
     lambda trace: trace.last.outputs is not None,
     name="has_output",
     success_message="Output was provided",
-    failure_message="No output found"
+    failure_message="No output found",
 )
 
 # Check with custom logic
 check = from_fn(
     lambda trace: len(trace.last.outputs) > 10,
     name="min_length_check",
-    description="Validates minimum output length"
+    description="Validates minimum output length",
 )
+
 
 # Async check
 async def validate_response(trace):
@@ -43,26 +46,27 @@ async def validate_response(trace):
     is_valid = await external_validator(response)
     return is_valid
 
+
 check = from_fn(validate_response, name="async_validation")
 ```
 
 **Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `fn` | `Callable` | required | Function taking trace, returning bool or CheckResult |
-| `name` | `str \| None` | `None` | Optional check name |
-| `description` | `str \| None` | `None` | Optional description |
-| `success_message` | `str \| None` | `None` | Message when check passes |
-| `failure_message` | `str \| None` | `None` | Message when check fails |
-| `details` | `dict \| None` | `None` | Additional details to include in result |
+| Parameter         | Type           | Default  | Description                                          |
+| ----------------- | -------------- | -------- | ---------------------------------------------------- |
+| `fn`              | `Callable`     | required | Function taking trace, returning bool or CheckResult |
+| `name`            | `str \| None`  | `None`   | Optional check name                                  |
+| `description`     | `str \| None`  | `None`   | Optional description                                 |
+| `success_message` | `str \| None`  | `None`   | Message when check passes                            |
+| `failure_message` | `str \| None`  | `None`   | Message when check fails                             |
+| `details`         | `dict \| None` | `None`   | Additional details to include in result              |
 
 **Returns:**
+
 - `FnCheck`: A check instance wrapping the function
 
-:::tip[Quick Testing]
-`from_fn` is perfect for quick prototyping and simple validation logic. For complex checks, consider creating a custom Check subclass.
-:::
+`from_fn` is perfect for quick prototyping and simple validation logic. For
+complex checks, consider creating a custom Check subclass.
 
 ### `FnCheck`
 
@@ -78,13 +82,12 @@ check = FnCheck(
     fn=lambda trace: "error" not in trace.last.outputs.lower(),
     name="no_errors",
     success_message="No errors detected",
-    failure_message="Error found in output"
+    failure_message="Error found in output",
 )
 ```
 
-:::note[Serialization]
-`FnCheck` instances cannot be reliably serialized/deserialized because the `fn` field is not serializable. This is intended for programmatic/test use only.
-:::
+`FnCheck` instances cannot be reliably serialized/deserialized because the `fn`
+field is not serializable. This is intended for programmatic/test use only.
 
 ---
 
@@ -101,16 +104,14 @@ from giskard.checks import StringMatching
 
 # Check if output contains specific text
 check = StringMatching(
-    keyword="success",
-    text_key="trace.last.outputs",
-    match_type="contains"
+    keyword="success", text_key="trace.last.outputs", match_type="contains"
 )
 
 # Check with regex pattern
 check = StringMatching(
     keyword=r"\d{3}-\d{3}-\d{4}",  # Phone number pattern
     text_key="trace.last.outputs.phone",
-    match_type="regex"
+    match_type="regex",
 )
 
 # Case-insensitive matching
@@ -118,28 +119,28 @@ check = StringMatching(
     keyword="error",
     text_key="trace.last.outputs",
     match_type="contains",
-    case_sensitive=False
+    case_sensitive=False,
 )
 ```
 
 **Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `keyword` | `str` | required | Pattern to match (string or regex) |
-| `text_key` | `str` | required | JSONPath to extract value from trace |
-| `match_type` | `str` | `"contains"` | Match type: "contains", "equals", "startswith", "endswith", "regex" |
-| `case_sensitive` | `bool` | `True` | Whether matching is case-sensitive |
+| Parameter        | Type   | Default      | Description                                                         |
+| ---------------- | ------ | ------------ | ------------------------------------------------------------------- |
+| `keyword`        | `str`  | required     | Pattern to match (string or regex)                                  |
+| `text_key`       | `str`  | required     | JSONPath to extract value from trace                                |
+| `match_type`     | `str`  | `"contains"` | Match type: "contains", "equals", "startswith", "endswith", "regex" |
+| `case_sensitive` | `bool` | `True`       | Whether matching is case-sensitive                                  |
 
 **Match Types:**
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `contains` | Pattern appears anywhere in text | "hello" in "hello world" |
-| `equals` | Exact match | "hello" == "hello" |
-| `startswith` | Text starts with pattern | "hello world".startswith("hello") |
-| `endswith` | Text ends with pattern | "hello world".endswith("world") |
-| `regex` | Regular expression match | re.search(r"\d+", "test123") |
+| Type         | Description                      | Example                           |
+| ------------ | -------------------------------- | --------------------------------- |
+| `contains`   | Pattern appears anywhere in text | "hello" in "hello world"          |
+| `equals`     | Exact match                      | "hello" == "hello"                |
+| `startswith` | Text starts with pattern         | "hello world".startswith("hello") |
+| `endswith`   | Text ends with pattern           | "hello world".endswith("world")   |
+| `regex`      | Regular expression match         | re.search(r"\d+", "test123")      |
 
 ---
 
@@ -157,36 +158,28 @@ Check that extracted values equal an expected value.
 from giskard.checks import Equals
 
 # Check exact value
-check = Equals(
-    expected_value=42,
-    key="trace.last.outputs.count"
-)
+check = Equals(expected_value=42, key="trace.last.outputs.count")
 
 # Check string equality
-check = Equals(
-    expected_value="success",
-    key="trace.last.outputs.status"
-)
+check = Equals(expected_value="success", key="trace.last.outputs.status")
 
 # Compare against value from trace
 check = Equals(
     expected_value_key="trace.interactions[0].outputs.baseline",
-    key="trace.last.outputs.result"
+    key="trace.last.outputs.result",
 )
 ```
 
 **Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `expected_value` | `Any \| None` | `None` | Static expected value |
-| `expected_value_key` | `str \| None` | `None` | JSONPath to extract expected value from trace |
-| `key` | `str` | required | JSONPath to extract actual value |
-| `normalization_form` | `str \| None` | `None` | Unicode normalization: "NFC", "NFD", "NFKC", "NFKD" |
+| Parameter            | Type          | Default  | Description                                         |
+| -------------------- | ------------- | -------- | --------------------------------------------------- |
+| `expected_value`     | `Any \| None` | `None`   | Static expected value                               |
+| `expected_value_key` | `str \| None` | `None`   | JSONPath to extract expected value from trace       |
+| `key`                | `str`         | required | JSONPath to extract actual value                    |
+| `normalization_form` | `str \| None` | `None`   | Unicode normalization: "NFC", "NFD", "NFKC", "NFKD" |
 
-:::note[Required Parameters]
 Provide exactly one of `expected_value` or `expected_value_key`.
-:::
 
 ### `NotEquals`
 
@@ -195,10 +188,7 @@ Check that extracted values do not equal an expected value.
 ```python
 from giskard.checks import NotEquals
 
-check = NotEquals(
-    expected_value="error",
-    key="trace.last.outputs.status"
-)
+check = NotEquals(expected_value="error", key="trace.last.outputs.status")
 ```
 
 ### `GreaterThan`
@@ -209,8 +199,7 @@ Check that extracted values are greater than an expected value.
 from giskard.checks import GreaterThan
 
 check = GreaterThan(
-    expected_value=0.8,
-    key="trace.last.metadata.confidence_score"
+    expected_value=0.8, key="trace.last.metadata.confidence_score"
 )
 ```
 
@@ -221,10 +210,7 @@ Check that extracted values are greater than or equal to an expected value.
 ```python
 from giskard.checks import GreaterEquals
 
-check = GreaterEquals(
-    expected_value=100,
-    key="trace.last.outputs.user_count"
-)
+check = GreaterEquals(expected_value=100, key="trace.last.outputs.user_count")
 ```
 
 ### `LesserThan`
@@ -234,10 +220,7 @@ Check that extracted values are less than an expected value.
 ```python
 from giskard.checks import LesserThan
 
-check = LesserThan(
-    expected_value=500,
-    key="trace.last.metadata.latency_ms"
-)
+check = LesserThan(expected_value=500, key="trace.last.metadata.latency_ms")
 ```
 
 ### `LesserThanEquals`
@@ -248,14 +231,13 @@ Check that extracted values are less than or equal to an expected value.
 from giskard.checks import LesserThanEquals
 
 check = LesserThanEquals(
-    expected_value=1000,
-    key="trace.last.metadata.token_count"
+    expected_value=1000, key="trace.last.metadata.token_count"
 )
 ```
 
-:::caution[Type Compatibility]
-Comparison checks use Python's comparison operators (`==`, `>`, `<`, etc.). Ensure the extracted values and expected values are compatible types for comparison.
-:::
+Comparison checks use Python's comparison operators (`==`, `>`, `<`, etc.).
+Ensure the extracted values and expected values are compatible types for
+comparison.
 
 ---
 
@@ -271,15 +253,18 @@ Abstract base class for creating custom LLM-powered checks.
 
 #### Description
 
-`BaseLLMCheck` provides a framework for building checks that leverage Large Language Models for evaluation. It handles the LLM interaction, prompt rendering, and result parsing, so subclasses only need to define the evaluation prompt.
+`BaseLLMCheck` provides a framework for building checks that leverage Large
+Language Models for evaluation. It handles the LLM interaction, prompt
+rendering, and result parsing, so subclasses only need to define the evaluation
+prompt.
 
 #### Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `generator` | `BaseGenerator \| None` | `None` | LLM generator for evaluation. Falls back to the global default if not provided |
-| `name` | `str \| None` | `None` | Optional check name |
-| `description` | `str \| None` | `None` | Optional description |
+| Attribute     | Type                    | Default | Description                                                                    |
+| ------------- | ----------------------- | ------- | ------------------------------------------------------------------------------ |
+| `generator`   | `BaseGenerator \| None` | `None`  | LLM generator for evaluation. Falls back to the global default if not provided |
+| `name`        | `str \| None`           | `None`  | Optional check name                                                            |
+| `description` | `str \| None`           | `None`  | Optional description                                                           |
 
 #### Key Methods
 
@@ -288,6 +273,7 @@ Abstract base class for creating custom LLM-powered checks.
 Returns the prompt to send to the LLM. Subclasses must implement this method.
 
 **Returns:**
+
 - Can be a string (automatically converted to MessageTemplate)
 - A Message object
 - A MessageTemplate with Jinja2 templating
@@ -295,12 +281,15 @@ Returns the prompt to send to the LLM. Subclasses must implement this method.
 
 ##### `get_inputs(trace: Trace) -> dict[str, Any]`
 
-Provides template variables for prompt rendering. Override to customize available variables.
+Provides template variables for prompt rendering. Override to customize
+available variables.
 
 **Parameters:**
+
 - `trace` (`Trace`): The trace containing interaction history
 
 **Returns:**
+
 - `dict[str, Any]`: Template variables (default: `{"trace": trace}`)
 
 ##### `run(trace: Trace) -> CheckResult`
@@ -312,6 +301,7 @@ Executes the LLM-based check (inherited, usually doesn't need to be overridden).
 ```python
 from giskard.checks.judges.base import BaseLLMCheck
 from giskard.agents.generators import Generator
+
 
 @BaseLLMCheck.register("custom_llm_check")
 class CustomLLMCheck(BaseLLMCheck):
@@ -330,19 +320,16 @@ class CustomLLMCheck(BaseLLMCheck):
 
     def get_inputs(self, trace):
         # Optionally customize template variables
-        return {
-            "trace": trace,
-            "custom_var": "additional context"
-        }
+        return {"trace": trace, "custom_var": "additional context"}
+
 
 # Usage
 check = CustomLLMCheck(
     custom_instruction="Response must be concise and helpful",
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 ```
 
-:::tip[Setting Default Generator]
 Configure a default generator to avoid passing it to every LLM check:
 
 ```python
@@ -351,11 +338,11 @@ from giskard.checks import set_default_generator
 
 set_default_generator(Generator(model="openai/gpt-4"))
 ```
-:::
 
 #### Output Format
 
 LLM checks expect the model to return structured output with:
+
 - `passed` (bool): Whether the check passed
 - `reason` (str, optional): Explanation of the result
 
@@ -371,12 +358,13 @@ Default result model for LLM-based checks.
 
 #### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `passed` | `bool` | Whether the check passed |
-| `reason` | `str \| None` | Optional explanation for the result |
+| Attribute | Type          | Description                         |
+| --------- | ------------- | ----------------------------------- |
+| `passed`  | `bool`        | Whether the check passed            |
+| `reason`  | `str \| None` | Optional explanation for the result |
 
-This is the structured output format expected from the LLM when using `BaseLLMCheck`.
+This is the structured output format expected from the LLM when using
+`BaseLLMCheck`.
 
 ---
 
@@ -388,17 +376,20 @@ Validates that answers are grounded in provided context documents.
 
 #### Description
 
-Uses an LLM to determine if an answer is properly supported by the given context. This is crucial for RAG (Retrieval-Augmented Generation) systems to ensure responses don't hallucinate information not present in the retrieved documents.
+Uses an LLM to determine if an answer is properly supported by the given
+context. This is crucial for RAG (Retrieval-Augmented Generation) systems to
+ensure responses don't hallucinate information not present in the retrieved
+documents.
 
 #### Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `answer` | `str \| None` | `None` | The answer text to evaluate |
-| `answer_key` | `str` | `"trace.last.outputs"` | JSONPath to extract answer from trace |
-| `context` | `str \| list[str] \| None` | `None` | Context document(s) that should support the answer |
-| `context_key` | `str` | `"trace.last.metadata.context"` | JSONPath to extract context from trace |
-| `generator` | `BaseGenerator \| None` | `None` | LLM generator for evaluation |
+| Attribute     | Type                       | Default                         | Description                                        |
+| ------------- | -------------------------- | ------------------------------- | -------------------------------------------------- |
+| `answer`      | `str \| None`              | `None`                          | The answer text to evaluate                        |
+| `answer_key`  | `str`                      | `"trace.last.outputs"`          | JSONPath to extract answer from trace              |
+| `context`     | `str \| list[str] \| None` | `None`                          | Context document(s) that should support the answer |
+| `context_key` | `str`                      | `"trace.last.metadata.context"` | JSONPath to extract context from trace             |
+| `generator`   | `BaseGenerator \| None`    | `None`                          | LLM generator for evaluation                       |
 
 #### Usage
 
@@ -410,8 +401,11 @@ from giskard.agents.generators import Generator
 
 check = Groundedness(
     answer="The Eiffel Tower is in Paris.",
-    context=["Paris is the capital of France.", "The Eiffel Tower is a famous landmark."],
-    generator=Generator(model="openai/gpt-4")
+    context=[
+        "Paris is the capital of France.",
+        "The Eiffel Tower is a famous landmark.",
+    ],
+    generator=Generator(model="openai/gpt-4"),
 )
 ```
 
@@ -421,19 +415,15 @@ check = Groundedness(
 check = Groundedness(
     answer_key="trace.last.outputs.answer",
     context_key="trace.last.metadata.retrieved_docs",
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 
 # Run against a trace
 result = await check.run(trace)
 ```
 
-:::note[Context Format]
-The `context` parameter can be:
-- A single string document
-- A list of string documents
-- Extracted from trace metadata using `context_key`
-:::
+The `context` parameter can be: a single string document, a list of string
+documents, or extracted from trace metadata using `context_key`.
 
 ---
 
@@ -445,14 +435,16 @@ Validates that interactions conform to a specified rule or requirement.
 
 #### Description
 
-Uses an LLM to evaluate whether an interaction (inputs, outputs, and metadata) conforms to a given rule. The rule supports Jinja2 templating, allowing for dynamic rules that reference trace data.
+Uses an LLM to evaluate whether an interaction (inputs, outputs, and metadata)
+conforms to a given rule. The rule supports Jinja2 templating, allowing for
+dynamic rules that reference trace data.
 
 #### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `rule` | `str` | The conformity rule to evaluate. Supports Jinja2 templating with access to the trace object |
-| `generator` | `BaseGenerator \| None` | LLM generator for evaluation (falls back to default) |
+| Attribute   | Type                    | Description                                                                                 |
+| ----------- | ----------------------- | ------------------------------------------------------------------------------------------- |
+| `rule`      | `str`                   | The conformity rule to evaluate. Supports Jinja2 templating with access to the trace object |
+| `generator` | `BaseGenerator \| None` | LLM generator for evaluation (falls back to default)                                        |
 
 #### Usage
 
@@ -464,7 +456,7 @@ from giskard.agents.generators import Generator
 
 check = Conformity(
     rule="The response must be professional and polite",
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 ```
 
@@ -472,8 +464,11 @@ check = Conformity(
 
 ```python
 check = Conformity(
-    rule="The response must contain the keywords '{{ trace.last.inputs.required_keywords }}' and be concise",
-    generator=Generator(model="openai/gpt-4")
+    rule=(
+        "The response must contain the keywords "
+        "'{{ trace.last.inputs.required_keywords }}' and be concise"
+    ),
+    generator=Generator(model="openai/gpt-4"),
 )
 
 # The rule is rendered at runtime with access to trace data
@@ -495,13 +490,15 @@ check = Conformity(
 
 # Reference earlier interactions
 check = Conformity(
-    rule="Build upon the previous answer: '{{ trace.interactions[-2].outputs }}'"
+    rule=(
+        "Build upon the previous answer: "
+        "'{{ trace.interactions[-2].outputs }}'"
+    )
 )
 ```
 
-:::tip[Template Variables]
-In Jinja2 templates, prefer `trace.last` over `trace.interactions[-1]` for better readability. Both provide access to the most recent interaction.
-:::
+In Jinja2 templates, prefer `trace.last` over `trace.interactions[-1]` for
+better readability. Both provide access to the most recent interaction.
 
 ---
 
@@ -513,19 +510,20 @@ General-purpose LLM-based validation with custom prompts.
 
 #### Description
 
-The most flexible LLM check that allows you to define completely custom evaluation logic through prompts. Use this when the specialized checks (Groundedness, Conformity) don't fit your needs.
+The most flexible LLM check that allows you to define completely custom
+evaluation logic through prompts. Use this when the specialized checks
+(Groundedness, Conformity) don't fit your needs.
 
 #### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `prompt` | `str \| None` | Inline prompt content with Jinja2 templating support |
-| `prompt_path` | `str \| None` | Path to a template file (e.g., `"checks::my_template.j2"`) |
-| `generator` | `BaseGenerator \| None` | LLM generator for evaluation |
+| Attribute     | Type                    | Description                                                |
+| ------------- | ----------------------- | ---------------------------------------------------------- |
+| `prompt`      | `str \| None`           | Inline prompt content with Jinja2 templating support       |
+| `prompt_path` | `str \| None`           | Path to a template file (e.g., `"checks::my_template.j2"`) |
+| `generator`   | `BaseGenerator \| None` | LLM generator for evaluation                               |
 
-:::caution[Mutually Exclusive]
-Exactly one of `prompt` or `prompt_path` must be provided. Providing both or neither will raise a validation error.
-:::
+Exactly one of `prompt` or `prompt_path` must be provided. Providing both or
+neither will raise a validation error.
 
 #### Usage
 
@@ -545,7 +543,7 @@ check = LLMJudge(
     Return passed=true if the response is helpful and accurate,
     passed=false otherwise. Provide a reason for your decision.
     """,
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 ```
 
@@ -554,8 +552,7 @@ check = LLMJudge(
 ```python
 # First, create a template file at templates/checks/safety.j2
 check = LLMJudge(
-    prompt_path="checks::safety.j2",
-    generator=Generator(model="openai/gpt-4")
+    prompt_path="checks::safety.j2", generator=Generator(model="openai/gpt-4")
 )
 ```
 
@@ -580,7 +577,7 @@ check = LLMJudge(
     Return passed=true if all criteria are met, passed=false otherwise.
     Include specific reasons for any failures.
     """,
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 ```
 
@@ -588,21 +585,21 @@ check = LLMJudge(
 
 The following variables are available in prompts:
 
-| Variable | Description |
-|----------|-------------|
-| `trace` | Full trace object with all interactions |
-| `trace.interactions` | List of all interactions in order |
-| `trace.last` | Most recent interaction (preferred) |
-| `trace.last.inputs` | Inputs from the most recent interaction |
-| `trace.last.outputs` | Outputs from the most recent interaction |
+| Variable              | Description                               |
+| --------------------- | ----------------------------------------- |
+| `trace`               | Full trace object with all interactions   |
+| `trace.interactions`  | List of all interactions in order         |
+| `trace.last`          | Most recent interaction (preferred)       |
+| `trace.last.inputs`   | Inputs from the most recent interaction   |
+| `trace.last.outputs`  | Outputs from the most recent interaction  |
 | `trace.last.metadata` | Metadata from the most recent interaction |
 
 :::tip[When to Use LLMJudge]
+
 - Custom evaluation criteria not covered by other checks
 - Multi-turn conversation analysis
 - Complex decision trees requiring LLM reasoning
-- Domain-specific validation logic
-:::
+- Domain-specific validation logic :::
 
 ---
 
@@ -620,19 +617,19 @@ check = SemanticSimilarity(
     expected="The capital of France is Paris.",
     actual_key="trace.last.outputs",
     threshold=0.8,
-    generator=Generator(model="openai/gpt-4")
+    generator=Generator(model="openai/gpt-4"),
 )
 ```
 
 **Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `expected` | `str` | required | Expected semantic content |
-| `actual` | `str \| None` | `None` | Actual output to compare |
-| `actual_key` | `str` | `"trace.last.outputs"` | JSONPath to extract actual value |
-| `threshold` | `float` | `0.8` | Similarity threshold (0.0 to 1.0) |
-| `generator` | `BaseGenerator \| None` | `None` | LLM generator for evaluation |
+| Parameter    | Type                    | Default                | Description                       |
+| ------------ | ----------------------- | ---------------------- | --------------------------------- |
+| `expected`   | `str`                   | required               | Expected semantic content         |
+| `actual`     | `str \| None`           | `None`                 | Actual output to compare          |
+| `actual_key` | `str`                   | `"trace.last.outputs"` | JSONPath to extract actual value  |
+| `threshold`  | `float`                 | `0.8`                  | Similarity threshold (0.0 to 1.0) |
+| `generator`  | `BaseGenerator \| None` | `None`                 | LLM generator for evaluation      |
 
 ---
 
@@ -647,17 +644,22 @@ scenario = (
     Scenario()
     .interact(
         inputs="What is the capital of France?",
-        outputs=lambda inputs: "Paris is the capital of France."
+        outputs=lambda inputs: "Paris is the capital of France.",
     )
-    .check(Groundedness(
-        context=["France is a country in Europe.", "Paris is the capital."]
-    ))
-    .check(Conformity(
-        rule="The response must be a complete sentence"
-    ))
-    .check(LLMJudge(
-        prompt="Is the response educational and informative? Return passed=true/false."
-    ))
+    .check(
+        Groundedness(
+            context=["France is a country in Europe.", "Paris is the capital."]
+        )
+    )
+    .check(Conformity(rule="The response must be a complete sentence"))
+    .check(
+        LLMJudge(
+            prompt=(
+                "Is the response educational and informative? "
+                "Return passed=true/false."
+            )
+        )
+    )
 )
 ```
 
@@ -702,6 +704,7 @@ For validation logic that doesn't fit built-in checks, create a custom check:
 ```python
 from giskard.checks import Check, CheckResult, Trace
 
+
 @Check.register("custom_business_logic")
 class CustomBusinessCheck(Check):
     threshold: float = 0.9
@@ -717,36 +720,41 @@ class CustomBusinessCheck(Check):
         if category not in self.allowed_categories:
             return CheckResult.failure(
                 message=f"Invalid category: {category}",
-                details={"category": category, "allowed": self.allowed_categories}
+                details={
+                    "category": category,
+                    "allowed": self.allowed_categories,
+                },
             )
 
         # Validate confidence
         if confidence < self.threshold:
             return CheckResult.failure(
-                message=f"Confidence {confidence} below threshold {self.threshold}",
-                details={"confidence": confidence, "threshold": self.threshold}
+                message=(
+                    f"Confidence {confidence} "
+                    f"below threshold {self.threshold}"
+                ),
+                details={"confidence": confidence, "threshold": self.threshold},
             )
 
         return CheckResult.success(
             message="Validation passed",
-            details={"confidence": confidence, "category": category}
+            details={"confidence": confidence, "category": category},
         )
+
 
 # Use the custom check
 check = CustomBusinessCheck(
-    threshold=0.85,
-    allowed_categories=["sports", "news", "entertainment"]
+    threshold=0.85, allowed_categories=["sports", "news", "entertainment"]
 )
 result = await check.run(trace)
 ```
 
-:::tip[When to Create Custom Checks]
-Create custom checks when you need:
+:::tip[When to Create Custom Checks] Create custom checks when you need:
+
 - Complex business logic validation
 - Multiple validation steps in sequence
 - Reusable validation across projects
-- Checks that combine multiple data sources
-:::
+- Checks that combine multiple data sources :::
 
 ---
 
@@ -754,4 +762,5 @@ Create custom checks when you need:
 
 - [Core API](/oss/checks/reference/core/) - Base classes and fundamental types
 - [Scenarios](/oss/checks/reference/scenarios/) - Multi-step workflow testing
-- [Custom Checks Guide](/oss/checks/testing/custom-checks/) - Detailed guide on creating custom checks
+- [Custom Checks](/oss/checks/how-to/custom-checks/) - Build domain-specific
+  checks with from_fn, Check subclasses, and more

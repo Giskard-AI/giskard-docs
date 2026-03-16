@@ -1,57 +1,63 @@
 ---
 title: Overview
 sidebar:
-  order: 1
+  order: 0
 ---
 
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 ## Summary
 
-These tutorials provide complete, working examples that you can adapt
-for your own use cases. Each tutorial includes:
-
-- Full working code
-- Explanation of key concepts
-- Common pitfalls and how to avoid them
-- Extensions and variations
+These tutorials teach you the fundamental patterns of Giskard Checks through
+hands-on, step-by-step exercises. Follow along to build your understanding of
+the core concepts.
 
 ## Available Tutorials
 
 <CardGrid>
-  <LinkCard title="🔍 RAG Evaluation" description="Test retrieval quality, groundedness, and answer relevance in RAG
-systems" href="/oss/checks/tutorials/rag-evaluation/" />
-  <LinkCard title="🤖 Testing Agents" description="Validate multi-step agent workflows with tool usage and reasoning" href="/oss/checks/tutorials/testing-agents/" />
-  <LinkCard title="💬 Chatbot Testing" description="Test conversational flows, context handling, and response quality" href="/oss/checks/tutorials/chatbot-testing/" />
-  <LinkCard title="🛡️ Content Moderation" description="Implement safety checks and content filtering" href="/oss/checks/tutorials/content-moderation/" />
+  <LinkCard
+    title="Your First Test"
+    description="Zero to first passing test in under 10 minutes — no API key or LLM required"
+    href="/oss/checks/tutorials/your-first-test/"
+  />
+  <LinkCard
+    title="Your First LLM Call"
+    description="Configure a generator and call a real language model — then use LLMJudge to evaluate the response"
+    href="/oss/checks/tutorials/single-turn/"
+  />
+  <LinkCard
+    title="Multi-Turn Scenarios"
+    description="Learn how to test conversational flows and stateful interactions across multiple exchanges"
+    href="/oss/checks/tutorials/multi-turn/"
+  />
+  <LinkCard
+    title="Dynamic Scenarios"
+    description="Learn how to use callable inputs and outputs that read from the trace, making interactions context-aware"
+    href="/oss/checks/tutorials/dynamic-scenarios/"
+  />
 </CardGrid>
+
+## Next steps
+
+Once you can build scenarios, extend with your own validation logic: see
+[Custom Checks](/oss/checks/how-to/custom-checks/) to create domain-specific
+checks with `from_fn`, Check subclasses, and more.
+
+**Your First Test** has no prerequisites — no API key or LLM needed. Start there
+if you are new to Giskard Checks.
 
 ## What You'll Learn
 
 Through these tutorials, you'll learn how to:
 
-- Design effective test suites for different AI application types
-- Combine built-in and custom checks for comprehensive validation
+- Design effective test cases for AI applications
 - Handle both single-turn and multi-turn scenarios
+- Use dynamic inputs and outputs for context-aware interactions
 - Use LLM-as-a-judge for nuanced evaluation
-- Track metrics and analyze test results
-- Integrate checks into CI/CD pipelines
 
 ## Prerequisites
 
 Before starting these tutorials, you should:
 
 - Have completed the [Install & Configure](/oss/checks/installation/) guide
-- Be familiar with the [Core Concepts](/oss/checks/testing/core-concepts/)
-- Have basic Python and async/await knowledge
-- Have access to an LLM API (OpenAI, Anthropic, or compatible)
-
-## Getting Help
-
-If you run into issues with these tutorials:
-
-1.  Check the [Core Concepts](/oss/checks/testing/core-concepts/) for concept clarifications
-2.  Review the [Custom Checks](/oss/checks/testing/custom-checks/) guide for check creation
-    patterns
-3.  Look at the API reference for detailed documentation
-4.  Open an issue on GitHub if you find bugs or have suggestions
+- Have basic Python and `async/await` knowledge

@@ -4,15 +4,17 @@ sidebar:
   order: 7
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
-Helper functions and utilities for normalization, value providers, and parameter injection.
+Helper functions and utilities for normalization, value providers, and parameter
+injection.
 
 ---
 
 ## Normalization
 
-Utilities for normalizing strings and data structures using Unicode normalization forms.
+Utilities for normalizing strings and data structures using Unicode
+normalization forms.
 
 **Module:** `giskard.checks.utils.normalization`
 
@@ -39,12 +41,13 @@ normalized = normalize_string(text, normalization_form="NFKD")
 
 **Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `value` | `str` | required | String to normalize |
-| `normalization_form` | `Literal['NFC', 'NFD', 'NFKC', 'NFKD'] \| None` | `None` | Unicode normalization form |
+| Parameter            | Type                                            | Default  | Description                |
+| -------------------- | ----------------------------------------------- | -------- | -------------------------- |
+| `value`              | `str`                                           | required | String to normalize        |
+| `normalization_form` | `Literal['NFC', 'NFD', 'NFKC', 'NFKD'] \| None` | `None`   | Unicode normalization form |
 
 **Returns:**
+
 - `str`: Normalized string
 
 ### `normalize_data`
@@ -58,9 +61,7 @@ from giskard.checks.utils.normalization import normalize_data
 data = {
     "name": "café",
     "items": ["naïve", "résumé"],
-    "details": {
-        "city": "São Paulo"
-    }
+    "details": {"city": "São Paulo"},
 }
 
 normalized_data = normalize_data(data, normalization_form="NFC")
@@ -68,29 +69,30 @@ normalized_data = normalize_data(data, normalization_form="NFC")
 
 **Parameters:**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `data` | `T` (dict or list) | required | Data structure to normalize |
-| `normalization_form` | `Literal['NFC', 'NFD', 'NFKC', 'NFKD'] \| None` | `None` | Unicode normalization form |
+| Parameter            | Type                                            | Default  | Description                 |
+| -------------------- | ----------------------------------------------- | -------- | --------------------------- |
+| `data`               | `T` (dict or list)                              | required | Data structure to normalize |
+| `normalization_form` | `Literal['NFC', 'NFD', 'NFKC', 'NFKD'] \| None` | `None`   | Unicode normalization form  |
 
 **Returns:**
+
 - `T`: Data structure with normalized strings
 
 ### Normalization Forms
 
-| Form | Description | Use Case |
-|------|-------------|----------|
-| `NFC` | Canonical Composition | Most common; combines characters |
-| `NFD` | Canonical Decomposition | Separates base + combining characters |
-| `NFKC` | Compatibility Composition | Combines + converts compatibility chars |
+| Form   | Description                 | Use Case                                 |
+| ------ | --------------------------- | ---------------------------------------- |
+| `NFC`  | Canonical Composition       | Most common; combines characters         |
+| `NFD`  | Canonical Decomposition     | Separates base + combining characters    |
+| `NFKC` | Compatibility Composition   | Combines + converts compatibility chars  |
 | `NFKD` | Compatibility Decomposition | Separates + converts compatibility chars |
 
-:::tip[When to Use Normalization]
-Use normalization when comparing text that may have different Unicode representations:
+:::tip[When to Use Normalization] Use normalization when comparing text that may
+have different Unicode representations:
+
 - User input vs. database values
 - Cross-language text comparison
-- Text from different sources (APIs, files, user input)
-:::
+- Text from different sources (APIs, files, user input) :::
 
 ---
 
@@ -107,9 +109,10 @@ Abstract base class for value providers.
 ```python
 from giskard.checks.utils.value_provider import ValueProvider
 
+
 class CustomProvider(ValueProvider):
     """Custom value provider implementation."""
-    
+
     async def provide(self, *args, **kwargs):
         # Custom logic to provide value
         return computed_value
@@ -131,9 +134,9 @@ result = await provider.provide()  # Returns "hello"
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `value` | `R` | The static value to provide |
+| Parameter | Type | Description                 |
+| --------- | ---- | --------------------------- |
+| `value`   | `R`  | The static value to provide |
 
 ### `CallableValueProvider`
 
@@ -143,8 +146,10 @@ Provider that wraps a callable with parameter injection.
 from giskard.checks.utils.value_provider import CallableValueProvider
 from giskard.checks.utils.parameter_injection import CallableInjectionMapping
 
+
 def compute_value(x: int, y: int) -> int:
     return x + y
+
 
 # Create injection mapping
 mapping = CallableInjectionMapping.from_callable(
@@ -154,8 +159,7 @@ mapping = CallableInjectionMapping.from_callable(
 
 # Create provider
 provider = CallableValueProvider(
-    callable=compute_value,
-    injection_mapping=mapping
+    callable=compute_value, injection_mapping=mapping
 )
 
 # Provide the value
@@ -164,9 +168,9 @@ result = await provider.provide()
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `callable` | `Callable` | Function to call for value |
+| Parameter           | Type                       | Description                       |
+| ------------------- | -------------------------- | --------------------------------- |
+| `callable`          | `Callable`                 | Function to call for value        |
 | `injection_mapping` | `CallableInjectionMapping` | Parameter injection configuration |
 
 ### `ValueGeneratorProvider`
@@ -176,10 +180,12 @@ Provider for generator-based values.
 ```python
 from giskard.checks.utils.value_provider import ValueGeneratorProvider
 
+
 async def value_generator():
     yield "first"
     yield "second"
     yield "third"
+
 
 provider = ValueGeneratorProvider.from_mapping(value_generator)
 
@@ -188,9 +194,8 @@ async for value in provider.provide():
     print(value)
 ```
 
-:::note[Advanced Usage]
-Value providers are primarily used internally by the framework. Most users won't need to interact with them directly.
-:::
+:::note[Advanced Usage] Value providers are primarily used internally by the
+framework. Most users won't need to interact with them directly. :::
 
 ---
 
@@ -207,9 +212,11 @@ Maps parameters to inject into a callable.
 ```python
 from giskard.checks.utils.parameter_injection import CallableInjectionMapping
 
+
 def my_function(trace, inputs, config):
     # Function that needs parameters injected
     return process(trace, inputs, config)
+
 
 # Create injection mapping
 mapping = CallableInjectionMapping.from_callable(
@@ -222,7 +229,7 @@ bound_function = mapping.inject_parameters(
     my_function,
     trace=current_trace,
     inputs=current_inputs,
-    config=current_config
+    config=current_config,
 )
 
 # Call with injected parameters
@@ -236,6 +243,7 @@ result = bound_function()
 Create an injection mapping from a callable.
 
 **Parameters:**
+
 - `callable`: The function to create mapping for
 - `args_reqs`: Positional argument injection requirements
 - `kwargs_reqs`: Keyword argument injection requirements
@@ -247,6 +255,7 @@ Create an injection mapping from a callable.
 Inject parameters into a callable.
 
 **Parameters:**
+
 - `value`: Callable to inject into
 - `args`: Positional arguments to inject
 - `kwargs`: Keyword arguments to inject
@@ -261,15 +270,12 @@ Configuration for a single parameter injection.
 from giskard.checks.utils.parameter_injection import ParameterInjection
 
 # Create parameter injection configuration
-injection = ParameterInjection(
-    name="trace",
-    source="context"
-)
+injection = ParameterInjection(name="trace", source="context")
 ```
 
-:::note[Framework Internal]
-Parameter injection is primarily used internally for dependency injection in checks and interaction specs. Most users won't need to use this directly.
-:::
+:::note[Framework Internal] Parameter injection is primarily used internally for
+dependency injection in checks and interaction specs. Most users won't need to
+use this directly. :::
 
 ---
 
@@ -290,19 +296,23 @@ from giskard.checks.utils.generator import a_generator
 async for value in a_generator("hello"):
     print(value)  # Yields "hello" once
 
+
 # Convert sync generator
 def sync_gen():
     yield 1
     yield 2
     yield 3
 
+
 async for value in a_generator(sync_gen()):
     print(value)  # Yields 1, 2, 3
+
 
 # Convert async generator (pass-through)
 async def async_gen():
     yield "a"
     yield "b"
+
 
 async for value in a_generator(async_gen()):
     print(value)  # Yields "a", "b"
@@ -310,11 +320,12 @@ async for value in a_generator(async_gen()):
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|---------|
+| Parameter            | Type                                | Description                   |
+| -------------------- | ----------------------------------- | ----------------------------- |
 | `value_or_generator` | `YieldType \| SyncOrAsyncGenerator` | Value or generator to convert |
 
 **Returns:**
+
 - `AsyncGenerator`: Async generator yielding values
 
 **Use Cases:**
@@ -326,6 +337,7 @@ async def process_values(source):
         # Process each value
         result = transform(value)
         yield result
+
 
 # Works with static values
 async for r in process_values("single value"):
@@ -340,9 +352,9 @@ async for r in process_values(my_generator()):
     print(r)
 ```
 
-:::tip[When to Use]
-Use `a_generator` when you need to handle different types of inputs (values, sync generators, async generators) uniformly as async generators.
-:::
+:::tip[When to Use] Use `a_generator` when you need to handle different types of
+inputs (values, sync generators, async generators) uniformly as async
+generators. :::
 
 ---
 
@@ -354,24 +366,23 @@ Use `a_generator` when you need to handle different types of inputs (values, syn
 from giskard.checks import Check, CheckResult, Trace
 from giskard.checks.utils.normalization import normalize_string
 
+
 @Check.register("normalized_comparison")
 class NormalizedComparison(Check):
     expected: str
     normalization_form: str = "NFC"
-    
+
     async def run(self, trace: Trace) -> CheckResult:
         actual = trace.last.outputs
-        
+
         # Normalize both strings
         expected_norm = normalize_string(
-            self.expected,
-            normalization_form=self.normalization_form
+            self.expected, normalization_form=self.normalization_form
         )
         actual_norm = normalize_string(
-            actual,
-            normalization_form=self.normalization_form
+            actual, normalization_form=self.normalization_form
         )
-        
+
         if expected_norm == actual_norm:
             return CheckResult.success(
                 message="Strings match after normalization"
@@ -379,10 +390,7 @@ class NormalizedComparison(Check):
         else:
             return CheckResult.failure(
                 message="Strings don't match",
-                details={
-                    "expected": expected_norm,
-                    "actual": actual_norm
-                }
+                details={"expected": expected_norm, "actual": actual_norm},
             )
 ```
 
@@ -391,22 +399,23 @@ class NormalizedComparison(Check):
 ```python
 from giskard.checks.utils.value_provider import ValueProvider
 
+
 class DatabaseValueProvider(ValueProvider):
     """Provide values from a database."""
-    
+
     def __init__(self, query: str, db_connection):
         self.query = query
         self.db = db_connection
-    
+
     async def provide(self, **params):
         # Execute query with parameters
         result = await self.db.execute(self.query, **params)
         return result.fetchone()
 
+
 # Use in testing
 provider = DatabaseValueProvider(
-    query="SELECT name FROM users WHERE id = :user_id",
-    db_connection=db
+    query="SELECT name FROM users WHERE id = :user_id", db_connection=db
 )
 
 # Get value
@@ -418,5 +427,5 @@ user_name = await provider.provide(user_id=123)
 ## See Also
 
 - [Core API](/oss/checks/reference/core/) - Core types and base classes
-- [Built-in Checks](/oss/checks/reference/builtin-checks/) - Checks using normalization
+- [Built-in Checks](/oss/checks/reference/checks/) - Checks using normalization
 - [Generators](/oss/checks/reference/generators/) - Input generators

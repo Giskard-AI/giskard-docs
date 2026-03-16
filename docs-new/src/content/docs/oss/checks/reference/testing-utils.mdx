@@ -4,7 +4,7 @@ sidebar:
   order: 5
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
 Testing utilities, test runners, and debugging helpers.
 
@@ -18,19 +18,21 @@ Bundle a trace with a set of checks to execute.
 
 ### Description
 
-`TestCase` combines a trace (with pre-recorded interactions) and a sequence of checks to run against that trace. This is useful for testing against fixed interaction sequences or replaying recorded conversations.
+`TestCase` combines a trace (with pre-recorded interactions) and a sequence of
+checks to run against that trace. This is useful for testing against fixed
+interaction sequences or replaying recorded conversations.
 
-:::note[Recommended Approach]
-For most use cases, use the `Scenario()` fluent API instead, which is simpler and more readable. `TestCase` is useful for advanced use cases where you need direct control over trace construction and check execution.
-:::
+For most use cases, use the `Scenario()` fluent API instead, which is simpler
+and more readable. `TestCase` is useful for advanced use cases where you need
+direct control over trace construction and check execution.
 
 ### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `name` | `str \| None` | Optional label for the test case |
-| `trace` | `Trace` | The trace containing interactions to test against |
-| `checks` | `Sequence[Check]` | Sequence of checks to run against the trace |
+| Attribute | Type              | Description                                       |
+| --------- | ----------------- | ------------------------------------------------- |
+| `name`    | `str \| None`     | Optional label for the test case                  |
+| `trace`   | `Trace`           | The trace containing interactions to test against |
+| `checks`  | `Sequence[Check]` | Sequence of checks to run against the trace       |
 
 ### Creating Test Cases
 
@@ -38,10 +40,12 @@ For most use cases, use the `Scenario()` fluent API instead, which is simpler an
 from giskard.checks import TestCase, Trace, Interaction, Equals
 
 # Create a trace with interactions
-trace = Trace(interactions=[
-    Interaction(inputs="Hello", outputs="Hi there!"),
-    Interaction(inputs="How are you?", outputs="I'm doing well!"),
-])
+trace = Trace(
+    interactions=[
+        Interaction(inputs="Hello", outputs="Hi there!"),
+        Interaction(inputs="How are you?", outputs="I'm doing well!"),
+    ]
+)
 
 # Create test case with checks
 test_case = TestCase(
@@ -50,7 +54,7 @@ test_case = TestCase(
     checks=[
         Equals(expected="Hi there!", key="trace.interactions[0].outputs"),
         Equals(expected="I'm doing well!", key="trace.interactions[1].outputs"),
-    ]
+    ],
 )
 
 # Run the test case
@@ -64,7 +68,9 @@ result = await test_case.run()
 Execute all checks against the trace.
 
 **Parameters:**
-- `return_exception` (`bool`): If True, return results even when exceptions occur instead of raising
+
+- `return_exception` (`bool`): If True, return results even when exceptions
+  occur instead of raising
 
 **Returns:** `TestCaseResult` with check outcomes
 
@@ -81,7 +87,9 @@ print(f"Failed: {result.failed}")
 Run the test case and assert that it passed.
 
 **Raises:**
-- `AssertionError`: If the test case did not pass, with formatted failure messages
+
+- `AssertionError`: If the test case did not pass, with formatted failure
+  messages
 
 ```python
 # Use in tests - raises if any check fails
@@ -92,22 +100,18 @@ result = await test_case.run()
 result.assert_passed()
 ```
 
-:::tip[Testing Framework Integration]
-Use `assert_passed()` to integrate with testing frameworks like pytest or unittest:
+Use `assert_passed()` to integrate with testing frameworks like pytest or
+unittest:
 
 ```python
 import pytest
 
+
 @pytest.mark.asyncio
 async def test_greeting():
-    test_case = TestCase(
-        name="greeting",
-        trace=trace,
-        checks=[greeting_check]
-    )
+    test_case = TestCase(name="greeting", trace=trace, checks=[greeting_check])
     await test_case.assert_passed()
 ```
-:::
 
 ---
 
@@ -119,15 +123,15 @@ Result of test case execution with check outcomes.
 
 ### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `status` | `CheckStatus` | Overall test case status (PASS/FAIL/ERROR) |
-| `trace` | `Trace` | The trace that was tested |
-| `check_results` | `list[CheckResult]` | Results from all checks |
-| `passed` | `bool` | True if all checks passed |
-| `failed` | `bool` | True if any check failed |
-| `message` | `str \| None` | Optional summary message |
-| `details` | `dict[str, Any]` | Additional execution details |
+| Attribute       | Type                | Description                                |
+| --------------- | ------------------- | ------------------------------------------ |
+| `status`        | `CheckStatus`       | Overall test case status (PASS/FAIL/ERROR) |
+| `trace`         | `Trace`             | The trace that was tested                  |
+| `check_results` | `list[CheckResult]` | Results from all checks                    |
+| `passed`        | `bool`              | True if all checks passed                  |
+| `failed`        | `bool`              | True if any check failed                   |
+| `message`       | `str \| None`       | Optional summary message                   |
+| `details`       | `dict[str, Any]`    | Additional execution details               |
 
 ### Accessing Results
 
@@ -159,7 +163,8 @@ Low-level runner for executing test cases.
 
 ### Description
 
-`TestCaseRunner` provides the execution engine for running test cases. Most users should use `test_case.run()` rather than using TestCaseRunner directly.
+`TestCaseRunner` provides the execution engine for running test cases. Most
+users should use `test_case.run()` rather than using TestCaseRunner directly.
 
 ### Methods
 
@@ -168,8 +173,10 @@ Low-level runner for executing test cases.
 Execute a test case's checks against its trace.
 
 **Parameters:**
+
 - `test_case` (`TestCase`): The test case to execute
-- `return_exception` (`bool`): If True, return results even when exceptions occur
+- `return_exception` (`bool`): If True, return results even when exceptions
+  occur
 
 **Returns:** `TestCaseResult` with check outcomes
 
@@ -193,9 +200,8 @@ runner = get_runner()
 result = await runner.run(test_case)
 ```
 
-:::note[Singleton Pattern]
-`get_runner()` returns a singleton runner instance that is reused across all executions within a process.
-:::
+`get_runner()` returns a singleton runner instance that is reused across all
+executions within a process.
 
 ---
 
@@ -207,14 +213,16 @@ Spy on function calls during interaction generation for debugging.
 
 ### Description
 
-`WithSpy` wraps an interaction spec and records all function calls made during interaction generation. This is useful for debugging complex interaction specs or understanding what's happening during scenario execution.
+`WithSpy` wraps an interaction spec and records all function calls made during
+interaction generation. This is useful for debugging complex interaction specs
+or understanding what's happening during scenario execution.
 
 ### Attributes
 
-| Attribute | Type | Description |
-|-----------|------|-------------|
-| `interaction_generator` | `InteractionSpec` | The interaction spec to spy on |
-| `target` | `str` | JSONPath to the value to spy on |
+| Attribute               | Type              | Description                     |
+| ----------------------- | ----------------- | ------------------------------- |
+| `interaction_generator` | `InteractionSpec` | The interaction spec to spy on  |
+| `target`                | `str`             | JSONPath to the value to spy on |
 
 ### Using WithSpy
 
@@ -224,20 +232,16 @@ from giskard.checks import Scenario, Interact, WithSpy
 # Create an interaction spec to spy on
 interaction_spec = Interact(
     inputs=lambda trace: f"Context: {trace.last.outputs if trace.last else 'None'}",
-    outputs=lambda inputs: my_model(inputs)
+    outputs=lambda inputs: my_model(inputs),
 )
 
 # Wrap with spy
 spied_spec = WithSpy(
-    interaction_generator=interaction_spec,
-    target="trace.last.outputs"
+    interaction_generator=interaction_spec, target="trace.last.outputs"
 )
 
 # Use in scenario
-test_scenario = (
-    Scenario("debug_test")
-    .add_interaction(spied_spec)
-)
+test_scenario = Scenario("debug_test").add_interaction(spied_spec)
 
 result = await test_scenario.run()
 
@@ -252,6 +256,7 @@ print(result.details.get("spy_data"))
 from giskard.checks import Scenario, Interact, from_fn
 from giskard.checks.testing.spy import WithSpy
 
+
 # Spy on a complex callable
 def complex_output_generator(inputs):
     # Complex logic
@@ -259,26 +264,23 @@ def complex_output_generator(inputs):
     enriched = enrich_data(processed)
     return generate_response(enriched)
 
+
 # Create spied interaction
 spied_interaction = WithSpy(
     interaction_generator=Interact(
-        inputs="test input",
-        outputs=complex_output_generator
+        inputs="test input", outputs=complex_output_generator
     ),
-    target="trace.last.outputs"
+    target="trace.last.outputs",
 )
 
 # Run and debug
 result = await Scenario("debug").add_interaction(spied_interaction).run()
 ```
 
-:::tip[When to Use WithSpy]
-Use `WithSpy` when:
-- Debugging complex interaction generation logic
-- Understanding the flow of multi-turn interactions
-- Tracking how trace context affects subsequent interactions
-- Investigating unexpected behavior in scenarios
-:::
+Use `WithSpy` when: debugging complex interaction generation logic,
+understanding the flow of multi-turn interactions, tracking how trace context
+affects subsequent interactions, or investigating unexpected behavior in
+scenarios.
 
 ---
 
@@ -294,12 +296,12 @@ recorded_interactions = [
     Interaction(
         inputs="What's the weather?",
         outputs="It's sunny and 75°F.",
-        metadata={"timestamp": "2024-01-01T10:00:00"}
+        metadata={"timestamp": "2024-01-01T10:00:00"},
     ),
     Interaction(
         inputs="Should I bring an umbrella?",
         outputs="No, you won't need one today.",
-        metadata={"timestamp": "2024-01-01T10:00:15"}
+        metadata={"timestamp": "2024-01-01T10:00:15"},
     ),
 ]
 
@@ -312,13 +314,13 @@ test_case = TestCase(
     checks=[
         from_fn(
             lambda t: "sunny" in t.interactions[0].outputs.lower(),
-            name="mentions_weather"
+            name="mentions_weather",
         ),
         from_fn(
             lambda t: "no" in t.interactions[1].outputs.lower(),
-            name="umbrella_not_needed"
+            name="umbrella_not_needed",
         ),
-    ]
+    ],
 )
 
 await test_case.assert_passed()
@@ -350,41 +352,48 @@ print(f"Failed: {failed}/{len(results)}")
 import pytest
 from giskard.checks import TestCase, Trace, Interaction, Equals
 
+
 @pytest.mark.asyncio
 async def test_greeting_response():
     """Test that greeting responses are polite."""
-    trace = Trace(interactions=[
-        Interaction(inputs="Hello", outputs="Hi there! How can I help?")
-    ])
+    trace = Trace(
+        interactions=[
+            Interaction(inputs="Hello", outputs="Hi there! How can I help?")
+        ]
+    )
 
     test_case = TestCase(
         name="greeting_politeness",
         trace=trace,
         checks=[
             from_fn(
-                lambda t: any(word in t.last.outputs.lower()
-                             for word in ["hi", "hello", "hey"]),
-                name="has_greeting"
+                lambda t: any(
+                    word in t.last.outputs.lower()
+                    for word in ["hi", "hello", "hey"]
+                ),
+                name="has_greeting",
             ),
             from_fn(
-                lambda t: "help" in t.last.outputs.lower(),
-                name="offers_help"
+                lambda t: "help" in t.last.outputs.lower(), name="offers_help"
             ),
-        ]
+        ],
     )
 
     await test_case.assert_passed()
 
+
 @pytest.mark.asyncio
 async def test_error_handling():
     """Test that errors are handled gracefully."""
-    trace = Trace(interactions=[
-        Interaction(
-            inputs="invalid command",
-            outputs="I don't understand that command.",
-            metadata={"error_handled": True}
-        )
-    ])
+    trace = Trace(
+        interactions=[
+            Interaction(
+                inputs="invalid command",
+                outputs="I don't understand that command.",
+                metadata={"error_handled": True},
+            )
+        ]
+    )
 
     test_case = TestCase(
         name="error_handling",
@@ -393,9 +402,9 @@ async def test_error_handling():
             Equals(expected=True, key="trace.last.metadata.error_handled"),
             from_fn(
                 lambda t: "don't understand" in t.last.outputs.lower(),
-                name="error_message_present"
+                name="error_message_present",
             ),
-        ]
+        ],
     )
 
     await test_case.assert_passed()
@@ -414,20 +423,21 @@ test_data = [
     ("Hey", "Hey! How can I help?"),
 ]
 
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("greeting_input,expected_output", test_data)
 async def test_greeting_variations(greeting_input, expected_output):
     """Test various greeting inputs."""
-    trace = Trace(interactions=[
-        Interaction(inputs=greeting_input, outputs=expected_output)
-    ])
+    trace = Trace(
+        interactions=[
+            Interaction(inputs=greeting_input, outputs=expected_output)
+        ]
+    )
 
     test_case = TestCase(
         name=f"greeting_{greeting_input}",
         trace=trace,
-        checks=[
-            Equals(expected=expected_output, key="trace.last.outputs")
-        ]
+        checks=[Equals(expected=expected_output, key="trace.last.outputs")],
     )
 
     await test_case.assert_passed()
@@ -437,7 +447,13 @@ async def test_greeting_variations(greeting_input, expected_output):
 
 ## See Also
 
-- [Core API](/oss/checks/api-reference/core/) - Trace, Interaction, and Check details
-- [Scenarios](/oss/checks/api-reference/scenarios/) - Building multi-step test workflows
-- [Built-in Checks](/oss/checks/api-reference/builtin-checks/) - Ready-to-use validation checks
-- [Testing Guide](/oss/checks/testing/) - Comprehensive testing patterns and best practices
+- [Core API](/oss/checks/reference/core/) - Trace, Interaction, and Check
+  details
+- [Scenarios](/oss/checks/reference/scenarios/) - Building multi-step test
+  workflows
+- [Built-in Checks](/oss/checks/reference/checks/) - Ready-to-use validation
+  checks
+- [Tutorials](/oss/checks/tutorials/) - Step-by-step tutorials for core testing
+  patterns
+- [How-to Guides](/oss/checks/how-to/) - Task-oriented guides for specific use
+  cases
