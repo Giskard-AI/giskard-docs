@@ -112,13 +112,13 @@ You can annotate test cases with comments for team collaboration:
 ```python
 comment = hub.test_cases.comments.add(
     "test-case-id",
-    comment="This test case needs a stronger expected output — the current one is too vague.",
+    content="This test case needs a stronger expected output — the current one is too vague.",
 )
 
 print(comment.id)
 
 # Edit a comment
-hub.test_cases.comments.edit("comment-id", test_case_id="test-case-id", comment="Updated comment text.")
+hub.test_cases.comments.edit("comment-id", test_case_id="test-case-id", content="Updated comment text.")
 
 # Delete a comment
 hub.test_cases.comments.delete("comment-id", test_case_id="test-case-id")
