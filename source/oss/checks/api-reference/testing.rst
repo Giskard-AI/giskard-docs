@@ -221,7 +221,7 @@ Measuring Execution Time
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    async def benchmark_test(tc, iterations: int = 10):
        """Run test multiple times and track performance."""

@@ -239,6 +239,8 @@ Check if outputs are grounded in the provided context/inputs.
 
    check = Groundedness(
        name="answer_grounded",
+       answer_key="trace.last.outputs.answer",
+       context="Your reference context here.",
        description="Verify answer is based on context"
    )
 
@@ -261,8 +263,9 @@ Check if outputs conform to instructions or specifications.
 
    check = Conformity(
        name="follows_instructions",
-       description="Ensure response follows the given instructions",
-       rule="Always respond in JSON"
+       key="trace.last.outputs",
+       rule="Always respond in JSON",
+       description="Ensure response follows the given instructions"
    )
 
 

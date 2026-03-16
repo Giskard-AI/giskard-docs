@@ -6,11 +6,10 @@ Practical, end-to-end examples of testing AI applications with Giskard Checks.
 
 .. toctree::
    :maxdepth: 2
-   
+
    rag-evaluation
    testing-agents
    chatbot-testing
-   content-moderation
 
 
 Overview
@@ -33,27 +32,20 @@ Available Tutorials
    .. grid-item-card:: 🔍 RAG Evaluation
       :link: rag-evaluation
       :link-type: doc
-      
+
       Test retrieval quality, groundedness, and answer relevance in RAG systems
 
    .. grid-item-card:: 🤖 Testing Agents
       :link: testing-agents
       :link-type: doc
-      
+
       Validate multi-step agent workflows with tool usage and reasoning
 
    .. grid-item-card:: 💬 Chatbot Testing
       :link: chatbot-testing
       :link-type: doc
-      
+
       Test conversational flows, context handling, and response quality
-
-   .. grid-item-card:: 🛡️ Content Moderation
-      :link: content-moderation
-      :link-type: doc
-      
-      Implement safety checks and content filtering
-
 
 What You'll Learn
 -----------------
@@ -88,4 +80,3 @@ If you run into issues with these tutorials:
 2. Review the :doc:`../ai-testing/custom-checks` guide for check creation patterns
 3. Look at the API reference for detailed documentation
 4. Open an issue on GitHub if you find bugs or have suggestions
-

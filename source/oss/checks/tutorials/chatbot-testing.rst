@@ -214,7 +214,7 @@ Verify the chatbot handles different conversation types:
 
    from giskard.agents.generators import Generator
    from giskard.checks import (
-       scenario,
+       Scenario,
        LLMJudge,
        Equals,
        set_default_generator
@@ -704,6 +704,6 @@ Test with unusual inputs:
 Next Steps
 ----------
 
-* See :doc:`content-moderation` for safety and filtering
+* See :doc:`../ai-testing/custom-checks` for safety checks and content filtering
 * Explore :doc:`testing-agents` for tool-using chatbots
 * Review :doc:`../ai-testing/multi-turn` for complex flows

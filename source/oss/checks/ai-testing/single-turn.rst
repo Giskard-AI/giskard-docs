@@ -204,7 +204,7 @@ Evaluate summary quality, length, and factual consistency:
 
    from giskard.agents.generators import Generator
    from giskard.checks import (
-       scenario,
+       Scenario,
        LLMJudge,
        from_fn,
        set_default_generator

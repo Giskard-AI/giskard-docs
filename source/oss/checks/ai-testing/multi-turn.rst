@@ -149,7 +149,7 @@ Test multi-step agent workflows with tool usage:
 
    from giskard.agents.generators import Generator
    from giskard.checks import (
-       scenario,
+       Scenario,
        LLMJudge,
        from_fn,
        set_default_generator
