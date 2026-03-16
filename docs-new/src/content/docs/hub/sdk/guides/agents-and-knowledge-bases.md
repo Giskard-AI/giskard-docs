@@ -64,7 +64,7 @@ print(output.metadata)  # any metadata returned by your agent
 If your agent's description is missing or stale, the Hub can generate one by observing how the agent behaves:
 
 ```python
-description = hub.agents.autofill_description("agent-id")
+description = hub.agents.generate_description("agent-id")
 hub.agents.update("agent-id", description=description)
 ```
 
