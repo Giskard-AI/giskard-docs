@@ -89,7 +89,7 @@ from giskard_hub.types import Agent, AgentOutput, ChatMessage
 | `bulk_delete(**params)` | `None` | Delete multiple agents |
 | `generate_completion(agent_id, **params)` | `AgentOutput` | Call the agent with a list of messages |
 | `test_connection(**params)` | `AgentOutput` | Test an agent endpoint without registering |
-| `autofill_description(agent_id)` | `str` | AI-generate a description for the agent |
+| `generate_description(agent_id)` | `str` | AI-generate a description for the agent |
 
 **`Agent` fields:** `id`, `name`, `description`, `url`, `project_id`, `supported_languages`, `headers`, `status`, `created_at`, `updated_at`
 
@@ -110,7 +110,7 @@ from giskard_hub.types import Audit, AuditDisplay
 | `search(**params)` | `Union[list[Audit], Tuple[list[Audit], APIPaginatedMetadata]]` | Search audit events with filters |
 | `list_entities(entity_id, entity_type, **params)` | `list[AuditDisplay]` | Audit history for a specific resource |
 
-**Search params:** `filters` (dict — keys: `project_id`, `entity_type`, `entity_id`, `action`, `user_id`, each with `{"selected_options": [...]}` shape; `created_at` with `{"from": ..., "to": ...}` shape), `limit`, `offset`
+**Search params:** `query`, `filters` (dict — keys: `project_id`, `entity_type`, `entity_id`, `action`, `user_id`, each with `{"selected_options": [...]}` shape; `created_at` with `{"from": ..., "to": ...}` shape), `limit`, `offset`
 
 ---
 

@@ -111,7 +111,7 @@ kb = hub.knowledge_bases.create(
     project_id="project-id",
     name="Product Documentation",
     description="Official product docs and FAQs",
-    file=("documents.json", json.dumps(documents).encode("utf-8")),
+    file=documents,
 )
 
 print(kb.id)

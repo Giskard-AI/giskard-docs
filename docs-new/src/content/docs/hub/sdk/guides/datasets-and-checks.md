@@ -146,7 +146,7 @@ test_cases = [
 dataset = hub.datasets.upload(
     project_id="project-id",
     name="Imported Suite",
-    file=("test_cases.json", json.dumps(test_cases).encode("utf-8")),
+    file=test_cases,
 )
 
 print(dataset.id)
