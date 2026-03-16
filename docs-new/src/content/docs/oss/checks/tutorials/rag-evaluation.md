@@ -140,9 +140,9 @@ Test that the system answers questions correctly:
 ``` python
 from giskard.agents.generators import Generator
 from giskard.checks import (
-    scenario,
+    Scenario,
     StringMatching,
-    Equality,
+    Equals,
     from_fn,
     set_default_generator
 )
@@ -152,7 +152,7 @@ set_default_generator(Generator(model="openai/gpt-5-mini"))
 
 async def test_basic_qa():
     tc = (
-        scenario("basic_qa_france_capital")
+        Scenario("basic_qa_france_capital")
         .interact(
             inputs="What is the capital of France?",
             outputs=lambda inputs: rag.answer(inputs)
@@ -200,11 +200,11 @@ asyncio.run(test_basic_qa())
 Verify that answers are grounded in retrieved context:
 
 ``` python
-from giskard.checks import scenario, Groundedness, StringMatching
+from giskard.checks import Scenario, Groundedness, StringMatching
 
 async def test_groundedness():
     tc = (
-        scenario("groundedness_eiffel_tower")
+        Scenario("groundedness_eiffel_tower")
         .interact(
             inputs="When was the Eiffel Tower completed?",
             outputs=lambda inputs: rag.answer(inputs)
@@ -232,7 +232,7 @@ async def test_groundedness():
 Test that the right documents are retrieved:
 
 ``` python
-from giskard.checks import scenario, from_fn
+from giskard.checks import Scenario, from_fn
 
 def check_retrieved_topics(trace) -> bool:
     """Verify retrieved docs are about the right topic."""
@@ -241,7 +241,7 @@ def check_retrieved_topics(trace) -> bool:
     return "Eiffel Tower" in topics or "France" in topics
 
 tc = (
-    scenario("retrieval_quality")
+    Scenario("retrieval_quality")
     .interact(
         inputs="Tell me about the Eiffel Tower",
         outputs=lambda inputs: rag.answer(inputs)
@@ -270,10 +270,10 @@ tc = (
 Test how the system handles questions it can't answer:
 
 ``` python
-from giskard.checks import scenario, LLMJudge, from_fn
+from giskard.checks import Scenario, LLMJudge, from_fn
 
 tc = (
-    scenario("out_of_scope_handling")
+    Scenario("out_of_scope_handling")
     .interact(
         inputs="What is the weather in Tokyo today?",
         outputs=lambda inputs: rag.answer(inputs)
@@ -308,10 +308,10 @@ tc = (
 Use an LLM to evaluate answer quality comprehensively:
 
 ``` python
-from giskard.checks import scenario, LLMJudge
+from giskard.checks import Scenario, LLMJudge
 
 tc = (
-    scenario("comprehensive_quality_check")
+    Scenario("comprehensive_quality_check")
     .interact(
         inputs="What is machine learning?",
         outputs=lambda inputs: rag.answer(inputs)
@@ -346,7 +346,7 @@ Test a conversational RAG that handles follow-up questions:
 
 ``` python
 from giskard.checks import (
-    scenario,
+    Scenario,
     Groundedness,
     from_fn,
     LLMJudge,
@@ -387,7 +387,7 @@ class ConversationalRAG(SimpleRAG):
 conv_rag = ConversationalRAG(documents=knowledge_base)
 
 test_scenario = (
-    scenario("conversational_rag_flow")
+    Scenario("conversational_rag_flow")
     # First question
     .interact(
         inputs="What is the capital of France?",
@@ -469,7 +469,7 @@ class RAGTestSuite:
         tests = []
         for question, expected_content in test_data:
             tc = (
-                scenario(f"qa_{expected_content.replace(' ', '_')}")
+                Scenario(f"qa_{expected_content.replace(' ', '_')}")
                 .interact(
                     inputs=question,
                     outputs=lambda q: self.rag.answer(q)
@@ -503,7 +503,7 @@ class RAGTestSuite:
         tests = []
         for question in questions:
             tc = (
-                scenario(f"groundedness_{question[:20]}")
+                Scenario(f"groundedness_{question[:20]}")
                 .interact(
                     inputs=question,
                     outputs=lambda q: self.rag.answer(q)
@@ -526,7 +526,7 @@ class RAGTestSuite:
         tests = []
         for question, case_name in edge_cases:
             tc = (
-                scenario(f"edge_case_{case_name}")
+                Scenario(f"edge_case_{case_name}")
                 .interact(
                     inputs=question,
                     outputs=lambda q: self.rag.answer(q)

@@ -28,10 +28,10 @@ often erode. A safe first reply can still lead to data leakage or policy
 violations in later turns.
 
 ``` python
-from giskard.checks import scenario, StringMatching
+from giskard.checks import Scenario, StringMatching
 
 test_scenario = (
-    scenario("incident_intake")
+    Scenario("incident_intake")
     # First interaction
     .interact(
         inputs="I think my account was compromised.",
@@ -83,7 +83,7 @@ private data, or break compliance workflows.
 Test systems that maintain conversation state:
 
 ``` python
-from giskard.checks import scenario, from_fn
+from giskard.checks import Scenario, from_fn
 
 class Chatbot:
     def __init__(self):
@@ -114,7 +114,7 @@ class Chatbot:
 bot = Chatbot()
 
 test_scenario = (
-    scenario("case_id_memory")
+    Scenario("case_id_memory")
     .interact(
         inputs="My case ID is SEC-1042.",
         outputs=lambda inputs: bot.chat(inputs)
@@ -177,7 +177,7 @@ class Agent:
 agent = Agent()
 
 test_scenario = (
-    scenario("policy_research_agent")
+    Scenario("policy_research_agent")
     # Agent receives task
     .interact(
         inputs="Find the policy section on export-controlled data sharing.",
@@ -232,7 +232,7 @@ context to avoid compounding mistakes.
 Generate interactions dynamically based on previous outputs:
 
 ``` python
-from giskard.checks import scenario, from_fn, Trace
+from giskard.checks import Scenario, from_fn, Trace
 
 def chatbot(message: str, context: list = None) -> dict:
     # Your chatbot that tracks context
@@ -244,7 +244,7 @@ async def generate_followup(trace: Trace):
     return f"Tell me more about {first_response}"
 
 test_scenario = (
-    scenario("dynamic_incident_followup")
+    Scenario("dynamic_incident_followup")
     .interact(
         inputs="Report a suspected account takeover.",
         outputs=lambda inputs: chatbot(inputs)
@@ -270,7 +270,7 @@ or amplify risk.
 Verify that systems handle errors gracefully across turns:
 
 ``` python
-from giskard.checks import scenario, from_fn, LLMJudge
+from giskard.checks import Scenario, from_fn, LLMJudge
 
 class RobustChatbot:
     def chat(self, message: str) -> dict:
@@ -284,7 +284,7 @@ class RobustChatbot:
 bot = RobustChatbot()
 
 test_scenario = (
-    scenario("error_recovery")
+    Scenario("error_recovery")
     # Send invalid input
     .interact(
         inputs="",
@@ -326,7 +326,7 @@ policies where hallucinations create legal exposure.
 Test RAG systems with follow-up questions and context references:
 
 ``` python
-from giskard.checks import scenario, Groundedness, from_fn
+from giskard.checks import Scenario, Groundedness, from_fn
 
 class ConversationalRAG:
     def __init__(self):
@@ -356,7 +356,7 @@ class ConversationalRAG:
 rag = ConversationalRAG()
 
 test_scenario = (
-    scenario("policy_rag_followups")
+    Scenario("policy_rag_followups")
     # Initial question
     .interact(
         inputs="What is our data retention policy for KYC documents?",
@@ -413,7 +413,7 @@ operations, and missing a step can create costly remediation.
 Test that multi-step tasks are completed successfully:
 
 ``` python
-from giskard.checks import scenario, from_fn, LLMJudge
+from giskard.checks import Scenario, from_fn, LLMJudge
 
 class TaskAgent:
     def __init__(self):
@@ -439,7 +439,7 @@ class TaskAgent:
 agent = TaskAgent()
 
 test_scenario = (
-    scenario("incident_checklist")
+    Scenario("incident_checklist")
     # Add first task
     .interact(
         inputs="Add task: Notify security on-call",
@@ -503,7 +503,7 @@ Add checks after each interaction to validate state:
 
 ``` python
 (
-    scenario("example")
+    Scenario("example")
     .interact(...)
     .check(from_fn(lambda trace: validate_state(trace), name="state_check_1"))
     .interact(...)
@@ -517,7 +517,7 @@ Name scenarios to describe the user flow:
 
 ``` python
 scenario = (
-    scenario("user_onboarding_collect_preferences_send_confirmation")
+    Scenario("user_onboarding_collect_preferences_send_confirmation")
     ...
 )
 ```
@@ -528,11 +528,11 @@ Create separate scenarios for success and failure cases:
 
 ``` python
 happy_path = (
-    scenario("booking_success")
+    Scenario("booking_success")
     ...
 )
 error_path = (
-    scenario("booking_invalid_date")
+    Scenario("booking_invalid_date")
     ...
 )
 ```

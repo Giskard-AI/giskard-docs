@@ -21,7 +21,7 @@ Bundle a trace with a set of checks to execute.
 `TestCase` combines a trace (with pre-recorded interactions) and a sequence of checks to run against that trace. This is useful for testing against fixed interaction sequences or replaying recorded conversations.
 
 :::note[Recommended Approach]
-For most use cases, use the `scenario()` fluent API instead, which is simpler and more readable. `TestCase` is useful for advanced use cases where you need direct control over trace construction and check execution.
+For most use cases, use the `Scenario()` fluent API instead, which is simpler and more readable. `TestCase` is useful for advanced use cases where you need direct control over trace construction and check execution.
 :::
 
 ### Attributes
@@ -219,11 +219,10 @@ Spy on function calls during interaction generation for debugging.
 ### Using WithSpy
 
 ```python
-from giskard.checks import scenario, InteractionSpec
-from giskard.checks.testing.spy import WithSpy
+from giskard.checks import Scenario, Interact, WithSpy
 
 # Create an interaction spec to spy on
-interaction_spec = InteractionSpec(
+interaction_spec = Interact(
     inputs=lambda trace: f"Context: {trace.last.outputs if trace.last else 'None'}",
     outputs=lambda inputs: my_model(inputs)
 )
@@ -236,8 +235,8 @@ spied_spec = WithSpy(
 
 # Use in scenario
 test_scenario = (
-    scenario("debug_test")
-    .add_spec(spied_spec)
+    Scenario("debug_test")
+    .add_interaction(spied_spec)
 )
 
 result = await test_scenario.run()
@@ -250,7 +249,7 @@ print(result.details.get("spy_data"))
 ### Debugging Scenarios
 
 ```python
-from giskard.checks import scenario, from_fn
+from giskard.checks import Scenario, Interact, from_fn
 from giskard.checks.testing.spy import WithSpy
 
 # Spy on a complex callable
@@ -262,7 +261,7 @@ def complex_output_generator(inputs):
 
 # Create spied interaction
 spied_interaction = WithSpy(
-    interaction_generator=InteractionSpec(
+    interaction_generator=Interact(
         inputs="test input",
         outputs=complex_output_generator
     ),
@@ -270,7 +269,7 @@ spied_interaction = WithSpy(
 )
 
 # Run and debug
-result = await scenario("debug").add_spec(spied_interaction).run()
+result = await Scenario("debug").add_interaction(spied_interaction).run()
 ```
 
 :::tip[When to Use WithSpy]
@@ -357,13 +356,13 @@ async def test_greeting_response():
     trace = Trace(interactions=[
         Interaction(inputs="Hello", outputs="Hi there! How can I help?")
     ])
-    
+
     test_case = TestCase(
         name="greeting_politeness",
         trace=trace,
         checks=[
             from_fn(
-                lambda t: any(word in t.last.outputs.lower() 
+                lambda t: any(word in t.last.outputs.lower()
                              for word in ["hi", "hello", "hey"]),
                 name="has_greeting"
             ),
@@ -373,7 +372,7 @@ async def test_greeting_response():
             ),
         ]
     )
-    
+
     await test_case.assert_passed()
 
 @pytest.mark.asyncio
@@ -386,7 +385,7 @@ async def test_error_handling():
             metadata={"error_handled": True}
         )
     ])
-    
+
     test_case = TestCase(
         name="error_handling",
         trace=trace,
@@ -398,7 +397,7 @@ async def test_error_handling():
             ),
         ]
     )
-    
+
     await test_case.assert_passed()
 ```
 
@@ -422,7 +421,7 @@ async def test_greeting_variations(greeting_input, expected_output):
     trace = Trace(interactions=[
         Interaction(inputs=greeting_input, outputs=expected_output)
     ])
-    
+
     test_case = TestCase(
         name=f"greeting_{greeting_input}",
         trace=trace,
@@ -430,7 +429,7 @@ async def test_greeting_variations(greeting_input, expected_output):
             Equals(expected=expected_output, key="trace.last.outputs")
         ]
     )
-    
+
     await test_case.assert_passed()
 ```
 

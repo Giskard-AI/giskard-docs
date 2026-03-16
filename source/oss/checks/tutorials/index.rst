@@ -10,6 +10,7 @@ Practical, end-to-end examples of testing AI applications with Giskard Checks.
    rag-evaluation
    testing-agents
    chatbot-testing
+   content-moderation
 
 
 Overview
@@ -46,6 +47,12 @@ Available Tutorials
       :link-type: doc
 
       Test conversational flows, context handling, and response quality
+
+   .. grid-item-card:: 🛡️ Content Moderation
+      :link: content-moderation
+      :link-type: doc
+
+      Implement safety checks and content filtering
 
 What You'll Learn
 -----------------

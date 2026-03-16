@@ -66,12 +66,12 @@ class MinLengthCheck(Check):
 ### Using Your Custom Check
 
 ``` python
-from giskard.checks import scenario
+from giskard.checks import Scenario
 
 check = MinLengthCheck(name="length_check", min_length=20)
 
 tc = (
-    scenario("test")
+    Scenario("test")
     .interact(
         inputs="test",
         outputs="This is a reasonably long output"
@@ -139,7 +139,8 @@ for check_result in result.results:
 Use JSONPath to extract values from complex structures:
 
 ``` python
-from giskard.checks import Check, CheckResult, Trace, JsonPathExtractor
+from giskard.checks import Check, CheckResult, Trace
+from giskard.checks.core.extraction import resolve, NoMatch
 
 @Check.register("field_validator")
 class FieldValidatorCheck(Check):
@@ -147,8 +148,11 @@ class FieldValidatorCheck(Check):
     min_value: float
 
     async def run(self, trace: Trace) -> CheckResult:
-        extractor = JsonPathExtractor(key=self.field_path)
-        value = extractor.extract(trace)
+        value = resolve(trace, self.field_path)
+        if isinstance(value, NoMatch):
+            return CheckResult.failure(
+                message=f"No value found at {self.field_path}"
+            )
 
         if value >= self.min_value:
             return CheckResult.success(
@@ -442,7 +446,7 @@ from giskard.checks import Interaction, Trace
 
 @pytest.mark.asyncio
 async def test_min_length_check():
-    from giskard.checks import scenario, Trace, Interaction
+    from giskard.checks import Scenario, Trace, Interaction
 
     # Test passing case
     trace_pass = Trace(interactions=[

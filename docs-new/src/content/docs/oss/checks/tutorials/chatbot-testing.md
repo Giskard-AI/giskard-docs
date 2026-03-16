@@ -138,12 +138,12 @@ class SimpleChatbot:
 Test a simple greeting and name exchange:
 
 ``` python
-from giskard.checks import scenario, from_fn, StringMatching
+from giskard.checks import Scenario, from_fn, StringMatching
 
 bot = SimpleChatbot()
 
 test_scenario = (
-    scenario("greeting_and_introduction")
+    Scenario("greeting_and_introduction")
     # User greets
     .interact(
         inputs="Hello",
@@ -209,9 +209,9 @@ Verify the chatbot handles different conversation types:
 ``` python
 from giskard.agents.generators import Generator
 from giskard.checks import (
-    scenario,
+    Scenario,
     LLMJudge,
-    Equality,
+    Equals,
     set_default_generator
 )
 
@@ -220,14 +220,14 @@ set_default_generator(Generator(model="openai/gpt-5-mini"))
 bot = SimpleChatbot()
 
 test_scenario = (
-    scenario("context_switching")
+    Scenario("context_switching")
     # Start with casual conversation
     .interact(
         inputs="Hi there!",
         outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
-        Equality(
+        Equals(
             name="casual_context",
             expected="casual",
             key="trace.last.outputs.context.conversation_type"
@@ -240,7 +240,7 @@ test_scenario = (
         outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
-        Equality(
+        Equals(
             name="support_context",
             expected="support",
             key="trace.last.outputs.context.conversation_type"
@@ -267,7 +267,7 @@ test_scenario = (
         outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
-        Equality(
+        Equals(
             name="sales_context",
             expected="sales",
             key="trace.last.outputs.context.conversation_type"
@@ -281,12 +281,12 @@ test_scenario = (
 Evaluate response quality using LLM-as-a-judge:
 
 ``` python
-from giskard.checks import scenario, LLMJudge
+from giskard.checks import Scenario, LLMJudge
 
 bot = SimpleChatbot(personality="professional")
 
 tc = (
-    scenario("response_quality_test")
+    Scenario("response_quality_test")
     .interact(
         inputs="I need help understanding your pricing",
         outputs=lambda inputs: bot.chat(inputs)
@@ -336,19 +336,19 @@ tc = (
 Test the chatbot's ability to extract and remember user information:
 
 ``` python
-from giskard.checks import scenario, from_fn, Equality
+from giskard.checks import Scenario, from_fn, Equals
 
 bot = SimpleChatbot()
 
 test_scenario = (
-    scenario("information_collection")
+    Scenario("information_collection")
     # Collect name
     .interact(
         inputs="Hi, I'm Bob Johnson",
         outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
-        Equality(
+        Equals(
             name="extracted_name",
             expected="Bob",
             key="trace.last.outputs.context.user_name"
@@ -361,7 +361,7 @@ test_scenario = (
         outputs=lambda inputs: bot.chat(inputs)
     )
     .check(
-        Equality(
+        Equals(
             name="extracted_email",
             expected="bob.johnson@example.com",
             key="trace.last.outputs.context.user_email"
@@ -392,13 +392,13 @@ test_scenario = (
 Test how the chatbot handles unusual inputs:
 
 ``` python
-from giskard.checks import scenario, from_fn, LLMJudge
+from giskard.checks import Scenario, from_fn, LLMJudge
 
 bot = SimpleChatbot()
 
 # Test empty input
 tc_empty = (
-    scenario("empty_input_handling")
+    Scenario("empty_input_handling")
     .interact(
         inputs="",
         outputs=lambda inputs: bot.chat(inputs) if inputs else ChatResponse(
@@ -417,7 +417,7 @@ tc_empty = (
 
 # Test very long input
 tc_long = (
-    scenario("long_input_handling")
+    Scenario("long_input_handling")
     .interact(
         inputs="Hello " * 1000,
         outputs=lambda inputs: bot.chat(inputs)
@@ -433,7 +433,7 @@ tc_long = (
 
 # Test gibberish
 tc_gibberish = (
-    scenario("gibberish_handling")
+    Scenario("gibberish_handling")
     .interact(
         inputs="asdfghjkl qwertyuiop zxcvbnm",
         outputs=lambda inputs: bot.chat(inputs)
@@ -464,7 +464,7 @@ tc_gibberish = (
 Test complex stateful interactions:
 
 ``` python
-from giskard.checks import scenario, from_fn, LLMJudge, StringMatching
+from giskard.checks import Scenario, from_fn, LLMJudge, StringMatching
 
 class StatefulChatbot(SimpleChatbot):
     def __init__(self):
@@ -503,7 +503,7 @@ class StatefulChatbot(SimpleChatbot):
 stateful_bot = StatefulChatbot()
 
 test_scenario = (
-    scenario("confirmation_flow")
+    Scenario("confirmation_flow")
     # Request action requiring confirmation
     .interact(
         inputs="I want to delete my account",
@@ -558,7 +558,7 @@ Combine all tests into a comprehensive suite:
 
 ``` python
 import asyncio
-from giskard.checks import scenario
+from giskard.checks import Scenario
 
 class ChatbotTestSuite:
     def __init__(self, chatbot):
@@ -582,7 +582,7 @@ class ChatbotTestSuite:
         for test_scenario in self.scenarios:
             print(f"  Running scenario: {test_scenario.name}")
             result = await test_scenario.run()
-            results.append(("scenario", test_scenario.name, result))
+            results.append(("Scenario", test_scenario.name, result))
 
         # Run test cases
         for tc in self.test_cases:
@@ -635,7 +635,7 @@ Don't just test individual responses—test complete conversation flows:
 
 ``` python
 test_scenario = (
-    scenario("complete_support_flow")
+    Scenario("complete_support_flow")
     # Greeting -> Problem statement -> Information collection -> Resolution
     ...
 )

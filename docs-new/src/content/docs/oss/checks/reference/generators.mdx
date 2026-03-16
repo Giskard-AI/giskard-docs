@@ -51,11 +51,11 @@ user_sim = UserSimulator(
 ### Using in Scenarios
 
 ```python
-from giskard.checks import scenario, from_fn
+from giskard.checks import Scenario, from_fn
 
 # Create a scenario with simulated user
 test_scenario = (
-    scenario("booking_flow")
+    Scenario("booking_flow")
     .interact(
         inputs=user_sim,  # Use simulator for inputs
         outputs=lambda inputs: booking_agent(inputs)
@@ -72,7 +72,7 @@ result = await test_scenario.run()
 ### Multi-step Simulations
 
 ```python
-from giskard.checks import scenario, Equals
+from giskard.checks import Scenario, Equals
 
 # Simulate a complete customer support conversation
 support_sim = UserSimulator(
@@ -87,7 +87,7 @@ support_sim = UserSimulator(
 )
 
 test_scenario = (
-    scenario("support_escalation")
+    Scenario("support_escalation")
     .interact(
         inputs=support_sim,
         outputs=lambda inputs: support_agent(inputs)
@@ -122,7 +122,7 @@ goal_oriented_sim = UserSimulator(
 )
 
 test_scenario = (
-    scenario("product_search")
+    Scenario("product_search")
     .interact(
         inputs=goal_oriented_sim,
         outputs=lambda inputs: ecommerce_agent(inputs)
@@ -163,7 +163,7 @@ result = await test_scenario.run()
 last_interaction = result.trace.last
 if "simulator_output" in last_interaction.metadata:
     output = last_interaction.metadata["simulator_output"]
-    
+
     if output.goal_reached:
         print("✓ User goal was achieved")
         print(f"Details: {output.message}")
@@ -188,20 +188,20 @@ Base class for creating custom input generators.
 
 ```python
 from giskard.checks.core.input_generator import InputGenerator
-from giskard.checks import scenario
+from giskard.checks import Scenario
 
 class SequentialInputGenerator(InputGenerator):
     """Generate sequential inputs from a list."""
-    
+
     def __init__(self, inputs_list: list[str]):
         self.inputs_list = inputs_list
         self.index = 0
-    
+
     async def generate(self, trace):
         """Generate the next input from the sequence."""
         if self.index >= len(self.inputs_list):
             return None  # No more inputs
-        
+
         input_value = self.inputs_list[self.index]
         self.index += 1
         return input_value
@@ -214,7 +214,7 @@ gen = SequentialInputGenerator([
 ])
 
 test_scenario = (
-    scenario("sequential_test")
+    Scenario("sequential_test")
     .interact(
         inputs=gen,
         outputs=lambda inputs: chatbot(inputs)
@@ -230,10 +230,10 @@ from giskard.checks.core.input_generator import InputGenerator
 
 class RandomQuestionGenerator(InputGenerator):
     """Generate random questions from a pool."""
-    
+
     def __init__(self, question_pool: list[str]):
         self.question_pool = question_pool
-    
+
     async def generate(self, trace):
         """Generate a random question."""
         return random.choice(self.question_pool)
@@ -249,7 +249,7 @@ questions = [
 gen = RandomQuestionGenerator(questions)
 
 test_scenario = (
-    scenario("random_qa")
+    Scenario("random_qa")
     .interact(inputs=gen, outputs=lambda inputs: assistant(inputs))
     .check(from_fn(
         lambda trace: len(trace.last.outputs) > 0,
@@ -265,29 +265,29 @@ from giskard.checks.core.input_generator import InputGenerator
 
 class ContextAwareGenerator(InputGenerator):
     """Generate inputs based on conversation context."""
-    
+
     def __init__(self, strategy: str = "follow_up"):
         self.strategy = strategy
-    
+
     async def generate(self, trace):
         """Generate context-aware input."""
         if not trace.last:
             return "Hello, I need help"
-        
+
         last_output = trace.last.outputs
-        
+
         if self.strategy == "follow_up":
             if "question" in last_output.lower():
                 return "Yes, please tell me more"
             elif "help" in last_output.lower():
                 return "I need assistance with my account"
-        
+
         return "Thank you"
 
 gen = ContextAwareGenerator(strategy="follow_up")
 
 test_scenario = (
-    scenario("context_test")
+    Scenario("context_test")
     .interact(inputs=gen, outputs=lambda inputs: agent(inputs))
 )
 ```
@@ -299,7 +299,7 @@ test_scenario = (
 ### Testing Conversational Flows
 
 ```python
-from giskard.checks import scenario, from_fn
+from giskard.checks import Scenario, from_fn
 from giskard.checks.generators.user import UserSimulator
 from giskard.agents.generators import Generator
 
@@ -316,7 +316,7 @@ customer_sim = UserSimulator(
 )
 
 test_flow = (
-    scenario("customer_service")
+    Scenario("customer_service")
     .interact(
         inputs=customer_sim,
         outputs=lambda inputs: customer_service_bot(inputs)
@@ -357,12 +357,12 @@ for persona in personas:
         max_steps=5,
         generator=Generator(model="openai/gpt-4")
     )
-    
+
     test_scenario = (
-        scenario(persona["name"])
+        Scenario(persona["name"])
         .interact(inputs=sim, outputs=lambda inputs: agent(inputs))
     )
-    
+
     results[persona["name"]] = await test_scenario.run()
 
 # Compare results
@@ -388,7 +388,7 @@ rapid_fire_sim = UserSimulator(
 )
 
 stress_test = (
-    scenario("rapid_fire")
+    Scenario("rapid_fire")
     .interact(inputs=rapid_fire_sim, outputs=lambda inputs: agent(inputs))
     .check(from_fn(
         lambda trace: len(trace.interactions) >= 5,

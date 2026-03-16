@@ -10,24 +10,24 @@ Multi-step workflow testing with scenario builders and runners.
 
 ---
 
-## `scenario()`
+## `Scenario`
 
-Create a new scenario builder for fluent API construction.
+Create a new scenario for fluent API construction.
 
-**Module:** `giskard.checks.scenarios.builder`
+**Module:** `giskard.checks.core.scenario`
 
 ### Description
 
-The `scenario()` function is the recommended entry point for creating test scenarios. It returns a `ScenarioBuilder` that provides a fluent API for building multi-step test workflows.
+The `Scenario` class is the recommended entry point for creating test scenarios. It provides a fluent API for building multi-step test workflows.
 
 ### Creating Scenarios
 
 ```python
-from giskard.checks import scenario, StringMatching, Equals
+from giskard.checks import Scenario, StringMatching, Equals
 
 # Basic scenario
 test_scenario = (
-    scenario("greeting_test")
+    Scenario("greeting_test")
     .interact(inputs="Hello", outputs="Hi there!")
     .check(StringMatching(pattern="Hi", key="trace.last.outputs"))
 )
@@ -49,11 +49,11 @@ result = await test_scenario.run()
 ### Multi-step Scenarios
 
 ```python
-from giskard.checks import scenario, from_fn, Equals
+from giskard.checks import Scenario, from_fn, Equals
 
 # Create a conversational flow
 conversation_test = (
-    scenario("customer_support")
+    Scenario("customer_support")
     # First interaction
     .interact(
         inputs="I need help with my account",
@@ -90,7 +90,7 @@ def generate_response(inputs):
     return "I don't understand."
 
 test_scenario = (
-    scenario("dynamic_test")
+    Scenario("dynamic_test")
     .interact(
         inputs="What's the weather?",
         outputs=generate_response
@@ -107,7 +107,7 @@ test_scenario = (
 ```python
 # Access trace context in interactions
 test_scenario = (
-    scenario("context_test")
+    Scenario("context_test")
     .interact(inputs="Hello", outputs="Hi! I'm Alice.")
     .interact(
         inputs=lambda trace: f"Nice to meet you, {trace.last.outputs.split()[-1][:-1]}!",
@@ -201,20 +201,20 @@ interaction = Interaction(
 builder.add_interaction(interaction)
 ```
 
-#### `add_spec(spec: BaseInteractionSpec)`
+#### `add_interaction(spec: InteractionSpec)`
 
-Add a custom interaction specification.
+Add a custom interaction specification (e.g. `Interact`, `WithSpy`).
 
 **Parameters:**
-- `spec`: A BaseInteractionSpec instance
+- `spec`: An InteractionSpec instance (e.g. `Interact`, or `WithSpy` wrapping one)
 
 **Returns:** `self` (for chaining)
 
 ```python
-from giskard.checks.core.interaction import InteractionSpec
+from giskard.checks import Interact
 
-spec = InteractionSpec(inputs="test", outputs="result")
-builder.add_spec(spec)
+spec = Interact(inputs="test", outputs="result")
+builder.add_interaction(spec)
 ```
 
 #### `build() -> Scenario`
@@ -249,7 +249,7 @@ Low-level scenario class for direct instantiation.
 
 ### Description
 
-The `Scenario` class represents an ordered sequence of components (Interactions, InteractionSpecs, and Checks) that share a trace. For most use cases, use the `scenario()` fluent API instead.
+The `Scenario` class represents an ordered sequence of components (Interactions, InteractionSpecs, and Checks) that share a trace. For most use cases, use the `Scenario(name)` constructor with `.interact()` and `.check()` methods.
 
 ### Attributes
 
@@ -277,10 +277,10 @@ result = await scenario_obj.run()
 ```
 
 :::note[Recommended Approach]
-Use the `scenario()` fluent API for better readability:
+Use the `Scenario()` fluent API for better readability:
 ```python
 result = await (
-    scenario("multi_step_test")
+    Scenario("multi_step_test")
     .interact("Hello", "Hi")
     .check(Equals(expected="Hi", key="trace.last.outputs"))
     .interact("Goodbye", "See you!")
@@ -356,7 +356,7 @@ Low-level runner for executing scenarios.
 
 ### Description
 
-`ScenarioRunner` provides the execution engine for running scenarios. Most users should use `scenario().run()` rather than using ScenarioRunner directly.
+`ScenarioRunner` provides the execution engine for running scenarios. Most users should use `Scenario(...).run()` rather than using ScenarioRunner directly.
 
 ### Execution Model
 
@@ -407,17 +407,17 @@ result = await runner.run(scenario_obj)
 ### Multiple Test Cases
 
 ```python
-from giskard.checks import scenario, Equals
+from giskard.checks import Scenario, Equals
 
 # Define reusable test scenarios
 greeting_test = (
-    scenario("greeting")
+    Scenario("greeting")
     .interact("Hello", "Hi!")
     .check(Equals(expected="Hi!", key="trace.last.outputs"))
 )
 
 farewell_test = (
-    scenario("farewell")
+    Scenario("farewell")
     .interact("Goodbye", "See you!")
     .check(Equals(expected="See you!", key="trace.last.outputs"))
 )
@@ -446,11 +446,11 @@ if result.status == CheckStatus.ERROR:
 ### Complex Workflows
 
 ```python
-from giskard.checks import scenario, from_fn, GreaterThan
+from giskard.checks import Scenario, from_fn, GreaterThan
 
 # Multi-step workflow with multiple checks
 workflow = (
-    scenario("user_onboarding")
+    Scenario("user_onboarding")
     # Step 1: Registration
     .interact(
         inputs={"action": "register", "email": "user@example.com"},
@@ -458,7 +458,7 @@ workflow = (
     )
     .check(Equals(expected="success", key="trace.last.outputs.status"))
     .check(GreaterThan(expected_value=0, key="trace.last.outputs.user_id"))
-    
+
     # Step 2: Verification
     .interact(
         inputs=lambda trace: {
@@ -468,7 +468,7 @@ workflow = (
         outputs={"verified": True}
     )
     .check(Equals(expected=True, key="trace.last.outputs.verified"))
-    
+
     # Step 3: Welcome message
     .interact(
         inputs="Welcome",

@@ -704,6 +704,6 @@ Test with unusual inputs:
 Next Steps
 ----------
 
-* See :doc:`../ai-testing/custom-checks` for safety checks and content filtering
+* See :doc:`content-moderation` for safety checks and content filtering
 * Explore :doc:`testing-agents` for tool-using chatbots
 * Review :doc:`../ai-testing/multi-turn` for complex flows
