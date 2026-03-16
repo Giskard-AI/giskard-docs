@@ -38,18 +38,24 @@ Quick Reference
        CheckStatus,
        Interaction,
        Trace,
+       Metric,
 
        # Interaction specs
        InteractionSpec,
-       BaseInteractionSpec,
+       Interact,
 
        # Scenarios
        Scenario,
+       ScenarioResult,
+       Suite,
+       SuiteResult,
+       Step,
        TestCase,
 
        # Built-in checks
        from_fn,
        StringMatching,
+       RegexMatching,
        Equals,
        NotEquals,
        LesserThan,
@@ -62,6 +68,9 @@ Quick Reference
        SemanticSimilarity,
        BaseLLMCheck,
        LLMCheckResult,
+
+       # Generators
+       UserSimulator,
 
        # Configuration
        set_default_generator,
@@ -77,23 +86,29 @@ Package Structure
    giskard.checks/
    ├── core/
    │   ├── check.py          # Check base class
-   │   ├── trace.py          # Trace and Interaction
-   │   ├── interaction.py    # InteractionSpec
-   │   ├── result.py         # CheckResult, CheckStatus
-   │   ├── scenario.py       # Scenario
+   │   ├── interaction/      # Trace, Interaction, Interact, InteractionSpec
+   │   ├── result.py         # CheckResult, CheckStatus, Metric, ScenarioResult
+   │   ├── scenario.py      # Scenario, Step
    │   ├── testcase.py       # TestCase
    │   └── extraction.py     # Extractors
    │
    ├── builtin/
    │   ├── fn.py             # from_fn
-   │   ├── string_matching.py
+   │   ├── text_matching.py  # StringMatching, RegexMatching
    │   ├── comparison.py
+   │   ├── semantic_similarity.py
+   │   └── ...
+   │
+   ├── judges/
    │   ├── groundedness.py
    │   ├── conformity.py
-   │   ├── judge.py          # LLMJudge
-   │   └── semantic_similarity.py
+   │   └── judge.py          # LLMJudge
+   │
+   ├── generators/
+   │   └── user.py           # UserSimulator
    │
    ├── scenarios/
+   │   ├── suite.py          # Suite
    │   └── runner.py         # ScenarioRunner
    │
    └── testing/

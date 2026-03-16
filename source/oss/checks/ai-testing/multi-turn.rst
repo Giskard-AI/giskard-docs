@@ -23,10 +23,10 @@ Basic Multi-Turn Flow
 
 .. code-block:: python
 
-   from giskard.checks import scenario, StringMatching
+   from giskard.checks import Scenario, StringMatching
 
    test_scenario = (
-       scenario("incident_intake")
+       Scenario("incident_intake")
        # First interaction
        .interact(
            inputs="I think my account was compromised.",
@@ -79,7 +79,7 @@ Test systems that maintain conversation state:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn
+   from giskard.checks import Scenario, from_fn
 
    class Chatbot:
        def __init__(self):
@@ -110,7 +110,7 @@ Test systems that maintain conversation state:
    bot = Chatbot()
 
    test_scenario = (
-       scenario("case_id_memory")
+       Scenario("case_id_memory")
        .interact(
            inputs="My case ID is SEC-1042.",
            outputs=lambda inputs: bot.chat(inputs)
@@ -174,7 +174,7 @@ Test multi-step agent workflows with tool usage:
    agent = Agent()
 
    test_scenario = (
-       scenario("policy_research_agent")
+       Scenario("policy_research_agent")
        # Agent receives task
        .interact(
            inputs="Find the policy section on export-controlled data sharing.",
@@ -230,7 +230,7 @@ Generate interactions dynamically based on previous outputs:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn, Trace
+   from giskard.checks import Scenario, from_fn, Trace
 
    def chatbot(message: str, context: list = None) -> dict:
        # Your chatbot that tracks context
@@ -242,7 +242,7 @@ Generate interactions dynamically based on previous outputs:
        return f"Tell me more about {first_response}"
 
    test_scenario = (
-       scenario("dynamic_incident_followup")
+       Scenario("dynamic_incident_followup")
        .interact(
            inputs="Report a suspected account takeover.",
            outputs=lambda inputs: chatbot(inputs)
@@ -269,7 +269,7 @@ Verify that systems handle errors gracefully across turns:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn, LLMJudge
+   from giskard.checks import Scenario, from_fn, LLMJudge
 
    class RobustChatbot:
        def chat(self, message: str) -> dict:
@@ -283,7 +283,7 @@ Verify that systems handle errors gracefully across turns:
    bot = RobustChatbot()
 
    test_scenario = (
-       scenario("error_recovery")
+       Scenario("error_recovery")
        # Send invalid input
        .interact(
            inputs="",
@@ -326,7 +326,7 @@ Test RAG systems with follow-up questions and context references:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, Groundedness, from_fn
+   from giskard.checks import Scenario, Groundedness, from_fn
 
    class ConversationalRAG:
        def __init__(self):
@@ -356,7 +356,7 @@ Test RAG systems with follow-up questions and context references:
    rag = ConversationalRAG()
 
    test_scenario = (
-       scenario("policy_rag_followups")
+       Scenario("policy_rag_followups")
        # Initial question
        .interact(
            inputs="What is our data retention policy for KYC documents?",
@@ -414,7 +414,7 @@ Test that multi-step tasks are completed successfully:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn, LLMJudge
+   from giskard.checks import Scenario, from_fn, LLMJudge
 
    class TaskAgent:
        def __init__(self):
@@ -440,7 +440,7 @@ Test that multi-step tasks are completed successfully:
    agent = TaskAgent()
 
    test_scenario = (
-       scenario("incident_checklist")
+       Scenario("incident_checklist")
        # Add first task
        .interact(
            inputs="Add task: Notify security on-call",
@@ -506,7 +506,7 @@ Add checks after each interaction to validate state:
 .. code-block:: python
 
    (
-       scenario("example")
+       Scenario("example")
        .interact(...)
        .check(from_fn(lambda trace: validate_state(trace), name="state_check_1"))
        .interact(...)
@@ -520,7 +520,7 @@ Name scenarios to describe the user flow:
 .. code-block:: python
 
    scenario = (
-       scenario("user_onboarding_collect_preferences_send_confirmation")
+       Scenario("user_onboarding_collect_preferences_send_confirmation")
        ...
    )
 
@@ -531,11 +531,11 @@ Create separate scenarios for success and failure cases:
 .. code-block:: python
 
    happy_path = (
-       scenario("booking_success")
+       Scenario("booking_success")
        ...
    )
    error_path = (
-       scenario("booking_invalid_date")
+       Scenario("booking_invalid_date")
        ...
    )
 

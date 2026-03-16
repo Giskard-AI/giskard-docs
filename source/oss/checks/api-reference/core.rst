@@ -41,7 +41,7 @@ CheckResult
    :undoc-members:
    :show-inheritance:
 
-Result of a check execution with status, message, and optional metrics.
+Result of a check execution with status, message, optional metrics, and details.
 
 **Example:**
 
@@ -50,7 +50,7 @@ Result of a check execution with status, message, and optional metrics.
    # Success
    result = CheckResult.success(
        message="Check passed",
-       metrics={"score": 0.95}
+       details={"score": 0.95}
    )
 
    # Failure
@@ -60,6 +60,16 @@ Result of a check execution with status, message, and optional metrics.
    )
 
 
+Metric
+------
+
+.. autoclass:: Metric
+   :members:
+   :undoc-members:
+
+Named metric value captured during check execution (e.g., scores, timings).
+
+
 CheckStatus
 -----------
 
@@ -67,7 +77,7 @@ CheckStatus
    :members:
    :undoc-members:
 
-Enumeration of possible check statuses: ``PASSED``, ``FAILED``, ``ERROR``.
+Enumeration of possible check statuses: ``PASS``, ``FAIL``, ``ERROR``, ``SKIP``.
 
 
 Interaction
@@ -84,11 +94,11 @@ A single exchange between inputs and outputs.
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    # Interactions are created through the fluent builder
    test_case = (
-       scenario("example")
+       Scenario("example")
        .interact(
            inputs="What is 2+2?",
            outputs="4",
@@ -111,18 +121,18 @@ Immutable history of all interactions in a scenario.
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    # Create a scenario with multiple interactions
    test_scenario = (
-       scenario("example_trace")
+       Scenario("example_trace")
        .interact(inputs="Hello", outputs="Hi!")
        .interact(inputs="How are you?", outputs="I'm well!")
    )
 
    # After running, access the trace
    result = await test_scenario.run()
-   last = result.trace.last
+   last = result.final_trace.last
 
 
 InteractionSpec
@@ -139,11 +149,11 @@ Declarative specification for generating interactions.
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    # Static values
    test_case = (
-       scenario("static_example")
+       Scenario("static_example")
        .interact(
            inputs="test input",
            outputs="test output"
@@ -152,7 +162,7 @@ Declarative specification for generating interactions.
 
    # Callable outputs
    test_case = (
-       scenario("dynamic_example")
+       Scenario("dynamic_example")
        .interact(
            inputs="test",
            outputs=lambda inputs: my_function(inputs)
@@ -160,15 +170,15 @@ Declarative specification for generating interactions.
    )
 
 
-BaseInteractionSpec
--------------------
+Interact
+--------
 
-.. autoclass:: BaseInteractionSpec
+.. autoclass:: Interact
    :members:
    :undoc-members:
    :show-inheritance:
 
-Base class for custom interaction specifications.
+Concrete interaction specification for defining exchanges with a system. Use ``Interact(inputs=..., outputs=...)`` directly or via ``Scenario(...).interact(...)``.
 
 
 Scenario
@@ -179,22 +189,33 @@ Scenario
    :undoc-members:
    :show-inheritance:
 
-Ordered sequence of interaction specs and checks with shared trace.
+Ordered sequence of steps (interactions and checks) with shared trace. Create with ``Scenario(name)`` and chain ``.interact()`` and ``.check()`` methods.
 
 **Example:**
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn
+   from giskard.checks import Scenario, from_fn
 
    test_scenario = (
-       scenario("test_flow")
+       Scenario("test_flow")
        .interact(inputs="hello", outputs="hi")
        .check(from_fn(lambda trace: True, name="check1"))
        .interact(inputs="bye", outputs="goodbye")
    )
 
    result = await test_scenario.run()
+
+
+Step
+----
+
+.. autoclass:: Step
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+A scenario step groups interactions and checks. Steps are created implicitly when building a Scenario.
 
 
 TestCase
@@ -206,16 +227,16 @@ TestCase
    :show-inheritance:
 
 .. note::
-   **Internal Implementation Detail**: ``TestCase`` is an internal implementation detail. Users should always use ``scenario()`` to create scenarios, which internally uses TestCase. The ``scenario()`` function creates a Scenario (a list of steps) and is the primary user-facing API.
+   **Internal Implementation Detail**: ``TestCase`` is an internal implementation detail. Users should always use ``Scenario()`` to create scenarios, which internally uses TestCase. The ``Scenario(name)`` constructor creates a Scenario (a list of steps) and is the primary user-facing API.
 
-**Example using scenario() (recommended):**
+**Example using Scenario() (recommended):**
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn
+   from giskard.checks import Scenario, from_fn
 
    test_scenario = (
-       scenario("my_test")
+       Scenario("my_test")
        .interact(inputs="test", outputs="result")
        .check(from_fn(lambda trace: True, name="check1"))
        .check(from_fn(lambda trace: True, name="check2"))
@@ -224,32 +245,10 @@ TestCase
    result = await test_scenario.run()
 
 
-Extractors
+Extraction
 ----------
 
-.. autoclass:: Extractor
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Base class for extracting values from traces.
-
-
-.. autoclass:: JsonPathExtractor
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Extract values using JSONPath expressions.
-
-**Example:**
-
-.. code-block:: python
-
-   from giskard.checks import JsonPathExtractor
-
-   extractor = JsonPathExtractor(key="trace.last.outputs.answer")
-   value = extractor.extract(trace)
+Checks use JSONPath expressions via the ``key`` parameter (e.g., ``key="trace.last.outputs.answer"``) to extract values from traces. Paths must start with ``trace.``.
 
 
 Configuration

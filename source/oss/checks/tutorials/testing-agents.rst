@@ -142,13 +142,13 @@ Verify that the agent selects appropriate tools:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn, Equality
+   from giskard.checks import Scenario, from_fn, Equals
 
    agent = SimpleAgent()
 
    async def test_tool_selection():
        tc = (
-           scenario("tool_selection_calculator")
+           Scenario("tool_selection_calculator")
            .interact(
                inputs="What is 15 * 23?",
                outputs=lambda inputs: agent.run(inputs)
@@ -162,9 +162,9 @@ Verify that the agent selects appropriate tools:
                )
            )
            .check(
-               Equality(
+               Equals(
                    name="selected_calculator",
-                   expected="calculator",
+                   expected_value="calculator",
                    key="trace.last.outputs.steps[0].tool"
                )
            )
@@ -189,12 +189,12 @@ Evaluate the quality of the agent's reasoning:
 .. code-block:: python
 
    from giskard.agents.generators import Generator
-   from giskard.checks import scenario, LLMJudge, from_fn, set_default_generator
+   from giskard.checks import Scenario, LLMJudge, from_fn, set_default_generator
 
    set_default_generator(Generator(model="openai/gpt-5-mini"))
 
    tc = (
-       scenario("reasoning_quality_test")
+       Scenario("reasoning_quality_test")
        .interact(
            inputs="Find information about quantum computing",
            outputs=lambda inputs: agent.run(inputs)
@@ -272,10 +272,10 @@ Test agents that perform multiple steps:
 
    multi_agent = MultiStepAgent()
 
-   from giskard.checks import scenario, from_fn, LLMJudge
+   from giskard.checks import Scenario, from_fn, LLMJudge
 
    test_scenario = (
-       scenario("multi_step_agent_workflow")
+       Scenario("multi_step_agent_workflow")
        .interact(
            inputs="Research the market size and calculate projected growth",
            outputs=lambda inputs: multi_agent.run(inputs)
@@ -375,7 +375,7 @@ Verify that agents handle errors gracefully:
    robust_agent = RobustAgent()
 
    tc = (
-       scenario("error_handling_test")
+       Scenario("error_handling_test")
        .interact(
            inputs="What is the meaning of life?",  # Not a valid calculation
            outputs=lambda inputs: robust_agent.run(inputs)
@@ -467,7 +467,7 @@ Test agents that maintain state across turns:
    stateful_agent = StatefulAgent()
 
    test_scenario = (
-       scenario("stateful_agent_memory")
+       Scenario("stateful_agent_memory")
        # First interaction
        .interact(
            inputs="Search for Python tutorials",
@@ -518,7 +518,7 @@ Verify that complex tasks are fully completed:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, LLMJudge, from_fn
+   from giskard.checks import Scenario, LLMJudge, from_fn
 
    class TaskTrackingAgent(SimpleAgent):
        def __init__(self):
@@ -569,7 +569,7 @@ Verify that complex tasks are fully completed:
    task_agent = TaskTrackingAgent()
 
    test_scenario = (
-       scenario("task_completion_workflow")
+       Scenario("task_completion_workflow")
        # Add tasks
        .interact(
            inputs="add task: Write documentation",
@@ -626,7 +626,7 @@ Combine all tests into a comprehensive suite:
 
    import asyncio
    from typing import List
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    class AgentTestSuite:
        def __init__(self, agent):

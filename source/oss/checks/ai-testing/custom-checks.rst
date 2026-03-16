@@ -67,12 +67,12 @@ Using Your Custom Check
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    check = MinLengthCheck(name="length_check", min_length=20)
 
    tc = (
-       scenario("test")
+       Scenario("test")
        .interact(
            inputs="test",
            outputs="This is a reasonably long output"
@@ -140,20 +140,25 @@ The metrics can be used for tracking, analysis, and visualization:
 Extracting Values with JSONPath
 --------------------------------
 
-Use JSONPath to extract values from complex structures:
+Giskard Checks provides built-in JSONPath extraction via ``resolve`` from ``giskard.checks.core.extraction``. Paths must start with ``trace.`` (e.g., ``trace.last.outputs.confidence``):
 
 .. code-block:: python
 
-   from giskard.checks import Check, CheckResult, Trace, JsonPathExtractor
+   from giskard.checks import Check, CheckResult, Trace
+   from giskard.checks.core.extraction import resolve, NoMatch
 
    @Check.register("field_validator")
    class FieldValidatorCheck(Check):
-       field_path: str
+       field_path: str  # JSONPath, e.g. "trace.last.outputs.confidence"
        min_value: float
 
        async def run(self, trace: Trace) -> CheckResult:
-           extractor = JsonPathExtractor(key=self.field_path)
-           value = extractor.extract(trace)
+           value = resolve(trace, self.field_path)
+
+           if isinstance(value, NoMatch):
+               return CheckResult.failure(
+                   message=f"No value found at {self.field_path}"
+               )
 
            if value >= self.min_value:
                return CheckResult.success(
@@ -459,7 +464,7 @@ Write tests for your custom checks:
 
    @pytest.mark.asyncio
    async def test_min_length_check():
-       from giskard.checks import scenario, Trace, Interaction
+       from giskard.checks import Scenario, Trace, Interaction
 
        # Test passing case
        trace_pass = Trace(interactions=[

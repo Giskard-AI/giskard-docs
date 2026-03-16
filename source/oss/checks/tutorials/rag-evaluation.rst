@@ -145,9 +145,9 @@ Test that the system answers questions correctly:
 
    from giskard.agents.generators import Generator
    from giskard.checks import (
-       scenario,
+       Scenario,
        StringMatching,
-       Equality,
+       Equals,
        from_fn,
        set_default_generator
    )
@@ -157,7 +157,7 @@ Test that the system answers questions correctly:
 
    async def test_basic_qa():
        tc = (
-           scenario("basic_qa_france_capital")
+           Scenario("basic_qa_france_capital")
            .interact(
                inputs="What is the capital of France?",
                outputs=lambda inputs: rag.answer(inputs)
@@ -166,8 +166,8 @@ Test that the system answers questions correctly:
            .check(
                StringMatching(
                    name="mentions_paris",
-                   content="Paris",
-                   key="trace.last.outputs.answer"
+                   keyword="Paris",
+                   text_key="trace.last.outputs.answer"
                )
            )
            # Check that documents were retrieved
@@ -207,11 +207,11 @@ Verify that answers are grounded in retrieved context:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, Groundedness, StringMatching
+   from giskard.checks import Scenario, Groundedness, StringMatching
 
    async def test_groundedness():
        tc = (
-           scenario("groundedness_eiffel_tower")
+           Scenario("groundedness_eiffel_tower")
            .interact(
                inputs="When was the Eiffel Tower completed?",
                outputs=lambda inputs: rag.answer(inputs)
@@ -225,8 +225,8 @@ Verify that answers are grounded in retrieved context:
            .check(
                StringMatching(
                    name="mentions_year",
-                   content="1889",
-                   key="trace.last.outputs.answer"
+                   keyword="1889",
+                   text_key="trace.last.outputs.answer"
                )
            )
        )
@@ -241,7 +241,7 @@ Test that the right documents are retrieved:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, from_fn
+   from giskard.checks import Scenario, from_fn
 
    def check_retrieved_topics(trace) -> bool:
        """Verify retrieved docs are about the right topic."""
@@ -250,7 +250,7 @@ Test that the right documents are retrieved:
        return "Eiffel Tower" in topics or "France" in topics
 
    tc = (
-       scenario("retrieval_quality")
+       Scenario("retrieval_quality")
        .interact(
            inputs="Tell me about the Eiffel Tower",
            outputs=lambda inputs: rag.answer(inputs)
@@ -281,10 +281,10 @@ Test how the system handles questions it can't answer:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, LLMJudge, from_fn
+   from giskard.checks import Scenario, LLMJudge, from_fn
 
    tc = (
-       scenario("out_of_scope_handling")
+       Scenario("out_of_scope_handling")
        .interact(
            inputs="What is the weather in Tokyo today?",
            outputs=lambda inputs: rag.answer(inputs)
@@ -321,10 +321,10 @@ Use an LLM to evaluate answer quality comprehensively:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, LLMJudge
+   from giskard.checks import Scenario, LLMJudge
 
    tc = (
-       scenario("comprehensive_quality_check")
+       Scenario("comprehensive_quality_check")
        .interact(
            inputs="What is machine learning?",
            outputs=lambda inputs: rag.answer(inputs)
@@ -361,7 +361,7 @@ Test a conversational RAG that handles follow-up questions:
 .. code-block:: python
 
    from giskard.checks import (
-       scenario,
+       Scenario,
        Groundedness,
        from_fn,
        LLMJudge,
@@ -402,7 +402,7 @@ Test a conversational RAG that handles follow-up questions:
    conv_rag = ConversationalRAG(documents=knowledge_base)
 
    test_scenario = (
-       scenario("conversational_rag_flow")
+       Scenario("conversational_rag_flow")
        # First question
        .interact(
            inputs="What is the capital of France?",
@@ -412,8 +412,8 @@ Test a conversational RAG that handles follow-up questions:
        .check(
            StringMatching(
                name="first_mentions_paris",
-               content="Paris",
-               key="trace.last.outputs.answer"
+               keyword="Paris",
+               text_key="trace.last.outputs.answer"
            )
        )
 
@@ -456,7 +456,7 @@ Combine all tests into a comprehensive suite:
 
    import asyncio
    from typing import List
-   from giskard.checks import TestCase
+   from giskard.checks import Scenario
 
    class RAGTestSuite:
        def __init__(self, rag_system: SimpleRAG):
@@ -475,7 +475,7 @@ Combine all tests into a comprehensive suite:
            # Add edge case tests
            self.test_cases.extend(self._create_edge_case_tests())
 
-       def _create_qa_tests(self) -> List[TestCase]:
+       def _create_qa_tests(self) -> List[Scenario]:
            """Create basic QA test cases."""
            test_data = [
                ("What is the capital of France?", "Paris"),
@@ -486,7 +486,7 @@ Combine all tests into a comprehensive suite:
            tests = []
            for question, expected_content in test_data:
                tc = (
-                   scenario(f"qa_{expected_content.replace(' ', '_')}")
+                   Scenario(f"qa_{expected_content.replace(' ', '_')}")
                    .interact(
                        inputs=question,
                        outputs=lambda q: self.rag.answer(q)
@@ -494,8 +494,8 @@ Combine all tests into a comprehensive suite:
                    .check(
                        StringMatching(
                            name=f"contains_{expected_content}",
-                           content=expected_content,
-                           key="trace.last.outputs.answer"
+                           keyword=expected_content,
+                           text_key="trace.last.outputs.answer"
                        )
                    )
                    .check(
@@ -509,7 +509,7 @@ Combine all tests into a comprehensive suite:
 
            return tests
 
-       def _create_groundedness_tests(self) -> List[TestCase]:
+       def _create_groundedness_tests(self) -> List[Scenario]:
            """Create groundedness test cases."""
            questions = [
                "What is the capital of France?",
@@ -520,7 +520,7 @@ Combine all tests into a comprehensive suite:
            tests = []
            for question in questions:
                tc = (
-                   scenario(f"groundedness_{question[:20]}")
+                   Scenario(f"groundedness_{question[:20]}")
                    .interact(
                        inputs=question,
                        outputs=lambda q: self.rag.answer(q)
@@ -531,7 +531,7 @@ Combine all tests into a comprehensive suite:
 
            return tests
 
-       def _create_edge_case_tests(self) -> List[TestCase]:
+       def _create_edge_case_tests(self) -> List[Scenario]:
            """Create edge case test cases."""
            edge_cases = [
                ("", "empty_query"),
@@ -543,7 +543,7 @@ Combine all tests into a comprehensive suite:
            tests = []
            for question, case_name in edge_cases:
                tc = (
-                   scenario(f"edge_case_{case_name}")
+                   Scenario(f"edge_case_{case_name}")
                    .interact(
                        inputs=question,
                        outputs=lambda q: self.rag.answer(q)

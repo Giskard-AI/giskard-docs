@@ -294,6 +294,29 @@ Custom LLM-based evaluation with user-defined prompt.
        """
    )
 
+RegexMatching
+~~~~~~~~~~~~~
+
+.. autoclass:: RegexMatching
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Check if a regex pattern matches within text.
+
+**Example:**
+
+.. code-block:: python
+
+   from giskard.checks import RegexMatching
+
+   check = RegexMatching(
+       name="valid_email",
+       pattern=r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}",
+       text_key="trace.last.outputs.response"
+   )
+
+
 SemanticSimilarity
 ~~~~~~~~~~~~~~~~~
 

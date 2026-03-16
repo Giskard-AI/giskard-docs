@@ -461,8 +461,8 @@ wheels = [
 
 [[package]]
 name = "giskard-agents"
-version = "1.0.0a1"
-source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-agents&rev=main#a3e1daa07d0e40877a99085246bff650052714d8" }
+version = "1.0.1a1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "giskard-core" },
     { name = "griffe" },
@@ -474,11 +474,15 @@ dependencies = [
     { name = "tenacity" },
     { name = "typing-extensions" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/12/3e/a697a587930e45b8bbf8815b5ca3b4bb0aeedc901c139302fa5bdfca86d2/giskard_agents-1.0.1a1.tar.gz", hash = "sha256:0eedc6140fd2714176fc1387785412f20add50005c4ea23615fa5a019b149b82", size = 41590, upload-time = "2026-03-12T08:36:47.957Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/7e/562a4ed4e5112e79687ec3bcfcd45d838fc446bbe4c27bd722e39c6ed8bb/giskard_agents-1.0.1a1-py3-none-any.whl", hash = "sha256:d782877c0d2736369e3601ebec4534af64021b20366c678d320c37a053f3d942", size = 32873, upload-time = "2026-03-12T08:36:46.808Z" },
+]
 
 [[package]]
 name = "giskard-checks"
-version = "1.0.0a1"
-source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-checks&rev=main#a3e1daa07d0e40877a99085246bff650052714d8" }
+version = "1.0.1a1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "giskard-agents" },
     { name = "giskard-core" },
@@ -488,13 +492,21 @@ dependencies = [
     { name = "pydantic" },
     { name = "rich" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/19/b7/eb0b658b15ff6f1fa25de2cc5ee211bea37f2af9bd334044dd4a1b361485/giskard_checks-1.0.1a1.tar.gz", hash = "sha256:89d4e91f38b60465c12019676876f4a5a68775993dc52f1e1bbbc1a07184b853", size = 42209, upload-time = "2026-03-12T08:42:07.807Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/47/88/0f179cd64a506ec5907e4b5489f17fedf58bd323b256fde8b6c32e0e1757/giskard_checks-1.0.1a1-py3-none-any.whl", hash = "sha256:0043060550d5a89f641af25e19f5af4b222aa34722ef2ddd75bcb073020ed0b8", size = 59435, upload-time = "2026-03-12T08:42:06.558Z" },
+]
 
 [[package]]
 name = "giskard-core"
-version = "1.0.0a1"
-source = { git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-core&rev=main#a3e1daa07d0e40877a99085246bff650052714d8" }
+version = "1.0.1a1"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ef/a4/2577877951b086b9a0464cc892a7744672eaf6d157ceafa5b39953c7a272/giskard_core-1.0.1a1.tar.gz", hash = "sha256:7d5d4221f3e605ed9f4a3f1ae9e2a8bb9642073eed4c4a2f73a28df3d1a4a252", size = 7509, upload-time = "2026-03-12T08:26:29.528Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9b/8a/53d5aab66acf777ab4e259ebc82cb054a3cc4e7fe142d4032bf689d51816/giskard_core-1.0.1a1-py3-none-any.whl", hash = "sha256:6d4d6bf0546756a37a255eabdb0b44950e87cf0999e94d4f3e5e3616098dc3e6", size = 8342, upload-time = "2026-03-12T08:26:28.776Z" },
 ]
 
 [[package]]
@@ -526,9 +538,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "giskard-agents", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-agents&rev=main" },
-    { name = "giskard-checks", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-checks&rev=main" },
-    { name = "giskard-core", git = "ssh://git@github.com/Giskard-AI/giskard-oss.git?subdirectory=libs%2Fgiskard-core&rev=main" },
+    { name = "giskard-agents", specifier = "==1.0.1a1" },
+    { name = "giskard-checks", specifier = "==1.0.1a1" },
+    { name = "giskard-core", specifier = "==1.0.1a1" },
 ]
 
 [package.metadata.requires-dev]

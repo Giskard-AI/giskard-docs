@@ -119,10 +119,10 @@ A ``Scenario`` is a list of steps (interactions and checks) that are executed se
 
 .. code-block:: python
 
-   from giskard.checks import scenario
+   from giskard.checks import Scenario
 
    test_scenario = (
-       scenario("test_with_checks")
+       Scenario("test_with_checks")
        .interact(inputs="test input", outputs="test output")
        .check(check1)
        .check(check2)
@@ -153,7 +153,7 @@ Fluent API Mapping
 
 The fluent API is the preferred user-facing entry point and maps directly to the core primitives above:
 
-* ``scenario(name)`` creates a ``Scenario`` builder.
+* ``Scenario(name)`` creates a ``Scenario`` builder.
 * ``.interact(...)`` adds an ``InteractionSpec`` to the scenario sequence.
 * ``.check(...)`` adds a ``Check`` to the scenario sequence.
 * ``.run()`` resolves specs to interactions, builds the ``Trace``, runs checks, and returns a ``ScenarioResult``.
@@ -162,10 +162,10 @@ For example, we can test a simple conversation flow with two turns:
 
 .. code-block:: python
 
-   from giskard.checks import scenario, Conformity
+   from giskard.checks import Scenario, Conformity
 
    test_scenario = (
-       scenario("conversation_flow")
+       Scenario("conversation_flow")
        .interact(inputs="Hello", outputs=generate_answer)
        .check(Conformity(key="trace.last.outputs", rule="response should be a friendly greeting"))
        .interact(inputs="Who invented the HTML?", outputs=generate_answer)
