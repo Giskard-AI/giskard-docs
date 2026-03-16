@@ -22,7 +22,7 @@ agent = hub.agents.create(
     description="GPT-4o chatbot with RAG over the product knowledge base",
     url="https://your-app.example.com/api/chat",
     supported_languages=["en", "fr"],
-    headers=[{"name": "Authorization", "value": "Bearer <token>"}],
+    headers={"Authorization": "Bearer <token>"},
 )
 
 print(agent.id)
