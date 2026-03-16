@@ -254,7 +254,7 @@ search_result = hub.datasets.search_test_cases(
 # Move test cases to a different dataset
 hub.test_cases.bulk_move(
     test_case_ids=["tc-id-1", "tc-id-2"],
-    dataset_id="other-dataset-id",
+    target_dataset_id="other-dataset-id",
 )
 
 # Bulk update tags on multiple test cases
