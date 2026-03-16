@@ -99,8 +99,6 @@ Documents are provided as a JSON or JSONL file where each record has a `text` fi
 ### From a Python list (in-memory)
 
 ```python
-import json
-
 documents = [
     {"text": "Our return policy allows returns within 30 days of purchase.", "topic": "Returns"},
     {"text": "Free shipping is available on all orders over $50.", "topic": "Shipping"},

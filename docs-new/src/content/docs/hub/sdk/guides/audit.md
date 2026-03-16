@@ -33,7 +33,7 @@ since = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
 now = datetime.now(timezone.utc).isoformat()
 
 events = hub.audit_logs.search(
-    filters={"created_at": {"from": since, "to": now}},
+    filters={"created_at": {"from_": since, "to_": now}},
     limit=200,
 )
 ```
@@ -94,7 +94,7 @@ deletions = hub.audit_logs.search(
         "project_id": {"selected_options": ["project-id"]},
         "entity_type": {"selected_options": ["evaluation"]},
         "action": {"selected_options": ["delete"]},
-        "created_at": {"from": start_of_month},
+        "created_at": {"from_": start_of_month},
     },
     limit=500,
 )

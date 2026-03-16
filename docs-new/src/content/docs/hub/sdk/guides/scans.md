@@ -98,14 +98,20 @@ probes = hub.scans.list_probes("scan-id")
 for probe in probes:
     if probe.state == "skipped":
         continue
-    print(f"{probe.probe_category} — {probe.probe_name}: {probe.metrics} ({probe.state})")
+    print(f"{probe.category} — {probe.name}: {probe.metrics} ({probe.state})")
+```
+
+You can also use the helper to print a formatted summary of all metrics for a scan:
+
+```python
+hub.helpers.print_metrics(scan)
 ```
 
 ### Retrieve a specific probe
 
 ```python
-probe = hub.scans.probes.retrieve("probe-result-id")
-print(probe.probe_description)
+probe = hub.scans.probes.retrieve("probe-id")
+print(probe.description)
 ```
 
 ### List individual probe attempts
@@ -113,7 +119,7 @@ print(probe.probe_description)
 Each probe may generate multiple adversarial prompt attempts. Inspect them to understand exactly what the agent was asked and how it responded:
 
 ```python
-attempts = hub.scans.probes.list_attempts("probe-result-id")
+attempts = hub.scans.probes.list_attempts("probe-id")
 
 for attempt in attempts:
     print(f"Prompt: {[m.content for m in attempt.messages[:-1]]}")
@@ -127,10 +133,8 @@ for attempt in attempts:
 If a flagged attempt is a false positive, update its review status:
 
 ```python
-from giskard_hub.types import ReviewStatus
-
 hub.scans.attempts.update(
-    "probe-attempt-id",
+    "attempt-id",
     review_status="ignored",
 )
 ```
@@ -161,7 +165,7 @@ for probe in probes:
                 messages=[{"role": m.role, "content": m.content} for m in attempt.messages[:-1]],
                 demo_output={"role": "assistant", "content": attempt.messages[-1].content},
                 checks=[{"identifier": "no-harmful-content"}],  # or any relevant check
-                tags=[probe.probe_category],
+                tags=[probe.category],
             )
 
 print(f"Imported attacks into dataset {dataset.id}")

@@ -133,7 +133,6 @@ Use `hub.datasets.upload()` to import a dataset. Each record must follow the tes
 ### From a Python list (in-memory)
 
 ```python
-import json
 from giskard_hub import HubClient
 
 hub = HubClient()
