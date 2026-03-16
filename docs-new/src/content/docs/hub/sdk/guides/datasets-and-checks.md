@@ -240,7 +240,7 @@ test_cases = hub.datasets.list_test_cases("dataset-id")
 # Paginated search with filters
 search_result = hub.datasets.search_test_cases(
     "dataset-id",
-    search="payment",
+    query="payment",
     limit=20,
     offset=0,
 )

@@ -150,7 +150,7 @@ You can perform a semantic search over the documents in a knowledge base directl
 ```python
 results = hub.knowledge_bases.search_documents(
     "kb-id",
-    search="return policy",
+    query="return policy",
     limit=5,
 )
 
