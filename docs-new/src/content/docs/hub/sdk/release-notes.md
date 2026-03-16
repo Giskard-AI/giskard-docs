@@ -16,7 +16,7 @@ This release is the first public beta of the v3 SDK. It is a full rewrite based 
 - **Document-based dataset generation** — `hub.datasets.generate_document_based()` generates test cases grounded in a Knowledge Base.
 - **Tasks** — `hub.tasks` provides a lightweight issue tracker for managing findings from evaluations and scans.
 - **Playground Chats** — `hub.playground_chats` lets you access conversations captured from the Hub UI playground.
-- **Audit Log** — `hub.audit` provides searchable, paginated audit event history.
+- **Audit Log** — `hub.audit_logs` provides searchable, paginated audit event history.
 - **Test case comments** — `hub.test_cases.comments` supports collaborative annotation of test cases.
 - **Scan probes and attempts** — `hub.scans.probes` and `hub.scans.attempts` give granular access to scan probe results and individual adversarial attempts.
 - **Evaluation result controls** — rerun errored results, update review status, control per-result visibility, and search/filter results via `hub.evaluations.results`.

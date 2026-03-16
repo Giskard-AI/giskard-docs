@@ -163,4 +163,4 @@ The Hub's UI includes a **Playground** where you can chat with registered agents
 
 Every significant action in the Hub (create, update, delete) is recorded in an **Audit Log**. You can search events by time range, user, entity type, or action, and retrieve the history for a specific resource.
 
-**SDK resource:** `hub.audit`
+**SDK resource:** `hub.audit_logs`

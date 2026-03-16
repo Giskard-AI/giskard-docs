@@ -14,7 +14,7 @@ from giskard_hub import HubClient
 
 hub = HubClient()
 
-events = hub.audit.search(
+events = hub.audit_logs.search(
     filters={"project_id": {"selected_options": ["project-id"]}},
     limit=50,
 )
@@ -32,7 +32,7 @@ from datetime import datetime, timedelta, timezone
 since = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
 now = datetime.now(timezone.utc).isoformat()
 
-events = hub.audit.search(
+events = hub.audit_logs.search(
     filters={"created_at": {"from": since, "to": now}},
     limit=200,
 )
@@ -41,7 +41,7 @@ events = hub.audit.search(
 ### Filter by entity type and action
 
 ```python
-events = hub.audit.search(
+events = hub.audit_logs.search(
     filters={
         "project_id": {"selected_options": ["project-id"]},
         "entity_type": {"selected_options": ["evaluation"]},
@@ -60,7 +60,7 @@ for event in events:
 If you want to see every change made to a particular resource — for example, a specific agent or dataset — use `list_entities`:
 
 ```python
-history = hub.audit.list_entities(
+history = hub.audit_logs.list_entities(
     entity_id="dataset-id",
     entity_type="dataset",
 )
@@ -89,7 +89,7 @@ from datetime import datetime, timezone
 now = datetime.now(timezone.utc)
 start_of_month = now.replace(day=1, hour=0, minute=0, second=0).isoformat()
 
-deletions = hub.audit.search(
+deletions = hub.audit_logs.search(
     filters={
         "project_id": {"selected_options": ["project-id"]},
         "entity_type": {"selected_options": ["evaluation"]},

@@ -262,7 +262,7 @@ The following resources have no equivalent in v2.x and require no migration — 
 - `hub.projects.scenarios` — scenario management and dataset generation
 - `hub.tasks` — issue tracking
 - `hub.playground_chats` — playground conversation access
-- `hub.audit` — audit log
+- `hub.audit_logs` — audit log
 - `hub.test_cases.comments` — test case annotations
 - `hub.scans.probes` / `hub.scans.attempts` — granular scan probe access
 - `hub.evaluations.results.search()` — filtered result queries

@@ -99,7 +99,7 @@ from giskard_hub.types import Agent, AgentOutput, ChatMessage
 
 ---
 
-## `hub.audit`
+## `hub.audit_logs`
 
 ```python
 from giskard_hub.types import Audit, AuditDisplay
@@ -165,7 +165,7 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
 ## `hub.evaluations`
 
 ```python
-from giskard_hub.types import Evaluation, Metric, OutputAnnotation
+from giskard_hub.types import Evaluation, CheckResult, Metric, OutputAnnotation
 ```
 
 | Method | Returns | Description |
@@ -178,7 +178,7 @@ from giskard_hub.types import Evaluation, Metric, OutputAnnotation
 | `delete(evaluation_id)` | `None` | Delete an evaluation |
 | `bulk_delete(**params)` | `None` | Delete multiple evaluations |
 | `rerun_errored_results(evaluation_id)` | `Evaluation` | Rerun all errored results |
-| `run_single(**params)` | `list[Check]` | Evaluate a single (input, output) pair ad hoc |
+| `run_single(**params)` | `list[CheckResult]` | Evaluate a single (input, output) pair ad hoc |
 
 **`Evaluation` fields:** `id`, `name`, `status` (object with `.state`), `agent_id`, `project_id`, `run_count`, `tags`, `metrics`, `created_at`
 
@@ -270,33 +270,33 @@ from giskard_hub.types import Scenario, ScenarioPreview
 ## `hub.scans`
 
 ```python
-from giskard_hub.types import ScanResult, ScanCategory, ScanProbeResult
+from giskard_hub.types import Scan, ScanCategory, ScanProbe
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `create(**params)` | `ScanResult` | Create and start a vulnerability scan |
-| `retrieve(scan_result_id, **params)` | `ScanResult` | Get a scan result, optionally including agent/KB |
-| `list(**params)` | `list[ScanResult]` | List scans |
-| `delete(scan_result_id)` | `None` | Delete a scan result |
+| `create(**params)` | `Scan` | Create and start a vulnerability scan |
+| `retrieve(scan_id, **params)` | `Scan` | Get a scan result, optionally including agent/KB |
+| `list(**params)` | `list[Scan]` | List scans |
+| `delete(scan_id)` | `None` | Delete a scan result |
 | `bulk_delete(**params)` | `None` | Delete multiple scan results |
 | `list_categories()` | `list[ScanCategory]` | List all available scan categories/tags |
-| `list_probes(scan_result_id)` | `list[ScanProbeResult]` | List probe results for a scan |
+| `list_probes(scan_id)` | `list[ScanProbe]` | List probe results for a scan |
 
-**`ScanResult` fields:** `id`, `status`, `grade`, `agent_id`, `knowledge_base_id`, `tags`, `created_at`
+**`Scan` fields:** `id`, `status`, `grade`, `agent_id`, `knowledge_base_id`, `tags`, `created_at`
 
 **`create` params:** `project_id`, `agent_id`, `knowledge_base_id` (optional), `tags` (list of OWASP/Giskard tag strings)
 
 ### `hub.scans.probes`
 
 ```python
-from giskard_hub.types.scan import ScanProbeResult, ScanProbeAttempt
+from giskard_hub.types.scan import ScanProbe, ScanProbeAttempt
 ```
 
 | Method | Returns | Description |
 |---|---|---|
-| `retrieve(probe_result_id)` | `ScanProbeResult` | Get a probe result |
-| `list_attempts(probe_result_id)` | `list[ScanProbeAttempt]` | List all attempts for a probe |
+| `retrieve(probe_id)` | `ScanProbe` | Get a probe result |
+| `list_attempts(probe_id)` | `list[ScanProbeAttempt]` | List all attempts for a probe |
 
 ### `hub.scans.attempts`
 
