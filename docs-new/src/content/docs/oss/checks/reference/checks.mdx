@@ -94,7 +94,7 @@ check = FnCheck(
 
 Check that validates string patterns in trace values.
 
-**Module:** `giskard.checks.builtin.string_matching`
+**Module:** `giskard.checks.builtin.text_matching`
 
 ```python
 from giskard.checks import StringMatching
@@ -316,18 +316,18 @@ from giskard.agents.generators import Generator
 @BaseLLMCheck.register("custom_llm_check")
 class CustomLLMCheck(BaseLLMCheck):
     custom_instruction: str
-    
+
     def get_prompt(self):
         return f"""
         Evaluate the interaction based on: {self.custom_instruction}
-        
+
         Input: {{{{ trace.last.inputs }}}}
         Output: {{{{ trace.last.outputs }}}}
-        
-        Return passed=true if the interaction meets the criteria, 
+
+        Return passed=true if the interaction meets the criteria,
         passed=false otherwise. Include a reason for your decision.
         """
-    
+
     def get_inputs(self, trace):
         # Optionally customize template variables
         return {
@@ -538,10 +538,10 @@ from giskard.agents.generators import Generator
 check = LLMJudge(
     prompt="""
     Evaluate if the response is helpful and accurate.
-    
+
     User Input: {{ trace.last.inputs }}
     AI Response: {{ trace.last.outputs }}
-    
+
     Return passed=true if the response is helpful and accurate,
     passed=false otherwise. Provide a reason for your decision.
     """,
@@ -565,18 +565,18 @@ check = LLMJudge(
 check = LLMJudge(
     prompt="""
     Evaluate the multi-turn conversation quality.
-    
+
     Conversation history:
     {% for interaction in trace.interactions %}
     User: {{ interaction.inputs }}
     Assistant: {{ interaction.outputs }}
     {% endfor %}
-    
+
     Criteria:
     1. Consistency across turns
     2. Relevant responses
     3. Professional tone
-    
+
     Return passed=true if all criteria are met, passed=false otherwise.
     Include specific reasons for any failures.
     """,
@@ -706,27 +706,27 @@ from giskard.checks import Check, CheckResult, Trace
 class CustomBusinessCheck(Check):
     threshold: float = 0.9
     allowed_categories: list[str] = []
-    
+
     async def run(self, trace: Trace) -> CheckResult:
         # Extract data
         output = trace.last.outputs
         category = output.get("category")
         confidence = output.get("confidence", 0)
-        
+
         # Validate category
         if category not in self.allowed_categories:
             return CheckResult.failure(
                 message=f"Invalid category: {category}",
                 details={"category": category, "allowed": self.allowed_categories}
             )
-        
+
         # Validate confidence
         if confidence < self.threshold:
             return CheckResult.failure(
                 message=f"Confidence {confidence} below threshold {self.threshold}",
                 details={"confidence": confidence, "threshold": self.threshold}
             )
-        
+
         return CheckResult.success(
             message="Validation passed",
             details={"confidence": confidence, "category": category}
