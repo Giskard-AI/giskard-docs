@@ -20,8 +20,10 @@ We'll test a content moderation system that:
 First, let's create a simple moderation layer:
 
 ``` python
+from dataclasses import dataclass
 from typing import Literal
 
+@dataclass
 class ModerationResult:
     allowed: bool
     reason: str

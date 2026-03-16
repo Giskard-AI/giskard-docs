@@ -178,9 +178,10 @@ test_scenario = (
     .check(Conformity(key="trace.last.outputs", rule="response should mention Tim Berners-Lee as the inventor of HTML"))
 )
 
-# Run with asyncio.run() if in a script
+# In a script: result = asyncio.run(test_scenario.run())
+# In async context (e.g. pytest): result = await test_scenario.run()
 import asyncio
-result = await test_scenario.run()  # or: result = asyncio.run(test_scenario.run())
+result = asyncio.run(test_scenario.run())
 ```
 
 For a practical introduction to the fluent API, see [Quickstart](/oss/checks/quickstart/).

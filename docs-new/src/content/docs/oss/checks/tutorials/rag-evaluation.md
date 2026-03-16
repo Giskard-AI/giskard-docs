@@ -161,8 +161,8 @@ async def test_basic_qa():
         .check(
             StringMatching(
                 name="mentions_paris",
-                content="Paris",
-                key="trace.last.outputs.answer"
+                keyword="Paris",
+                text_key="trace.last.outputs.answer"
             )
         )
         # Check that documents were retrieved
@@ -212,14 +212,15 @@ async def test_groundedness():
         .check(
             Groundedness(
                 name="answer_grounded",
-                description="Answer should be based on retrieved documents"
+                answer_key="trace.last.outputs.answer",
+                context_key="trace.last.outputs.retrieved_docs"
             )
         )
         .check(
             StringMatching(
                 name="mentions_year",
-                content="1889",
-                key="trace.last.outputs.answer"
+                keyword="1889",
+                text_key="trace.last.outputs.answer"
             )
         )
     )
@@ -393,12 +394,18 @@ test_scenario = (
         inputs="What is the capital of France?",
         outputs=lambda inputs: conv_rag.answer(inputs)
     )
-    .check(Groundedness(name="first_answer_grounded"))
+    .check(
+        Groundedness(
+            name="first_answer_grounded",
+            answer_key="trace.last.outputs.answer",
+            context_key="trace.last.outputs.retrieved_docs"
+        )
+    )
     .check(
         StringMatching(
             name="first_mentions_paris",
-            content="Paris",
-            key="trace.last.outputs.answer"
+            keyword="Paris",
+            text_key="trace.last.outputs.answer"
         )
     )
 
@@ -407,7 +414,13 @@ test_scenario = (
         inputs="What is it known for?",
         outputs=lambda inputs: conv_rag.answer(inputs)
     )
-    .check(Groundedness(name="followup_grounded"))
+    .check(
+        Groundedness(
+            name="followup_grounded",
+            answer_key="trace.last.outputs.answer",
+            context_key="trace.last.outputs.retrieved_docs"
+        )
+    )
     .check(
         LLMJudge(
             name="resolves_reference",
@@ -439,7 +452,7 @@ Combine all tests into a comprehensive suite:
 ``` python
 import asyncio
 from typing import List
-from giskard.checks import TestCase
+from giskard.checks import Scenario
 
 class RAGTestSuite:
     def __init__(self, rag_system: SimpleRAG):
@@ -458,7 +471,7 @@ class RAGTestSuite:
         # Add edge case tests
         self.test_cases.extend(self._create_edge_case_tests())
 
-    def _create_qa_tests(self) -> List[TestCase]:
+    def _create_qa_tests(self) -> List[Scenario]:
         """Create basic QA test cases."""
         test_data = [
             ("What is the capital of France?", "Paris"),
@@ -477,8 +490,8 @@ class RAGTestSuite:
                 .check(
                     StringMatching(
                         name=f"contains_{expected_content}",
-                        content=expected_content,
-                        key="trace.last.outputs.answer"
+                        keyword=expected_content,
+                        text_key="trace.last.outputs.answer"
                     )
                 )
                 .check(
@@ -492,7 +505,7 @@ class RAGTestSuite:
 
         return tests
 
-    def _create_groundedness_tests(self) -> List[TestCase]:
+    def _create_groundedness_tests(self) -> List[Scenario]:
         """Create groundedness test cases."""
         questions = [
             "What is the capital of France?",
@@ -508,13 +521,19 @@ class RAGTestSuite:
                     inputs=question,
                     outputs=lambda q: self.rag.answer(q)
                 )
-                .check(Groundedness(name="grounded"))
+                .check(
+                Groundedness(
+                    name="grounded",
+                    answer_key="trace.last.outputs.answer",
+                    context_key="trace.last.outputs.retrieved_docs"
+                )
+            )
             )
             tests.append(tc)
 
         return tests
 
-    def _create_edge_case_tests(self) -> List[TestCase]:
+    def _create_edge_case_tests(self) -> List[Scenario]:
         """Create edge case test cases."""
         edge_cases = [
             ("", "empty_query"),

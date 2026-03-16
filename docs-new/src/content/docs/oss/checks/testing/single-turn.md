@@ -59,7 +59,7 @@ relevance, groundedness, and answer quality.
 ``` python
 from giskard.agents.generators import Generator
 from giskard.checks import (
-    scenario,
+    Scenario,
     Groundedness,
     StringMatching,
     set_default_generator
@@ -208,7 +208,7 @@ Evaluate summary quality, length, and factual consistency:
 ``` python
 from giskard.agents.generators import Generator
 from giskard.checks import (
-    scenario,
+    Scenario,
     LLMJudge,
     from_fn,
     set_default_generator
@@ -348,7 +348,7 @@ tc = (
     .check(
         Conformity(
             name="instruction_following",
-            description="Response should follow the formatting instructions"
+            rule="Response should follow the formatting instructions"
         )
     )
 )
@@ -442,8 +442,8 @@ async def test_qa_system(qa_test_cases):
             .check(
                 StringMatching(
                     name="contains_answer",
-                    content=expected_answer,
-                    key="trace.last.outputs"
+                    keyword=expected_answer,
+                    text_key="trace.last.outputs"
                 )
             )
         )
@@ -481,8 +481,8 @@ async def run_batch_evaluation():
             .check(
                 StringMatching(
                     name="contains_answer",
-                    content=expected,
-                    key="trace.last.outputs"
+                    keyword=expected,
+                    text_key="trace.last.outputs"
                 )
             )
         )

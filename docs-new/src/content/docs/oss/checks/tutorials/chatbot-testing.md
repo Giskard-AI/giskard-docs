@@ -152,8 +152,8 @@ test_scenario = (
     .check(
         StringMatching(
             name="polite_greeting",
-            content="help",
-            key="trace.last.outputs.message"
+            keyword="help",
+            text_key="trace.last.outputs.message"
         )
     )
 
@@ -165,8 +165,8 @@ test_scenario = (
     .check(
         StringMatching(
             name="acknowledges_name",
-            content="Alice",
-            key="trace.last.outputs.message"
+            keyword="Alice",
+            text_key="trace.last.outputs.message"
         )
     )
     .check(
@@ -186,8 +186,8 @@ test_scenario = (
     .check(
         StringMatching(
             name="recalls_name",
-            content="Alice",
-            key="trace.last.outputs.message"
+            keyword="Alice",
+            text_key="trace.last.outputs.message"
         )
     )
 )
@@ -519,8 +519,8 @@ test_scenario = (
     .check(
         StringMatching(
             name="asks_confirmation",
-            content="confirm",
-            key="trace.last.outputs.message"
+            keyword="confirm",
+            text_key="trace.last.outputs.message"
         )
     )
 
