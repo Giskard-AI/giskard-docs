@@ -18,7 +18,7 @@ from giskard_hub import HubClient
 
 hub = HubClient()  # reads GISKARD_HUB_BASE_URL and GISKARD_HUB_API_KEY from env
 
-project = hub.projects.list().data[0]
+project = hub.projects.list()[0]
 evaluation = hub.evaluations.create(
     agent_id="<agent-id>",
     dataset_id="<dataset-id>",

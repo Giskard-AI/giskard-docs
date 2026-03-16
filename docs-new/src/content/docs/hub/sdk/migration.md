@@ -123,11 +123,11 @@ remote_eval.print_metrics()
 # v3.x
 remote_eval = hub.evaluations.create(
     name="eval run",
-    project=my_project, # my_project.id
-    agent=my_agent, # or my_agent.id
-    dataset=my_dataset, # or my_dataset.id
+    project_id=my_project.id,
+    agent_id=my_agent.id,
+    dataset_id=my_dataset.id,
 )
-remote_eval = hub.helpers.wait_for_completion(evaluation)
+remote_eval = hub.helpers.wait_for_completion(remote_eval)
 hub.helpers.print_metrics(remote_eval)
 ```
 
@@ -243,8 +243,8 @@ hub.helpers.print_metrics(eval_run)
 | `hub.models.create(...)` | `hub.agents.create(...)` |
 | `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...])` |
 | `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
-| `hub.evaluate(model=, dataset=, name=)` | `hub.helpers.evaluate(project=, agent=, dataset=, name=)` |
-| `hub.evaluate(model=fn, dataset=, name=)` | `hub.helpers.evaluate(agent=fn, dataset_id=, name=)` |
+| `hub.evaluate(model=, dataset=, name=)` | `hub.helpers.evaluate(agent=, dataset=, project=, name=)` |
+| `hub.evaluate(model=fn, dataset=, name=)` | `hub.helpers.evaluate(agent=fn, dataset=, name=)` |
 | `entity.wait_for_completion()` | `entity = hub.helpers.wait_for_completion(entity)` |
 | `entity.print_metrics()` | `hub.helpers.print_metrics(entity)` |
 | `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...)` |
