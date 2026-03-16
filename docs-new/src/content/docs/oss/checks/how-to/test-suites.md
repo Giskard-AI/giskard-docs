@@ -2,6 +2,11 @@
 title: Test Suites
 ---
 
+For the basic suite pattern, see the
+[Test Suites tutorial](/oss/checks/tutorials/test-suites/). This guide covers
+advanced usage: injecting the agent through the constructor, running in pytest,
+and handling partial failures in CI.
+
 Organizing scenarios into a suite class lets you run a group of related tests
 concurrently and get a unified pass/fail report from a single `await`.
 

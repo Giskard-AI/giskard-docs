@@ -1,11 +1,15 @@
 ---
 title: Audit Log
-description: Search and retrieve audit log events for compliance reporting, change history, and debugging.
+description:
+  Search and retrieve audit log events for compliance reporting, change history,
+  and debugging.
 sidebar:
   order: 8
 ---
 
-Every significant action in the Hub — creating, updating, or deleting a resource — is recorded in the **Audit Log**. Use the SDK to query these events for compliance reporting, change history, or debugging unexpected changes.
+Every significant action in the Hub — creating, updating, or deleting a resource
+— is recorded in the **Audit Log**. Use the SDK to query these events for
+compliance reporting, change history, or debugging unexpected changes.
 
 ## Search audit events
 
@@ -20,7 +24,9 @@ events = hub.audit_logs.search(
 )
 
 for event in events:
-    print(f"[{event.created_at}] {event.action} on {event.entity_type} {event.entity_id} by {event.user_id}")
+    print(
+        f"[{event.created_at}] {event.action} on {event.entity_type} {event.entity_id} by {event.user_id}"
+    )
 ```
 
 ### Filter by time range
@@ -50,14 +56,17 @@ events = hub.audit_logs.search(
 )
 
 for event in events:
-    print(f"Evaluation {event.entity_id} deleted by {event.user_id} at {event.created_at}")
+    print(
+        f"Evaluation {event.entity_id} deleted by {event.user_id} at {event.created_at}"
+    )
 ```
 
 ---
 
 ## Retrieve audit history for a specific entity
 
-If you want to see every change made to a particular resource — for example, a specific agent or dataset — use `list_entities`:
+If you want to see every change made to a particular resource — for example, a
+specific agent or dataset — use `list_entities`:
 
 ```python
 history = hub.audit_logs.list_entities(

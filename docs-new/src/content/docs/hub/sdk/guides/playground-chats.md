@@ -1,11 +1,15 @@
 ---
 title: Playground Chats
-description: Access and export conversations captured from the Giskard Hub playground.
+description:
+  Access and export conversations captured from the Giskard Hub playground.
 sidebar:
   order: 7
 ---
 
-The Hub's **Playground** lets you chat with registered agents interactively from the UI. Each conversation is automatically saved as a **Playground Chat**, which you can then access programmatically for analysis, export, or import into a dataset.
+The Hub's **Playground** lets you chat with registered agents interactively from
+the UI. Each conversation is automatically saved as a **Playground Chat**, which
+you can then access programmatically for analysis, export, or import into a
+dataset.
 
 ## List playground chats
 
@@ -39,7 +43,8 @@ for msg in chat.messages:
 
 ## Export conversations to a dataset
 
-A common use case is to promote interesting playground conversations into a dataset as new test cases:
+A common use case is to promote interesting playground conversations into a
+dataset as new test cases:
 
 ```python
 chats = hub.playground_chats.list(project_id="project-id")

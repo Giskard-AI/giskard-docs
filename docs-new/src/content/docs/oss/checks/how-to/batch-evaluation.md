@@ -233,9 +233,9 @@ await run_with_metrics()
 
 ## Next steps
 
-- See [Run in pytest](/oss/checks/how-to/run-in-pytest/) to integrate batch
-  tests into CI with proper failure reporting
-- Use [Test Suites](/oss/checks/how-to/test-suites/) when you want to group
-  named scenarios rather than iterate over a data list
-- See [Structured Output Testing](/oss/checks/how-to/structured-output/) if your
-  system returns Pydantic models or dicts
+- [Run in pytest](/oss/checks/how-to/run-in-pytest/) — integrate batch tests
+  into CI with proper failure reporting
+- [Test Suites](/oss/checks/how-to/test-suites/) — group named scenarios
+  rather than iterate over a data list
+- [Structured Output Testing](/oss/checks/how-to/structured-output/) — validate
+  Pydantic models or dicts

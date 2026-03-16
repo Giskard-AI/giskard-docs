@@ -132,5 +132,5 @@ this to multi-turn conversations:
   model providers and configuration options
 - [Checks reference](/oss/checks/reference/checks/) — full `LLMJudge` prompt
   template syntax
-- [Content Moderation](/oss/checks/use-cases/content-moderation/) — safety checks
-  and policy compliance on a real system
+- [Content Moderation](/oss/checks/use-cases/content-moderation/) — safety
+  checks and policy compliance on a real system

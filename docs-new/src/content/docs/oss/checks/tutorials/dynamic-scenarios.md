@@ -200,7 +200,7 @@ the final turn. If you need to assert on an earlier turn, use
 You now know how to build scenarios that adapt to previous outputs. Once you
 have a collection of scenarios, see how to group them into a reusable suite:
 
-[Test Suites](/oss/checks/how-to/test-suites/)
+[Test Suites](/oss/checks/tutorials/test-suites/)
 
 ## See also
 

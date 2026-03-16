@@ -157,12 +157,17 @@ generic failure.
 Name each scenario after the user flow it covers, for example `case_id_memory`
 or `booking_invalid_date`. This makes failure reports immediately readable.
 
-## Next Steps
+## Next step
 
-- See [Dynamic Scenarios](/oss/checks/tutorials/dynamic-scenarios/) to build
-  inputs that adapt to previous outputs
-- Learn [Test Suites](/oss/checks/how-to/test-suites/) to run multiple scenarios
+The next tutorial shows how to build inputs that adapt to previous outputs:
+
+[Dynamic Scenarios](/oss/checks/tutorials/dynamic-scenarios/)
+
+## See also
+
+- [Test Suites](/oss/checks/tutorials/test-suites/) — run multiple scenarios
   together
-- Explore how-to guides for domain-specific multi-turn patterns:
-  - [Testing Agents](/oss/checks/use-cases/testing-agents/)
-  - [Chatbot Testing](/oss/checks/use-cases/chatbot-testing/)
+- [Testing Agents](/oss/checks/use-cases/testing-agents/) — domain-specific
+  agent patterns
+- [Chatbot Testing](/oss/checks/use-cases/chatbot-testing/) — conversational
+  testing patterns

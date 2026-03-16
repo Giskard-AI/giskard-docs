@@ -1,11 +1,14 @@
 ---
 title: Tasks
-description: Create and manage tasks to track issues found during evaluations and scans.
+description:
+  Create and manage tasks to track issues found during evaluations and scans.
 sidebar:
   order: 6
 ---
 
-**Tasks** are a lightweight issue tracker built into the Hub. When an evaluation or scan surfaces a problem, you can create a task to track the fix, assign it to a team member, and mark it as resolved — all from the SDK.
+**Tasks** are a lightweight issue tracker built into the Hub. When an evaluation
+or scan surfaces a problem, you can create a task to track the fix, assign it to
+a team member, and mark it as resolved — all from the SDK.
 
 ## Create a task
 
@@ -28,19 +31,19 @@ print(f"Task created: {task.id}")
 
 ### Status values
 
-| Status | Meaning |
-|---|---|
-| `"open"` | Newly created, not yet picked up |
-| `"in_progress"` | Actively being worked on |
-| `"resolved"` | Fixed and verified |
+| Status          | Meaning                          |
+| --------------- | -------------------------------- |
+| `"open"`        | Newly created, not yet picked up |
+| `"in_progress"` | Actively being worked on         |
+| `"resolved"`    | Fixed and verified               |
 
 ### Priority values
 
-| Priority | When to use |
-|---|---|
-| `"low"` | Nice-to-fix, no urgency |
+| Priority   | When to use                           |
+| ---------- | ------------------------------------- |
+| `"low"`    | Nice-to-fix, no urgency               |
 | `"medium"` | Should be addressed in the next cycle |
-| `"high"` | Needs attention soon |
+| `"high"`   | Needs attention soon                  |
 
 ---
 
@@ -88,7 +91,8 @@ hub.tasks.bulk_delete(task_ids=["task-id-1", "task-id-2"])
 
 ## Workflow example: create tasks from failed evaluation results
 
-A common pattern is to automatically create tasks for every failed test case after an evaluation:
+A common pattern is to automatically create tasks for every failed test case
+after an evaluation:
 
 ```python
 evaluation = hub.evaluations.create(
@@ -109,7 +113,7 @@ for result in failed_results:
     hub.tasks.create(
         project_id="project-id",
         description=f"Test case {result.test_case.id} failed checks: "
-                    + ", ".join(c.name for c in result.results if not c.passed),
+        + ", ".join(c.name for c in result.results if not c.passed),
         status="open",
         priority="medium",
         evaluation_result_id=result.id,

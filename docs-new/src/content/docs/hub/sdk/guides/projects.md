@@ -5,7 +5,8 @@ sidebar:
   order: 1
 ---
 
-Projects are the top-level organisational unit in the Hub. All agents, datasets, evaluations, and scans belong to a project.
+Projects are the top-level organisational unit in the Hub. All agents, datasets,
+evaluations, and scans belong to a project.
 
 ### Create a project
 
@@ -44,7 +45,9 @@ hub.projects.delete("project-id")
 
 ## Scenarios
 
-**Scenarios** are reusable templates that describe a persona, a topic, or a behaviour pattern within a project. They are used as input when generating scenario-based datasets via `hub.datasets.generate_scenario_based()`.
+**Scenarios** are reusable templates that describe a persona, a topic, or a
+behaviour pattern within a project. They are used as input when generating
+scenario-based datasets via `hub.datasets.generate_scenario_based()`.
 
 ### Create a scenario
 
@@ -63,7 +66,8 @@ print(scenario.id)
 
 ### Preview generated questions from a scenario
 
-Before generating a full dataset, you can preview a single sample conversation that a scenario would produce:
+Before generating a full dataset, you can preview a single sample conversation
+that a scenario would produce:
 
 ```python
 preview = hub.projects.scenarios.preview(
@@ -80,7 +84,9 @@ print(preview.conversation)
 ```python
 scenarios = hub.projects.scenarios.list("project-id")
 
-hub.projects.scenarios.update("scenario-id", project_id="project-id", name="Updated name")
+hub.projects.scenarios.update(
+    "scenario-id", project_id="project-id", name="Updated name"
+)
 
 hub.projects.scenarios.delete("scenario-id", project_id="project-id")
 ```

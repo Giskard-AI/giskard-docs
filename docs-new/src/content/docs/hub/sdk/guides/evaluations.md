@@ -1,15 +1,20 @@
 ---
 title: Evaluations
-description: Run remote and local evaluations, schedule recurring runs, inspect results, rerun errors, and integrate with CI/CD pipelines.
+description:
+  Run remote and local evaluations, schedule recurring runs, inspect results,
+  rerun errors, and integrate with CI/CD pipelines.
 sidebar:
   order: 5
 ---
 
-An **Evaluation** runs an agent against all test cases in a dataset, applies the configured checks to each response, and produces a per-test-case result with a pass/fail verdict.
+An **Evaluation** runs an agent against all test cases in a dataset, applies the
+configured checks to each response, and produces a per-test-case result with a
+pass/fail verdict.
 
 ## Remote evaluations
 
-A remote evaluation calls your registered agent's HTTP endpoint for every test case in the dataset.
+A remote evaluation calls your registered agent's HTTP endpoint for every test
+case in the dataset.
 
 ```python
 from giskard_hub import HubClient
@@ -31,13 +36,14 @@ evaluation = hub.helpers.wait_for_completion(evaluation)
 print(f"Evaluation completed with state: {evaluation.state}")
 ```
 
-Alternatively, you can run a remote evaluation using the convenient helper method:
+Alternatively, you can run a remote evaluation using the convenient helper
+method:
 
 ```python
 evaluation = hub.helpers.evaluate(
     name="v2.2. regression run",
-    project=my_project, # giskard_hub.types.Project or str
-    dataset=my_dataset, # giskard_hub.types.Dataset or str
+    project=my_project,  # giskard_hub.types.Project or str
+    dataset=my_dataset,  # giskard_hub.types.Dataset or str
     agent=my_agent,  # giskard_hub.types.Agent or str
 )
 ```
@@ -58,7 +64,8 @@ evaluation = hub.evaluations.create(
 
 ### Run multiple times
 
-Set `run_count` to run each test case multiple times (useful for measuring consistency across stochastic outputs):
+Set `run_count` to run each test case multiple times (useful for measuring
+consistency across stochastic outputs):
 
 ```python
 evaluation = hub.evaluations.create(
@@ -74,12 +81,16 @@ evaluation = hub.evaluations.create(
 
 ## Local evaluations
 
-A local evaluation lets you run inference using a Python function in your process rather than an HTTP endpoint. This is ideal for evaluating models during development without exposing an API.
+A local evaluation lets you run inference using a Python function in your
+process rather than an HTTP endpoint. This is ideal for evaluating models during
+development without exposing an API.
 
-Simply pass your callable as the `agent` parameter; this will automatically run a local evaluation.
+Simply pass your callable as the `agent` parameter; this will automatically run
+a local evaluation.
 
 ```python
 from giskard_hub.types import ChatMessage, AgentOutput
+
 
 def my_agent(messages: list[ChatMessage]) -> str | ChatMessage | AgentOutput:
     # Call your local model or chain here
@@ -87,8 +98,9 @@ def my_agent(messages: list[ChatMessage]) -> str | ChatMessage | AgentOutput:
 
     return ChatMessage(
         role="assistant",
-        content=f"Echo: {user_input}"  # replace with real inference
+        content=f"Echo: {user_input}",  # replace with real inference
     )
+
 
 evaluation = hub.helpers.evaluate(
     dataset="dataset-id",
@@ -136,7 +148,8 @@ print(result.state)
 
 ### Update the failure category of result (manual review)
 
-The full list of available failure categories for a project can be retrieved via `hub.projects.retrieve("project-id").failure_categories`.
+The full list of available failure categories for a project can be retrieved via
+`hub.projects.retrieve("project-id").failure_categories`.
 
 ```python
 hub.evaluations.results.update(
@@ -145,14 +158,15 @@ hub.evaluations.results.update(
     failure_category={
         "identifier": "contradiction",
         "title": "Contradiction",
-        "description": "The agent incorrectly provides an answer that contradicts the information given in the context (for groundedness checks) or in the reference (for correctness checks)."
-    }
+        "description": "The agent incorrectly provides an answer that contradicts the information given in the context (for groundedness checks) or in the reference (for correctness checks).",
+    },
 )
 ```
 
 ### Control result visibility
 
-You can hide individual results from the default view (for example, noisy outliers):
+You can hide individual results from the default view (for example, noisy
+outliers):
 
 ```python
 hub.evaluations.results.update_visibility(
@@ -166,7 +180,8 @@ hub.evaluations.results.update_visibility(
 
 ## Rerun errored results
 
-If some test cases failed due to transient agent errors (timeouts, 5xx responses), rerun only the errored ones without triggering a full re-evaluation:
+If some test cases failed due to transient agent errors (timeouts, 5xx
+responses), rerun only the errored ones without triggering a full re-evaluation:
 
 ```python
 hub.evaluations.rerun_errored_results("evaluation-id")
@@ -175,14 +190,17 @@ hub.evaluations.rerun_errored_results("evaluation-id")
 Rerun a single specific result:
 
 ```python
-hub.evaluations.results.rerun_test_case("result-id", evaluation_id="evaluation-id")
+hub.evaluations.results.rerun_test_case(
+    "result-id", evaluation_id="evaluation-id"
+)
 ```
 
 ---
 
 ## CI/CD integration
 
-Use evaluations as a quality gate in your CI/CD pipeline. Exit with a non-zero code if any metric falls below your threshold:
+Use evaluations as a quality gate in your CI/CD pipeline. Exit with a non-zero
+code if any metric falls below your threshold:
 
 ```python
 import os
@@ -207,7 +225,9 @@ except Exception as e:
 global_metrics = [m for m in evaluation.metrics if m.name == "global"][0]
 pass_rate = global_metrics.passed / global_metrics.total * 100
 
-print(f"Pass rate: {pass_rate:.2f}% ({global_metrics.passed}/{global_metrics.total})")
+print(
+    f"Pass rate: {pass_rate:.2f}% ({global_metrics.passed}/{global_metrics.total})"
+)
 
 THRESHOLD = 90.0
 if pass_rate < THRESHOLD:
@@ -221,14 +241,20 @@ print("Quality gate passed.")
 
 ## Run a single test case ad hoc
 
-You can evaluate a single (input, output) pair against a set of checks without running a full evaluation. This is useful for debugging or CI gates on individual responses:
+You can evaluate a single (input, output) pair against a set of checks without
+running a full evaluation. This is useful for debugging or CI gates on
+individual responses:
 
 ```python
 from giskard_hub.types import ChatMessage
 
 results = hub.evaluations.run_single(
     project_id="project-id",
-    agent_output={"response": ChatMessage(role="assistant", content="You can return anything within 30 days.")},
+    agent_output={
+        "response": ChatMessage(
+            role="assistant", content="You can return anything within 30 days."
+        )
+    },
     messages=[{"role": "user", "content": "What is your return policy?"}],
     checks=[
         {"identifier": "tone_professional"},
@@ -255,7 +281,10 @@ hub.evaluations.delete("evaluation-id")
 
 ## Scheduled evaluations
 
-**Scheduled Evaluations** automatically run an evaluation on a regular cadence — daily, weekly, or monthly. They're the foundation of continuous quality monitoring: set them up once and the Hub will run them automatically, so you catch regressions without any manual effort.
+**Scheduled Evaluations** automatically run an evaluation on a regular cadence —
+daily, weekly, or monthly. They're the foundation of continuous quality
+monitoring: set them up once and the Hub will run them automatically, so you
+catch regressions without any manual effort.
 
 ### Create a scheduled evaluation
 
@@ -266,8 +295,8 @@ schedule = hub.scheduled_evaluations.create(
     dataset_id="dataset-id",
     name="Weekly regression check",
     frequency="weekly",
-    time="09:00",       # UTC time of day
-    day_of_week=1,      # 1 = Monday, 7 = Sunday
+    time="09:00",  # UTC time of day
+    day_of_week=1,  # 1 = Monday, 7 = Sunday
 )
 
 print(f"Scheduled evaluation created: {schedule.id}")
@@ -275,11 +304,11 @@ print(f"Scheduled evaluation created: {schedule.id}")
 
 ### Frequency options
 
-| `frequency` | Description | Required extra params |
-|---|---|---|
-| `"daily"` | Runs every day at the specified time | `time` |
-| `"weekly"` | Runs once a week | `time`, `day_of_week` (1–7) |
-| `"monthly"` | Runs once a month | `time`, `day_of_month` (1–28) |
+| `frequency` | Description                          | Required extra params         |
+| ----------- | ------------------------------------ | ----------------------------- |
+| `"daily"`   | Runs every day at the specified time | `time`                        |
+| `"weekly"`  | Runs once a week                     | `time`, `day_of_week` (1–7)   |
+| `"monthly"` | Runs once a month                    | `time`, `day_of_month` (1–28) |
 
 ```python
 # Daily at 06:00 UTC
@@ -323,7 +352,9 @@ scheduled_evaluation = hub.scheduled_evaluations.retrieve(
 
 print(f"Schedule: {scheduled_evaluation.name}")
 for evaluation in scheduled_evaluation.evaluations:
-    print(f"  Run {evaluation.id}: {evaluation.state} at {evaluation.created_at}")
+    print(
+        f"  Run {evaluation.id}: {evaluation.state} at {evaluation.created_at}"
+    )
 ```
 
 ### List past evaluation runs
