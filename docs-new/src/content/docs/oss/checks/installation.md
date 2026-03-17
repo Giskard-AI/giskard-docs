@@ -24,8 +24,20 @@ example, to use OpenAI, you can set the `OPENAI_API_KEY` environment variable:
 export OPENAI_API_KEY="your-api-key"
 ```
 
-Preferably, you should set these environment variables in your `.env` file. Then
-you can set your preferred LLM judge model like this:
+Preferably, you should set these environment variables in your `.env` file. To
+load them in Python, install and use `python-dotenv`:
+
+```bash
+pip install python-dotenv
+```
+
+```python
+from dotenv import load_dotenv
+
+load_dotenv()  # loads .env from the current directory
+```
+
+Then you can set your preferred LLM judge model like this:
 
 ```python
 from giskard.agents.generators import Generator
