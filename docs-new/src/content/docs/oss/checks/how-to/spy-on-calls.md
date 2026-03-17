@@ -90,8 +90,8 @@ result = await scenario.run()
 ## 6. Access `spy_data` from the result
 
 After the scenario runs, the captured data is stored in the last interaction's
-metadata under the `target` key. Use
-`result.final_trace.last.metadata.get(target)` to retrieve it.
+metadata under the `target` key. Use `result.final_trace.last.metadata.get(target)`
+to retrieve it.
 
 ```python
 target = "trace.last.outputs"
@@ -113,9 +113,7 @@ Use the spy data to verify call counts or inspect intermediate values.
 assert spy_data is not None, "No spy data recorded — check your WithSpy setup"
 
 # Inspect what was captured (call_args.args[0] for the last call's first argument)
-captured_output = (
-    spy_data["call_args"].args[0] if spy_data["call_args"] else None
-)
+captured_output = spy_data["call_args"].args[0] if spy_data["call_args"] else None
 print(f"Captured output: {captured_output}")
 
 # Assert on content

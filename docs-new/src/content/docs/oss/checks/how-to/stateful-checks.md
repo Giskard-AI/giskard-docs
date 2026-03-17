@@ -223,7 +223,7 @@ independent scenario runs**, not multiple turns within a single scenario.
 ## Next steps
 
 - [Custom Checks](/oss/checks/how-to/custom-checks/) — full check class API
-- [Batch Evaluation](/oss/checks/how-to/batch-evaluation/) — run stateful checks
-  across a dataset
-- [Run in pytest](/oss/checks/how-to/run-in-pytest/) — fixture-based state reset
-  in CI
+- [Batch Evaluation](/oss/checks/how-to/batch-evaluation/) — run stateful
+  checks across a dataset
+- [Run in pytest](/oss/checks/how-to/run-in-pytest/) — fixture-based state
+  reset in CI

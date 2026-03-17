@@ -113,11 +113,11 @@ print(result.passed)  # True
 
 `result` is a `ScenarioResult` with three useful attributes:
 
-| Attribute                 | What it contains                                                    |
-| ------------------------- | ------------------------------------------------------------------- |
-| `result.passed`           | `True` if every check passed, `False` otherwise                     |
-| `result.final_trace`      | The full `Trace` object with every interaction's inputs and outputs |
-| `result.steps[0].results` | A list of individual `CheckResult` objects for the first step       |
+| Attribute                    | What it contains                                                    |
+| ---------------------------- | ------------------------------------------------------------------- |
+| `result.passed`              | `True` if every check passed, `False` otherwise                     |
+| `result.final_trace`         | The full `Trace` object with every interaction's inputs and outputs |
+| `result.steps[0].results`    | A list of individual `CheckResult` objects for the first step       |
 
 Print check details to understand what passed or failed. When a scenario has
 several checks, iterating over `result.steps[0].results` tells you exactly which

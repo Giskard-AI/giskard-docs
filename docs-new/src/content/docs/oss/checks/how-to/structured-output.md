@@ -321,8 +321,8 @@ print(f"Results: {passed}/{len(results)} passed")
 
 ## Next steps
 
-- [Batch Evaluation](/oss/checks/how-to/batch-evaluation/) — run the same check
-  against many inputs and aggregate results
+- [Batch Evaluation](/oss/checks/how-to/batch-evaluation/) — run the same
+  check against many inputs and aggregate results
 - [Custom Checks](/oss/checks/how-to/custom-checks/) — build reusable field
   validators with Pydantic parameters
 - [Checks Reference](/oss/checks/reference/checks/) — full list of built-in
