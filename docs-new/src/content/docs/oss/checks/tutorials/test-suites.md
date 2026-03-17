@@ -6,14 +6,14 @@ sidebar:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/tutorials/test-suites.ipynb)
 
-Learn how to group multiple scenarios into a suite class and run them
-concurrently with a single `await`. By the end you'll have a reusable pattern
-for organizing related tests.
+Learn how to group multiple scenarios into a suite and run them with a single
+`await`. By the end you'll have a reusable pattern for organizing related
+tests.
 
 ## What you'll build
 
-A suite class that holds two scenarios (greeting and error handling), runs them
-with `asyncio.gather`, and produces a unified pass/fail report.
+A suite that holds two scenarios (greeting and error handling), runs them
+together, and produces a unified pass/fail report.
 
 ## Prerequisites
 
@@ -66,15 +66,63 @@ error_handling_scenario = (
 )
 ```
 
-## Create a suite class
+## Create a suite
 
-A suite is a plain Python class that holds scenarios and runs them with
-`asyncio.gather`. There is no special `Suite` class — the pattern is idiomatic
-Python:
+Use the library's `Suite` class to group scenarios and run them together:
+
+```python
+from giskard.checks import Suite
+
+suite = Suite(name="chatbot_suite")
+suite.append(greeting_scenario)
+suite.append(error_handling_scenario)
+```
+
+The suite runs scenarios serially and returns a `SuiteResult` with a unified
+pass/fail summary.
+
+## Run the suite
+
+In a Jupyter notebook:
+
+```python
+result = await suite.run()
+```
+
+In a Python script:
 
 ```python
 import asyncio
 
+result = asyncio.run(suite.run())
+```
+
+## Inspect the results
+
+`result` is a `SuiteResult` with `results` (list of `ScenarioResult`), `pass_rate`,
+and `duration_ms`. Iterate to count pass/fail and print a report:
+
+```python
+scenarios = ["greeting", "empty_input"]
+results = result.results
+passed = sum(1 for r in results if r.passed)
+total = len(results)
+
+print(f"Results: {passed}/{total} passed (pass rate: {result.pass_rate:.0%})")
+for name, r in zip(scenarios, results):
+    status = "PASS" if r.passed else "FAIL"
+    print(f"  [{status}] {name}")
+```
+
+When a scenario fails, use `(cr for step in r.steps for cr in step.results)` to
+see which check broke.
+
+## Concurrent alternative
+
+For concurrent execution, use `asyncio.gather` with a plain class:
+
+```python
+import asyncio
 
 class ChatbotSuite:
     def __init__(self):
@@ -86,44 +134,9 @@ class ChatbotSuite:
             self.greeting.run(),
             self.error_handling.run(),
         )
+
+results = await ChatbotSuite().run_all()  # list of ScenarioResult
 ```
-
-`asyncio.gather` runs both scenarios concurrently and returns a list of
-`ScenarioResult` objects in the same order as the arguments.
-
-## Run the suite
-
-In a Jupyter notebook:
-
-```python
-results = await ChatbotSuite().run_all()
-```
-
-In a Python script:
-
-```python
-import asyncio
-
-results = asyncio.run(ChatbotSuite().run_all())
-```
-
-## Inspect the results
-
-`results` is a list of `ScenarioResult` objects. Iterate to count pass/fail and
-print a report:
-
-```python
-scenarios = ["greeting", "empty_input"]
-passed = sum(1 for r in results if r.passed)
-total = len(results)
-
-print(f"Results: {passed}/{total} passed")
-for name, result in zip(scenarios, results):
-    status = "PASS" if result.passed else "FAIL"
-    print(f"  [{status}] {name}")
-```
-
-When a scenario fails, use `result.check_results` to see which check broke.
 
 ## Next step
 

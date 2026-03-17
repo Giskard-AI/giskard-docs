@@ -66,9 +66,9 @@ async def run_batch():
     for (question, _), result in zip(scenarios, results):
         if not result.passed:
             print(f"  FAIL: {question}")
-            for cr in result.check_results:
+            for cr in (r for step in result.steps for r in step.results):
                 if not cr.passed:
-                    print(f"    {cr.name}: {cr.message}")
+                    print(f"    {cr.details.get('check_name', 'Unknown')}: {cr.message}")
 
     return results
 

@@ -52,8 +52,8 @@ test_case = TestCase(
     name="greeting_test",
     trace=trace,
     checks=[
-        Equals(expected="Hi there!", key="trace.interactions[0].outputs"),
-        Equals(expected="I'm doing well!", key="trace.interactions[1].outputs"),
+        Equals(expected_value="Hi there!", key="trace.interactions[0].outputs"),
+        Equals(expected_value="I'm doing well!", key="trace.interactions[1].outputs"),
     ],
 )
 
@@ -123,15 +123,13 @@ Result of test case execution with check outcomes.
 
 ### Attributes
 
-| Attribute       | Type                | Description                                |
-| --------------- | ------------------- | ------------------------------------------ |
-| `status`        | `CheckStatus`       | Overall test case status (PASS/FAIL/ERROR) |
-| `trace`         | `Trace`             | The trace that was tested                  |
-| `check_results` | `list[CheckResult]` | Results from all checks                    |
-| `passed`        | `bool`              | True if all checks passed                  |
-| `failed`        | `bool`              | True if any check failed                   |
-| `message`       | `str \| None`       | Optional summary message                   |
-| `details`       | `dict[str, Any]`    | Additional execution details               |
+| Attribute   | Type                | Description                                |
+| ----------- | ------------------- | ------------------------------------------ |
+| `status`    | `TestCaseStatus`    | Overall test case status (PASS/FAIL/ERROR) |
+| `results`   | `list[CheckResult]` | Results from all checks                    |
+| `passed`    | `bool`              | True if all checks passed                  |
+| `failed`    | `bool`              | True if any check failed                   |
+| `duration_ms` | `int`              | Execution time in milliseconds             |
 
 ### Accessing Results
 
@@ -145,7 +143,7 @@ else:
     print(f"✗ Test failed: {result.message}")
 
 # Review individual check results
-for i, check_result in enumerate(result.check_results):
+for i, check_result in enumerate(result.results):
     status_icon = "✓" if check_result.passed else "✗"
     print(f"{status_icon} Check {i}: {check_result.message}")
 
@@ -399,7 +397,7 @@ async def test_error_handling():
         name="error_handling",
         trace=trace,
         checks=[
-            Equals(expected=True, key="trace.last.metadata.error_handled"),
+            Equals(expected_value=True, key="trace.last.metadata.error_handled"),
             from_fn(
                 lambda t: "don't understand" in t.last.outputs.lower(),
                 name="error_message_present",
@@ -437,7 +435,7 @@ async def test_greeting_variations(greeting_input, expected_output):
     test_case = TestCase(
         name=f"greeting_{greeting_input}",
         trace=trace,
-        checks=[Equals(expected=expected_output, key="trace.last.outputs")],
+        checks=[Equals(expected_value=expected_output, key="trace.last.outputs")],
     )
 
     await test_case.assert_passed()

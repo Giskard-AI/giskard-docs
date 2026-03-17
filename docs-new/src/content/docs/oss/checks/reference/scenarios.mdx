@@ -30,7 +30,7 @@ from giskard.checks import Scenario, StringMatching, Equals
 test_scenario = (
     Scenario("greeting_test")
     .interact(inputs="Hello", outputs="Hi there!")
-    .check(StringMatching(pattern="Hi", key="trace.last.outputs"))
+    .check(StringMatching(keyword="Hi", text_key="trace.last.outputs"))
 )
 
 # Run the scenario
@@ -46,7 +46,7 @@ result = await test_scenario.run()
 
 **Returns:**
 
-- `ScenarioBuilder`: A builder instance ready for configuration
+- `Scenario`: A scenario instance ready for configuration (fluent API)
 
 ### Multi-step Scenarios
 
@@ -91,7 +91,7 @@ def generate_response(inputs):
 test_scenario = (
     Scenario("dynamic_test")
     .interact(inputs="What's the weather?", outputs=generate_response)
-    .check(StringMatching(pattern="sunny", key="trace.last.outputs"))
+    .check(StringMatching(keyword="sunny", text_key="trace.last.outputs"))
 )
 ```
 
@@ -111,16 +111,12 @@ test_scenario = (
 
 ---
 
-## `ScenarioBuilder`
+## Scenario fluent API
 
-Builder for creating scenarios with a fluent API.
-
-**Module:** `giskard.checks.scenarios.builder`
-
-### Description
-
-`ScenarioBuilder` provides a chainable interface for constructing multi-step
-test scenarios. Each method returns `self`, allowing for method chaining.
+`Scenario` provides a chainable interface for constructing multi-step test
+scenarios. Each method returns the scenario (or self), allowing for method
+chaining. There is no separate `ScenarioBuilder` class — `Scenario` is the
+builder.
 
 ### Methods
 
@@ -139,15 +135,15 @@ Add an interaction to the scenario.
 
 ```python
 # Static values
-builder.interact(
+scenario.interact(
     inputs="test input", outputs="test output", metadata={"model": "gpt-4"}
 )
 
 # Dynamic outputs
-builder.interact(inputs="query", outputs=lambda inputs: my_model(inputs))
+scenario.interact(inputs="query", outputs=lambda inputs: my_model(inputs))
 
 # Full context access
-builder.interact(
+scenario.interact(
     inputs=lambda trace: generate_input(trace),
     outputs=lambda trace, inputs: generate_output(trace, inputs),
 )
@@ -166,7 +162,7 @@ Add a validation check to the scenario.
 ```python
 from giskard.checks import Equals, GreaterThan
 
-builder.check(Equals(expected_value="success", key="trace.last.outputs.status"))
+scenario.check(Equals(expected_value="success", key="trace.last.outputs.status"))
 ```
 
 #### `add_interaction(interaction: Interaction)`
@@ -186,7 +182,7 @@ interaction = Interaction(
     inputs="Hello", outputs="Hi", metadata={"timestamp": "2024-01-01"}
 )
 
-builder.add_interaction(interaction)
+scenario.add_interaction(interaction)
 ```
 
 #### `add_interaction(spec: InteractionSpec)`
@@ -204,7 +200,7 @@ Add a custom interaction specification (e.g. `Interact`, `WithSpy`).
 from giskard.checks import Interact
 
 spec = Interact(inputs="test", outputs="result")
-builder.add_interaction(spec)
+scenario.add_interaction(spec)
 ```
 
 #### `build() -> Scenario`
@@ -260,7 +256,7 @@ scenario_obj = Scenario(
     name="multi_step_test",
     sequence=[
         InteractionSpec(inputs="Hello", outputs="Hi"),
-        Equals(expected="Hi", key="trace.last.outputs"),
+        Equals(expected_value="Hi", key="trace.last.outputs"),
         InteractionSpec(inputs="Goodbye", outputs="See you!"),
     ],
 )
@@ -274,7 +270,7 @@ Use the `Scenario()` fluent API for better readability:
 result = await (
     Scenario("multi_step_test")
     .interact("Hello", "Hi")
-    .check(Equals(expected="Hi", key="trace.last.outputs"))
+    .check(Equals(expected_value="Hi", key="trace.last.outputs"))
     .interact("Goodbye", "See you!")
     .run()
 )
@@ -297,8 +293,8 @@ Execute the scenario components sequentially.
 result = await scenario_obj.run()
 
 print(f"Status: {result.status}")
-print(f"Trace: {result.trace}")
-print(f"Check results: {result.check_results}")
+print(f"Trace: {result.final_trace}")
+print(f"Check results: {[r for step in result.steps for r in step.results]}")
 ```
 
 ---
@@ -311,13 +307,13 @@ Result of scenario execution with trace and check results.
 
 ### Attributes
 
-| Attribute       | Type                | Description                               |
-| --------------- | ------------------- | ----------------------------------------- |
-| `status`        | `CheckStatus`       | Overall scenario status (PASS/FAIL/ERROR) |
-| `trace`         | `Trace`             | Complete trace of all interactions        |
-| `check_results` | `list[CheckResult]` | Results from all checks executed          |
-| `message`       | `str \| None`       | Optional summary message                  |
-| `details`       | `dict[str, Any]`    | Additional execution details              |
+| Attribute     | Type                  | Description                                    |
+| ------------- | --------------------- | ---------------------------------------------- |
+| `status`      | `ScenarioStatus`      | Overall scenario status (PASS/FAIL/ERROR/SKIP) |
+| `steps`       | `list[TestCaseResult]` | Results for each step (interact + check)       |
+| `final_trace` | `Trace`               | Complete trace of all interactions             |
+| `passed`      | `bool`                | True when all steps passed                     |
+| `duration_ms` | `int`                 | Total execution time in milliseconds           |
 
 ### Accessing Results
 
@@ -325,19 +321,75 @@ Result of scenario execution with trace and check results.
 result = await test_scenario.run()
 
 # Check overall status
-if result.status == CheckStatus.PASS:
+if result.passed:
     print("✓ All checks passed!")
 
 # Access trace
-print(f"Total interactions: {len(result.trace.interactions)}")
-last_output = result.trace.last.outputs
+print(f"Total interactions: {len(result.final_trace.interactions)}")
+last_output = result.final_trace.last.outputs
 
-# Review check results
-for i, check_result in enumerate(result.check_results):
+# Review check results (flatten from steps)
+for i, check_result in enumerate(r for step in result.steps for r in step.results):
     print(f"Check {i}: {check_result.status}")
     if check_result.failed:
         print(f"  Failed: {check_result.message}")
 ```
+
+---
+
+## `Suite`
+
+Group multiple scenarios and run them together.
+
+**Module:** `giskard.checks.scenarios.suite`
+
+### Description
+
+`Suite` holds multiple `Scenario` instances and runs them serially. Optionally
+bind a shared target SUT at suite level or override it in `run()`.
+
+### Usage
+
+```python
+from giskard.checks import Suite, Scenario
+
+suite = Suite(name="my_suite", target=my_sut)  # target optional
+suite.append(scenario1)
+suite.append(scenario2)
+result = await suite.run()  # returns SuiteResult
+print(result.pass_rate)
+print(result.results)  # list of ScenarioResult
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+| --------- | ---- | ----------- |
+| `name` | `str` | Suite identifier |
+| `target` | callable | Optional suite-level target SUT |
+
+### Methods
+
+- `append(scenario)` — Add a scenario to the suite
+- `run(target=..., return_exception=False)` — Run all scenarios serially, returns `SuiteResult`
+
+---
+
+## `SuiteResult`
+
+Aggregate result from suite execution.
+
+**Module:** `giskard.checks.core.result`
+
+### Attributes
+
+| Attribute | Type | Description |
+| --------- | ---- | ----------- |
+| `results` | `list[ScenarioResult]` | Scenario results in order |
+| `pass_rate` | `float` | Fraction of non-skipped scenarios that passed |
+| `duration_ms` | `int` | Total execution time in milliseconds |
+| `passed_count` | `int` | Number of passed scenarios |
+| `failed_count` | `int` | Number of failed scenarios |
 
 ---
 
@@ -410,20 +462,20 @@ from giskard.checks import Scenario, Equals
 greeting_test = (
     Scenario("greeting")
     .interact("Hello", "Hi!")
-    .check(Equals(expected="Hi!", key="trace.last.outputs"))
+    .check(Equals(expected_value="Hi!", key="trace.last.outputs"))
 )
 
 farewell_test = (
     Scenario("farewell")
     .interact("Goodbye", "See you!")
-    .check(Equals(expected="See you!", key="trace.last.outputs"))
+    .check(Equals(expected_value="See you!", key="trace.last.outputs"))
 )
 
 # Run all tests
 results = await asyncio.gather(greeting_test.run(), farewell_test.run())
 
 # Check all passed
-all_passed = all(r.status == CheckStatus.PASS for r in results)
+all_passed = all(r.passed for r in results)
 ```
 
 ### Error Handling
@@ -432,7 +484,7 @@ all_passed = all(r.status == CheckStatus.PASS for r in results)
 # Graceful error handling
 result = await test_scenario.run(return_exception=True)
 
-if result.status == CheckStatus.ERROR:
+if result.errored:
     print(f"Error occurred: {result.message}")
     print(f"Details: {result.details}")
 ```
@@ -450,7 +502,7 @@ workflow = (
         inputs={"action": "register", "email": "user@example.com"},
         outputs={"status": "success", "user_id": 12345},
     )
-    .check(Equals(expected="success", key="trace.last.outputs.status"))
+    .check(Equals(expected_value="success", key="trace.last.outputs.status"))
     .check(GreaterThan(expected_value=0, key="trace.last.outputs.user_id"))
     # Step 2: Verification
     .interact(
@@ -460,7 +512,7 @@ workflow = (
         },
         outputs={"verified": True},
     )
-    .check(Equals(expected=True, key="trace.last.outputs.verified"))
+    .check(Equals(expected_value=True, key="trace.last.outputs.verified"))
     # Step 3: Welcome message
     .interact(
         inputs="Welcome", outputs=lambda inputs: f"{inputs} to our platform!"

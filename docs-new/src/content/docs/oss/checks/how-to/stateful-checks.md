@@ -94,7 +94,7 @@ results = await asyncio.gather(*(s.run() for s in scenarios))
 
 for i, result in enumerate(results):
     status = "PASS" if result.passed else "FAIL"
-    print(f"[{status}] test_{i}: {result.check_results[0].message}")
+    print(f"[{status}] test_{i}: {result.steps[0].results[0].message}")
 ```
 
 Expected output (because all three return the same string):

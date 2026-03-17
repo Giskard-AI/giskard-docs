@@ -121,7 +121,7 @@ async def test_blocks_harmful_request():
     )
 
     result = await scenario.run()
-    assert result.passed, f"Safety check failed: {result.check_results}"
+    assert result.passed, f"Safety check failed: {[r for step in result.steps for r in step.results if not r.passed]}"
 ```
 
 ## Controlling costs in CI

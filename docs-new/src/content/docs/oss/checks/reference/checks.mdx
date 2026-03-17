@@ -100,47 +100,35 @@ Check that validates string patterns in trace values.
 **Module:** `giskard.checks.builtin.text_matching`
 
 ```python
-from giskard.checks import StringMatching
+from giskard.checks import StringMatching, RegexMatching
 
-# Check if output contains specific text
+# Check if output contains specific keyword (substring)
 check = StringMatching(
-    keyword="success", text_key="trace.last.outputs", match_type="contains"
+    keyword="success", text_key="trace.last.outputs"
 )
 
-# Check with regex pattern
-check = StringMatching(
-    keyword=r"\d{3}-\d{3}-\d{4}",  # Phone number pattern
+# Check with regex pattern (use RegexMatching for regex)
+check = RegexMatching(
+    pattern=r"\d{3}-\d{3}-\d{4}",
     text_key="trace.last.outputs.phone",
-    match_type="regex",
 )
 
 # Case-insensitive matching
 check = StringMatching(
     keyword="error",
     text_key="trace.last.outputs",
-    match_type="contains",
     case_sensitive=False,
 )
 ```
 
 **Parameters:**
 
-| Parameter        | Type   | Default      | Description                                                         |
-| ---------------- | ------ | ------------ | ------------------------------------------------------------------- |
-| `keyword`        | `str`  | required     | Pattern to match (string or regex)                                  |
-| `text_key`       | `str`  | required     | JSONPath to extract value from trace                                |
-| `match_type`     | `str`  | `"contains"` | Match type: "contains", "equals", "startswith", "endswith", "regex" |
-| `case_sensitive` | `bool` | `True`       | Whether matching is case-sensitive                                  |
-
-**Match Types:**
-
-| Type         | Description                      | Example                           |
-| ------------ | -------------------------------- | --------------------------------- |
-| `contains`   | Pattern appears anywhere in text | "hello" in "hello world"          |
-| `equals`     | Exact match                      | "hello" == "hello"                |
-| `startswith` | Text starts with pattern         | "hello world".startswith("hello") |
-| `endswith`   | Text ends with pattern           | "hello world".endswith("world")   |
-| `regex`      | Regular expression match         | re.search(r"\d+", "test123")      |
+| Parameter        | Type   | Default | Description                                    |
+| ---------------- | ------ | ------- | ---------------------------------------------- |
+| `keyword`        | `str`  | —       | Substring to search for (or use `keyword_key`)  |
+| `keyword_key`    | `str`  | —       | JSONPath to extract keyword from trace         |
+| `text_key`       | `str`  | `"trace.last.outputs"` | JSONPath to extract text from trace    |
+| `case_sensitive` | `bool` | `True`  | Whether matching is case-sensitive             |
 
 ---
 

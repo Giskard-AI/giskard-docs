@@ -9,70 +9,60 @@ For the basic suite pattern, see the
 advanced usage: injecting the agent through the constructor, running in pytest,
 and handling partial failures in CI.
 
-Organizing scenarios into a suite class lets you run a group of related tests
-concurrently and get a unified pass/fail report from a single `await`.
+Organizing scenarios into a suite lets you run a group of related tests and
+get a unified pass/fail report from a single `await`.
 
 ## Why a suite?
 
-A suite is a plain Python class that holds multiple `Scenario` instances and
-runs them with `asyncio.gather`. There is no special `Suite` class to import —
-the pattern is just idiomatic Python. The benefit is that all scenarios run
-concurrently and you get a unified pass/fail report.
+The library's `Suite` class holds multiple `Scenario` instances and runs them
+serially. Use it when you want a single `SuiteResult` with `pass_rate` and
+aggregated results. For concurrent execution, use `asyncio.gather` (see below).
 
-## Define your scenarios
+## Define your scenarios and suite
 
-Before building the suite class, define the chatbot and the scenarios it will
-cover. Inject the agent through the constructor so you can swap in a different
-model version without touching the scenario definitions:
+Define the chatbot and build a suite with scenarios. Inject the agent through a
+factory so you can swap in a different model without touching the scenario
+definitions:
 
 ```python
-import asyncio
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Suite, Scenario, from_fn
 
 
-class ChatbotSuite:
-    def __init__(self, agent):
-        self.greeting = (
-            Scenario("greeting")
-            .interact(
-                inputs="Hello there",
-                outputs=lambda inputs: agent(inputs),
-            )
-            .check(
-                from_fn(
-                    lambda trace: "Hello" in trace.last.outputs,
-                    name="responds_with_greeting",
-                )
+def make_chatbot_suite(agent):
+    suite = Suite(name="chatbot_suite")
+    suite.append(
+        Scenario("greeting")
+        .interact(
+            inputs="Hello there",
+            outputs=lambda inputs: agent(inputs),
+        )
+        .check(
+            from_fn(
+                lambda trace: "Hello" in trace.last.outputs,
+                name="responds_with_greeting",
             )
         )
-        self.error_handling = (
-            Scenario("empty_input")
-            .interact(
-                inputs="",
-                outputs=lambda inputs: agent(inputs),
-            )
-            .check(
-                from_fn(
-                    lambda trace: "try again" in trace.last.outputs.lower(),
-                    name="handles_empty_input",
-                )
+    )
+    suite.append(
+        Scenario("empty_input")
+        .interact(
+            inputs="",
+            outputs=lambda inputs: agent(inputs),
+        )
+        .check(
+            from_fn(
+                lambda trace: "try again" in trace.last.outputs.lower(),
+                name="handles_empty_input",
             )
         )
-
-    async def run_all(self):
-        return await asyncio.gather(
-            self.greeting.run(),
-            self.error_handling.run(),
-        )
+    )
+    return suite
 ```
-
-`asyncio.gather` runs both scenarios concurrently and returns a list of
-`ScenarioResult` objects in the same order as the arguments.
 
 ## Run the suite
 
-With the suite class defined, running all scenarios is a single call. In a
-Jupyter notebook you can `await` directly:
+With the suite built, running all scenarios is a single call. In a Jupyter
+notebook you can `await` directly:
 
 ```python
 def chatbot(message: str) -> str:
@@ -83,7 +73,7 @@ def chatbot(message: str) -> str:
     return "I'm not sure how to respond to that."
 
 
-results = await ChatbotSuite(chatbot).run_all()
+result = await make_chatbot_suite(chatbot).run()
 ```
 
 In a Python script:
@@ -91,32 +81,31 @@ In a Python script:
 ```python
 import asyncio
 
-results = asyncio.run(ChatbotSuite(chatbot).run_all())
+result = asyncio.run(make_chatbot_suite(chatbot).run())
 ```
 
 ## Summarise results
 
-`results` is a plain list, so you can process it with standard Python. Iterate
-over the results list to count pass/fail and print a report — the `zip` keeps
-scenario names and results aligned because `asyncio.gather` preserves argument
-order:
+`result` is a `SuiteResult` with `results` (list of `ScenarioResult`), `pass_rate`,
+and `duration_ms`. Iterate over `result.results` to count pass/fail and print a report:
 
 ```python
 scenarios = ["greeting", "empty_input"]
+results = result.results
 
 passed = sum(1 for r in results if r.passed)
 total = len(results)
 
-print(f"\nResults: {passed}/{total} passed")
+print(f"\nResults: {passed}/{total} passed (pass rate: {result.pass_rate:.0%})")
 print("-" * 40)
 
-for name, result in zip(scenarios, results):
-    status = "PASS" if result.passed else "FAIL"
+for name, r in zip(scenarios, results):
+    status = "PASS" if r.passed else "FAIL"
     print(f"  [{status}] {name}")
-    if not result.passed:
-        for check_result in result.check_results:
+    if not r.passed:
+        for check_result in (cr for step in r.steps for cr in step.results):
             if not check_result.passed:
-                print(f"         {check_result.name}: {check_result.message}")
+                print(f"         {check_result.details.get('check_name', 'Unknown')}: {check_result.message}")
 ```
 
 Example output:
@@ -134,32 +123,52 @@ when something breaks.
 
 ## Handling partial failures
 
-When `asyncio.gather` returns, some results may have passed and others may have
+When the suite returns, some results may have passed and others may have
 failed. Inspect them individually rather than treating the whole suite as a
 single pass/fail:
 
 ```python
-results = await ChatbotSuite(chatbot).run_all()
+result = await make_chatbot_suite(chatbot).run()
 scenarios = ["greeting", "empty_input"]
+results = result.results
 
-for name, result in zip(scenarios, results):
-    if not result.passed:
+for name, r in zip(scenarios, results):
+    if not r.passed:
         print(f"FAIL: {name}")
-        for check_result in result.check_results:
+        for check_result in (cr for step in r.steps for cr in step.results):
             if not check_result.passed:
-                print(f"  {check_result.name}: {check_result.message}")
+                print(f"  {check_result.details.get('check_name', 'Unknown')}: {check_result.message}")
     else:
         print(f"PASS: {name}")
 ```
 
-The key insight is that `result.passed` is `False` when **any** check in that
-scenario failed. Use `result.check_results` to find the specific assertion that
-broke. When running in CI, you can raise an exception if any scenario fails:
+The key insight is that `r.passed` is `False` when **any** check in that
+scenario failed. Use `(cr for step in r.steps for cr in step.results)` to
+find the specific assertion that broke. When running in CI, raise an exception
+if any scenario fails:
 
 ```python
 failed = [name for name, r in zip(scenarios, results) if not r.passed]
 if failed:
     raise AssertionError(f"Suite failed: {failed}")
+```
+
+## Concurrent alternative
+
+For concurrent execution, use `asyncio.gather` with a plain class:
+
+```python
+import asyncio
+
+class ChatbotSuite:
+    def __init__(self, agent):
+        self.greeting = Scenario("greeting").interact(...).check(...)
+        self.error_handling = Scenario("empty_input").interact(...).check(...)
+
+    async def run_all(self):
+        return await asyncio.gather(self.greeting.run(), self.error_handling.run())
+
+results = await ChatbotSuite(chatbot).run_all()  # list of ScenarioResult
 ```
 
 ## Next step

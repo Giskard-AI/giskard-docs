@@ -46,7 +46,7 @@ the test passed regardless of the scenario outcome.
 
 ```python
 # test_chatbot.py
-from giskard.checks import Scenario, StringMatching
+from giskard.checks import Scenario, RegexMatching
 
 
 async def test_greeting_response():
@@ -56,7 +56,7 @@ async def test_greeting_response():
             inputs="Hello!",
             outputs=lambda inputs: my_chatbot(inputs),
         )
-        .check(StringMatching(pattern=r"hi|hello|hey", name="has_greeting"))
+        .check(RegexMatching(pattern=r"hi|hello|hey", name="has_greeting"))
     )
 
     result = await scenario.run()
@@ -116,7 +116,7 @@ async def test_factual_answers(question, pattern):
             inputs=question,
             outputs=lambda inputs: my_agent(inputs),
         )
-        .check(StringMatching(pattern=pattern, name="correct_answer"))
+        .check(StringMatching(keyword=pattern, name="correct_answer"))
     )
 
     result = await scenario.run()
