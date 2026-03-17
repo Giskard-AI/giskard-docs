@@ -485,8 +485,11 @@ all_passed = all(r.passed for r in results)
 result = await test_scenario.run(return_exception=True)
 
 if result.errored:
-    print(f"Error occurred: {result.message}")
-    print(f"Details: {result.details}")
+    for step in result.steps:
+        for r in step.results:
+            if r.errored:
+                print(f"Error: {r.message}")
+                print(f"Details: {r.details}")
 ```
 
 ### Complex Workflows
