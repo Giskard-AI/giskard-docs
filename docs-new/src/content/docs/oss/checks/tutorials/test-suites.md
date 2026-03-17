@@ -7,8 +7,7 @@ sidebar:
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/tutorials/test-suites.ipynb)
 
 Learn how to group multiple scenarios into a suite and run them with a single
-`await`. By the end you'll have a reusable pattern for organizing related
-tests.
+`await`. By the end you'll have a reusable pattern for organizing related tests.
 
 ## What you'll build
 
@@ -114,35 +113,12 @@ for name, r in zip(scenarios, results):
     print(f"  [{status}] {name}")
 ```
 
-When a scenario fails, use `(cr for step in r.steps for cr in step.results)` to
-see which check broke.
-
-## Concurrent alternative
-
-For concurrent execution, use `asyncio.gather` with a plain class:
-
-```python
-import asyncio
-
-class ChatbotSuite:
-    def __init__(self):
-        self.greeting = greeting_scenario
-        self.error_handling = error_handling_scenario
-
-    async def run_all(self):
-        return await asyncio.gather(
-            self.greeting.run(),
-            self.error_handling.run(),
-        )
-
-results = await ChatbotSuite().run_all()  # list of ScenarioResult
-```
+When a scenario fails, use `(cr for step in r.steps for cr in step.results)` to see which check broke.
 
 ## Next step
 
-You now know the basic suite pattern. For advanced usage — injecting the agent
-through the constructor, running in pytest, or handling partial failures in CI —
-see [Test Suites](/oss/checks/how-to/test-suites/) in the how-to guides.
+You now know the basic suite pattern. For running suites in CI with pytest and
+proper failure reporting, see [Run in pytest](/oss/checks/how-to/run-in-pytest/).
 
 ## See also
 

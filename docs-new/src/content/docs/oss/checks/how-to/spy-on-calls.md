@@ -89,14 +89,13 @@ result = await scenario.run()
 
 ## 6. Access `spy_data` from the result
 
-After the scenario runs, the captured value is available in `result.details`
-under the `"spy_data"` key. This is where you can inspect intermediate values
-that wouldn't normally surface in a check result.
-
-`WithSpy` stores recorded data in `result.details` under the `"spy_data"` key.
+After the scenario runs, the captured data is stored in the last interaction's
+metadata under the `target` key. Use `result.final_trace.last.metadata.get(target)`
+to retrieve it.
 
 ```python
-spy_data = result.details.get("spy_data")
+target = "trace.last.outputs"
+spy_data = result.final_trace.last.metadata.get(target)
 print(spy_data)
 ```
 
@@ -113,8 +112,8 @@ Use the spy data to verify call counts or inspect intermediate values.
 # Check that the agent was called
 assert spy_data is not None, "No spy data recorded — check your WithSpy setup"
 
-# Inspect what was captured at the target path
-captured_output = spy_data.get("trace.last.outputs")
+# Inspect what was captured (call_args.args[0] for the last call's first argument)
+captured_output = spy_data["call_args"].args[0] if spy_data["call_args"] else None
 print(f"Captured output: {captured_output}")
 
 # Assert on content
@@ -163,8 +162,9 @@ async def debug_scenario():
 
     result = await scenario.run()
 
-    # Inspect spy data
-    spy_data = result.details.get("spy_data")
+    # Inspect spy data (stored in last interaction's metadata under the target key)
+    target = "trace.last.outputs"
+    spy_data = result.final_trace.last.metadata.get(target)
     print(f"Spy data: {spy_data}")
     print(f"Test passed: {result.passed}")
 

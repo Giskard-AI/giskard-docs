@@ -134,7 +134,7 @@ test_scenario = Scenario("product_search").interact(
 result = await test_scenario.run()
 
 # Check if goal was reached
-output = result.trace.last.metadata.get("simulator_output")
+output = result.final_trace.last.metadata.get("simulator_output")
 if isinstance(output, UserSimulatorOutput):
     print(f"Goal reached: {output.goal_reached}")
     print(f"Message: {output.message}")
@@ -162,7 +162,7 @@ Output format for user simulator results.
 result = await test_scenario.run()
 
 # Get simulator output from metadata
-last_interaction = result.trace.last
+last_interaction = result.final_trace.last
 if "simulator_output" in last_interaction.metadata:
     output = last_interaction.metadata["simulator_output"]
 

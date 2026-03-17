@@ -53,13 +53,13 @@ class UniquenessTracker(Check):
         if output in self._seen:
             return CheckResult.failure(
                 message=f"Duplicate output detected: {output!r}",
-                metrics={"unique_count": len(self._seen)},
+                details={"unique_count": len(self._seen)},
             )
 
         self._seen.add(output)
         return CheckResult.success(
             message="Output is unique",
-            metrics={"unique_count": len(self._seen)},
+            details={"unique_count": len(self._seen)},
         )
 ```
 
@@ -144,12 +144,12 @@ class RefusalCounter(Check):
                     f"Model has refused {self._refusal_count} times "
                     f"(max allowed: {self.max_refusals})"
                 ),
-                metrics={"refusal_count": self._refusal_count},
+                details={"refusal_count": self._refusal_count},
             )
 
         return CheckResult.success(
             message=f"Refusal count within limit ({self._refusal_count})",
-            metrics={"refusal_count": self._refusal_count},
+            details={"refusal_count": self._refusal_count},
         )
 ```
 

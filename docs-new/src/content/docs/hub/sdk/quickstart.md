@@ -181,7 +181,9 @@ evaluation_results = hub.evaluations.results.list(evaluation.id)
 for eval_result in evaluation_results:
     print(f"Test case {eval_result.test_case.id}: {eval_result.state}")
     for check_result in eval_result.results:
-        print(f"  {check_result.details.get('check_name', 'Unknown')}: {'✓' if check_result.passed else '✗'}")
+        print(
+            f"  {check_result.details.get('check_name', 'Unknown')}: {'✓' if check_result.passed else '✗'}"
+        )
 ```
 
 You can also view the full evaluation with aggregated metrics in the Hub UI.

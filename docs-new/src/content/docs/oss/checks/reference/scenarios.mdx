@@ -162,7 +162,9 @@ Add a validation check to the scenario.
 ```python
 from giskard.checks import Equals, GreaterThan
 
-scenario.check(Equals(expected_value="success", key="trace.last.outputs.status"))
+scenario.check(
+    Equals(expected_value="success", key="trace.last.outputs.status")
+)
 ```
 
 #### `add_interaction(interaction: Interaction)`
@@ -244,21 +246,19 @@ InteractionSpecs, and Checks) that share a trace. For most use cases, use the
 | Attribute    | Type                      | Description                 |
 | ------------ | ------------------------- | --------------------------- |
 | `name`       | `str`                     | Scenario identifier         |
-| `sequence`   | `Sequence[Component]`     | Sequential steps to execute |
+| `steps`      | `list[Step]`              | Sequential steps to execute |
 | `trace_type` | `type[TraceType] \| None` | Optional custom trace type  |
 
 ### Direct Instantiation (Advanced)
 
 ```python
-from giskard.checks import Scenario, InteractionSpec, Equals
+from giskard.checks import Scenario, Interact, Equals
 
-scenario_obj = Scenario(
+scenario_obj = Scenario.from_sequence(
+    Interact(inputs="Hello", outputs="Hi"),
+    Equals(expected_value="Hi", key="trace.last.outputs"),
+    Interact(inputs="Goodbye", outputs="See you!"),
     name="multi_step_test",
-    sequence=[
-        InteractionSpec(inputs="Hello", outputs="Hi"),
-        Equals(expected_value="Hi", key="trace.last.outputs"),
-        InteractionSpec(inputs="Goodbye", outputs="See you!"),
-    ],
 )
 
 result = await scenario_obj.run()
@@ -307,13 +307,13 @@ Result of scenario execution with trace and check results.
 
 ### Attributes
 
-| Attribute     | Type                  | Description                                    |
-| ------------- | --------------------- | ---------------------------------------------- |
-| `status`      | `ScenarioStatus`      | Overall scenario status (PASS/FAIL/ERROR/SKIP) |
+| Attribute     | Type                   | Description                                    |
+| ------------- | ---------------------- | ---------------------------------------------- |
+| `status`      | `ScenarioStatus`       | Overall scenario status (PASS/FAIL/ERROR/SKIP) |
 | `steps`       | `list[TestCaseResult]` | Results for each step (interact + check)       |
-| `final_trace` | `Trace`               | Complete trace of all interactions             |
-| `passed`      | `bool`                | True when all steps passed                     |
-| `duration_ms` | `int`                 | Total execution time in milliseconds           |
+| `final_trace` | `Trace`                | Complete trace of all interactions             |
+| `passed`      | `bool`                 | True when all steps passed                     |
+| `duration_ms` | `int`                  | Total execution time in milliseconds           |
 
 ### Accessing Results
 
@@ -329,7 +329,9 @@ print(f"Total interactions: {len(result.final_trace.interactions)}")
 last_output = result.final_trace.last.outputs
 
 # Review check results (flatten from steps)
-for i, check_result in enumerate(r for step in result.steps for r in step.results):
+for i, check_result in enumerate(
+    r for step in result.steps for r in step.results
+):
     print(f"Check {i}: {check_result.status}")
     if check_result.failed:
         print(f"  Failed: {check_result.message}")
@@ -363,15 +365,16 @@ print(result.results)  # list of ScenarioResult
 
 ### Parameters
 
-| Parameter | Type | Description |
-| --------- | ---- | ----------- |
-| `name` | `str` | Suite identifier |
-| `target` | callable | Optional suite-level target SUT |
+| Parameter | Type     | Description                     |
+| --------- | -------- | ------------------------------- |
+| `name`    | `str`    | Suite identifier                |
+| `target`  | callable | Optional suite-level target SUT |
 
 ### Methods
 
 - `append(scenario)` — Add a scenario to the suite
-- `run(target=..., return_exception=False)` — Run all scenarios serially, returns `SuiteResult`
+- `run(target=..., return_exception=False)` — Run all scenarios serially,
+  returns `SuiteResult`
 
 ---
 
@@ -383,13 +386,13 @@ Aggregate result from suite execution.
 
 ### Attributes
 
-| Attribute | Type | Description |
-| --------- | ---- | ----------- |
-| `results` | `list[ScenarioResult]` | Scenario results in order |
-| `pass_rate` | `float` | Fraction of non-skipped scenarios that passed |
-| `duration_ms` | `int` | Total execution time in milliseconds |
-| `passed_count` | `int` | Number of passed scenarios |
-| `failed_count` | `int` | Number of failed scenarios |
+| Attribute      | Type                   | Description                                   |
+| -------------- | ---------------------- | --------------------------------------------- |
+| `results`      | `list[ScenarioResult]` | Scenario results in order                     |
+| `pass_rate`    | `float`                | Fraction of non-skipped scenarios that passed |
+| `duration_ms`  | `int`                  | Total execution time in milliseconds          |
+| `passed_count` | `int`                  | Number of passed scenarios                    |
+| `failed_count` | `int`                  | Number of failed scenarios                    |
 
 ---
 

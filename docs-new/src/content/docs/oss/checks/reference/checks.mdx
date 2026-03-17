@@ -103,9 +103,7 @@ Check that validates string patterns in trace values.
 from giskard.checks import StringMatching, RegexMatching
 
 # Check if output contains specific keyword (substring)
-check = StringMatching(
-    keyword="success", text_key="trace.last.outputs"
-)
+check = StringMatching(keyword="success", text_key="trace.last.outputs")
 
 # Check with regex pattern (use RegexMatching for regex)
 check = RegexMatching(
@@ -123,12 +121,12 @@ check = StringMatching(
 
 **Parameters:**
 
-| Parameter        | Type   | Default | Description                                    |
-| ---------------- | ------ | ------- | ---------------------------------------------- |
-| `keyword`        | `str`  | —       | Substring to search for (or use `keyword_key`)  |
-| `keyword_key`    | `str`  | —       | JSONPath to extract keyword from trace         |
-| `text_key`       | `str`  | `"trace.last.outputs"` | JSONPath to extract text from trace    |
-| `case_sensitive` | `bool` | `True`  | Whether matching is case-sensitive             |
+| Parameter        | Type   | Default                | Description                                    |
+| ---------------- | ------ | ---------------------- | ---------------------------------------------- |
+| `keyword`        | `str`  | —                      | Substring to search for (or use `keyword_key`) |
+| `keyword_key`    | `str`  | —                      | JSONPath to extract keyword from trace         |
+| `text_key`       | `str`  | `"trace.last.outputs"` | JSONPath to extract text from trace            |
+| `case_sensitive` | `bool` | `True`                 | Whether matching is case-sensitive             |
 
 ---
 

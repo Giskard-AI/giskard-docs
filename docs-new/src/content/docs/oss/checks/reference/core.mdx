@@ -65,12 +65,12 @@ class MyCustomCheck(Check):
         if score >= self.threshold:
             return CheckResult.success(
                 message=f"Score {score} meets threshold",
-                metrics={"score": score},
+                details={"score": score},
             )
         else:
             return CheckResult.failure(
                 message=f"Score {score} below threshold {self.threshold}",
-                metrics={"score": score},
+                details={"score": score},
             )
 
     def _calculate_score(self, trace: Trace) -> float:
@@ -358,7 +358,7 @@ test_scenario = (
 # Run the scenario
 result = await test_scenario.run()
 print(f"Status: {result.status}")
-print(f"Interactions: {len(result.trace.interactions)}")
+print(f"Interactions: {len(result.final_trace.interactions)}")
 ```
 
 ### Methods

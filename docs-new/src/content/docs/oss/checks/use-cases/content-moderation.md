@@ -251,12 +251,12 @@ class SafetyFilterCheck(Check):
         if any(kw in output for kw in self.blocked_keywords):
             return CheckResult.success(
                 message="Request was appropriately filtered",
-                metrics={"filter_detected": True},
+                details={"filter_detected": True},
             )
 
         return CheckResult.failure(
             message="Expected filtering for this input type",
-            metrics={"filter_detected": False},
+            details={"filter_detected": False},
         )
 ```
 

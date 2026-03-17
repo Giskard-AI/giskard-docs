@@ -91,7 +91,7 @@ failing check — you can see exactly what the simulated user said at each step.
 result = await scenario.run()
 
 # Print every turn
-for turn in result.trace.interactions:
+for turn in result.final_trace.interactions:
     print(f"User:  {turn.inputs}")
     print(f"Agent: {turn.outputs}")
     print()
@@ -108,7 +108,7 @@ conversation outcome.
 ```python
 from giskard.checks.generators.user import UserSimulatorOutput
 
-last = result.trace.last
+last = result.final_trace.last
 simulator_output = last.metadata.get("simulator_output")
 
 if isinstance(simulator_output, UserSimulatorOutput):
