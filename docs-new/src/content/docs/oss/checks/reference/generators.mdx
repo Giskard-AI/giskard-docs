@@ -47,7 +47,7 @@ user_sim = UserSimulator(
     - Be polite and patient
     """,
     max_steps=5,
-    generator=Generator(model="openai/gpt-4"),
+    generator=Generator(model="openai/gpt-5"),
 )
 ```
 
@@ -88,7 +88,7 @@ support_sim = UserSimulator(
     - Accept a solution if offered (refund or replacement)
     """,
     max_steps=10,
-    generator=Generator(model="openai/gpt-4"),
+    generator=Generator(model="openai/gpt-5"),
 )
 
 test_scenario = (
@@ -124,7 +124,7 @@ goal_oriented_sim = UserSimulator(
     - Complete checkout
     """,
     max_steps=15,
-    generator=Generator(model="openai/gpt-4"),
+    generator=Generator(model="openai/gpt-5"),
 )
 
 test_scenario = Scenario("product_search").interact(
@@ -311,7 +311,7 @@ customer_sim = UserSimulator(
     - Accept a solution if reasonable
     """,
     max_steps=8,
-    generator=Generator(model="openai/gpt-4"),
+    generator=Generator(model="openai/gpt-5"),
 )
 
 test_flow = (
@@ -355,7 +355,7 @@ for persona in personas:
     sim = UserSimulator(
         instructions=persona["instructions"],
         max_steps=5,
-        generator=Generator(model="openai/gpt-4"),
+        generator=Generator(model="openai/gpt-5"),
     )
 
     test_scenario = Scenario(persona["name"]).interact(
@@ -383,7 +383,7 @@ rapid_fire_sim = UserSimulator(
     Be concise and move quickly between topics.
     """,
     max_steps=10,
-    generator=Generator(model="openai/gpt-4"),
+    generator=Generator(model="openai/gpt-5"),
 )
 
 stress_test = (
