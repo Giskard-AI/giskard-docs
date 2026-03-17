@@ -4,6 +4,8 @@ sidebar:
   order: 10
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/stateful-checks.ipynb)
+
 Most checks are stateless — they inspect the current trace and return a result.
 Stateful checks maintain internal state across multiple scenario runs, enabling
 patterns like uniqueness tracking, accumulated counts, or cross-scenario

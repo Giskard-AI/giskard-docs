@@ -2,6 +2,8 @@
 title: Test Suites
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/test-suites.ipynb)
+
 For the basic suite pattern, see the
 [Test Suites tutorial](/oss/checks/tutorials/test-suites/). This guide covers
 advanced usage: injecting the agent through the constructor, running in pytest,

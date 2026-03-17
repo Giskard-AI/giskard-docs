@@ -181,7 +181,7 @@ from giskard.checks import (
 )
 
 # Configure LLM for checks
-set_default_generator(Generator(model="openai/gpt-5-mini"))
+set_default_generator(Generator(model="openai/gpt-4o-mini"))
 
 
 async def test_basic_qa():
@@ -220,14 +220,15 @@ async def test_basic_qa():
     result = await tc.run()
 
     print(f"Test passed: {result.passed}")
-    for check_result in result.results:
-        print(f"  {check_result.name}: {check_result.status.value}")
+    for check_result in result.steps[0].results:
+        print(f"  {check_result.status.value}")
 
 
 # Run the test
 import asyncio
 
 asyncio.run(test_basic_qa())
+
 ```
 
 ## Test 2: Groundedness Check
@@ -646,12 +647,10 @@ class RAGTestSuite:
             status = "✓" if result.passed else "✗"
             print(f"  {status} {name}")
             if not result.passed:
-                for check_result in result.results:
-                    if not check_result.passed:
-                        print(
-                            f"      - {check_result.name}: "
-                            f"{check_result.message}"
-                        )
+                for step in result.steps:
+                    for check_result in step.results:
+                        if not check_result.passed:
+                            print(f"      - {check_result.message}")
 
         return results
 
@@ -701,11 +700,10 @@ Track confidence metrics to identify problematic queries:
 ```python
 checks = [
     from_fn(
-        lambda trace: trace.last.outputs.confidence,
+        lambda trace: trace.last.outputs.confidence > 0,
         name="track_confidence",
-        success_message=lambda trace: (
-            f"Confidence: {trace.last.outputs.confidence}"
-        ),
+        success_message="Confidence is sufficient",
+        failure_message="Low confidence",
     ),
 ]
 ```

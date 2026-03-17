@@ -4,6 +4,8 @@ sidebar:
   order: 3
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/tutorials/multi-turn.ipynb)
+
 Multi-turn scenarios test conversational flows, stateful interactions, and
 complex workflows that span multiple exchanges. Use them to verify that your
 system stays compliant, consistent, and safe across an entire conversation.

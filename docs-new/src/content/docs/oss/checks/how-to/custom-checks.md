@@ -4,6 +4,8 @@ sidebar:
   order: 6
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/custom-checks.ipynb)
+
 Build domain-specific checks that go beyond the built-in library — from simple
 predicate functions to stateful LLM judges.
 
@@ -68,15 +70,9 @@ class ContainsKeyword(Check):
         target = output if self.case_sensitive else output.lower()
         needle = self.keyword if self.case_sensitive else self.keyword.lower()
         passed = needle in target
-        return CheckResult(
-            name=self.name,
-            passed=passed,
-            message=(
-                f"Found '{self.keyword}'"
-                if passed
-                else f"Missing '{self.keyword}'"
-            ),
-        )
+        if passed:
+            return CheckResult.success(message=f"Found '{self.keyword}'")
+        return CheckResult.failure(message=f"Missing '{self.keyword}'")
 ```
 
 Instantiate it like any built-in check:
@@ -91,7 +87,8 @@ Use `resolve(key, trace)` to extract values from the trace using dot-notation
 paths — the same paths used by `Equals`, `Groundedness`, and other built-ins.
 
 ```python
-from giskard.checks import Check, CheckResult, Trace, resolve
+from giskard.checks import Check, CheckResult, Trace
+from giskard.checks.core.extraction import resolve
 from pydantic import Field
 
 
@@ -103,11 +100,10 @@ class MaxTokens(Check):
         value = resolve(self.key, trace)
         token_count = len(str(value).split())
         passed = token_count <= self.limit
-        return CheckResult(
-            name=self.name,
-            passed=passed,
-            message=f"{token_count} tokens ({'ok' if passed else f'exceeds limit of {self.limit}'})",
-        )
+        msg = f"{token_count} tokens ({'ok' if passed else f'exceeds limit of {self.limit}'})"
+        if passed:
+            return CheckResult.success(message=msg)
+        return CheckResult.failure(message=msg)
 ```
 
 ## LLM-backed check with `BaseLLMCheck`
@@ -164,11 +160,9 @@ class ToxicityAPICheck(Check):
             )
         score = response.json()["toxicity_score"]
         passed = score < 0.5
-        return CheckResult(
-            name=self.name,
-            passed=passed,
-            message=f"Toxicity score: {score:.2f}",
-        )
+        if passed:
+            return CheckResult.success(message=f"Toxicity score: {score:.2f}")
+        return CheckResult.failure(message=f"Toxicity score: {score:.2f}")
 ```
 
 ## Composing checks
@@ -177,7 +171,7 @@ Group related checks into a helper function that returns a list, then unpack
 them into `.check()` calls with a loop.
 
 ```python
-from giskard.checks import from_fn, ContainsKeyword
+from giskard.checks import from_fn
 
 
 def safety_checks():

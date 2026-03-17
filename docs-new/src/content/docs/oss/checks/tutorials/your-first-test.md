@@ -4,6 +4,8 @@ sidebar:
   order: 1
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/tutorials/your-first-test.ipynb)
+
 Write and run your first Giskard Checks test in under ten minutes — no API key
 or LLM required.
 
@@ -23,20 +25,26 @@ If you haven't installed Giskard Checks yet, see the
 
 You need something to test. Create a simple greeting function:
 
+No LLM, no API calls — just a Python function that returns a predictable string.
+Starting with a pure function removes all external dependencies so you can focus
+entirely on the testing mechanics.
+
 ```python
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 ```
-
-No LLM, no API calls — just a Python function that returns a predictable string.
-Starting with a pure function removes all external dependencies so you can focus
-entirely on the testing mechanics.
 
 ## Create a scenario
 
 A `Scenario` chains together one or more interactions and checks. Each
 `.interact()` call provides an input and the callable that produces the output.
 Each `.check()` call asserts something about the result.
+
+`Equals` compares the value at the trace path `trace.last.outputs` against
+`expected_value`. If they match the check passes; otherwise it fails. Notice
+that `trace.last.outputs` is a dot-separated path — this is how all built-in
+checks address values stored in the trace, so you'll see this pattern throughout
+the documentation.
 
 ```python
 from giskard.checks import Scenario, Equals
@@ -56,12 +64,6 @@ scenario = (
     )
 )
 ```
-
-`Equals` compares the value at the trace path `trace.last.outputs` against
-`expected_value`. If they match the check passes; otherwise it fails. Notice
-that `trace.last.outputs` is a dot-separated path — this is how all built-in
-checks address values stored in the trace, so you'll see this pattern throughout
-the documentation.
 
 ## Run it
 
@@ -111,20 +113,20 @@ print(result.passed)  # True
 
 `result` is a `ScenarioResult` with three useful attributes:
 
-| Attribute              | What it contains                                                    |
-| ---------------------- | ------------------------------------------------------------------- |
-| `result.passed`        | `True` if every check passed, `False` otherwise                     |
-| `result.trace`         | The full `Trace` object with every interaction's inputs and outputs |
-| `result.check_results` | A list of individual `CheckResult` objects, one per `.check()` call |
+| Attribute                    | What it contains                                                    |
+| ---------------------------- | ------------------------------------------------------------------- |
+| `result.passed`              | `True` if every check passed, `False` otherwise                     |
+| `result.final_trace`         | The full `Trace` object with every interaction's inputs and outputs |
+| `result.steps[0].results`    | A list of individual `CheckResult` objects for the first step       |
 
 Print check details to understand what passed or failed. When a scenario has
-several checks, iterating over `result.check_results` tells you exactly which
+several checks, iterating over `result.steps[0].results` tells you exactly which
 assertion succeeded or broke and why.
 
 ```python
-for check_result in result.check_results:
+for check_result in result.steps[0].results:
     status = "PASS" if check_result.passed else "FAIL"
-    print(f"[{status}] {check_result.name}: {check_result.message}")
+    print(f"[{status}] {check_result.message}")
 ```
 
 Expected output:
@@ -158,7 +160,7 @@ scenario = (
 result = await scenario.run()
 print(result.passed)  # False
 print(
-    result.check_results[0].message
+    result.steps[0].results[0].message
 )  # expected "Hi, Alice!" but got "Hello, Alice!"
 ```
 

@@ -4,6 +4,8 @@ sidebar:
   order: 5
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/run-in-pytest.ipynb)
+
 Configure pytest to run async Giskard Checks tests with `pytest-asyncio`.
 
 ## 1. Install dependencies

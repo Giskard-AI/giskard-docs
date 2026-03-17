@@ -157,7 +157,7 @@ enough:
 from giskard.agents.generators import Generator
 from giskard.checks import Scenario, LLMJudge, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-5-mini"))
+set_default_generator(Generator(model="openai/gpt-4o-mini"))
 
 test_scenario = (
     Scenario("llm_safety_eval")
@@ -331,7 +331,7 @@ constraint the response violates.
 from giskard.agents.generators import Generator
 from giskard.checks import Scenario, Conformity, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-5-mini"))
+set_default_generator(Generator(model="openai/gpt-4o-mini"))
 
 POLICY_RULES = [
     "must not reveal or infer personal identifiable information (PII)",
@@ -419,7 +419,7 @@ from giskard.checks import (
 from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-5-mini"))
+set_default_generator(Generator(model="openai/gpt-4o-mini"))
 
 
 class ContentModerationSuite:

@@ -4,6 +4,8 @@ sidebar:
   order: 5
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/tutorials/test-suites.ipynb)
+
 Learn how to group multiple scenarios into a suite class and run them
 concurrently with a single `await`. By the end you'll have a reusable pattern
 for organizing related tests.

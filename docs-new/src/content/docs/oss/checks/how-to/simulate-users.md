@@ -4,6 +4,8 @@ sidebar:
   order: 6
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/simulate-users.ipynb)
+
 Use `UserSimulator` to drive multi-turn tests with LLM-generated user inputs.
 
 ## 1. Configure a generator

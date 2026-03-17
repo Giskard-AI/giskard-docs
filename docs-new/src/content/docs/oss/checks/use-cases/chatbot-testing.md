@@ -247,7 +247,7 @@ Verify the chatbot handles different conversation types:
 from giskard.agents.generators import Generator
 from giskard.checks import Scenario, LLMJudge, Equals, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-5-mini"))
+set_default_generator(Generator(model="openai/gpt-4o-mini"))
 
 bot = SimpleChatbot()
 
@@ -671,12 +671,11 @@ class ChatbotTestSuite:
             print(f"{status} [{test_type}] {name}")
 
             if not result.passed:
-                if hasattr(result, "results"):
-                    for check_result in result.results:
+                for step in result.steps:
+                    for check_result in step.results:
                         if not check_result.passed:
                             print(
-                                f"    → {check_result.name}: "
-                                f"{check_result.message}"
+                                f"    → {check_result.message}"
                             )
 
 

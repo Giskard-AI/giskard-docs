@@ -4,6 +4,8 @@ sidebar:
   order: 2
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/tutorials/single-turn.ipynb)
+
 In the previous tutorial you tested a pure Python function. Real AI systems are
 less predictable — the same input can produce a different output every time.
 This tutorial shows you how to wire up a real language model and use an
@@ -28,6 +30,9 @@ LLM-based checks (`LLMJudge`, `Conformity`) need a model to evaluate responses.
 Register one with `set_default_generator` before running any scenario that uses
 these checks:
 
+This call is a one-time setup — once set, every `LLMJudge` check in the same
+process uses this generator automatically.
+
 ```python
 from giskard.checks import set_default_generator
 from giskard.agents.generators import Generator
@@ -35,14 +40,14 @@ from giskard.agents.generators import Generator
 set_default_generator(Generator(model="openai/gpt-4o-mini"))
 ```
 
-This call is a one-time setup — once set, every `LLMJudge` check in the same
-process uses this generator automatically.
-
 ## 2. Write a callable that calls the model
 
 Instead of a stub that returns a hardcoded string, pass a real function that
 calls your LLM. The callable receives the user input and must return the model's
 response as a string:
+
+Any callable that accepts a string and returns a string works here — swap in
+your own wrapper, LangChain chain, or agent at this point.
 
 ```python
 from openai import OpenAI
@@ -61,14 +66,14 @@ def call_model(user_message: str) -> str:
     return response.choices[0].message.content
 ```
 
-Any callable that accepts a string and returns a string works here — swap in
-your own wrapper, LangChain chain, or agent at this point.
-
 ## 3. Write the scenario
 
 Use `LLMJudge` to evaluate the model's response. The judge calls the generator
 you configured in step 1 and returns `passed: true` or `passed: false` based on
 the freeform prompt you provide:
+
+The `{{ trace.last.inputs }}` and `{{ trace.last.outputs }}` template variables
+are filled in at run time with the actual values from the trace.
 
 ```python
 from giskard.checks import Scenario, LLMJudge
@@ -100,24 +105,21 @@ scenario = (
 )
 ```
 
-The `{{ trace.last.inputs }}` and `{{ trace.last.outputs }}` template variables
-are filled in at run time with the actual values from the trace.
-
 ## 4. Run it and read the result
-
-```python
-result = await scenario.run()
-print(f"Passed: {result.passed}")
-
-for check_result in result.check_results:
-    status = "PASS" if check_result.passed else "FAIL"
-    print(f"[{status}] {check_result.name}: {check_result.message}")
-```
 
 Because the response comes from a real model, `result.passed` may vary across
 runs. If the check fails, `check_result.message` contains the judge's
 explanation — this is the main advantage of `LLMJudge` over a boolean predicate:
 failures are human-readable.
+
+```python
+result = await scenario.run()
+print(f"Passed: {result.passed}")
+
+for check_result in result.steps[0].results:
+    status = "PASS" if check_result.passed else "FAIL"
+    print(f"[{status}] {check_result.message}")
+```
 
 ## Next step
 

@@ -4,6 +4,8 @@ sidebar:
   order: 9
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/batch-evaluation.ipynb)
+
 Batch evaluation runs the same scenario pattern across many inputs and
 aggregates the results into a pass/fail summary. Use it to evaluate a dataset of
 test cases, measure regression coverage, or compare outputs across prompt
@@ -133,7 +135,7 @@ import asyncio
 from giskard.agents.generators import Generator
 from giskard.checks import Scenario, LLMJudge, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-5-mini"))
+set_default_generator(Generator(model="openai/gpt-4o-mini"))
 
 summarisation_cases = [
     "The new policy requires all employees to complete security training annually.",

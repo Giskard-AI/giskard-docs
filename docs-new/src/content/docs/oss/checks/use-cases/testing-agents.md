@@ -216,7 +216,7 @@ Evaluate the quality of the agent's reasoning:
 from giskard.agents.generators import Generator
 from giskard.checks import Scenario, LLMJudge, from_fn, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-5-mini"))
+set_default_generator(Generator(model="openai/gpt-4o-mini"))
 
 tc = (
     Scenario("reasoning_quality_test")
@@ -722,14 +722,12 @@ class AgentTestSuite:
             print(f"  {status} [{test_type}] {name}")
 
             if not result.passed:
-                if hasattr(result, "results"):
-                    for check_result in result.results:
+                for step in result.steps:
+                    for check_result in step.results:
                         if not check_result.passed:
                             print(
-                                f"      ↳ {check_result.name}: {check_result.message}"
+                                f"      ↳ {check_result.message}"
                             )
-                elif hasattr(result, "message"):
-                    print(f"      ↳ {result.message}")
 
 
 # Usage

@@ -4,6 +4,8 @@ sidebar:
   order: 8
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/structured-output.ipynb)
+
 Many AI systems return structured data — Pydantic models, JSON objects, or
 nested dicts — rather than plain strings. This guide shows how to validate
 individual fields, assert types, and check nested values using `Equals`,

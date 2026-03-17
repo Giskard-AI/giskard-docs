@@ -4,6 +4,8 @@ sidebar:
   order: 7
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/spy-on-calls.ipynb)
+
 Inspect function calls made during scenario execution using `WithSpy` to
 diagnose unexpected behavior.
 

@@ -4,6 +4,8 @@ sidebar:
   order: 4
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/tutorials/dynamic-scenarios.ipynb)
+
 Static test inputs cover known cases — dynamic inputs let your scenarios adapt
 to what the system actually says. This tutorial shows you how to make both
 inputs and outputs context-aware using callables that read from the trace.
@@ -11,6 +13,15 @@ inputs and outputs context-aware using callables that read from the trace.
 ## Static vs. dynamic
 
 A static scenario fixes every value up front:
+
+This is fine when you know the exact input and can hard-code the output. But two
+situations call for something more flexible:
+
+- You want the **output** to come from a live function call rather than a string
+  literal.
+- You want the **input for turn 2** to reference what the system said in turn 1.
+
+Both are solved by passing a callable instead of a string.
 
 ```python
 from giskard.checks import Scenario, from_fn
@@ -30,20 +41,15 @@ scenario = (
 )
 ```
 
-This is fine when you know the exact input and can hard-code the output. But two
-situations call for something more flexible:
-
-- You want the **output** to come from a live function call rather than a string
-  literal.
-- You want the **input for turn 2** to reference what the system said in turn 1.
-
-Both are solved by passing a callable instead of a string.
-
 ## Dynamic outputs
 
 The most common reason to switch from a static string to a callable is that you
 want the scenario to exercise your real model instead of a pre-written response.
 Pass a callable to `outputs` to call your function at run time:
+
+The lambda receives the current interaction's `inputs` string and must return
+the output value. At run time the framework evaluates it and stores the return
+value in the trace, exactly as it would a hard-coded string.
 
 ```python
 def my_model(user_message: str) -> str:
@@ -68,15 +74,15 @@ scenario = (
 result = await scenario.run()
 ```
 
-The lambda receives the current interaction's `inputs` string and must return
-the output value. At run time the framework evaluates it and stores the return
-value in the trace, exactly as it would a hard-coded string.
-
 ## Dynamic inputs from trace
 
 Next, we'll tackle the second common need: making the input to turn 2 depend on
 what the system said in turn 1. Pass a callable to `inputs` to build the second
 turn's input from the first turn's output:
+
+The `inputs` callable receives the `Trace` object accumulated so far, so you can
+read any previous interaction via `trace.interactions[i]` or the shorthand
+`trace.last`.
 
 ```python
 scenario = (
@@ -98,10 +104,6 @@ scenario = (
     )
 )
 ```
-
-The `inputs` callable receives the `Trace` object accumulated so far, so you can
-read any previous interaction via `trace.interactions[i]` or the shorthand
-`trace.last`.
 
 ## Combining both
 
@@ -162,6 +164,10 @@ The scenario above runs both turns but does not assert anything about turn 2's
 output. Add a `.check()` after the dynamic turn to validate the context-aware
 output:
 
+The check runs after all interactions complete, so `trace.last` always refers to
+the final turn. If you need to assert on an earlier turn, use
+`trace.interactions[0]` to address it directly.
+
 ```python
 from giskard.checks import StringMatching
 
@@ -190,10 +196,6 @@ scenario = (
 result = await scenario.run()
 print(result.passed)
 ```
-
-The check runs after all interactions complete, so `trace.last` always refers to
-the final turn. If you need to assert on an earlier turn, use
-`trace.interactions[0]` to address it directly.
 
 ## Next step
 
