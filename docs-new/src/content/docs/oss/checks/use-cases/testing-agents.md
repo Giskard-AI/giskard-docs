@@ -216,7 +216,7 @@ Evaluate the quality of the agent's reasoning:
 from giskard.agents.generators import Generator
 from giskard.checks import Scenario, LLMJudge, FnCheck, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-4o-mini"))
+set_default_generator(Generator(model="openai/gpt-5-mini"))
 
 tc = (
     Scenario("reasoning_quality_test")

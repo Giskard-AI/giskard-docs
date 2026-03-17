@@ -207,7 +207,7 @@ from giskard.checks import Interaction
 interaction = Interaction(
     inputs="What is the capital of France?",
     outputs="The capital of France is Paris.",
-    metadata={"model": "gpt-4", "tokens": 15},
+    metadata={"model": "gpt-5", "tokens": 15},
 )
 
 # Structured interaction
@@ -495,7 +495,7 @@ from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
 # Configure default generator
-set_default_generator(Generator(model="openai/gpt-4"))
+set_default_generator(Generator(model="openai/gpt-5"))
 
 # Now LLM checks will use this generator by default
 from giskard.checks import Groundedness

@@ -37,7 +37,7 @@ process uses this generator automatically.
 from giskard.checks import set_default_generator
 from giskard.agents.generators import Generator
 
-set_default_generator(Generator(model="openai/gpt-4o-mini"))
+set_default_generator(Generator(model="openai/gpt-5-mini"))
 ```
 
 ## 2. Write a callable that calls the model
@@ -57,7 +57,7 @@ client = OpenAI()  # reads OPENAI_API_KEY from the environment
 
 def call_model(user_message: str) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-5-mini",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": user_message},

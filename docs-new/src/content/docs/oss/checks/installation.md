@@ -32,7 +32,7 @@ from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
 # Create a generator with giskard.agents
-llm_judge = Generator(model="openai/gpt-4o-mini")
+llm_judge = Generator(model="openai/gpt-5-mini")
 
 # Configure the checks to use this judge model by default
 set_default_generator(llm_judge)

@@ -83,7 +83,7 @@ from giskard.agents.generators import Generator
 
 @pytest.fixture(scope="session", autouse=True)
 def configure_generator():
-    set_default_generator(Generator(model="openai/gpt-4o-mini"))
+    set_default_generator(Generator(model="openai/gpt-5-mini"))
 ```
 
 ## Example test file

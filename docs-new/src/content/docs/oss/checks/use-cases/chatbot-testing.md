@@ -247,7 +247,7 @@ Verify the chatbot handles different conversation types:
 from giskard.agents.generators import Generator
 from giskard.checks import Scenario, LLMJudge, Equals, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-4o-mini"))
+set_default_generator(Generator(model="openai/gpt-5-mini"))
 
 bot = SimpleChatbot()
 

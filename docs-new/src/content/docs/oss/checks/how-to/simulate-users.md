@@ -21,7 +21,7 @@ generator once, or pass one inline.
 from giskard.checks import set_default_generator
 from giskard.agents.generators import Generator
 
-set_default_generator(Generator(model="openai/gpt-4o-mini"))
+set_default_generator(Generator(model="openai/gpt-5-mini"))
 ```
 
 ## 2. Create a `UserSimulator` with a persona
