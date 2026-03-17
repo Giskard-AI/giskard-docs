@@ -113,7 +113,9 @@ Use the spy data to verify call counts or inspect intermediate values.
 assert spy_data is not None, "No spy data recorded — check your WithSpy setup"
 
 # Inspect what was captured (call_args.args[0] for the last call's first argument)
-captured_output = spy_data["call_args"].args[0] if spy_data["call_args"] else None
+captured_output = (
+    spy_data["call_args"].args[0] if spy_data["call_args"] else None
+)
 print(f"Captured output: {captured_output}")
 
 # Assert on content

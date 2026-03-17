@@ -68,7 +68,9 @@ async def run_batch():
             print(f"  FAIL: {question}")
             for cr in (r for step in result.steps for r in step.results):
                 if not cr.passed:
-                    print(f"    {cr.details.get('check_name', 'Unknown')}: {cr.message}")
+                    print(
+                        f"    {cr.details.get('check_name', 'Unknown')}: {cr.message}"
+                    )
 
     return results
 
