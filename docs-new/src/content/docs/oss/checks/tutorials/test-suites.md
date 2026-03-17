@@ -98,8 +98,8 @@ result = asyncio.run(suite.run())
 
 ## Inspect the results
 
-`result` is a `SuiteResult` with `results` (list of `ScenarioResult`), `pass_rate`,
-and `duration_ms`. Iterate to count pass/fail and print a report:
+`result` is a `SuiteResult` with `results` (list of `ScenarioResult`),
+`pass_rate`, and `duration_ms`. Iterate to count pass/fail and print a report:
 
 ```python
 scenarios = ["greeting", "empty_input"]
@@ -113,12 +113,14 @@ for name, r in zip(scenarios, results):
     print(f"  [{status}] {name}")
 ```
 
-When a scenario fails, use `(cr for step in r.steps for cr in step.results)` to see which check broke.
+When a scenario fails, use `(cr for step in r.steps for cr in step.results)` to
+see which check broke.
 
 ## Next step
 
 You now know the basic suite pattern. For running suites in CI with pytest and
-proper failure reporting, see [Run in pytest](/oss/checks/how-to/run-in-pytest/).
+proper failure reporting, see
+[Run in pytest](/oss/checks/how-to/run-in-pytest/).
 
 ## See also
 

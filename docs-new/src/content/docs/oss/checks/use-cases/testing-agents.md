@@ -186,7 +186,7 @@ async def test_tool_selection():
         .check(
             Equals(
                 name="selected_calculator",
-                expected="calculator",
+                expected_value="calculator",
                 key="trace.last.outputs.steps[0].tool",
             )
         )

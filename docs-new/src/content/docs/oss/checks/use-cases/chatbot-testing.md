@@ -258,7 +258,7 @@ test_scenario = (
     .check(
         Equals(
             name="casual_context",
-            expected="casual",
+            expected_value="casual",
             key="trace.last.outputs.context.conversation_type",
         )
     )
@@ -270,7 +270,7 @@ test_scenario = (
     .check(
         Equals(
             name="support_context",
-            expected="support",
+            expected_value="support",
             key="trace.last.outputs.context.conversation_type",
         )
     )
@@ -295,7 +295,7 @@ test_scenario = (
     .check(
         Equals(
             name="sales_context",
-            expected="sales",
+            expected_value="sales",
             key="trace.last.outputs.context.conversation_type",
         )
     )
@@ -386,7 +386,7 @@ test_scenario = (
     .check(
         Equals(
             name="extracted_name",
-            expected="Bob",
+            expected_value="Bob",
             key="trace.last.outputs.context.user_name",
         )
     )
@@ -398,7 +398,7 @@ test_scenario = (
     .check(
         Equals(
             name="extracted_email",
-            expected="bob.johnson@example.com",
+            expected_value="bob.johnson@example.com",
             key="trace.last.outputs.context.user_email",
         )
     )

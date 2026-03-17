@@ -600,8 +600,8 @@ from giskard.checks import SemanticSimilarity
 from giskard.agents.generators import Generator
 
 check = SemanticSimilarity(
-    expected="The capital of France is Paris.",
-    actual_key="trace.last.outputs",
+    reference_text="The capital of France is Paris.",
+    actual_answer_key="trace.last.outputs",
     threshold=0.8,
     generator=Generator(model="openai/gpt-4"),
 )
@@ -609,13 +609,13 @@ check = SemanticSimilarity(
 
 **Parameters:**
 
-| Parameter    | Type                    | Default                | Description                       |
-| ------------ | ----------------------- | ---------------------- | --------------------------------- |
-| `expected`   | `str`                   | required               | Expected semantic content         |
-| `actual`     | `str \| None`           | `None`                 | Actual output to compare          |
-| `actual_key` | `str`                   | `"trace.last.outputs"` | JSONPath to extract actual value  |
-| `threshold`  | `float`                 | `0.8`                  | Similarity threshold (0.0 to 1.0) |
-| `generator`  | `BaseGenerator \| None` | `None`                 | LLM generator for evaluation      |
+| Parameter            | Type                    | Default                                | Description                        |
+| -------------------- | ----------------------- | -------------------------------------- | ---------------------------------- |
+| `reference_text`     | `str \| None`           | `None`                                 | Reference text to compare against  |
+| `reference_text_key` | `str`                   | `"trace.last.metadata.reference_text"` | JSONPath to extract reference text |
+| `actual_answer_key`  | `str`                   | `"trace.last.outputs"`                 | JSONPath to extract actual value   |
+| `threshold`          | `float`                 | `0.8`                                  | Similarity threshold (0.0 to 1.0)  |
+| `generator`          | `BaseGenerator \| None` | `None`                                 | LLM generator for evaluation       |
 
 ---
 

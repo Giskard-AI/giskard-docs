@@ -90,8 +90,8 @@ result = await scenario.run()
 ## 6. Access `spy_data` from the result
 
 After the scenario runs, the captured data is stored in the last interaction's
-metadata under the `target` key. Use `result.final_trace.last.metadata.get(target)`
-to retrieve it.
+metadata under the `target` key. Use
+`result.final_trace.last.metadata.get(target)` to retrieve it.
 
 ```python
 target = "trace.last.outputs"

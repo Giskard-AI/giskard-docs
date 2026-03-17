@@ -83,7 +83,7 @@ scenario.check(ContainsKeyword(name="mentions_price", keyword="price"))
 
 ## Reading values from the trace with `resolve`
 
-Use `resolve(key, trace)` to extract values from the trace using dot-notation
+Use `resolve(trace, key)` to extract values from the trace using dot-notation
 paths — the same paths used by `Equals`, `Groundedness`, and other built-ins.
 
 ```python
@@ -97,7 +97,7 @@ class MaxTokens(Check):
     limit: int = Field(default=500)
 
     async def run(self, trace: Trace) -> CheckResult:
-        value = resolve(self.key, trace)
+        value = resolve(trace, self.key)
         token_count = len(str(value).split())
         passed = token_count <= self.limit
         msg = f"{token_count} tokens ({'ok' if passed else f'exceeds limit of {self.limit}'})"
@@ -113,7 +113,7 @@ class MaxTokens(Check):
 `passed: true/false` response.
 
 ```python
-from giskard.checks import BaseLLMCheck, Trace
+from giskard.checks import BaseLLMCheck
 from pydantic import Field
 
 
@@ -122,11 +122,11 @@ class ToneCheck(BaseLLMCheck):
         ..., description="Expected tone, e.g. 'professional', 'empathetic'"
     )
 
-    def get_prompt(self, trace: Trace) -> str:
+    def get_prompt(self) -> str:
         return f"""
         Evaluate whether the following response has a {self.tone} tone.
 
-        Response: {trace.last.outputs}
+        Response: {{{{ trace.last.outputs }}}}
 
         Return 'passed: true' if the tone is {self.tone}, 'passed: false' otherwise.
         Include a brief explanation.

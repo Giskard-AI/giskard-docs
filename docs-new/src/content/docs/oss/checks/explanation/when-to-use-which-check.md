@@ -36,8 +36,8 @@ Cheaper and faster than an LLM judge.
 
 ```python
 SemanticSimilarity(
-    expected="The capital of France is Paris.",
-    key="trace.last.outputs",
+    reference_text="The capital of France is Paris.",
+    actual_answer_key="trace.last.outputs",
     threshold=0.85,
 )
 ```
@@ -50,9 +50,7 @@ Groundedness(
     answer_key="trace.last.outputs.answer",
     context_key="trace.last.outputs.context",
 )
-Conformity(
-    key="trace.last.outputs", rule="Response must not give medical advice"
-)
+Conformity(rule="Response must not give medical advice")
 ```
 
 ## Combining Check Types
