@@ -67,13 +67,13 @@ Use `.add_interaction()` instead of `.interact()` when passing a `WithSpy` (or
 any raw `InteractionSpec`).
 
 ```python
-from giskard.checks import from_fn
+from giskard.checks import FnCheck
 
 scenario = (
     Scenario("debug_policy_response")
     .add_interaction(spied_spec)
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "30 days" in trace.last.outputs.lower(),
             name="mentions_return_window",
         )
@@ -130,7 +130,7 @@ end-to-end flow before adapting it to your own agent.
 
 ```python
 import asyncio
-from giskard.checks import Scenario, Interact, WithSpy, from_fn
+from giskard.checks import Scenario, Interact, WithSpy, FnCheck
 
 
 def my_support_agent(inputs: str) -> str:
@@ -153,7 +153,7 @@ async def debug_scenario():
         Scenario("return_policy_debug")
         .add_interaction(spied_spec)
         .check(
-            from_fn(
+            FnCheck(fn=
                 lambda trace: "30 days" in trace.last.outputs.lower(),
                 name="mentions_return_window",
             )

@@ -199,7 +199,7 @@ cross-turn assertions like "does turn 2 reference what was said in turn 1?" are
 naturally captured without any external state:
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 # This does NOT need a stateful check — the trace has both turns
 scenario = (
@@ -209,7 +209,7 @@ scenario = (
     )
     .interact(inputs="What is my name?", outputs=lambda inputs: chatbot(inputs))
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "Alice" in trace.last.outputs,
             name="recalls_name",
         )

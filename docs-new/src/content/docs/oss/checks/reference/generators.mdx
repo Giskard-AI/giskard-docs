@@ -54,7 +54,7 @@ user_sim = UserSimulator(
 ### Using in Scenarios
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 # Create a scenario with simulated user
 test_scenario = (
@@ -64,7 +64,7 @@ test_scenario = (
         outputs=lambda inputs: booking_agent(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "booked" in trace.last.outputs.lower(),
             name="booking_completed",
         )
@@ -97,7 +97,7 @@ test_scenario = (
     )
     # Check that issue was resolved
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: any(
                 keyword
                 in str(trace.last.metadata.get("resolution", "")).lower()
@@ -251,7 +251,7 @@ test_scenario = (
     Scenario("random_qa")
     .interact(inputs=gen, outputs=lambda inputs: assistant(inputs))
     .check(
-        from_fn(lambda trace: len(trace.last.outputs) > 0, name="has_response")
+        FnCheck(fn=lambda trace: len(trace.last.outputs) > 0, name="has_response")
     )
 )
 ```
@@ -298,7 +298,7 @@ test_scenario = Scenario("context_test").interact(
 ### Testing Conversational Flows
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 from giskard.checks.generators.user import UserSimulator
 from giskard.agents.generators import Generator
 
@@ -320,7 +320,7 @@ test_flow = (
         inputs=customer_sim, outputs=lambda inputs: customer_service_bot(inputs)
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "solution" in str(trace.last.metadata).lower()
             or "replacement" in str(trace.last.outputs).lower(),
             name="solution_offered",
@@ -390,7 +390,7 @@ stress_test = (
     Scenario("rapid_fire")
     .interact(inputs=rapid_fire_sim, outputs=lambda inputs: agent(inputs))
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.interactions) >= 5,
             name="handled_multiple_questions",
         )

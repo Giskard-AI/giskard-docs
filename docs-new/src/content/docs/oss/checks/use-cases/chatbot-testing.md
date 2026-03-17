@@ -174,7 +174,7 @@ conversation it simulates.
 Test a simple greeting and name exchange:
 
 ```python
-from giskard.checks import Scenario, from_fn, StringMatching
+from giskard.checks import Scenario, FnCheck, StringMatching
 
 bot = SimpleChatbot()
 
@@ -201,7 +201,7 @@ test_scenario = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: trace.last.outputs.context.user_name == "Alice",
             name="stored_name",
             success_message="Chatbot stored the user's name",
@@ -373,7 +373,7 @@ intact, ruling out extraction bugs that clear previous data.
 Test the chatbot's ability to extract and remember user information:
 
 ```python
-from giskard.checks import Scenario, from_fn, Equals
+from giskard.checks import Scenario, FnCheck, Equals
 
 bot = SimpleChatbot()
 
@@ -408,7 +408,7 @@ test_scenario = (
         outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: (
                 trace.last.outputs.context.user_name == "Bob"
                 and trace.last.outputs.context.user_email
@@ -432,7 +432,7 @@ before shipping.
 Test how the chatbot handles unusual inputs:
 
 ```python
-from giskard.checks import Scenario, from_fn, LLMJudge
+from giskard.checks import Scenario, FnCheck, LLMJudge
 
 bot = SimpleChatbot()
 
@@ -451,7 +451,7 @@ tc_empty = (
         ),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.last.outputs.message) > 0,
             name="provides_response",
             success_message="Bot provided a response to empty input",
@@ -464,7 +464,7 @@ tc_long = (
     Scenario("long_input_handling")
     .interact(inputs="Hello " * 1000, outputs=lambda inputs: bot.chat(inputs))
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.last.outputs.message) > 0,
             name="handles_long_input",
             success_message="Bot handled long input",
@@ -510,7 +510,7 @@ is correctly cleared when the user cancels.
 Test complex stateful interactions:
 
 ```python
-from giskard.checks import Scenario, from_fn, LLMJudge, StringMatching
+from giskard.checks import Scenario, FnCheck, LLMJudge, StringMatching
 
 
 class StatefulChatbot(SimpleChatbot):
@@ -569,7 +569,7 @@ test_scenario = (
         outputs=lambda inputs: stateful_bot.chat(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: stateful_bot.awaiting_confirmation,
             name="requested_confirmation",
             success_message="Bot requested confirmation",
@@ -587,7 +587,7 @@ test_scenario = (
         inputs="No, nevermind", outputs=lambda inputs: stateful_bot.chat(inputs)
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: not stateful_bot.awaiting_confirmation,
             name="cleared_confirmation_state",
             success_message="Bot cleared confirmation state",
@@ -716,7 +716,7 @@ test_scenario = (
 Ensure the chatbot remembers important information:
 
 ```python
-from_fn(
+FnCheck(fn=
     lambda trace: (
         trace.last.outputs.context.user_name
         and trace.last.outputs.context.user_email

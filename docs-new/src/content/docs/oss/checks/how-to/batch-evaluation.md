@@ -192,7 +192,7 @@ If your checks emit numeric metrics, collect them to compute aggregates:
 
 ```python
 import asyncio
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 test_inputs = [
     "This is a short response.",
@@ -213,7 +213,7 @@ async def run_with_metrics():
             outputs=lambda inputs, x=inp: my_model(x),
         )
         .check(
-            from_fn(
+            FnCheck(fn=
                 lambda trace: len(trace.last.outputs.split()) >= 3,
                 name="min_word_count",
                 success_message="Meets minimum word count",

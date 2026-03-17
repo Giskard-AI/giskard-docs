@@ -51,7 +51,7 @@ result = await test_scenario.run()
 ### Multi-step Scenarios
 
 ```python
-from giskard.checks import Scenario, from_fn, Equals
+from giskard.checks import Scenario, FnCheck, Equals
 
 # Create a conversational flow
 conversation_test = (
@@ -63,7 +63,7 @@ conversation_test = (
     )
     # Validate greeting
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "help" in trace.last.outputs.lower(),
             name="helpful_response",
         )
@@ -498,7 +498,7 @@ if result.errored:
 ### Complex Workflows
 
 ```python
-from giskard.checks import Scenario, from_fn, GreaterThan
+from giskard.checks import Scenario, FnCheck, GreaterThan
 
 # Multi-step workflow with multiple checks
 workflow = (
@@ -524,7 +524,7 @@ workflow = (
         inputs="Welcome", outputs=lambda inputs: f"{inputs} to our platform!"
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "Welcome" in trace.last.outputs, name="welcome_check"
         )
     )

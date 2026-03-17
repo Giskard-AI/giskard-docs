@@ -14,26 +14,26 @@ validation.
 
 ## Function-based Checks
 
-### `from_fn`
+### `FnCheck`
 
 Create a check from a callable function.
 
 **Module:** `giskard.checks.builtin.fn`
 
 ```python
-from giskard.checks import from_fn
+from giskard.checks import FnCheck
 
 # Simple boolean check
-check = from_fn(
-    lambda trace: trace.last.outputs is not None,
+check = FnCheck(
+    fn=lambda trace: trace.last.outputs is not None,
     name="has_output",
     success_message="Output was provided",
     failure_message="No output found",
 )
 
 # Check with custom logic
-check = from_fn(
-    lambda trace: len(trace.last.outputs) > 10,
+check = FnCheck(
+    fn=lambda trace: len(trace.last.outputs) > 10,
     name="min_length_check",
     description="Validates minimum output length",
 )
@@ -47,7 +47,7 @@ async def validate_response(trace):
     return is_valid
 
 
-check = from_fn(validate_response, name="async_validation")
+check = FnCheck(fn=validate_response, name="async_validation")
 ```
 
 **Parameters:**
@@ -65,7 +65,7 @@ check = from_fn(validate_response, name="async_validation")
 
 - `FnCheck`: A check instance wrapping the function
 
-`from_fn` is perfect for quick prototyping and simple validation logic. For
+`FnCheck` is perfect for quick prototyping and simple validation logic. For
 complex checks, consider creating a custom Check subclass.
 
 ### `FnCheck`
@@ -749,4 +749,4 @@ result = await check.run(trace)
 - [Core API](/oss/checks/reference/core/) - Base classes and fundamental types
 - [Scenarios](/oss/checks/reference/scenarios/) - Multi-step workflow testing
 - [Custom Checks](/oss/checks/how-to/custom-checks/) - Build domain-specific
-  checks with from_fn, Check subclasses, and more
+  checks with FnCheck, Check subclasses, and more

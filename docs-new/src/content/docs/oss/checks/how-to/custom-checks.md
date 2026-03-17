@@ -9,16 +9,16 @@ sidebar:
 Build domain-specific checks that go beyond the built-in library — from simple
 predicate functions to stateful LLM judges.
 
-## Quick check with `from_fn`
+## Quick check with `FnCheck`
 
-`from_fn` wraps any boolean function into a named check. Use it when the logic
+`FnCheck` wraps any boolean function into a named check. Use it when the logic
 fits in one expression.
 
 ```python
-from giskard.checks import from_fn, Scenario
+from giskard.checks import FnCheck, Scenario
 
-is_short = from_fn(
-    lambda trace: len(trace.last.outputs) < 200,
+is_short = FnCheck(
+    fn=lambda trace: len(trace.last.outputs) < 200,
     name="response_is_concise",
     success_message="Response is concise",
     failure_message="Response is too long",
@@ -40,8 +40,8 @@ def no_placeholder_text(trace) -> bool:
 
 
 scenario.check(
-    from_fn(
-        no_placeholder_text,
+    FnCheck(
+        fn=no_placeholder_text,
         name="no_placeholders",
         success_message="No placeholder text",
         failure_message="Response contains placeholder text",
@@ -171,19 +171,19 @@ Group related checks into a helper function that returns a list, then unpack
 them into `.check()` calls with a loop.
 
 ```python
-from giskard.checks import from_fn
+from giskard.checks import FnCheck
 
 
 def safety_checks():
     return [
-        from_fn(
-            lambda trace: len(trace.last.outputs) > 0,
+        FnCheck(
+            fn=lambda trace: len(trace.last.outputs) > 0,
             name="non_empty",
             success_message="Response is non-empty",
             failure_message="Empty response",
         ),
-        from_fn(
-            lambda trace: "error" not in trace.last.outputs.lower(),
+        FnCheck(
+            fn=lambda trace: "error" not in trace.last.outputs.lower(),
             name="no_error_string",
             success_message="No error string",
             failure_message="Response contains 'error'",

@@ -88,7 +88,7 @@ system where the chatbot maintains its own conversation history and must recall
 information from an earlier turn.
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 
 class Chatbot:
@@ -129,7 +129,7 @@ test_scenario = (
         outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "SEC-1042" in trace.last.outputs,
             name="acknowledges_case_id",
         )
@@ -139,7 +139,7 @@ test_scenario = (
         outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "SEC-1042" in trace.last.outputs,
             name="remembers_case_id",
             success_message="Correctly recalled the case ID",

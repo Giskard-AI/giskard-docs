@@ -25,7 +25,7 @@ together, and produces a unified pass/fail report.
 Start with a simple chatbot and the two scenarios you want to run together:
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 
 def chatbot(message: str) -> str:
@@ -43,7 +43,7 @@ greeting_scenario = (
         outputs=lambda inputs: chatbot(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "Hello" in trace.last.outputs,
             name="responds_with_greeting",
         )
@@ -57,7 +57,7 @@ error_handling_scenario = (
         outputs=lambda inputs: chatbot(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "try again" in trace.last.outputs.lower(),
             name="handles_empty_input",
         )

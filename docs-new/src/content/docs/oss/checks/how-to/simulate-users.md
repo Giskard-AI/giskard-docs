@@ -61,7 +61,7 @@ Pass the `UserSimulator` instance as the `inputs` argument. The scenario will
 call it repeatedly to generate each user turn.
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 scenario = (
     Scenario("order_tracking")
@@ -70,7 +70,7 @@ scenario = (
         outputs=lambda inputs: support_agent(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: any(
                 word in trace.last.outputs.lower()
                 for word in ["resolved", "refund", "replacement", "shipped"]

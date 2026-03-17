@@ -336,7 +336,7 @@ can be inserted at any point to validate the state.
 ### Building Scenarios
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 # Create a multi-step scenario
 test_scenario = (
@@ -345,13 +345,13 @@ test_scenario = (
     .interact(inputs="Hello", outputs="Hi there!")
     # Check after first interaction
     .check(
-        from_fn(lambda trace: "Hi" in trace.last.outputs, name="greeting_check")
+        FnCheck(fn=lambda trace: "Hi" in trace.last.outputs, name="greeting_check")
     )
     # Second interaction
     .interact(inputs="What's the weather?", outputs="It's sunny!")
     # Final validation
     .check(
-        from_fn(lambda trace: len(trace.interactions) == 2, name="count_check")
+        FnCheck(fn=lambda trace: len(trace.interactions) == 2, name="count_check")
     )
 )
 
@@ -412,14 +412,14 @@ TestCase provides the execution engine that runs scenarios. :::
 ### Using Scenarios (Recommended)
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 # Create individual scenarios (recommended approach)
 test_scenario = (
     Scenario("my_test")
     .interact(inputs="test", outputs="result")
-    .check(from_fn(lambda trace: True, name="check1"))
-    .check(from_fn(lambda trace: True, name="check2"))
+    .check(FnCheck(fn=lambda trace: True, name="check1"))
+    .check(FnCheck(fn=lambda trace: True, name="check2"))
 )
 
 # Run the scenario

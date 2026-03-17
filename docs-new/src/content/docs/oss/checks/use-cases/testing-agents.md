@@ -164,7 +164,7 @@ behavior.
 Verify that the agent selects appropriate tools:
 
 ```python
-from giskard.checks import Scenario, from_fn, Equals
+from giskard.checks import Scenario, FnCheck, Equals
 
 agent = SimpleAgent()
 
@@ -176,7 +176,7 @@ async def test_tool_selection():
             inputs="What is 15 * 23?", outputs=lambda inputs: agent.run(inputs)
         )
         .check(
-            from_fn(
+            FnCheck(fn=
                 lambda trace: len(trace.last.outputs.steps) > 0,
                 name="used_tools",
                 success_message="Agent used tools",
@@ -191,7 +191,7 @@ async def test_tool_selection():
             )
         )
         .check(
-            from_fn(
+            FnCheck(fn=
                 lambda trace: trace.last.outputs.success,
                 name="task_successful",
                 success_message="Agent completed task successfully",
@@ -214,7 +214,7 @@ Evaluate the quality of the agent's reasoning:
 
 ```python
 from giskard.agents.generators import Generator
-from giskard.checks import Scenario, LLMJudge, from_fn, set_default_generator
+from giskard.checks import Scenario, LLMJudge, FnCheck, set_default_generator
 
 set_default_generator(Generator(model="openai/gpt-4o-mini"))
 
@@ -244,7 +244,7 @@ tc = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: trace.last.outputs.steps[0].tool == "search",
             name="correct_tool_for_research",
             success_message="Selected search for research task",
@@ -257,7 +257,7 @@ tc = (
 ## Test 3: Multi-Step Agent Workflow
 
 Next, we'll test an agent that must chain multiple tools in a specific order.
-The three `from_fn` checks assert that each required tool was used, while the
+The three `FnCheck` checks assert that each required tool was used, while the
 `LLMJudge` check validates that the steps appeared in a logical sequence —
 catching cases where the agent calculates before it has gathered the data to
 calculate from.
@@ -307,7 +307,7 @@ class MultiStepAgent(SimpleAgent):
 
 multi_agent = MultiStepAgent()
 
-from giskard.checks import Scenario, from_fn, LLMJudge
+from giskard.checks import Scenario, FnCheck, LLMJudge
 
 test_scenario = (
     Scenario("multi_step_agent_workflow")
@@ -316,7 +316,7 @@ test_scenario = (
         outputs=lambda inputs: multi_agent.run(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.last.outputs.steps) >= 2,
             name="multiple_steps_taken",
             success_message="Agent performed multiple steps",
@@ -324,7 +324,7 @@ test_scenario = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: any(
                 step.tool == "search" for step in trace.last.outputs.steps
             ),
@@ -334,7 +334,7 @@ test_scenario = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: any(
                 step.tool == "calculator" for step in trace.last.outputs.steps
             ),
@@ -420,7 +420,7 @@ tc = (
         outputs=lambda inputs: robust_agent.run(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.last.outputs.steps) > 1,
             name="tried_fallback",
             success_message="Agent tried fallback strategy",
@@ -428,7 +428,7 @@ tc = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: trace.interactions[-1].outputs.success,
             name="eventually_succeeded",
             success_message="Agent completed task despite initial failure",
@@ -515,7 +515,7 @@ test_scenario = (
         outputs=lambda inputs: stateful_agent.run(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: trace.interactions[-1].outputs.success,
             name="first_task_completed",
         )
@@ -526,7 +526,7 @@ test_scenario = (
         outputs=lambda inputs: stateful_agent.run(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "Python tutorials" in trace.last.outputs.final_answer,
             name="recalls_previous_task",
             success_message="Agent correctly recalled previous task",
@@ -561,7 +561,7 @@ internal state matches what the responses claim.
 Verify that complex tasks are fully completed:
 
 ```python
-from giskard.checks import Scenario, LLMJudge, from_fn
+from giskard.checks import Scenario, LLMJudge, FnCheck
 
 
 class TaskTrackingAgent(SimpleAgent):
@@ -627,7 +627,7 @@ test_scenario = (
         outputs=lambda inputs: task_agent.run(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(task_agent.pending_tasks) == 2, name="tasks_added"
         )
     )
@@ -637,7 +637,7 @@ test_scenario = (
         outputs=lambda inputs: task_agent.run(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(task_agent.completed_tasks) == 1,
             name="task_completed",
         )
@@ -648,7 +648,7 @@ test_scenario = (
         outputs=lambda inputs: task_agent.run(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: (
                 "Pending: 1" in trace.last.outputs.final_answer
                 and "Completed: 1" in trace.last.outputs.final_answer
@@ -794,7 +794,7 @@ Track token usage, API calls, and execution time:
 
 ```python
 checks = [
-    from_fn(
+    FnCheck(fn=
         lambda trace: len(trace.last.outputs.steps) <= 5,
         name="reasonable_step_count",
         success_message="Used reasonable number of steps",

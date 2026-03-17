@@ -64,7 +64,7 @@ from giskard.checks import (
     Scenario,
     TestCase,
     # Built-in checks
-    from_fn,
+    FnCheck,
     StringMatching,
     Equals,
     NotEquals,
@@ -105,7 +105,7 @@ giskard.checks/
 │       └── interact.py   # Interact helpers
 │
 ├── builtin/              # Ready-to-use checks
-│   ├── fn.py             # from_fn, FnCheck
+│   ├── fn.py             # FnCheck
 │   ├── text_matching.py  # StringMatching
 │   ├── comparison.py     # Equals, NotEquals, etc.
 │   └── semantic_similarity.py # SemanticSimilarity

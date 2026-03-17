@@ -176,7 +176,7 @@ from giskard.checks import (
     Scenario,
     StringMatching,
     Equals,
-    from_fn,
+    FnCheck,
     set_default_generator,
 )
 
@@ -200,7 +200,7 @@ async def test_basic_qa():
         )
         # Check that documents were retrieved
         .check(
-            from_fn(
+            FnCheck(fn=
                 lambda trace: len(trace.last.outputs.retrieved_docs) > 0,
                 name="retrieved_documents",
                 success_message="Retrieved relevant documents",
@@ -209,7 +209,7 @@ async def test_basic_qa():
         )
         # Check confidence is reasonable
         .check(
-            from_fn(
+            FnCheck(fn=
                 lambda trace: trace.last.outputs.confidence > 0.5,
                 name="confident_answer",
                 success_message="High confidence answer",
@@ -280,7 +280,7 @@ answer — and this test lets you catch that upstream.
 Test that the right documents are retrieved:
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 
 def check_retrieved_topics(trace) -> bool:
@@ -297,7 +297,7 @@ tc = (
         outputs=lambda inputs: rag.answer(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.last.outputs.retrieved_docs) >= 2,
             name="sufficient_context",
             success_message="Retrieved multiple documents",
@@ -305,7 +305,7 @@ tc = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             check_retrieved_topics,
             name="relevant_topics",
             success_message="Retrieved documents are topically relevant",
@@ -324,7 +324,7 @@ exists — not a hallucinated answer that sounds plausible.
 Test how the system handles questions it can't answer:
 
 ```python
-from giskard.checks import Scenario, LLMJudge, from_fn
+from giskard.checks import Scenario, LLMJudge, FnCheck
 
 tc = (
     Scenario("out_of_scope_handling")
@@ -333,7 +333,7 @@ tc = (
         outputs=lambda inputs: rag.answer(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.last.outputs.retrieved_docs) == 0,
             name="no_irrelevant_docs",
             success_message="Correctly retrieved no documents",
@@ -412,7 +412,7 @@ Test a conversational RAG that handles follow-up questions:
 from giskard.checks import (
     Scenario,
     Groundedness,
-    from_fn,
+    FnCheck,
     LLMJudge,
     StringMatching,
 )
@@ -564,7 +564,7 @@ class RAGTestSuite:
                     )
                 )
                 .check(
-                    from_fn(
+                    FnCheck(fn=
                         lambda trace: (
                             len(trace.last.outputs.retrieved_docs) > 0
                         ),
@@ -616,7 +616,7 @@ class RAGTestSuite:
                 Scenario(f"edge_case_{case_name}")
                 .interact(inputs=question, outputs=lambda q: self.rag.answer(q))
                 .check(
-                    from_fn(
+                    FnCheck(fn=
                         lambda trace: trace.last.outputs.answer,
                         name="provides_response",
                         success_message="System provided a response",
@@ -699,7 +699,7 @@ Track confidence metrics to identify problematic queries:
 
 ```python
 checks = [
-    from_fn(
+    FnCheck(fn=
         lambda trace: trace.last.outputs.confidence > 0,
         name="track_confidence",
         success_message="Confidence is sufficient",

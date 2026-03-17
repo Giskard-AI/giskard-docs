@@ -90,7 +90,7 @@ def configure_generator():
 
 ```python
 # tests/llm/test_safety.py
-from giskard.checks import Scenario, LLMJudge, from_fn
+from giskard.checks import Scenario, LLMJudge, FnCheck
 
 
 def my_chatbot(message: str) -> str:

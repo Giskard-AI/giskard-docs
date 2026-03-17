@@ -257,7 +257,7 @@ print(spy_data)
 ### Debugging Scenarios
 
 ```python
-from giskard.checks import Scenario, Interact, from_fn
+from giskard.checks import Scenario, Interact, FnCheck
 from giskard.checks.testing.spy import WithSpy
 
 
@@ -293,7 +293,7 @@ scenarios.
 ### Replaying Recorded Conversations
 
 ```python
-from giskard.checks import TestCase, Trace, Interaction, from_fn
+from giskard.checks import TestCase, Trace, Interaction, FnCheck
 
 # Load recorded conversation
 recorded_interactions = [
@@ -316,11 +316,11 @@ test_case = TestCase(
     name="weather_conversation_replay",
     trace=trace,
     checks=[
-        from_fn(
+        FnCheck(fn=
             lambda t: "sunny" in t.interactions[0].outputs.lower(),
             name="mentions_weather",
         ),
-        from_fn(
+        FnCheck(fn=
             lambda t: "no" in t.interactions[1].outputs.lower(),
             name="umbrella_not_needed",
         ),
@@ -370,14 +370,14 @@ async def test_greeting_response():
         name="greeting_politeness",
         trace=trace,
         checks=[
-            from_fn(
+            FnCheck(fn=
                 lambda t: any(
                     word in t.last.outputs.lower()
                     for word in ["hi", "hello", "hey"]
                 ),
                 name="has_greeting",
             ),
-            from_fn(
+            FnCheck(fn=
                 lambda t: "help" in t.last.outputs.lower(), name="offers_help"
             ),
         ],
@@ -406,7 +406,7 @@ async def test_error_handling():
             Equals(
                 expected_value=True, key="trace.last.metadata.error_handled"
             ),
-            from_fn(
+            FnCheck(fn=
                 lambda t: "don't understand" in t.last.outputs.lower(),
                 name="error_message_present",
             ),

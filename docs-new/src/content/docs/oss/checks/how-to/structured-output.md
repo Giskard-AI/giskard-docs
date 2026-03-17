@@ -9,7 +9,7 @@ sidebar:
 Many AI systems return structured data — Pydantic models, JSON objects, or
 nested dicts — rather than plain strings. This guide shows how to validate
 individual fields, assert types, and check nested values using `Equals`,
-`from_fn`, and JSONPath extraction.
+`FnCheck`, and JSONPath extraction.
 
 ## The system under test
 
@@ -89,15 +89,15 @@ access (`outputs.name`) and dict access (`outputs["name"]`) are supported.
 ## Check with a predicate
 
 Next, we'll verify fields where the correct value isn't a single fixed string.
-`from_fn` lets you express any boolean predicate, so you can validate format
+`FnCheck` lets you express any boolean predicate, so you can validate format
 constraints like email structure or numeric bounds without hard-coding the exact
 output.
 
 When you need more than equality — a range, a regex, a format check — use
-`from_fn`:
+`FnCheck`:
 
 ```python
-from giskard.checks import from_fn
+from giskard.checks import FnCheck
 
 tc = (
     Scenario("extract_email")
@@ -109,7 +109,7 @@ tc = (
         outputs=lambda inputs: extract_info(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "@" in trace.last.outputs.email,
             name="valid_email_format",
             success_message="Email contains @",
@@ -117,7 +117,7 @@ tc = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: 18 <= trace.last.outputs.age <= 120,
             name="reasonable_age",
             success_message="Age is in valid range",
@@ -139,7 +139,7 @@ For deeply nested data, use the `resolve` helper from
 
 ```python
 from pydantic import BaseModel
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 from giskard.checks.core.extraction import resolve, NoMatch
 
 
@@ -170,7 +170,7 @@ tc = (
         outputs=lambda inputs: extract_contact(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: (
                 resolve(trace, "trace.last.outputs.address.city") == "London"
             ),
@@ -178,7 +178,7 @@ tc = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: ("vip" in resolve(trace, "trace.last.outputs.tags")),
             name="has_vip_tag",
         )
@@ -198,7 +198,7 @@ score:
 
 ```python
 from pydantic import BaseModel
-from giskard.checks import Scenario, Equals, from_fn
+from giskard.checks import Scenario, Equals, FnCheck
 
 
 class Classification(BaseModel):
@@ -227,7 +227,7 @@ tc = (
         )
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: trace.last.outputs.confidence >= 0.8,
             name="high_confidence",
             success_message="Confidence meets threshold",
@@ -248,7 +248,7 @@ Group multiple extraction checks into a suite for concurrent execution:
 
 ```python
 import asyncio
-from giskard.checks import Scenario, Equals, from_fn
+from giskard.checks import Scenario, Equals, FnCheck
 
 
 class ExtractionTestSuite:
@@ -281,7 +281,7 @@ class ExtractionTestSuite:
                 outputs=lambda inputs: extractor(inputs),
             )
             .check(
-                from_fn(
+                FnCheck(fn=
                     lambda trace: "@" in trace.last.outputs.email,
                     name="valid_email",
                 )

@@ -24,7 +24,7 @@ situations call for something more flexible:
 Both are solved by passing a callable instead of a string.
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 scenario = (
     Scenario("static_greeting")
@@ -33,7 +33,7 @@ scenario = (
         outputs="Hi there! How can I help?",
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "Hi" in trace.last.outputs,
             name="responds_with_greeting",
         )
@@ -64,7 +64,7 @@ scenario = (
         outputs=lambda inputs: my_model(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.last.outputs) > 0,
             name="non_empty_response",
         )
@@ -97,7 +97,7 @@ scenario = (
         outputs=lambda inputs: my_model(inputs),
     )
     .check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: len(trace.interactions) == 2,
             name="two_turns_completed",
         )
@@ -129,7 +129,7 @@ scenario = (
         inputs="Please start a new support ticket.",
         outputs=lambda inputs: chatbot(inputs),
     ).check(
-        from_fn(
+        FnCheck(fn=
             lambda trace: "#42" in trace.last.outputs,
             name="ticket_id_present",
             success_message="Ticket ID returned",

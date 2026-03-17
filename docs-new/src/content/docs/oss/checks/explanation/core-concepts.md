@@ -109,7 +109,7 @@ used in both JSONPath keys and Python code.
 
 Giskard provides several families of checks:
 
-- **Rule-based** — `Equals`, `StringMatching`, `from_fn`: exact values,
+- **Rule-based** — `Equals`, `StringMatching`, `FnCheck`: exact values,
   keywords, or custom predicates. Fast, free, deterministic.
 - **Semantic similarity** — `SemanticSimilarity`: compare meaning rather than
   exact text. Uses embeddings; good when phrasing varies.
