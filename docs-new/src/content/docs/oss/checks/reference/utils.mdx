@@ -6,15 +6,13 @@ sidebar:
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
 
-Helper functions and utilities for normalization, value providers, and parameter
-injection.
+Helper functions and utilities for normalization, value providers, and parameter injection.
 
 ---
 
 ## Normalization
 
-Utilities for normalizing strings and data structures using Unicode
-normalization forms.
+Utilities for normalizing strings and data structures using Unicode normalization forms.
 
 **Module:** `giskard.checks.utils.normalization`
 
@@ -41,10 +39,10 @@ normalized = normalize_string(text, normalization_form="NFKD")
 
 **Parameters:**
 
-| Parameter            | Type                                            | Default  | Description                |
-| -------------------- | ----------------------------------------------- | -------- | -------------------------- |
-| `value`              | `str`                                           | required | String to normalize        |
-| `normalization_form` | `Literal['NFC', 'NFD', 'NFKC', 'NFKD'] \| None` | `None`   | Unicode normalization form |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `str` | required | String to normalize |
+| `normalization_form` | `Literal['NFC', 'NFD', 'NFKC', 'NFKD'] \| None` | `None` | Unicode normalization form |
 
 **Returns:**
 
@@ -69,10 +67,10 @@ normalized_data = normalize_data(data, normalization_form="NFC")
 
 **Parameters:**
 
-| Parameter            | Type                                            | Default  | Description                 |
-| -------------------- | ----------------------------------------------- | -------- | --------------------------- |
-| `data`               | `T` (dict or list)                              | required | Data structure to normalize |
-| `normalization_form` | `Literal['NFC', 'NFD', 'NFKC', 'NFKD'] \| None` | `None`   | Unicode normalization form  |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `T` (dict or list) | required | Data structure to normalize |
+| `normalization_form` | `Literal['NFC', 'NFD', 'NFKC', 'NFKD'] \| None` | `None` | Unicode normalization form |
 
 **Returns:**
 
@@ -80,15 +78,14 @@ normalized_data = normalize_data(data, normalization_form="NFC")
 
 ### Normalization Forms
 
-| Form   | Description                 | Use Case                                 |
-| ------ | --------------------------- | ---------------------------------------- |
-| `NFC`  | Canonical Composition       | Most common; combines characters         |
-| `NFD`  | Canonical Decomposition     | Separates base + combining characters    |
-| `NFKC` | Compatibility Composition   | Combines + converts compatibility chars  |
+| Form | Description | Use Case |
+| --- | --- | --- |
+| `NFC` | Canonical Composition | Most common; combines characters |
+| `NFD` | Canonical Decomposition | Separates base + combining characters |
+| `NFKC` | Compatibility Composition | Combines + converts compatibility chars |
 | `NFKD` | Compatibility Decomposition | Separates + converts compatibility chars |
 
-:::tip[When to Use Normalization] Use normalization when comparing text that may
-have different Unicode representations:
+:::tip[When to Use Normalization] Use normalization when comparing text that may have different Unicode representations:
 
 - User input vs. database values
 - Cross-language text comparison
@@ -168,9 +165,9 @@ result = await provider.provide()
 
 **Parameters:**
 
-| Parameter           | Type                       | Description                       |
-| ------------------- | -------------------------- | --------------------------------- |
-| `callable`          | `Callable`                 | Function to call for value        |
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `callable` | `Callable` | Function to call for value |
 | `injection_mapping` | `CallableInjectionMapping` | Parameter injection configuration |
 
 ### `ValueGeneratorProvider`
@@ -194,8 +191,7 @@ async for value in provider.provide():
     print(value)
 ```
 
-:::note[Advanced Usage] Value providers are primarily used internally by the
-framework. Most users won't need to interact with them directly. :::
+:::note[Advanced Usage] Value providers are primarily used internally by the framework. Most users won't need to interact with them directly. :::
 
 ---
 
@@ -273,9 +269,7 @@ from giskard.checks.utils.parameter_injection import ParameterInjection
 injection = ParameterInjection(name="trace", source="context")
 ```
 
-:::note[Framework Internal] Parameter injection is primarily used internally for
-dependency injection in checks and interaction specs. Most users won't need to
-use this directly. :::
+:::note[Framework Internal] Parameter injection is primarily used internally for dependency injection in checks and interaction specs. Most users won't need to use this directly. :::
 
 ---
 
@@ -320,8 +314,8 @@ async for value in a_generator(async_gen()):
 
 **Parameters:**
 
-| Parameter            | Type                                | Description                   |
-| -------------------- | ----------------------------------- | ----------------------------- |
+| Parameter | Type | Description |
+| --- | --- | --- |
 | `value_or_generator` | `YieldType \| SyncOrAsyncGenerator` | Value or generator to convert |
 
 **Returns:**
@@ -352,9 +346,7 @@ async for r in process_values(my_generator()):
     print(r)
 ```
 
-:::tip[When to Use] Use `a_generator` when you need to handle different types of
-inputs (values, sync generators, async generators) uniformly as async
-generators. :::
+:::tip[When to Use] Use `a_generator` when you need to handle different types of inputs (values, sync generators, async generators) uniformly as async generators. :::
 
 ---
 

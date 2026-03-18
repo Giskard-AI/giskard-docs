@@ -23,26 +23,19 @@ At runtime, the flow looks like this:
 
 ## Interaction
 
-An `Interaction` represents a single turn of data exchange with the system under
-test. Interactions are computed at execution time by resolving `InteractionSpec`
-objects into the trace.
+An `Interaction` represents a single turn of data exchange with the system under test. Interactions are computed at execution time by resolving `InteractionSpec` objects into the trace.
 
 **Properties:**
 
 - `inputs`: The input to your system (string, dict, Pydantic model, etc.)
 - `outputs`: The output from your system (any serializable type)
-- `metadata`: Optional dictionary for additional context (timings, model info,
-  etc.)
+- `metadata`: Optional dictionary for additional context (timings, model info, etc.)
 
-Interactions are **immutable**, as they represent something that has already
-happened.
+Interactions are **immutable**, as they represent something that has already happened.
 
 ## InteractionSpec
 
-An `InteractionSpec` describes _how_ to generate an interaction and is used to
-describe a scenario. When you call `.interact(...)` in the fluent API, it adds
-an `InteractionSpec` to the scenario sequence. Inputs and outputs can be static
-values or dynamic callables, and you can mix both.
+An `InteractionSpec` describes _how_ to generate an interaction and is used to describe a scenario. When you call `.interact(...)` in the fluent API, it adds an `InteractionSpec` to the scenario sequence. Inputs and outputs can be static values or dynamic callables, and you can mix both.
 
 ```python
 from giskard.checks import InteractionSpec
@@ -70,16 +63,11 @@ spec = InteractionSpec(
 )
 ```
 
-Specs are resolved into interactions during scenario execution. This is common
-in multi-turn scenarios, where inputs and outputs are generated based on
-previous interactions. See
-[Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn/) for practical
-examples.
+Specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn/) for practical examples.
 
 ## Trace
 
-A `Trace` is an immutable snapshot of all data exchanged with the system under
-test. In its simplest form, it is a list of interactions.
+A `Trace` is an immutable snapshot of all data exchanged with the system under test. In its simplest form, it is a list of interactions.
 
 ```python
 from giskard.checks import Trace, Interaction
@@ -92,36 +80,23 @@ trace = Trace(
 )
 ```
 
-Traces are typically created during scenario execution by resolving each
-`InteractionSpec` into a frozen interaction.
+Traces are typically created during scenario execution by resolving each `InteractionSpec` into a frozen interaction.
 
 ## Checks
 
-A `Check` validates something about a trace and returns a `CheckResult`. Checks
-run after each interaction in a scenario and can inspect any part of the trace —
-including outputs from earlier turns.
+A `Check` validates something about a trace and returns a `CheckResult`. Checks run after each interaction in a scenario and can inspect any part of the trace — including outputs from earlier turns.
 
-When referencing values in a trace, use JSONPath expressions that start with
-`trace.`. The `last` property is a shortcut for `interactions[-1]` and can be
-used in both JSONPath keys and Python code.
+When referencing values in a trace, use JSONPath expressions that start with `trace.`. The `last` property is a shortcut for `interactions[-1]` and can be used in both JSONPath keys and Python code.
 
 ### Built-in check categories
 
 Giskard provides several families of checks:
 
-- **Rule-based** — `Equals`, `StringMatching`, `FnCheck`: exact values,
-  keywords, or custom predicates. Fast, free, deterministic.
-- **Semantic similarity** — `SemanticSimilarity`: compare meaning rather than
-  exact text. Uses embeddings; good when phrasing varies.
-- **LLM-as-judge** — `Groundedness`, `Conformity`, `LLMJudge`: qualitative
-  evaluation (tone, policy compliance, reasoning). Uses an LLM call; more
-  flexible but slower and non-deterministic.
+- **Rule-based** — `Equals`, `StringMatching`, `FnCheck`: exact values, keywords, or custom predicates. Fast, free, deterministic.
+- **Semantic similarity** — `SemanticSimilarity`: compare meaning rather than exact text. Uses embeddings; good when phrasing varies.
+- **LLM-as-judge** — `Groundedness`, `Conformity`, `LLMJudge`: qualitative evaluation (tone, policy compliance, reasoning). Uses an LLM call; more flexible but slower and non-deterministic.
 
-For guidance on choosing the right check, see
-[When to Use Which Check](/oss/checks/explanation/when-to-use-which-check/). For
-the full API, see the [Checks reference](/oss/checks/reference/checks/). To
-build your own validation logic, see
-[Custom Checks](/oss/checks/how-to/custom-checks/).
+For guidance on choosing the right check, see [When to Use Which Check](/oss/checks/explanation/when-to-use-which-check/). For the full API, see the [Checks reference](/oss/checks/reference/checks/). To build your own validation logic, see [Custom Checks](/oss/checks/how-to/custom-checks/).
 
 ```python
 from giskard.checks import Groundedness
@@ -134,9 +109,7 @@ check = Groundedness(
 
 ## Scenario
 
-A `Scenario` is a list of steps (interactions and checks) that are executed
-sequentially with a shared trace. Scenarios work for both single-turn and
-multi-turn tests.
+A `Scenario` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. Scenarios work for both single-turn and multi-turn tests.
 
 ```python
 from giskard.checks import Scenario
@@ -151,8 +124,7 @@ test_scenario = (
 result = await test_scenario.run()
 ```
 
-The `run()` method is asynchronous. When running in a script, use
-`asyncio.run()`:
+The `run()` method is asynchronous. When running in a script, use `asyncio.run()`:
 
 ```python
 import asyncio
@@ -166,19 +138,16 @@ async def main():
 result = asyncio.run(main())
 ```
 
-In async contexts (like pytest with `@pytest.mark.asyncio`), you can use `await`
-directly.
+In async contexts (like pytest with `@pytest.mark.asyncio`), you can use `await` directly.
 
 ## Fluent API Mapping
 
-The fluent API is the preferred user-facing entry point and maps directly to the
-core primitives above:
+The fluent API is the preferred user-facing entry point and maps directly to the core primitives above:
 
 - `Scenario(name)` creates a scenario builder.
 - `.interact(...)` adds an `InteractionSpec` to the scenario sequence.
 - `.check(...)` adds a `Check` to the scenario sequence.
-- `.run()` resolves specs to interactions, builds the `Trace`, runs checks, and
-  returns a `ScenarioResult`.
+- `.run()` resolves specs to interactions, builds the `Trace`, runs checks, and returns a `ScenarioResult`.
 
 For example, we can test a simple conversation flow with two turns:
 
@@ -210,5 +179,4 @@ import asyncio
 result = asyncio.run(test_scenario.run())
 ```
 
-For a practical introduction to the fluent API, see
-[Quickstart](/oss/checks/quickstart/).
+For a practical introduction to the fluent API, see [Quickstart](/oss/checks/quickstart/).

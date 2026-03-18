@@ -6,9 +6,7 @@ sidebar:
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
 
-Ready-to-use validation checks for common testing scenarios, including
-function-based checks, string matching, comparisons, and LLM-powered semantic
-validation.
+Ready-to-use validation checks for common testing scenarios, including function-based checks, string matching, comparisons, and LLM-powered semantic validation.
 
 ---
 
@@ -52,21 +50,20 @@ check = FnCheck(fn=validate_response, name="async_validation")
 
 **Parameters:**
 
-| Parameter         | Type           | Default  | Description                                          |
-| ----------------- | -------------- | -------- | ---------------------------------------------------- |
-| `fn`              | `Callable`     | required | Function taking trace, returning bool or CheckResult |
-| `name`            | `str \| None`  | `None`   | Optional check name                                  |
-| `description`     | `str \| None`  | `None`   | Optional description                                 |
-| `success_message` | `str \| None`  | `None`   | Message when check passes                            |
-| `failure_message` | `str \| None`  | `None`   | Message when check fails                             |
-| `details`         | `dict \| None` | `None`   | Additional details to include in result              |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fn` | `Callable` | required | Function taking trace, returning bool or CheckResult |
+| `name` | `str \| None` | `None` | Optional check name |
+| `description` | `str \| None` | `None` | Optional description |
+| `success_message` | `str \| None` | `None` | Message when check passes |
+| `failure_message` | `str \| None` | `None` | Message when check fails |
+| `details` | `dict \| None` | `None` | Additional details to include in result |
 
 **Returns:**
 
 - `FnCheck`: A check instance wrapping the function
 
-`FnCheck` is perfect for quick prototyping and simple validation logic. For
-complex checks, consider creating a custom Check subclass.
+`FnCheck` is perfect for quick prototyping and simple validation logic. For complex checks, consider creating a custom Check subclass.
 
 ### `FnCheck`
 
@@ -86,8 +83,7 @@ check = FnCheck(
 )
 ```
 
-`FnCheck` instances cannot be reliably serialized/deserialized because the `fn`
-field is not serializable. This is intended for programmatic/test use only.
+`FnCheck` instances cannot be reliably serialized/deserialized because the `fn` field is not serializable. This is intended for programmatic/test use only.
 
 ---
 
@@ -121,12 +117,12 @@ check = StringMatching(
 
 **Parameters:**
 
-| Parameter        | Type   | Default                | Description                                    |
-| ---------------- | ------ | ---------------------- | ---------------------------------------------- |
-| `keyword`        | `str`  | —                      | Substring to search for (or use `keyword_key`) |
-| `keyword_key`    | `str`  | —                      | JSONPath to extract keyword from trace         |
-| `text_key`       | `str`  | `"trace.last.outputs"` | JSONPath to extract text from trace            |
-| `case_sensitive` | `bool` | `True`                 | Whether matching is case-sensitive             |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `keyword` | `str` | — | Substring to search for (or use `keyword_key`) |
+| `keyword_key` | `str` | — | JSONPath to extract keyword from trace |
+| `text_key` | `str` | `"trace.last.outputs"` | JSONPath to extract text from trace |
+| `case_sensitive` | `bool` | `True` | Whether matching is case-sensitive |
 
 ---
 
@@ -158,12 +154,12 @@ check = Equals(
 
 **Parameters:**
 
-| Parameter            | Type          | Default  | Description                                         |
-| -------------------- | ------------- | -------- | --------------------------------------------------- |
-| `expected_value`     | `Any \| None` | `None`   | Static expected value                               |
-| `expected_value_key` | `str \| None` | `None`   | JSONPath to extract expected value from trace       |
-| `key`                | `str`         | required | JSONPath to extract actual value                    |
-| `normalization_form` | `str \| None` | `None`   | Unicode normalization: "NFC", "NFD", "NFKC", "NFKD" |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `expected_value` | `Any \| None` | `None` | Static expected value |
+| `expected_value_key` | `str \| None` | `None` | JSONPath to extract expected value from trace |
+| `key` | `str` | required | JSONPath to extract actual value |
+| `normalization_form` | `str \| None` | `None` | Unicode normalization: "NFC", "NFD", "NFKC", "NFKD" |
 
 Provide exactly one of `expected_value` or `expected_value_key`.
 
@@ -221,9 +217,7 @@ check = LesserThanEquals(
 )
 ```
 
-Comparison checks use Python's comparison operators (`==`, `>`, `<`, etc.).
-Ensure the extracted values and expected values are compatible types for
-comparison.
+Comparison checks use Python's comparison operators (`==`, `>`, `<`, etc.). Ensure the extracted values and expected values are compatible types for comparison.
 
 ---
 
@@ -239,18 +233,15 @@ Abstract base class for creating custom LLM-powered checks.
 
 #### Description
 
-`BaseLLMCheck` provides a framework for building checks that leverage Large
-Language Models for evaluation. It handles the LLM interaction, prompt
-rendering, and result parsing, so subclasses only need to define the evaluation
-prompt.
+`BaseLLMCheck` provides a framework for building checks that leverage Large Language Models for evaluation. It handles the LLM interaction, prompt rendering, and result parsing, so subclasses only need to define the evaluation prompt.
 
 #### Attributes
 
-| Attribute     | Type                    | Default | Description                                                                    |
-| ------------- | ----------------------- | ------- | ------------------------------------------------------------------------------ |
-| `generator`   | `BaseGenerator \| None` | `None`  | LLM generator for evaluation. Falls back to the global default if not provided |
-| `name`        | `str \| None`           | `None`  | Optional check name                                                            |
-| `description` | `str \| None`           | `None`  | Optional description                                                           |
+| Attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| `generator` | `BaseGenerator \| None` | `None` | LLM generator for evaluation. Falls back to the global default if not provided |
+| `name` | `str \| None` | `None` | Optional check name |
+| `description` | `str \| None` | `None` | Optional description |
 
 #### Key Methods
 
@@ -267,8 +258,7 @@ Returns the prompt to send to the LLM. Subclasses must implement this method.
 
 ##### `get_inputs(trace: Trace) -> dict[str, Any]`
 
-Provides template variables for prompt rendering. Override to customize
-available variables.
+Provides template variables for prompt rendering. Override to customize available variables.
 
 **Parameters:**
 
@@ -349,8 +339,7 @@ Default result model for LLM-based checks.
 | `passed`  | `bool`        | Whether the check passed            |
 | `reason`  | `str \| None` | Optional explanation for the result |
 
-This is the structured output format expected from the LLM when using
-`BaseLLMCheck`.
+This is the structured output format expected from the LLM when using `BaseLLMCheck`.
 
 ---
 
@@ -362,20 +351,17 @@ Validates that answers are grounded in provided context documents.
 
 #### Description
 
-Uses an LLM to determine if an answer is properly supported by the given
-context. This is crucial for RAG (Retrieval-Augmented Generation) systems to
-ensure responses don't hallucinate information not present in the retrieved
-documents.
+Uses an LLM to determine if an answer is properly supported by the given context. This is crucial for RAG (Retrieval-Augmented Generation) systems to ensure responses don't hallucinate information not present in the retrieved documents.
 
 #### Attributes
 
-| Attribute     | Type                       | Default                         | Description                                        |
-| ------------- | -------------------------- | ------------------------------- | -------------------------------------------------- |
-| `answer`      | `str \| None`              | `None`                          | The answer text to evaluate                        |
-| `answer_key`  | `str`                      | `"trace.last.outputs"`          | JSONPath to extract answer from trace              |
-| `context`     | `str \| list[str] \| None` | `None`                          | Context document(s) that should support the answer |
-| `context_key` | `str`                      | `"trace.last.metadata.context"` | JSONPath to extract context from trace             |
-| `generator`   | `BaseGenerator \| None`    | `None`                          | LLM generator for evaluation                       |
+| Attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| `answer` | `str \| None` | `None` | The answer text to evaluate |
+| `answer_key` | `str` | `"trace.last.outputs"` | JSONPath to extract answer from trace |
+| `context` | `str \| list[str] \| None` | `None` | Context document(s) that should support the answer |
+| `context_key` | `str` | `"trace.last.metadata.context"` | JSONPath to extract context from trace |
+| `generator` | `BaseGenerator \| None` | `None` | LLM generator for evaluation |
 
 #### Usage
 
@@ -408,8 +394,7 @@ check = Groundedness(
 result = await check.run(trace)
 ```
 
-The `context` parameter can be: a single string document, a list of string
-documents, or extracted from trace metadata using `context_key`.
+The `context` parameter can be: a single string document, a list of string documents, or extracted from trace metadata using `context_key`.
 
 ---
 
@@ -421,16 +406,14 @@ Validates that interactions conform to a specified rule or requirement.
 
 #### Description
 
-Uses an LLM to evaluate whether an interaction (inputs, outputs, and metadata)
-conforms to a given rule. The rule supports Jinja2 templating, allowing for
-dynamic rules that reference trace data.
+Uses an LLM to evaluate whether an interaction (inputs, outputs, and metadata) conforms to a given rule. The rule supports Jinja2 templating, allowing for dynamic rules that reference trace data.
 
 #### Attributes
 
-| Attribute   | Type                    | Description                                                                                 |
-| ----------- | ----------------------- | ------------------------------------------------------------------------------------------- |
-| `rule`      | `str`                   | The conformity rule to evaluate. Supports Jinja2 templating with access to the trace object |
-| `generator` | `BaseGenerator \| None` | LLM generator for evaluation (falls back to default)                                        |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `rule` | `str` | The conformity rule to evaluate. Supports Jinja2 templating with access to the trace object |
+| `generator` | `BaseGenerator \| None` | LLM generator for evaluation (falls back to default) |
 
 #### Usage
 
@@ -483,8 +466,7 @@ check = Conformity(
 )
 ```
 
-In Jinja2 templates, prefer `trace.last` over `trace.interactions[-1]` for
-better readability. Both provide access to the most recent interaction.
+In Jinja2 templates, prefer `trace.last` over `trace.interactions[-1]` for better readability. Both provide access to the most recent interaction.
 
 ---
 
@@ -496,20 +478,17 @@ General-purpose LLM-based validation with custom prompts.
 
 #### Description
 
-The most flexible LLM check that allows you to define completely custom
-evaluation logic through prompts. Use this when the specialized checks
-(Groundedness, Conformity) don't fit your needs.
+The most flexible LLM check that allows you to define completely custom evaluation logic through prompts. Use this when the specialized checks (Groundedness, Conformity) don't fit your needs.
 
 #### Attributes
 
-| Attribute     | Type                    | Description                                                |
-| ------------- | ----------------------- | ---------------------------------------------------------- |
-| `prompt`      | `str \| None`           | Inline prompt content with Jinja2 templating support       |
-| `prompt_path` | `str \| None`           | Path to a template file (e.g., `"checks::my_template.j2"`) |
-| `generator`   | `BaseGenerator \| None` | LLM generator for evaluation                               |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `prompt` | `str \| None` | Inline prompt content with Jinja2 templating support |
+| `prompt_path` | `str \| None` | Path to a template file (e.g., `"checks::my_template.j2"`) |
+| `generator` | `BaseGenerator \| None` | LLM generator for evaluation |
 
-Exactly one of `prompt` or `prompt_path` must be provided. Providing both or
-neither will raise a validation error.
+Exactly one of `prompt` or `prompt_path` must be provided. Providing both or neither will raise a validation error.
 
 #### Usage
 
@@ -609,13 +588,13 @@ check = SemanticSimilarity(
 
 **Parameters:**
 
-| Parameter            | Type                    | Default                                | Description                        |
-| -------------------- | ----------------------- | -------------------------------------- | ---------------------------------- |
-| `reference_text`     | `str \| None`           | `None`                                 | Reference text to compare against  |
-| `reference_text_key` | `str`                   | `"trace.last.metadata.reference_text"` | JSONPath to extract reference text |
-| `actual_answer_key`  | `str`                   | `"trace.last.outputs"`                 | JSONPath to extract actual value   |
-| `threshold`          | `float`                 | `0.8`                                  | Similarity threshold (0.0 to 1.0)  |
-| `generator`          | `BaseGenerator \| None` | `None`                                 | LLM generator for evaluation       |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `reference_text` | `str \| None` | `None` | Reference text to compare against |
+| `reference_text_key` | `str` | `"trace.last.metadata.reference_text"` | JSONPath to extract reference text |
+| `actual_answer_key` | `str` | `"trace.last.outputs"` | JSONPath to extract actual value |
+| `threshold` | `float` | `0.8` | Similarity threshold (0.0 to 1.0) |
+| `generator` | `BaseGenerator \| None` | `None` | LLM generator for evaluation |
 
 ---
 
@@ -748,5 +727,4 @@ result = await check.run(trace)
 
 - [Core API](/oss/checks/reference/core/) - Base classes and fundamental types
 - [Scenarios](/oss/checks/reference/scenarios/) - Multi-step workflow testing
-- [Custom Checks](/oss/checks/how-to/custom-checks/) - Build domain-specific
-  checks with FnCheck, Check subclasses, and more
+- [Custom Checks](/oss/checks/how-to/custom-checks/) - Build domain-specific checks with FnCheck, Check subclasses, and more

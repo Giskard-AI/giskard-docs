@@ -18,21 +18,17 @@ Bundle a trace with a set of checks to execute.
 
 ### Description
 
-`TestCase` combines a trace (with pre-recorded interactions) and a sequence of
-checks to run against that trace. This is useful for testing against fixed
-interaction sequences or replaying recorded conversations.
+`TestCase` combines a trace (with pre-recorded interactions) and a sequence of checks to run against that trace. This is useful for testing against fixed interaction sequences or replaying recorded conversations.
 
-For most use cases, use the `Scenario()` fluent API instead, which is simpler
-and more readable. `TestCase` is useful for advanced use cases where you need
-direct control over trace construction and check execution.
+For most use cases, use the `Scenario()` fluent API instead, which is simpler and more readable. `TestCase` is useful for advanced use cases where you need direct control over trace construction and check execution.
 
 ### Attributes
 
-| Attribute | Type              | Description                                       |
-| --------- | ----------------- | ------------------------------------------------- |
-| `name`    | `str \| None`     | Optional label for the test case                  |
-| `trace`   | `Trace`           | The trace containing interactions to test against |
-| `checks`  | `Sequence[Check]` | Sequence of checks to run against the trace       |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `name` | `str \| None` | Optional label for the test case |
+| `trace` | `Trace` | The trace containing interactions to test against |
+| `checks` | `Sequence[Check]` | Sequence of checks to run against the trace |
 
 ### Creating Test Cases
 
@@ -72,8 +68,7 @@ Execute all checks against the trace.
 
 **Parameters:**
 
-- `return_exception` (`bool`): If True, return results even when exceptions
-  occur instead of raising
+- `return_exception` (`bool`): If True, return results even when exceptions occur instead of raising
 
 **Returns:** `TestCaseResult` with check outcomes
 
@@ -91,8 +86,7 @@ Run the test case and assert that it passed.
 
 **Raises:**
 
-- `AssertionError`: If the test case did not pass, with formatted failure
-  messages
+- `AssertionError`: If the test case did not pass, with formatted failure messages
 
 ```python
 # Use in tests - raises if any check fails
@@ -103,8 +97,7 @@ result = await test_case.run()
 result.assert_passed()
 ```
 
-Use `assert_passed()` to integrate with testing frameworks like pytest or
-unittest:
+Use `assert_passed()` to integrate with testing frameworks like pytest or unittest:
 
 ```python
 import pytest
@@ -126,13 +119,13 @@ Result of test case execution with check outcomes.
 
 ### Attributes
 
-| Attribute     | Type                | Description                                |
-| ------------- | ------------------- | ------------------------------------------ |
-| `status`      | `TestCaseStatus`    | Overall test case status (PASS/FAIL/ERROR) |
-| `results`     | `list[CheckResult]` | Results from all checks                    |
-| `passed`      | `bool`              | True if all checks passed                  |
-| `failed`      | `bool`              | True if any check failed                   |
-| `duration_ms` | `int`               | Execution time in milliseconds             |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `status` | `TestCaseStatus` | Overall test case status (PASS/FAIL/ERROR) |
+| `results` | `list[CheckResult]` | Results from all checks |
+| `passed` | `bool` | True if all checks passed |
+| `failed` | `bool` | True if any check failed |
+| `duration_ms` | `int` | Execution time in milliseconds |
 
 ### Accessing Results
 
@@ -164,8 +157,7 @@ Low-level runner for executing test cases.
 
 ### Description
 
-`TestCaseRunner` provides the execution engine for running test cases. Most
-users should use `test_case.run()` rather than using TestCaseRunner directly.
+`TestCaseRunner` provides the execution engine for running test cases. Most users should use `test_case.run()` rather than using TestCaseRunner directly.
 
 ### Methods
 
@@ -176,8 +168,7 @@ Execute a test case's checks against its trace.
 **Parameters:**
 
 - `test_case` (`TestCase`): The test case to execute
-- `return_exception` (`bool`): If True, return results even when exceptions
-  occur
+- `return_exception` (`bool`): If True, return results even when exceptions occur
 
 **Returns:** `TestCaseResult` with check outcomes
 
@@ -201,8 +192,7 @@ runner = get_runner()
 result = await runner.run(test_case)
 ```
 
-`get_runner()` returns a singleton runner instance that is reused across all
-executions within a process.
+`get_runner()` returns a singleton runner instance that is reused across all executions within a process.
 
 ---
 
@@ -214,16 +204,14 @@ Spy on function calls during interaction generation for debugging.
 
 ### Description
 
-`WithSpy` wraps an interaction spec and records all function calls made during
-interaction generation. This is useful for debugging complex interaction specs
-or understanding what's happening during scenario execution.
+`WithSpy` wraps an interaction spec and records all function calls made during interaction generation. This is useful for debugging complex interaction specs or understanding what's happening during scenario execution.
 
 ### Attributes
 
-| Attribute               | Type              | Description                     |
-| ----------------------- | ----------------- | ------------------------------- |
-| `interaction_generator` | `InteractionSpec` | The interaction spec to spy on  |
-| `target`                | `str`             | JSONPath to the value to spy on |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `interaction_generator` | `InteractionSpec` | The interaction spec to spy on |
+| `target` | `str` | JSONPath to the value to spy on |
 
 ### Using WithSpy
 
@@ -281,10 +269,7 @@ spied_interaction = WithSpy(
 result = await Scenario("debug").add_interaction(spied_interaction).run()
 ```
 
-Use `WithSpy` when: debugging complex interaction generation logic,
-understanding the flow of multi-turn interactions, tracking how trace context
-affects subsequent interactions, or investigating unexpected behavior in
-scenarios.
+Use `WithSpy` when: debugging complex interaction generation logic, understanding the flow of multi-turn interactions, tracking how trace context affects subsequent interactions, or investigating unexpected behavior in scenarios.
 
 ---
 
@@ -456,13 +441,8 @@ async def test_greeting_variations(greeting_input, expected_output):
 
 ## See Also
 
-- [Core API](/oss/checks/reference/core/) - Trace, Interaction, and Check
-  details
-- [Scenarios](/oss/checks/reference/scenarios/) - Building multi-step test
-  workflows
-- [Built-in Checks](/oss/checks/reference/checks/) - Ready-to-use validation
-  checks
-- [Tutorials](/oss/checks/tutorials/) - Step-by-step tutorials for core testing
-  patterns
-- [How-to Guides](/oss/checks/how-to/) - Task-oriented guides for specific use
-  cases
+- [Core API](/oss/checks/reference/core/) - Trace, Interaction, and Check details
+- [Scenarios](/oss/checks/reference/scenarios/) - Building multi-step test workflows
+- [Built-in Checks](/oss/checks/reference/checks/) - Ready-to-use validation checks
+- [Tutorials](/oss/checks/tutorials/) - Step-by-step tutorials for core testing patterns
+- [How-to Guides](/oss/checks/how-to/) - Task-oriented guides for specific use cases

@@ -6,8 +6,7 @@ sidebar:
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
 
-Input generators for creating dynamic test data and simulating user
-interactions.
+Input generators for creating dynamic test data and simulating user interactions.
 
 ---
 
@@ -19,17 +18,15 @@ Simulate user behavior in multi-turn conversations or workflows.
 
 ### Description
 
-`UserSimulator` uses an LLM to simulate realistic user inputs based on
-instructions and conversation context. This is particularly useful for testing
-conversational AI agents or chatbots with dynamic, realistic user interactions.
+`UserSimulator` uses an LLM to simulate realistic user inputs based on instructions and conversation context. This is particularly useful for testing conversational AI agents or chatbots with dynamic, realistic user interactions.
 
 ### Attributes
 
-| Attribute      | Type                    | Default  | Description                                         |
-| -------------- | ----------------------- | -------- | --------------------------------------------------- |
-| `instructions` | `str`                   | required | Instructions defining the user's behavior and goals |
-| `max_steps`    | `int`                   | `10`     | Maximum number of interaction steps to generate     |
-| `generator`    | `BaseGenerator \| None` | `None`   | LLM generator for simulating user behavior          |
+| Attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| `instructions` | `str` | required | Instructions defining the user's behavior and goals |
+| `max_steps` | `int` | `10` | Maximum number of interaction steps to generate |
+| `generator` | `BaseGenerator \| None` | `None` | LLM generator for simulating user behavior |
 
 ### Creating User Simulators
 
@@ -150,10 +147,10 @@ Output format for user simulator results.
 
 ### Attributes
 
-| Attribute      | Type          | Description                                   |
-| -------------- | ------------- | --------------------------------------------- |
-| `goal_reached` | `bool`        | Whether the simulator achieved its goal       |
-| `message`      | `str \| None` | Optional message about the simulation outcome |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `goal_reached` | `bool` | Whether the simulator achieved its goal |
+| `message` | `str \| None` | Optional message about the simulation outcome |
 
 ### Accessing Simulator Output
 
@@ -184,8 +181,7 @@ Base class for creating custom input generators.
 
 ### Description
 
-`InputGenerator` is the abstract base class for all input generators. Extend it
-to create custom generators for dynamic test data generation.
+`InputGenerator` is the abstract base class for all input generators. Extend it to create custom generators for dynamic test data generation.
 
 ### Creating Custom Generators
 
@@ -406,9 +402,6 @@ result = await stress_test.run()
 
 ## See Also
 
-- [Core API](/oss/checks/reference/core/) - Trace, Interaction, and
-  InteractionSpec
-- [Scenarios](/oss/checks/reference/scenarios/) - Building multi-step test
-  workflows
-- [Built-in Checks](/oss/checks/reference/checks/) - Validation checks for
-  generated interactions
+- [Core API](/oss/checks/reference/core/) - Trace, Interaction, and InteractionSpec
+- [Scenarios](/oss/checks/reference/scenarios/) - Building multi-step test workflows
+- [Built-in Checks](/oss/checks/reference/checks/) - Validation checks for generated interactions

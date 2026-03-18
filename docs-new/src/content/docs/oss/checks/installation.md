@@ -14,18 +14,13 @@ pip install giskard-checks
 
 ## Configure the default LLM judge model
 
-Some checks require calling an LLM (`LLMJudge`, `Groundedness`, `Conformity`).
-To use them, you'll need configure an LLM provider. Giskard Checks supports any
-LiteLLM-compatible provider (Azure, Anthropic, etc.). See the
-[LiteLLM documentation](https://docs.litellm.ai/docs/providers) for details. For
-example, to use OpenAI, you can set the `OPENAI_API_KEY` environment variable:
+Some checks require calling an LLM (`LLMJudge`, `Groundedness`, `Conformity`). To use them, you'll need configure an LLM provider. Giskard Checks supports any LiteLLM-compatible provider (Azure, Anthropic, etc.). See the [LiteLLM documentation](https://docs.litellm.ai/docs/providers) for details. For example, to use OpenAI, you can set the `OPENAI_API_KEY` environment variable:
 
 ```bash
 export OPENAI_API_KEY="your-api-key"
 ```
 
-Preferably, you should set these environment variables in your `.env` file. To
-load them in Python, install and use `python-dotenv`:
+Preferably, you should set these environment variables in your `.env` file. To load them in Python, install and use `python-dotenv`:
 
 ```bash
 pip install python-dotenv
@@ -54,6 +49,4 @@ We use the `giskard-agents` library to handle LLM generations.
 
 ## Next Steps
 
-For a step-by-step lesson with no API key, try
-[Your First Test](/oss/checks/tutorials/your-first-test/) first. Or head to the
-[Quickstart](/oss/checks/quickstart/) for a single example.
+For a step-by-step lesson with no API key, try [Your First Test](/oss/checks/tutorials/your-first-test/) first. Or head to the [Quickstart](/oss/checks/quickstart/) for a single example.

@@ -12,23 +12,20 @@ Base classes and fundamental types for building checks and scenarios.
 
 ## `Check`
 
-Base class for all checks. Subclass and register to create custom validation
-logic.
+Base class for all checks. Subclass and register to create custom validation logic.
 
 **Module:** `giskard.checks.core.check`
 
 ### Description
 
-The `Check` class provides the foundation for all validation logic in Giskard.
-Create custom checks by subclassing and registering with a unique kind
-identifier using the `@Check.register("kind")` decorator.
+The `Check` class provides the foundation for all validation logic in Giskard. Create custom checks by subclassing and registering with a unique kind identifier using the `@Check.register("kind")` decorator.
 
 ### Attributes
 
-| Attribute     | Type          | Default | Description                                            |
-| ------------- | ------------- | ------- | ------------------------------------------------------ |
-| `name`        | `str \| None` | `None`  | Optional check name for reporting                      |
-| `description` | `str \| None` | `None`  | Human-readable description of what the check validates |
+| Attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name` | `str \| None` | `None` | Optional check name for reporting |
+| `description` | `str \| None` | `None` | Human-readable description of what the check validates |
 
 ### Key Methods
 
@@ -38,15 +35,13 @@ Execute the check logic against the provided trace.
 
 **Parameters:**
 
-- `trace` (`Trace`): The trace containing interaction history. Access the
-  current interaction via `trace.last` or `trace.interactions[-1]`
+- `trace` (`Trace`): The trace containing interaction history. Access the current interaction via `trace.last` or `trace.interactions[-1]`
 
 **Returns:**
 
 - `CheckResult`: Success, failure, error, or skip result
 
-:::note The `run` method may be async. Use `await check.run(trace)` when calling
-asynchronously. :::
+:::note The `run` method may be async. Use `await check.run(trace)` when calling asynchronously. :::
 
 ### Creating Custom Checks
 
@@ -78,9 +73,7 @@ class MyCustomCheck(Check):
         return 0.85
 ```
 
-:::tip[Best Practice] Use the `@Check.register()` decorator to make your check
-discoverable and enable polymorphic serialization. This allows your checks to be
-saved, loaded, and shared across your testing suite. :::
+:::tip[Best Practice] Use the `@Check.register()` decorator to make your check discoverable and enable polymorphic serialization. This allows your checks to be saved, loaded, and shared across your testing suite. :::
 
 ---
 
@@ -92,17 +85,15 @@ Immutable result produced by running a check.
 
 ### Description
 
-`CheckResult` encapsulates the outcome of a check execution, including the
-status (pass/fail/error/skip), optional message, metrics, and additional
-details.
+`CheckResult` encapsulates the outcome of a check execution, including the status (pass/fail/error/skip), optional message, metrics, and additional details.
 
 ### Attributes
 
-| Attribute | Type             | Description                                          |
-| --------- | ---------------- | ---------------------------------------------------- |
-| `status`  | `CheckStatus`    | Outcome status (PASS, FAIL, ERROR, SKIP)             |
-| `message` | `str \| None`    | Optional short message to surface to users           |
-| `metrics` | `list[Metric]`   | List of auxiliary metrics captured by the check      |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `status` | `CheckStatus` | Outcome status (PASS, FAIL, ERROR, SKIP) |
+| `message` | `str \| None` | Optional short message to surface to users |
+| `metrics` | `list[Metric]` | List of auxiliary metrics captured by the check |
 | `details` | `dict[str, Any]` | Arbitrary structured payload with additional context |
 
 ### Creating Results
@@ -187,16 +178,15 @@ A single exchange between inputs and outputs.
 
 ### Description
 
-An interaction represents one exchange in a conversation or workflow, capturing
-the inputs provided, the outputs produced, and optional metadata.
+An interaction represents one exchange in a conversation or workflow, capturing the inputs provided, the outputs produced, and optional metadata.
 
 ### Attributes
 
-| Attribute  | Type             | Description                                                              |
-| ---------- | ---------------- | ------------------------------------------------------------------------ |
-| `inputs`   | `InputType`      | Input values for this interaction (e.g., user message, API request)      |
-| `outputs`  | `OutputType`     | Output values produced in response (e.g., assistant reply, API response) |
-| `metadata` | `dict[str, Any]` | Optional metadata (timing, tool calls, intermediate states, etc.)        |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `inputs` | `InputType` | Input values for this interaction (e.g., user message, API request) |
+| `outputs` | `OutputType` | Output values produced in response (e.g., assistant reply, API response) |
+| `metadata` | `dict[str, Any]` | Optional metadata (timing, tool calls, intermediate states, etc.) |
 
 ### Examples
 
@@ -218,8 +208,7 @@ interaction = Interaction(
 )
 ```
 
-:::note Interactions are typically created through the scenario builder's
-`.interact()` method rather than directly instantiated. :::
+:::note Interactions are typically created through the scenario builder's `.interact()` method rather than directly instantiated. :::
 
 ---
 
@@ -231,19 +220,16 @@ Immutable history of all interactions in a scenario.
 
 ### Description
 
-A trace accumulates all interactions that have occurred during scenario
-execution. It is passed to checks for validation and to interaction specs for
-generating subsequent interactions.
+A trace accumulates all interactions that have occurred during scenario execution. It is passed to checks for validation and to interaction specs for generating subsequent interactions.
 
-The trace is immutable (frozen), ensuring that checks and specs cannot
-accidentally modify the history.
+The trace is immutable (frozen), ensuring that checks and specs cannot accidentally modify the history.
 
 ### Attributes
 
-| Attribute      | Type                  | Description                                                        |
-| -------------- | --------------------- | ------------------------------------------------------------------ |
-| `interactions` | `list[Interaction]`   | Ordered list of all interactions. Most recent at `[-1]`            |
-| `last`         | `Interaction \| None` | Computed property returning the last interaction, or None if empty |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `interactions` | `list[Interaction]` | Ordered list of all interactions. Most recent at `[-1]` |
+| `last` | `Interaction \| None` | Computed property returning the last interaction, or None if empty |
 
 ### Accessing Trace Data
 
@@ -274,9 +260,7 @@ class TraceCheck(Check):
         return CheckResult.success(message=f"Processed {count} interactions")
 ```
 
-:::tip[Accessing Trace in Templates] The `trace.last` property is available in
-Jinja2 prompt templates and JSONPath expressions, making it easy to reference
-the most recent interaction. :::
+:::tip[Accessing Trace in Templates] The `trace.last` property is available in Jinja2 prompt templates and JSONPath expressions, making it easy to reference the most recent interaction. :::
 
 ---
 
@@ -288,8 +272,7 @@ Declarative specification for generating interactions.
 
 ### Description
 
-`InteractionSpec` defines how to generate interactions in a scenario. It can use
-static values or callables that compute values based on the current trace.
+`InteractionSpec` defines how to generate interactions in a scenario. It can use static values or callables that compute values based on the current trace.
 
 ### Creating Interaction Specs
 
@@ -315,9 +298,7 @@ test_case = Scenario("context_example").interact(
 )
 ```
 
-:::tip[Dynamic Interactions] Use callables for `inputs` and `outputs` when you
-need to generate values based on the current trace context or previous
-interactions. :::
+:::tip[Dynamic Interactions] Use callables for `inputs` and `outputs` when you need to generate values based on the current trace context or previous interactions. :::
 
 ---
 
@@ -329,9 +310,7 @@ Ordered sequence of interaction specs and checks with shared trace.
 
 ### Description
 
-A `Scenario` represents a multi-step test workflow combining interactions and
-checks. Each interaction is executed in order, building up the trace, and checks
-can be inserted at any point to validate the state.
+A `Scenario` represents a multi-step test workflow combining interactions and checks. Each interaction is executed in order, building up the trace, and checks can be inserted at any point to validate the state.
 
 ### Building Scenarios
 
@@ -374,8 +353,7 @@ Add an interaction spec to the scenario.
 **Parameters:**
 
 - `inputs`: Static value or callable `(trace) -> value`
-- `outputs`: Static value or callable `(inputs) -> value` or
-  `(trace, inputs) -> value`
+- `outputs`: Static value or callable `(inputs) -> value` or `(trace, inputs) -> value`
 - `metadata`: Optional metadata dict
 
 **Returns:** The scenario (for chaining)
@@ -406,12 +384,9 @@ Container for running multiple test scenarios.
 
 ### Description
 
-A `TestCase` groups multiple scenarios for batch execution. Each scenario runs
-independently with its own trace.
+A `TestCase` groups multiple scenarios for batch execution. Each scenario runs independently with its own trace.
 
-:::note[Internal Implementation] `TestCase` is an internal implementation
-detail. Users should always use the `Scenario()` class to create scenarios. The
-TestCase provides the execution engine that runs scenarios. :::
+:::note[Internal Implementation] `TestCase` is an internal implementation detail. Users should always use the `Scenario()` class to create scenarios. The TestCase provides the execution engine that runs scenarios. :::
 
 ### Using Scenarios (Recommended)
 
@@ -454,8 +429,7 @@ class CustomExtractor(Extractor):
 
 ### JSONPath extraction with `resolve`
 
-Extract values using JSONPath expressions via `resolve` from
-`giskard.checks.core.extraction`.
+Extract values using JSONPath expressions via `resolve` from `giskard.checks.core.extraction`.
 
 **Module:** `giskard.checks.core.extraction`
 
@@ -536,19 +510,14 @@ Low-level runner for executing scenarios.
 
 ### Description
 
-`ScenarioRunner` provides the execution engine for running scenarios. Most users
-should use the higher-level `Scenario(...).run()` API rather than using
-ScenarioRunner directly.
+`ScenarioRunner` provides the execution engine for running scenarios. Most users should use the higher-level `Scenario(...).run()` API rather than using ScenarioRunner directly.
 
-:::note This is a low-level API. Prefer using `Scenario(...).run()` for most use
-cases. :::
+:::note This is a low-level API. Prefer using `Scenario(...).run()` for most use cases. :::
 
 ---
 
 ## See Also
 
-- [Built-in Checks](/oss/checks/reference/checks/) - Ready-to-use validation
-  checks
+- [Built-in Checks](/oss/checks/reference/checks/) - Ready-to-use validation checks
 - [Scenarios](/oss/checks/reference/scenarios/) - Multi-step workflow testing
-- [Testing Utilities](/oss/checks/reference/utils/) - Testing utilities and
-  helpers
+- [Testing Utilities](/oss/checks/reference/utils/) - Testing utilities and helpers

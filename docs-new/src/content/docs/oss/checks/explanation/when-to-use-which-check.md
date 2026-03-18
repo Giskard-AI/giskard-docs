@@ -4,24 +4,21 @@ sidebar:
   order: 2
 ---
 
-Three check families cover most use cases. Pick the simplest one that can
-express your requirement.
+Three check families cover most use cases. Pick the simplest one that can express your requirement.
 
 ## Tradeoffs at a Glance
 
-|                   | Rule-based                            | Semantic similarity        | LLM-as-judge                             |
-| ----------------- | ------------------------------------- | -------------------------- | ---------------------------------------- |
-| **Examples**      | `Equals`, `StringMatching`, `FnCheck` | `SemanticSimilarity`       | `Groundedness`, `Conformity`, `LLMJudge` |
-| **Cost**          | Free                                  | Low (embedding call)       | Medium–High (LLM call)                   |
-| **Latency**       | <1 ms                                 | ~50–200 ms                 | ~1–10 s                                  |
-| **Deterministic** | Yes                                   | Near-deterministic         | No                                       |
-| **Best for**      | Exact values, keywords, formats       | Meaning-equivalent answers | Tone, reasoning, policy compliance       |
+|  | Rule-based | Semantic similarity | LLM-as-judge |
+| --- | --- | --- | --- |
+| **Examples** | `Equals`, `StringMatching`, `FnCheck` | `SemanticSimilarity` | `Groundedness`, `Conformity`, `LLMJudge` |
+| **Cost** | Free | Low (embedding call) | Medium–High (LLM call) |
+| **Latency** | <1 ms | ~50–200 ms | ~1–10 s |
+| **Deterministic** | Yes | Near-deterministic | No |
+| **Best for** | Exact values, keywords, formats | Meaning-equivalent answers | Tone, reasoning, policy compliance |
 
 ## Choosing the Right Check
 
-**Rule-based** — when you can express the pass condition as a predicate:
-required keywords, value ranges, exact labels. Use these first; they're free,
-instant, and never flaky.
+**Rule-based** — when you can express the pass condition as a predicate: required keywords, value ranges, exact labels. Use these first; they're free, instant, and never flaky.
 
 ```python
 Equals(expected_value="potential_fraud", key="trace.last.outputs.label")
@@ -31,8 +28,7 @@ StringMatching(
 LesserThan(expected_value=500, key="trace.last.outputs.token_count")
 ```
 
-**Semantic similarity** — when phrasing varies but meaning should be consistent.
-Cheaper and faster than an LLM judge.
+**Semantic similarity** — when phrasing varies but meaning should be consistent. Cheaper and faster than an LLM judge.
 
 ```python
 SemanticSimilarity(
@@ -42,8 +38,7 @@ SemanticSimilarity(
 )
 ```
 
-**LLM-as-judge** — when the criterion is qualitative and hard to express as a
-rule: tone, groundedness, policy compliance, reasoning quality.
+**LLM-as-judge** — when the criterion is qualitative and hard to express as a rule: tone, groundedness, policy compliance, reasoning quality.
 
 ```python
 Groundedness(
@@ -55,8 +50,7 @@ Conformity(rule="Response must not give medical advice")
 
 ## Combining Check Types
 
-Layer all three in a single scenario: run the cheap deterministic checks first,
-and only reach for LLM judges when you genuinely need them.
+Layer all three in a single scenario: run the cheap deterministic checks first, and only reach for LLM judges when you genuinely need them.
 
 ```python
 from giskard.checks import Scenario, StringMatching, GreaterThan, Groundedness

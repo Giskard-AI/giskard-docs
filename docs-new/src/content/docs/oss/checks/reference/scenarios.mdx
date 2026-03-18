@@ -18,8 +18,7 @@ Create a new scenario for fluent API construction.
 
 ### Description
 
-The `Scenario` class is the recommended entry point for creating test scenarios.
-It provides a fluent API for building multi-step test workflows.
+The `Scenario` class is the recommended entry point for creating test scenarios. It provides a fluent API for building multi-step test workflows.
 
 ### Creating Scenarios
 
@@ -39,10 +38,10 @@ result = await test_scenario.run()
 
 **Parameters:**
 
-| Parameter    | Type                      | Default | Description                                                       |
-| ------------ | ------------------------- | ------- | ----------------------------------------------------------------- |
-| `name`       | `str \| None`             | `None`  | Scenario name for identification (defaults to "Unnamed Scenario") |
-| `trace_type` | `type[TraceType] \| None` | `None`  | Optional custom trace type for advanced use cases                 |
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name` | `str \| None` | `None` | Scenario name for identification (defaults to "Unnamed Scenario") |
+| `trace_type` | `type[TraceType] \| None` | `None` | Optional custom trace type for advanced use cases |
 
 **Returns:**
 
@@ -113,10 +112,7 @@ test_scenario = (
 
 ## Scenario fluent API
 
-`Scenario` provides a chainable interface for constructing multi-step test
-scenarios. Each method returns the scenario (or self), allowing for method
-chaining. There is no separate `ScenarioBuilder` class — `Scenario` is the
-builder.
+`Scenario` provides a chainable interface for constructing multi-step test scenarios. Each method returns the scenario (or self), allowing for method chaining. There is no separate `ScenarioBuilder` class — `Scenario` is the builder.
 
 ### Methods
 
@@ -127,8 +123,7 @@ Add an interaction to the scenario.
 **Parameters:**
 
 - `inputs`: Static value or callable `(trace) -> value`
-- `outputs`: Static value, callable `(inputs) -> value`, or callable
-  `(trace, inputs) -> value`
+- `outputs`: Static value, callable `(inputs) -> value`, or callable `(trace, inputs) -> value`
 - `metadata`: Optional metadata dictionary
 
 **Returns:** `self` (for chaining)
@@ -193,8 +188,7 @@ Add a custom interaction specification (e.g. `Interact`, `WithSpy`).
 
 **Parameters:**
 
-- `spec`: An InteractionSpec instance (e.g. `Interact`, or `WithSpy` wrapping
-  one)
+- `spec`: An InteractionSpec instance (e.g. `Interact`, or `WithSpy` wrapping one)
 
 **Returns:** `self` (for chaining)
 
@@ -237,9 +231,7 @@ Low-level scenario class for direct instantiation.
 
 ### Description
 
-The `Scenario` class represents an ordered sequence of components (Interactions,
-InteractionSpecs, and Checks) that share a trace. For most use cases, use the
-`Scenario(name)` constructor with `.interact()` and `.check()` methods.
+The `Scenario` class represents an ordered sequence of components (Interactions, InteractionSpecs, and Checks) that share a trace. For most use cases, use the `Scenario(name)` constructor with `.interact()` and `.check()` methods.
 
 ### Attributes
 
@@ -284,8 +276,7 @@ Execute the scenario components sequentially.
 
 **Parameters:**
 
-- `return_exception` (`bool`): If True, return results even when exceptions
-  occur instead of raising
+- `return_exception` (`bool`): If True, return results even when exceptions occur instead of raising
 
 **Returns:** `ScenarioResult` with status, trace, and check results
 
@@ -307,13 +298,13 @@ Result of scenario execution with trace and check results.
 
 ### Attributes
 
-| Attribute     | Type                   | Description                                    |
-| ------------- | ---------------------- | ---------------------------------------------- |
-| `status`      | `ScenarioStatus`       | Overall scenario status (PASS/FAIL/ERROR/SKIP) |
-| `steps`       | `list[TestCaseResult]` | Results for each step (interact + check)       |
-| `final_trace` | `Trace`                | Complete trace of all interactions             |
-| `passed`      | `bool`                 | True when all steps passed                     |
-| `duration_ms` | `int`                  | Total execution time in milliseconds           |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `status` | `ScenarioStatus` | Overall scenario status (PASS/FAIL/ERROR/SKIP) |
+| `steps` | `list[TestCaseResult]` | Results for each step (interact + check) |
+| `final_trace` | `Trace` | Complete trace of all interactions |
+| `passed` | `bool` | True when all steps passed |
+| `duration_ms` | `int` | Total execution time in milliseconds |
 
 ### Accessing Results
 
@@ -347,8 +338,7 @@ Group multiple scenarios and run them together.
 
 ### Description
 
-`Suite` holds multiple `Scenario` instances and runs them serially. Optionally
-bind a shared target SUT at suite level or override it in `run()`.
+`Suite` holds multiple `Scenario` instances and runs them serially. Optionally bind a shared target SUT at suite level or override it in `run()`.
 
 ### Usage
 
@@ -373,8 +363,7 @@ print(result.results)  # list of ScenarioResult
 ### Methods
 
 - `append(scenario)` — Add a scenario to the suite
-- `run(target=..., return_exception=False)` — Run all scenarios serially,
-  returns `SuiteResult`
+- `run(target=..., return_exception=False)` — Run all scenarios serially, returns `SuiteResult`
 
 ---
 
@@ -386,13 +375,13 @@ Aggregate result from suite execution.
 
 ### Attributes
 
-| Attribute      | Type                   | Description                                   |
-| -------------- | ---------------------- | --------------------------------------------- |
-| `results`      | `list[ScenarioResult]` | Scenario results in order                     |
-| `pass_rate`    | `float`                | Fraction of non-skipped scenarios that passed |
-| `duration_ms`  | `int`                  | Total execution time in milliseconds          |
-| `passed_count` | `int`                  | Number of passed scenarios                    |
-| `failed_count` | `int`                  | Number of failed scenarios                    |
+| Attribute | Type | Description |
+| --- | --- | --- |
+| `results` | `list[ScenarioResult]` | Scenario results in order |
+| `pass_rate` | `float` | Fraction of non-skipped scenarios that passed |
+| `duration_ms` | `int` | Total execution time in milliseconds |
+| `passed_count` | `int` | Number of passed scenarios |
+| `failed_count` | `int` | Number of failed scenarios |
 
 ---
 
@@ -404,16 +393,14 @@ Low-level runner for executing scenarios.
 
 ### Description
 
-`ScenarioRunner` provides the execution engine for running scenarios. Most users
-should use `Scenario(...).run()` rather than using ScenarioRunner directly.
+`ScenarioRunner` provides the execution engine for running scenarios. Most users should use `Scenario(...).run()` rather than using ScenarioRunner directly.
 
 ### Execution Model
 
 Components are processed sequentially:
 
 1. **Interaction/InteractionSpec components**: Add interactions to the trace
-2. **Check components**: Validate the current trace state. Execution stops on
-   first failure or error
+2. **Check components**: Validate the current trace state. Execution stops on first failure or error
 
 ### Methods
 
@@ -424,8 +411,7 @@ Execute a scenario with shared trace.
 **Parameters:**
 
 - `scenario` (`Scenario`): The scenario to execute
-- `return_exception` (`bool`): If True, return results even when exceptions
-  occur
+- `return_exception` (`bool`): If True, return results even when exceptions occur
 
 **Returns:** `ScenarioResult` with execution details
 
@@ -449,8 +435,7 @@ runner = get_runner()
 result = await runner.run(scenario_obj)
 ```
 
-`get_runner()` returns a singleton runner instance that is reused across all
-executions within a process.
+`get_runner()` returns a singleton runner instance that is reused across all executions within a process.
 
 ---
 
@@ -538,8 +523,7 @@ result = await workflow.run()
 
 ## See Also
 
-- [Core API](/oss/checks/reference/core/) - Scenario, Trace, and Interaction
-  details
+- [Core API](/oss/checks/reference/core/) - Scenario, Trace, and Interaction details
 - [Built-in Checks](/oss/checks/reference/checks/) - Checks to use in scenarios
 - [Testing Utilities](/oss/checks/reference/utils/) - Test runners and utilities
 - [Tutorials](/oss/checks/tutorials/) - Complete scenario examples
