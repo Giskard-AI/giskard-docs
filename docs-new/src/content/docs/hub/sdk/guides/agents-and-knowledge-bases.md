@@ -99,8 +99,6 @@ Documents are provided as a JSON or JSONL file where each record has a `text` fi
 ### From a Python list (in-memory)
 
 ```python
-import json
-
 documents = [
     {"text": "Our return policy allows returns within 30 days of purchase.", "topic": "Returns"},
     {"text": "Free shipping is available on all orders over $50.", "topic": "Shipping"},
@@ -111,7 +109,7 @@ kb = hub.knowledge_bases.create(
     project_id="project-id",
     name="Product Documentation",
     description="Official product docs and FAQs",
-    file=documents,
+    data=documents,
 )
 
 print(kb.id)
@@ -126,7 +124,7 @@ kb = hub.knowledge_bases.create(
     project_id="project-id",
     name="Product Documentation",
     description="Official product docs and FAQs",
-    file=Path("documents.json"),
+    data="documents.json",
 )
 ```
 
