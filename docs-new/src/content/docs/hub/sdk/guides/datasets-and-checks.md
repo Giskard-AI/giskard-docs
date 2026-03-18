@@ -156,7 +156,6 @@ test case schema, with a `messages` list and an optional `checks` list.
 ### From a Python list (in-memory)
 
 ```python
-import json
 from giskard_hub import HubClient
 
 hub = HubClient()

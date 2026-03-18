@@ -158,9 +158,7 @@ the responses:
 evaluation = hub.evaluations.create(
     project_id=project.id,
     agent_id=agent.id,
-    criteria={
-        "dataset_id": dataset.id,
-    },
+    dataset_id=dataset.id,
     name="v1 baseline",
 )
 

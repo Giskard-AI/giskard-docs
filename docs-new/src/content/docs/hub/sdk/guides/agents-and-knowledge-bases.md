@@ -117,8 +117,6 @@ field and an optional `topic` field.
 ### From a Python list (in-memory)
 
 ```python
-import json
-
 documents = [
     {
         "text": "Our return policy allows returns within 30 days of purchase.",

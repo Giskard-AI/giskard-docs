@@ -125,6 +125,12 @@ for result in results:
         print(f"  {verdict} {check.name}")
 ```
 
+You can also use the helper to print a formatted summary of all metrics for an evaluation:
+
+```python
+hub.helpers.print_metrics(evaluation)
+```
+
 ### Search and filter results
 
 ```python
@@ -223,7 +229,7 @@ except Exception as e:
     sys.exit(1)
 
 global_metrics = [m for m in evaluation.metrics if m.name == "global"][0]
-pass_rate = global_metrics.passed / global_metrics.total * 100
+pass_rate = global_metrics.success_rate * 100
 
 print(
     f"Pass rate: {pass_rate:.2f}% ({global_metrics.passed}/{global_metrics.total})"
