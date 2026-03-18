@@ -64,8 +64,8 @@ test_scenario = (
         outputs=lambda inputs: booking_agent(inputs),
     )
     .check(
-        FnCheck(fn=
-            lambda trace: "booked" in trace.last.outputs.lower(),
+        FnCheck(
+            fn=lambda trace: "booked" in trace.last.outputs.lower(),
             name="booking_completed",
         )
     )
@@ -97,8 +97,8 @@ test_scenario = (
     )
     # Check that issue was resolved
     .check(
-        FnCheck(fn=
-            lambda trace: any(
+        FnCheck(
+            fn=lambda trace: any(
                 keyword
                 in str(trace.last.metadata.get("resolution", "")).lower()
                 for keyword in ["refund", "replacement", "resolved"]
@@ -251,7 +251,9 @@ test_scenario = (
     Scenario("random_qa")
     .interact(inputs=gen, outputs=lambda inputs: assistant(inputs))
     .check(
-        FnCheck(fn=lambda trace: len(trace.last.outputs) > 0, name="has_response")
+        FnCheck(
+            fn=lambda trace: len(trace.last.outputs) > 0, name="has_response"
+        )
     )
 )
 ```
@@ -320,8 +322,8 @@ test_flow = (
         inputs=customer_sim, outputs=lambda inputs: customer_service_bot(inputs)
     )
     .check(
-        FnCheck(fn=
-            lambda trace: "solution" in str(trace.last.metadata).lower()
+        FnCheck(
+            fn=lambda trace: "solution" in str(trace.last.metadata).lower()
             or "replacement" in str(trace.last.outputs).lower(),
             name="solution_offered",
         )
@@ -390,8 +392,8 @@ stress_test = (
     Scenario("rapid_fire")
     .interact(inputs=rapid_fire_sim, outputs=lambda inputs: agent(inputs))
     .check(
-        FnCheck(fn=
-            lambda trace: len(trace.interactions) >= 5,
+        FnCheck(
+            fn=lambda trace: len(trace.interactions) >= 5,
             name="handled_multiple_questions",
         )
     )

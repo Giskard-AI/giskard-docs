@@ -63,8 +63,8 @@ conversation_test = (
     )
     # Validate greeting
     .check(
-        FnCheck(fn=
-            lambda trace: "help" in trace.last.outputs.lower(),
+        FnCheck(
+            fn=lambda trace: "help" in trace.last.outputs.lower(),
             name="helpful_response",
         )
     )
@@ -524,8 +524,9 @@ workflow = (
         inputs="Welcome", outputs=lambda inputs: f"{inputs} to our platform!"
     )
     .check(
-        FnCheck(fn=
-            lambda trace: "Welcome" in trace.last.outputs, name="welcome_check"
+        FnCheck(
+            fn=lambda trace: "Welcome" in trace.last.outputs,
+            name="welcome_check",
         )
     )
 )

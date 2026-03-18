@@ -61,6 +61,18 @@ and only reach for LLM judges when you genuinely need them.
 ```python
 from giskard.checks import Scenario, StringMatching, GreaterThan, Groundedness
 
+question = "What is the refund policy?"
+
+
+def rag_system(query: str) -> dict:
+    # Your RAG system
+    return {
+        "answer": "Refunds are processed within 5 business days.",
+        "context": "Policy §3.2",
+        "confidence": 0.9,
+    }
+
+
 tc = (
     Scenario("rag_test")
     .interact(inputs=question, outputs=lambda q: rag_system(q))

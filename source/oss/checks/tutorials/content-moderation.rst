@@ -275,5 +275,5 @@ Next Steps
 ----------
 
 * See :doc:`../ai-testing/custom-checks` for building custom safety checks
-* Review :doc:`single-turn` for more guardrail patterns
+* Review :doc:`../ai-testing/single-turn` for more guardrail patterns
 * Explore :doc:`chatbot-testing` for conversational safety testing

@@ -316,12 +316,12 @@ test_case = TestCase(
     name="weather_conversation_replay",
     trace=trace,
     checks=[
-        FnCheck(fn=
-            lambda t: "sunny" in t.interactions[0].outputs.lower(),
+        FnCheck(
+            fn=lambda t: "sunny" in t.interactions[0].outputs.lower(),
             name="mentions_weather",
         ),
-        FnCheck(fn=
-            lambda t: "no" in t.interactions[1].outputs.lower(),
+        FnCheck(
+            fn=lambda t: "no" in t.interactions[1].outputs.lower(),
             name="umbrella_not_needed",
         ),
     ],
@@ -370,15 +370,16 @@ async def test_greeting_response():
         name="greeting_politeness",
         trace=trace,
         checks=[
-            FnCheck(fn=
-                lambda t: any(
+            FnCheck(
+                fn=lambda t: any(
                     word in t.last.outputs.lower()
                     for word in ["hi", "hello", "hey"]
                 ),
                 name="has_greeting",
             ),
-            FnCheck(fn=
-                lambda t: "help" in t.last.outputs.lower(), name="offers_help"
+            FnCheck(
+                fn=lambda t: "help" in t.last.outputs.lower(),
+                name="offers_help",
             ),
         ],
     )
@@ -406,8 +407,8 @@ async def test_error_handling():
             Equals(
                 expected_value=True, key="trace.last.metadata.error_handled"
             ),
-            FnCheck(fn=
-                lambda t: "don't understand" in t.last.outputs.lower(),
+            FnCheck(
+                fn=lambda t: "don't understand" in t.last.outputs.lower(),
                 name="error_message_present",
             ),
         ],

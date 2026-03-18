@@ -345,13 +345,17 @@ test_scenario = (
     .interact(inputs="Hello", outputs="Hi there!")
     # Check after first interaction
     .check(
-        FnCheck(fn=lambda trace: "Hi" in trace.last.outputs, name="greeting_check")
+        FnCheck(
+            fn=lambda trace: "Hi" in trace.last.outputs, name="greeting_check"
+        )
     )
     # Second interaction
     .interact(inputs="What's the weather?", outputs="It's sunny!")
     # Final validation
     .check(
-        FnCheck(fn=lambda trace: len(trace.interactions) == 2, name="count_check")
+        FnCheck(
+            fn=lambda trace: len(trace.interactions) == 2, name="count_check"
+        )
     )
 )
 
