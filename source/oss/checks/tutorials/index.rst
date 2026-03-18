@@ -4,6 +4,14 @@ Tutorials
 
 Practical, end-to-end examples of testing AI applications with Giskard Checks.
 
+.. toctree::
+   :maxdepth: 2
+
+   rag-evaluation
+   testing-agents
+   chatbot-testing
+   content-moderation
+
 
 Overview
 --------

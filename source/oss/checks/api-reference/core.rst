@@ -102,7 +102,7 @@ A single exchange between inputs and outputs.
        .interact(
            inputs="What is 2+2?",
            outputs="4",
-           metadata={"model": "gpt-5", "tokens": 5}
+           metadata={"model": "gpt-4", "tokens": 5}
        )
    )
 

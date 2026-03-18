@@ -4,6 +4,14 @@ API Reference
 
 Complete API documentation for Giskard Checks.
 
+.. toctree::
+   :maxdepth: 2
+
+   core
+   builtin-checks
+   scenarios
+   testing
+
 
 Overview
 --------
