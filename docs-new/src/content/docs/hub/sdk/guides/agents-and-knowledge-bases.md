@@ -109,7 +109,7 @@ kb = hub.knowledge_bases.create(
     project_id="project-id",
     name="Product Documentation",
     description="Official product docs and FAQs",
-    data=documents,
+    file=documents,
 )
 
 print(kb.id)
@@ -124,7 +124,7 @@ kb = hub.knowledge_bases.create(
     project_id="project-id",
     name="Product Documentation",
     description="Official product docs and FAQs",
-    data="documents.json",
+    file=Path("documents.json"),
 )
 ```
 

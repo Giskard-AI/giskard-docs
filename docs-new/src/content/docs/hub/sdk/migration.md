@@ -183,9 +183,9 @@ import json
 hub.knowledge_bases.create(
     project_id=project_id,
     name="My KB",
-    data=[
+    file=("documents.json", json.dumps([
         {"text": "Document text here.", "topic": "Topic A"},
-    ],
+    ]).encode("utf-8")),
 )
 
 # v3.x — from a file on disk
@@ -194,7 +194,7 @@ from pathlib import Path
 hub.knowledge_bases.create(
     project_id=project_id,
     name="My KB",
-    data="documents.json",
+    file=Path("documents.json"),
 )
 ```
 
