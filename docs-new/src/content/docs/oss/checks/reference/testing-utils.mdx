@@ -4,7 +4,9 @@ sidebar:
   order: 5
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
+import Property from '../../../../../components/api/Property.astro';
+import MethodCard from '../../../../../components/api/MethodCard.astro';
+import TypeTable from '../../../../../components/api/TypeTable.astro';
 
 Testing utilities, test runners, and debugging helpers.
 
@@ -12,30 +14,33 @@ Testing utilities, test runners, and debugging helpers.
 
 ## `TestCase`
 
-Bundle a trace with a set of checks to execute.
-
 **Module:** `giskard.checks.core.testcase`
 
-### Description
+Bundle a trace with a set of checks to execute. Useful for testing against fixed interaction sequences or replaying recorded conversations.
 
-`TestCase` combines a trace (with pre-recorded interactions) and a sequence of checks to run against that trace. This is useful for testing against fixed interaction sequences or replaying recorded conversations.
+:::note
+For most use cases, use the `Scenario()` fluent API instead. `TestCase` is for advanced use cases where you need direct control over trace construction.
+:::
 
-For most use cases, use the `Scenario()` fluent API instead, which is simpler and more readable. `TestCase` is useful for advanced use cases where you need direct control over trace construction and check execution.
+<TypeTable name="TestCase">
+  <Property name="name" type="str | None">Optional label for the test case.</Property>
+  <Property name="trace" type="Trace" required>The trace containing interactions to test against.</Property>
+  <Property name="checks" type="Sequence[Check]" required>Sequence of checks to run against the trace.</Property>
+</TypeTable>
 
-### Attributes
+<MethodCard name=".run()" returnType="TestCaseResult">
+  Execute all checks against the trace.
 
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `name` | `str \| None` | Optional label for the test case |
-| `trace` | `Trace` | The trace containing interactions to test against |
-| `checks` | `Sequence[Check]` | Sequence of checks to run against the trace |
+  <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
+</MethodCard>
 
-### Creating Test Cases
+<MethodCard name=".assert_passed()" returnType="None">
+  Run the test case and assert that all checks passed. Raises `AssertionError` with formatted failure messages if any check fails.
+</MethodCard>
 
 ```python
 from giskard.checks import TestCase, Trace, Interaction, Equals
 
-# Create a trace with interactions
 trace = Trace(
     interactions=[
         Interaction(inputs="Hello", outputs="Hi there!"),
@@ -43,69 +48,35 @@ trace = Trace(
     ]
 )
 
-# Create test case with checks
 test_case = TestCase(
     name="greeting_test",
     trace=trace,
     checks=[
         Equals(expected_value="Hi there!", key="trace.interactions[0].outputs"),
-        Equals(
-            expected_value="I'm doing well!",
-            key="trace.interactions[1].outputs",
-        ),
+        Equals(expected_value="I'm doing well!", key="trace.interactions[1].outputs"),
     ],
 )
 
-# Run the test case
 result = await test_case.run()
 ```
 
-### Methods
-
-#### `run(return_exception=False) -> TestCaseResult`
-
-Execute all checks against the trace.
-
-**Parameters:**
-
-- `return_exception` (`bool`): If True, return results even when exceptions occur instead of raising
-
-**Returns:** `TestCaseResult` with check outcomes
-
-```python
-result = await test_case.run()
-
-print(f"Status: {result.status}")
-print(f"Passed: {result.passed}")
-print(f"Failed: {result.failed}")
-```
-
-#### `assert_passed()`
-
-Run the test case and assert that it passed.
-
-**Raises:**
-
-- `AssertionError`: If the test case did not pass, with formatted failure messages
-
-```python
-# Use in tests - raises if any check fails
-await test_case.assert_passed()
-
-# Equivalent to:
-result = await test_case.run()
-result.assert_passed()
-```
-
-Use `assert_passed()` to integrate with testing frameworks like pytest or unittest:
+### Integration with pytest
 
 ```python
 import pytest
 
-
 @pytest.mark.asyncio
-async def test_greeting():
-    test_case = TestCase(name="greeting", trace=trace, checks=[greeting_check])
+async def test_greeting_response():
+    trace = Trace(
+        interactions=[Interaction(inputs="Hello", outputs="Hi there! How can I help?")]
+    )
+    test_case = TestCase(
+        name="greeting_politeness",
+        trace=trace,
+        checks=[
+            FnCheck(fn=lambda t: "help" in t.last.outputs.lower(), name="offers_help"),
+        ],
+    )
     await test_case.assert_passed()
 ```
 
@@ -113,37 +84,29 @@ async def test_greeting():
 
 ## `TestCaseResult`
 
-Result of test case execution with check outcomes.
-
 **Module:** `giskard.checks.core.result`
 
-### Attributes
+Result of test case execution with check outcomes.
 
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `status` | `TestCaseStatus` | Overall test case status (PASS/FAIL/ERROR) |
-| `results` | `list[CheckResult]` | Results from all checks |
-| `passed` | `bool` | True if all checks passed |
-| `failed` | `bool` | True if any check failed |
-| `duration_ms` | `int` | Execution time in milliseconds |
-
-### Accessing Results
+<TypeTable name="TestCaseResult">
+  <Property name="status" type="TestCaseStatus">Overall test case status (PASS/FAIL/ERROR).</Property>
+  <Property name="results" type="list[CheckResult]">Results from all checks.</Property>
+  <Property name="passed" type="bool">True if all checks passed.</Property>
+  <Property name="failed" type="bool">True if any check failed.</Property>
+  <Property name="duration_ms" type="int">Execution time in milliseconds.</Property>
+</TypeTable>
 
 ```python
 result = await test_case.run()
 
-# Check overall status
 if result.passed:
-    print("✓ All checks passed!")
+    print("All checks passed!")
 else:
-    print(f"✗ Test failed:\n" + "\n".join(result.format_failures()))
+    for check_result in result.results:
+        if check_result.failed:
+            print(f"Failed: {check_result.message}")
 
-# Review individual check results
-for i, check_result in enumerate(result.results):
-    status_icon = "✓" if check_result.passed else "✗"
-    print(f"{status_icon} Check {i}: {check_result.message}")
-
-# Assert passed (raises if failed)
+# Assert (raises if failed)
 result.assert_passed()
 ```
 
@@ -151,298 +114,121 @@ result.assert_passed()
 
 ## `TestCaseRunner`
 
-Low-level runner for executing test cases.
-
 **Module:** `giskard.checks.testing.runner`
 
-### Description
+Low-level runner for executing test cases. Most users should use `test_case.run()` instead.
 
-`TestCaseRunner` provides the execution engine for running test cases. Most users should use `test_case.run()` rather than using TestCaseRunner directly.
+<MethodCard name=".run()" returnType="TestCaseResult">
+  Execute a test case's checks against its trace.
 
-### Methods
+  <Property name="test_case" type="TestCase" required>The test case to execute.</Property>
+  <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
+</MethodCard>
 
-#### `run(test_case, return_exception=False) -> TestCaseResult`
-
-Execute a test case's checks against its trace.
-
-**Parameters:**
-
-- `test_case` (`TestCase`): The test case to execute
-- `return_exception` (`bool`): If True, return results even when exceptions occur
-
-**Returns:** `TestCaseResult` with check outcomes
-
-```python
-from giskard.checks.testing.runner import TestCaseRunner
-
-runner = TestCaseRunner()
-result = await runner.run(test_case)
-```
-
-### `get_runner()`
-
-Get the default process-wide TestCaseRunner instance.
-
-**Module:** `giskard.checks.testing.runner`
-
-```python
-from giskard.checks.testing.runner import get_runner
-
-runner = get_runner()
-result = await runner.run(test_case)
-```
-
-`get_runner()` returns a singleton runner instance that is reused across all executions within a process.
+<MethodCard name="get_runner()" returnType="TestCaseRunner">
+  Get the default process-wide singleton runner instance.
+</MethodCard>
 
 ---
 
 ## `WithSpy`
 
-Spy on function calls during interaction generation for debugging.
-
 **Module:** `giskard.checks.testing.spy`
 
-### Description
+Spy on function calls during interaction generation for debugging. Wraps an interaction spec and records all function calls made during generation.
 
-`WithSpy` wraps an interaction spec and records all function calls made during interaction generation. This is useful for debugging complex interaction specs or understanding what's happening during scenario execution.
-
-### Attributes
-
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `interaction_generator` | `InteractionSpec` | The interaction spec to spy on |
-| `target` | `str` | JSONPath to the value to spy on |
-
-### Using WithSpy
+<TypeTable name="WithSpy">
+  <Property name="interaction_generator" type="InteractionSpec" required>The interaction spec to spy on.</Property>
+  <Property name="target" type="str" required>JSONPath to the value to spy on.</Property>
+</TypeTable>
 
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 
-# Create an interaction spec to spy on
 interaction_spec = Interact(
     inputs=lambda trace: f"Context: {trace.last.outputs if trace.last else 'None'}",
     outputs=lambda inputs: my_model(inputs),
 )
 
-# Wrap with spy
-spied_spec = WithSpy(
-    interaction_generator=interaction_spec, target="trace.last.outputs"
-)
+spied_spec = WithSpy(interaction_generator=interaction_spec, target="trace.last.outputs")
 
-# Use in scenario
-test_scenario = Scenario("debug_test").add_interaction(spied_spec)
+result = await Scenario("debug_test").add_interaction(spied_spec).run()
 
-result = await test_scenario.run()
-
-# Access spy data (stored in last interaction's metadata under the target key)
-target = "trace.last.outputs"
-spy_data = result.final_trace.last.metadata.get(target)
-print("Function calls recorded:")
-
+# Access spy data from metadata
+spy_data = result.final_trace.last.metadata.get("trace.last.outputs")
 print(spy_data)
 ```
 
-### Debugging Scenarios
-
-```python
-from giskard.checks import Scenario, Interact, FnCheck
-from giskard.checks.testing.spy import WithSpy
-
-
-# Spy on a complex callable
-def complex_output_generator(inputs):
-    # Complex logic
-    processed = process_input(inputs)
-    enriched = enrich_data(processed)
-    return generate_response(enriched)
-
-
-# Create spied interaction
-spied_interaction = WithSpy(
-    interaction_generator=Interact(
-        inputs="test input", outputs=complex_output_generator
-    ),
-    target="trace.last.outputs",
-)
-
-# Run and debug
-result = await Scenario("debug").add_interaction(spied_interaction).run()
-```
-
-Use `WithSpy` when: debugging complex interaction generation logic, understanding the flow of multi-turn interactions, tracking how trace context affects subsequent interactions, or investigating unexpected behavior in scenarios.
+:::tip
+Use `WithSpy` when debugging complex interaction generation logic, understanding multi-turn interaction flow, or investigating unexpected behavior in scenarios.
+:::
 
 ---
 
-## Usage Patterns
+## Usage patterns
 
-### Replaying Recorded Conversations
+### Replaying recorded conversations
 
 ```python
 from giskard.checks import TestCase, Trace, Interaction, FnCheck
 
-# Load recorded conversation
-recorded_interactions = [
-    Interaction(
-        inputs="What's the weather?",
-        outputs="It's sunny and 75°F.",
-        metadata={"timestamp": "2024-01-01T10:00:00"},
-    ),
-    Interaction(
-        inputs="Should I bring an umbrella?",
-        outputs="No, you won't need one today.",
-        metadata={"timestamp": "2024-01-01T10:00:15"},
-    ),
+recorded = [
+    Interaction(inputs="What's the weather?", outputs="It's sunny and 75F."),
+    Interaction(inputs="Should I bring an umbrella?", outputs="No, you won't need one."),
 ]
 
-trace = Trace(interactions=recorded_interactions)
+trace = Trace(interactions=recorded)
 
-# Test against recorded conversation
 test_case = TestCase(
-    name="weather_conversation_replay",
+    name="weather_replay",
     trace=trace,
     checks=[
-        FnCheck(
-            fn=lambda t: "sunny" in t.interactions[0].outputs.lower(),
-            name="mentions_weather",
-        ),
-        FnCheck(
-            fn=lambda t: "no" in t.interactions[1].outputs.lower(),
-            name="umbrella_not_needed",
-        ),
+        FnCheck(fn=lambda t: "sunny" in t.interactions[0].outputs.lower(), name="weather"),
+        FnCheck(fn=lambda t: "no" in t.interactions[1].outputs.lower(), name="umbrella"),
     ],
 )
 
 await test_case.assert_passed()
 ```
 
-### Batch Testing
+### Batch testing
 
 ```python
-# Run multiple test cases
 test_cases = [
     TestCase(name="test1", trace=trace1, checks=checks1),
     TestCase(name="test2", trace=trace2, checks=checks2),
     TestCase(name="test3", trace=trace3, checks=checks3),
 ]
 
-# Run all in parallel
 results = await asyncio.gather(*[tc.run() for tc in test_cases])
 
-# Summary
 passed = sum(1 for r in results if r.passed)
-failed = sum(1 for r in results if r.failed)
 print(f"Passed: {passed}/{len(results)}")
-print(f"Failed: {failed}/{len(results)}")
 ```
 
-### Integration with pytest
+### Parameterized tests
 
 ```python
 import pytest
-from giskard.checks import TestCase, Trace, Interaction, Equals
 
-
-@pytest.mark.asyncio
-async def test_greeting_response():
-    """Test that greeting responses are polite."""
-    trace = Trace(
-        interactions=[
-            Interaction(inputs="Hello", outputs="Hi there! How can I help?")
-        ]
-    )
-
-    test_case = TestCase(
-        name="greeting_politeness",
-        trace=trace,
-        checks=[
-            FnCheck(
-                fn=lambda t: any(
-                    word in t.last.outputs.lower()
-                    for word in ["hi", "hello", "hey"]
-                ),
-                name="has_greeting",
-            ),
-            FnCheck(
-                fn=lambda t: "help" in t.last.outputs.lower(),
-                name="offers_help",
-            ),
-        ],
-    )
-
-    await test_case.assert_passed()
-
-
-@pytest.mark.asyncio
-async def test_error_handling():
-    """Test that errors are handled gracefully."""
-    trace = Trace(
-        interactions=[
-            Interaction(
-                inputs="invalid command",
-                outputs="I don't understand that command.",
-                metadata={"error_handled": True},
-            )
-        ]
-    )
-
-    test_case = TestCase(
-        name="error_handling",
-        trace=trace,
-        checks=[
-            Equals(
-                expected_value=True, key="trace.last.metadata.error_handled"
-            ),
-            FnCheck(
-                fn=lambda t: "don't understand" in t.last.outputs.lower(),
-                name="error_message_present",
-            ),
-        ],
-    )
-
-    await test_case.assert_passed()
-```
-
-### Parameterized Tests
-
-```python
-import pytest
-from giskard.checks import TestCase, Trace, Interaction, Equals
-
-# Test data
-test_data = [
-    ("Hello", "Hi there!"),
-    ("Good morning", "Good morning!"),
-    ("Hey", "Hey! How can I help?"),
-]
-
+test_data = [("Hello", "Hi there!"), ("Good morning", "Good morning!")]
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("greeting_input,expected_output", test_data)
 async def test_greeting_variations(greeting_input, expected_output):
-    """Test various greeting inputs."""
-    trace = Trace(
-        interactions=[
-            Interaction(inputs=greeting_input, outputs=expected_output)
-        ]
-    )
-
+    trace = Trace(interactions=[Interaction(inputs=greeting_input, outputs=expected_output)])
     test_case = TestCase(
         name=f"greeting_{greeting_input}",
         trace=trace,
-        checks=[
-            Equals(expected_value=expected_output, key="trace.last.outputs")
-        ],
+        checks=[Equals(expected_value=expected_output, key="trace.last.outputs")],
     )
-
     await test_case.assert_passed()
 ```
 
 ---
 
-## See Also
+## See also
 
-- [Core API](/oss/checks/reference/core/) - Trace, Interaction, and Check details
-- [Scenarios](/oss/checks/reference/scenarios/) - Building multi-step test workflows
-- [Built-in Checks](/oss/checks/reference/checks/) - Ready-to-use validation checks
-- [Tutorials](/oss/checks/tutorials/) - Step-by-step tutorials for core testing patterns
-- [How-to Guides](/oss/checks/how-to/) - Task-oriented guides for specific use cases
+- [Core API](/oss/checks/reference/core/) -- Trace, Interaction, and Check details
+- [Scenarios](/oss/checks/reference/scenarios/) -- Building multi-step test workflows
+- [Built-in Checks](/oss/checks/reference/checks/) -- Ready-to-use validation checks

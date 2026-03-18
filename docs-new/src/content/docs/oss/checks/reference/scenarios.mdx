@@ -4,7 +4,9 @@ sidebar:
   order: 4
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
+import Property from '../../../../../components/api/Property.astro';
+import MethodCard from '../../../../../components/api/MethodCard.astro';
+import TypeTable from '../../../../../components/api/TypeTable.astro';
 
 Multi-step workflow testing with scenario builders and runners.
 
@@ -12,93 +14,84 @@ Multi-step workflow testing with scenario builders and runners.
 
 ## `Scenario`
 
-Create a new scenario for fluent API construction.
-
 **Module:** `giskard.checks.core.scenario`
 
-### Description
+The recommended entry point for creating test scenarios. Provides a fluent API for building multi-step test workflows.
 
-The `Scenario` class is the recommended entry point for creating test scenarios. It provides a fluent API for building multi-step test workflows.
+<MethodCard name="Scenario()" returnType="Scenario">
+  Create a new scenario.
 
-### Creating Scenarios
+  <Property name="name" type="str | None" defaultValue="None">Scenario name for identification.</Property>
+  <Property name="trace_type" type="type[TraceType] | None" defaultValue="None">Optional custom trace type for advanced use cases.</Property>
+</MethodCard>
 
-```python
-from giskard.checks import Scenario, StringMatching, Equals
+<MethodCard name=".interact()" returnType="self">
+  Add an interaction to the scenario. Returns self for chaining.
 
-# Basic scenario
-test_scenario = (
-    Scenario("greeting_test")
-    .interact(inputs="Hello", outputs="Hi there!")
-    .check(StringMatching(keyword="Hi", text_key="trace.last.outputs"))
-)
+  <Property name="inputs" type="value | Callable" required>Static value or callable `(trace) -> value`.</Property>
+  <Property name="outputs" type="value | Callable" required>Static value, callable `(inputs) -> value`, or `(trace, inputs) -> value`.</Property>
+  <Property name="metadata" type="dict | None">Optional metadata dictionary.</Property>
+</MethodCard>
 
-# Run the scenario
-result = await test_scenario.run()
-```
+<MethodCard name=".check()" returnType="self">
+  Add a validation check to the scenario. Returns self for chaining.
 
-**Parameters:**
+  <Property name="check" type="Check" required>A Check instance to validate the trace.</Property>
+</MethodCard>
 
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| `name` | `str \| None` | `None` | Scenario name for identification (defaults to "Unnamed Scenario") |
-| `trace_type` | `type[TraceType] \| None` | `None` | Optional custom trace type for advanced use cases |
+<MethodCard name=".add_interaction()" returnType="self">
+  Add a pre-constructed `Interaction` or `InteractionSpec` object.
 
-**Returns:**
+  <Property name="interaction" type="Interaction | InteractionSpec" required>The interaction or spec to add.</Property>
+</MethodCard>
 
-- `Scenario`: A scenario instance ready for configuration (fluent API)
+<MethodCard name=".build()" returnType="Scenario">
+  Build and return the Scenario instance.
+</MethodCard>
 
-### Multi-step Scenarios
+<MethodCard name=".run()" returnType="ScenarioResult">
+  Build and immediately execute the scenario.
+
+  <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
+</MethodCard>
+
+### Multi-step example
 
 ```python
 from giskard.checks import Scenario, FnCheck, Equals
 
-# Create a conversational flow
-conversation_test = (
+result = await (
     Scenario("customer_support")
-    # First interaction
     .interact(
         inputs="I need help with my account",
         outputs="I'd be happy to help! What's your account number?",
     )
-    # Validate greeting
-    .check(
-        FnCheck(
-            fn=lambda trace: "help" in trace.last.outputs.lower(),
-            name="helpful_response",
-        )
-    )
-    # Second interaction
+    .check(FnCheck(fn=lambda trace: "help" in trace.last.outputs.lower(), name="helpful"))
     .interact(inputs="12345", outputs="Thank you! I've found your account.")
-    # Validate account lookup
     .check(Equals(expected_value=True, key="trace.last.metadata.account_found"))
+    .run()
 )
-
-result = await conversation_test.run()
 ```
 
-### Dynamic Interactions
+### Dynamic interactions
 
 ```python
 # Use callables for dynamic generation
 def generate_response(inputs):
-    # Custom logic to generate response
     if "weather" in inputs:
         return "It's sunny today!"
     return "I don't understand."
 
-
-test_scenario = (
+scenario = (
     Scenario("dynamic_test")
     .interact(inputs="What's the weather?", outputs=generate_response)
-    .check(StringMatching(keyword="sunny", text_key="trace.last.outputs"))
 )
 ```
 
-### Context-aware Interactions
+### Context-aware interactions
 
 ```python
-# Access trace context in interactions
-test_scenario = (
+scenario = (
     Scenario("context_test")
     .interact(inputs="Hello", outputs="Hi! I'm Alice.")
     .interact(
@@ -110,420 +103,105 @@ test_scenario = (
 
 ---
 
-## Scenario fluent API
-
-`Scenario` provides a chainable interface for constructing multi-step test scenarios. Each method returns the scenario (or self), allowing for method chaining. There is no separate `ScenarioBuilder` class — `Scenario` is the builder.
-
-### Methods
-
-#### `interact(inputs, outputs, metadata=None)`
-
-Add an interaction to the scenario.
-
-**Parameters:**
-
-- `inputs`: Static value or callable `(trace) -> value`
-- `outputs`: Static value, callable `(inputs) -> value`, or callable `(trace, inputs) -> value`
-- `metadata`: Optional metadata dictionary
-
-**Returns:** `self` (for chaining)
-
-```python
-# Static values
-scenario.interact(
-    inputs="test input", outputs="test output", metadata={"model": "gpt-5"}
-)
-
-# Dynamic outputs
-scenario.interact(inputs="query", outputs=lambda inputs: my_model(inputs))
-
-# Full context access
-scenario.interact(
-    inputs=lambda trace: generate_input(trace),
-    outputs=lambda trace, inputs: generate_output(trace, inputs),
-)
-```
-
-#### `check(check: Check)`
-
-Add a validation check to the scenario.
-
-**Parameters:**
-
-- `check`: A Check instance to validate the trace
-
-**Returns:** `self` (for chaining)
-
-```python
-from giskard.checks import Equals, GreaterThan
-
-scenario.check(
-    Equals(expected_value="success", key="trace.last.outputs.status")
-)
-```
-
-#### `add_interaction(interaction: Interaction)`
-
-Add a pre-constructed Interaction object.
-
-**Parameters:**
-
-- `interaction`: An Interaction instance
-
-**Returns:** `self` (for chaining)
-
-```python
-from giskard.checks import Interaction
-
-interaction = Interaction(
-    inputs="Hello", outputs="Hi", metadata={"timestamp": "2024-01-01"}
-)
-
-scenario.add_interaction(interaction)
-```
-
-#### `add_interaction(spec: InteractionSpec)`
-
-Add a custom interaction specification (e.g. `Interact`, `WithSpy`).
-
-**Parameters:**
-
-- `spec`: An InteractionSpec instance (e.g. `Interact`, or `WithSpy` wrapping one)
-
-**Returns:** `self` (for chaining)
-
-```python
-from giskard.checks import Interact
-
-spec = Interact(inputs="test", outputs="result")
-scenario.add_interaction(spec)
-```
-
-#### `build() -> Scenario`
-
-Build and return the Scenario instance.
-
-**Returns:** `Scenario` ready for execution
-
-```python
-scenario_obj = builder.build()
-result = await scenario_obj.run()
-```
-
-#### `run() -> ScenarioResult`
-
-Build and immediately execute the scenario.
-
-**Returns:** `ScenarioResult` with execution details
-
-```python
-# Shorthand for build().run()
-result = await builder.run()
-```
-
----
-
-## `Scenario`
-
-Low-level scenario class for direct instantiation.
-
-**Module:** `giskard.checks.core.scenario`
-
-### Description
-
-The `Scenario` class represents an ordered sequence of components (Interactions, InteractionSpecs, and Checks) that share a trace. For most use cases, use the `Scenario(name)` constructor with `.interact()` and `.check()` methods.
-
-### Attributes
-
-| Attribute    | Type                      | Description                 |
-| ------------ | ------------------------- | --------------------------- |
-| `name`       | `str`                     | Scenario identifier         |
-| `steps`      | `list[Step]`              | Sequential steps to execute |
-| `trace_type` | `type[TraceType] \| None` | Optional custom trace type  |
-
-### Direct Instantiation (Advanced)
-
-```python
-from giskard.checks import Scenario, Interact, Equals
-
-scenario_obj = Scenario.from_sequence(
-    Interact(inputs="Hello", outputs="Hi"),
-    Equals(expected_value="Hi", key="trace.last.outputs"),
-    Interact(inputs="Goodbye", outputs="See you!"),
-    name="multi_step_test",
-)
-
-result = await scenario_obj.run()
-```
-
-Use the `Scenario()` fluent API for better readability:
-
-```python
-result = await (
-    Scenario("multi_step_test")
-    .interact("Hello", "Hi")
-    .check(Equals(expected_value="Hi", key="trace.last.outputs"))
-    .interact("Goodbye", "See you!")
-    .run()
-)
-```
-
-### Methods
-
-#### `run(return_exception=False) -> ScenarioResult`
-
-Execute the scenario components sequentially.
-
-**Parameters:**
-
-- `return_exception` (`bool`): If True, return results even when exceptions occur instead of raising
-
-**Returns:** `ScenarioResult` with status, trace, and check results
-
-```python
-result = await scenario_obj.run()
-
-print(f"Status: {result.status}")
-print(f"Trace: {result.final_trace}")
-print(f"Check results: {[r for step in result.steps for r in step.results]}")
-```
-
----
-
 ## `ScenarioResult`
-
-Result of scenario execution with trace and check results.
 
 **Module:** `giskard.checks.core.result`
 
-### Attributes
+Result of scenario execution with trace and check results.
 
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `status` | `ScenarioStatus` | Overall scenario status (PASS/FAIL/ERROR/SKIP) |
-| `steps` | `list[TestCaseResult]` | Results for each step (interact + check) |
-| `final_trace` | `Trace` | Complete trace of all interactions |
-| `passed` | `bool` | True when all steps passed |
-| `duration_ms` | `int` | Total execution time in milliseconds |
-
-### Accessing Results
+<TypeTable name="ScenarioResult">
+  <Property name="status" type="ScenarioStatus">Overall status (PASS/FAIL/ERROR/SKIP).</Property>
+  <Property name="steps" type="list[TestCaseResult]">Results for each step (interact + check).</Property>
+  <Property name="final_trace" type="Trace">Complete trace of all interactions.</Property>
+  <Property name="passed" type="bool">True when all steps passed.</Property>
+  <Property name="duration_ms" type="int">Total execution time in milliseconds.</Property>
+</TypeTable>
 
 ```python
 result = await test_scenario.run()
 
-# Check overall status
 if result.passed:
-    print("✓ All checks passed!")
+    print("All checks passed!")
 
-# Access trace
 print(f"Total interactions: {len(result.final_trace.interactions)}")
-last_output = result.final_trace.last.outputs
 
-# Review check results (flatten from steps)
-for i, check_result in enumerate(
-    r for step in result.steps for r in step.results
-):
+for i, check_result in enumerate(r for step in result.steps for r in step.results):
     print(f"Check {i}: {check_result.status}")
-    if check_result.failed:
-        print(f"  Failed: {check_result.message}")
 ```
 
 ---
 
 ## `Suite`
 
-Group multiple scenarios and run them together.
-
 **Module:** `giskard.checks.scenarios.suite`
 
-### Description
+Group multiple scenarios and run them together.
 
-`Suite` holds multiple `Scenario` instances and runs them serially. Optionally bind a shared target SUT at suite level or override it in `run()`.
+<MethodCard name="Suite()" returnType="Suite">
+  <Property name="name" type="str" required>Suite identifier.</Property>
+  <Property name="target" type="Callable">Optional suite-level target SUT.</Property>
+</MethodCard>
 
-### Usage
+<MethodCard name=".append()" returnType="None">
+  Add a scenario to the suite.
+
+  <Property name="scenario" type="Scenario" required>The scenario to add.</Property>
+</MethodCard>
+
+<MethodCard name=".run()" returnType="SuiteResult">
+  Run all scenarios serially.
+
+  <Property name="target" type="Callable">Override target for this run.</Property>
+  <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
+</MethodCard>
 
 ```python
 from giskard.checks import Suite, Scenario
 
-suite = Suite(name="my_suite", target=my_sut)  # target optional
+suite = Suite(name="my_suite", target=my_sut)
 suite.append(scenario1)
 suite.append(scenario2)
-result = await suite.run()  # returns SuiteResult
+result = await suite.run()
 print(result.pass_rate)
-print(result.results)  # list of ScenarioResult
 ```
-
-### Parameters
-
-| Parameter | Type     | Description                     |
-| --------- | -------- | ------------------------------- |
-| `name`    | `str`    | Suite identifier                |
-| `target`  | callable | Optional suite-level target SUT |
-
-### Methods
-
-- `append(scenario)` — Add a scenario to the suite
-- `run(target=..., return_exception=False)` — Run all scenarios serially, returns `SuiteResult`
 
 ---
 
 ## `SuiteResult`
 
-Aggregate result from suite execution.
-
 **Module:** `giskard.checks.core.result`
 
-### Attributes
+Aggregate result from suite execution.
 
-| Attribute | Type | Description |
-| --- | --- | --- |
-| `results` | `list[ScenarioResult]` | Scenario results in order |
-| `pass_rate` | `float` | Fraction of non-skipped scenarios that passed |
-| `duration_ms` | `int` | Total execution time in milliseconds |
-| `passed_count` | `int` | Number of passed scenarios |
-| `failed_count` | `int` | Number of failed scenarios |
+<TypeTable name="SuiteResult">
+  <Property name="results" type="list[ScenarioResult]">Scenario results in order.</Property>
+  <Property name="pass_rate" type="float">Fraction of non-skipped scenarios that passed.</Property>
+  <Property name="duration_ms" type="int">Total execution time in milliseconds.</Property>
+  <Property name="passed_count" type="int">Number of passed scenarios.</Property>
+  <Property name="failed_count" type="int">Number of failed scenarios.</Property>
+</TypeTable>
 
 ---
 
 ## `ScenarioRunner`
 
-Low-level runner for executing scenarios.
-
 **Module:** `giskard.checks.scenarios.runner`
 
-### Description
+Low-level runner for executing scenarios. Most users should use `Scenario(...).run()` instead.
 
-`ScenarioRunner` provides the execution engine for running scenarios. Most users should use `Scenario(...).run()` rather than using ScenarioRunner directly.
+<MethodCard name=".run()" returnType="ScenarioResult">
+  <Property name="scenario" type="Scenario" required>The scenario to execute.</Property>
+  <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
+</MethodCard>
 
-### Execution Model
-
-Components are processed sequentially:
-
-1. **Interaction/InteractionSpec components**: Add interactions to the trace
-2. **Check components**: Validate the current trace state. Execution stops on first failure or error
-
-### Methods
-
-#### `run(scenario, return_exception=False) -> ScenarioResult`
-
-Execute a scenario with shared trace.
-
-**Parameters:**
-
-- `scenario` (`Scenario`): The scenario to execute
-- `return_exception` (`bool`): If True, return results even when exceptions occur
-
-**Returns:** `ScenarioResult` with execution details
-
-```python
-from giskard.checks.scenarios.runner import ScenarioRunner
-
-runner = ScenarioRunner()
-result = await runner.run(scenario_obj)
-```
-
-### `get_runner()`
-
-Get the default process-wide ScenarioRunner instance.
-
-**Module:** `giskard.checks.scenarios.runner`
-
-```python
-from giskard.checks.scenarios.runner import get_runner
-
-runner = get_runner()
-result = await runner.run(scenario_obj)
-```
-
-`get_runner()` returns a singleton runner instance that is reused across all executions within a process.
+<MethodCard name="get_runner()" returnType="ScenarioRunner">
+  Get the default process-wide singleton runner instance.
+</MethodCard>
 
 ---
 
-## Usage Patterns
+## See also
 
-### Multiple Test Cases
-
-```python
-from giskard.checks import Scenario, Equals
-
-# Define reusable test scenarios
-greeting_test = (
-    Scenario("greeting")
-    .interact("Hello", "Hi!")
-    .check(Equals(expected_value="Hi!", key="trace.last.outputs"))
-)
-
-farewell_test = (
-    Scenario("farewell")
-    .interact("Goodbye", "See you!")
-    .check(Equals(expected_value="See you!", key="trace.last.outputs"))
-)
-
-# Run all tests
-results = await asyncio.gather(greeting_test.run(), farewell_test.run())
-
-# Check all passed
-all_passed = all(r.passed for r in results)
-```
-
-### Error Handling
-
-```python
-# Graceful error handling
-result = await test_scenario.run(return_exception=True)
-
-if result.errored:
-    for step in result.steps:
-        for r in step.results:
-            if r.errored:
-                print(f"Error: {r.message}")
-                print(f"Details: {r.details}")
-```
-
-### Complex Workflows
-
-```python
-from giskard.checks import Scenario, FnCheck, GreaterThan
-
-# Multi-step workflow with multiple checks
-workflow = (
-    Scenario("user_onboarding")
-    # Step 1: Registration
-    .interact(
-        inputs={"action": "register", "email": "user@example.com"},
-        outputs={"status": "success", "user_id": 12345},
-    )
-    .check(Equals(expected_value="success", key="trace.last.outputs.status"))
-    .check(GreaterThan(expected_value=0, key="trace.last.outputs.user_id"))
-    # Step 2: Verification
-    .interact(
-        inputs=lambda trace: {
-            "action": "verify",
-            "user_id": trace.last.outputs["user_id"],
-        },
-        outputs={"verified": True},
-    )
-    .check(Equals(expected_value=True, key="trace.last.outputs.verified"))
-    # Step 3: Welcome message
-    .interact(
-        inputs="Welcome", outputs=lambda inputs: f"{inputs} to our platform!"
-    )
-    .check(
-        FnCheck(
-            fn=lambda trace: "Welcome" in trace.last.outputs,
-            name="welcome_check",
-        )
-    )
-)
-
-result = await workflow.run()
-```
-
----
-
-## See Also
-
-- [Core API](/oss/checks/reference/core/) - Scenario, Trace, and Interaction details
-- [Built-in Checks](/oss/checks/reference/checks/) - Checks to use in scenarios
-- [Testing Utilities](/oss/checks/reference/utils/) - Test runners and utilities
-- [Tutorials](/oss/checks/tutorials/) - Complete scenario examples
+- [Core API](/oss/checks/reference/core/) -- Scenario, Trace, and Interaction details
+- [Built-in Checks](/oss/checks/reference/checks/) -- Checks to use in scenarios
+- [Testing Utilities](/oss/checks/reference/testing-utils/) -- Test runners and utilities
