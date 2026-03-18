@@ -179,7 +179,7 @@ tc = (
     )
     .check(
         FnCheck(fn=
-            lambda trace: ("vip" in resolve(trace, "trace.last.outputs.tags")),
+            lambda trace: "vip" in trace.last.outputs.tags",
             name="has_vip_tag",
         )
     )
