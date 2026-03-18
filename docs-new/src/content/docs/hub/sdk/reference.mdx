@@ -105,7 +105,7 @@ All methods documented below are shown in their synchronous form. The async vari
 
 ## `hub.agents`
 
-<ResourceSection name="hub.agents" description="Register, test, and invoke LLM agents. An agent represents your LLM application -- either a remote HTTP endpoint or a local Python callable.">
+<ResourceSection description="Register, test, and invoke LLM agents. An agent represents your LLM application -- either a remote HTTP endpoint or a local Python callable.">
 
 ```python
 from giskard_hub.types import Agent, AgentOutput, ChatMessage
@@ -241,7 +241,7 @@ from giskard_hub.types import Agent, AgentOutput, ChatMessage
 
 ## `hub.checks`
 
-<ResourceSection name="hub.checks" description="Define and manage reusable check criteria for evaluating agent responses. Checks are project-scoped and can be referenced by identifier in any test case.">
+<ResourceSection description="Define and manage reusable check criteria for evaluating agent responses. Checks are project-scoped and can be referenced by identifier in any test case.">
 
 ```python
 from giskard_hub.types import Check, CheckResult
@@ -346,7 +346,7 @@ Each `JsonPathRule`: `{"json_path": str, "expected_value": str, "expected_value_
 
 ## `hub.datasets`
 
-<ResourceSection name="hub.datasets" description="Create datasets, import test cases, and auto-generate test suites from scenarios or knowledge bases.">
+<ResourceSection description="Create datasets, import test cases, and auto-generate test suites from scenarios or knowledge bases.">
 
 ```python
 from giskard_hub.types import Dataset, TestCase, TaskProgress
@@ -454,7 +454,7 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
 
 ## `hub.evaluations`
 
-<ResourceSection name="hub.evaluations" description="Run agents against datasets, inspect per-test-case results, and manage the evaluation lifecycle. Sub-resource: hub.evaluations.results.">
+<ResourceSection description="Run agents against datasets, inspect per-test-case results, and manage the evaluation lifecycle. Sub-resource: hub.evaluations.results.">
 
 ```python
 from giskard_hub.types import Evaluation, Metric, CheckResult
@@ -636,7 +636,7 @@ from giskard_hub.types.evaluation import TestCaseEvaluation, FailureCategory
 
 ## `hub.helpers`
 
-<ResourceSection name="hub.helpers" description="High-level convenience methods for the most common SDK workflows: waiting for async operations, running evaluations, and printing metrics.">
+<ResourceSection description="High-level convenience methods for the most common SDK workflows: waiting for async operations, running evaluations, and printing metrics.">
 
 ```python
 from giskard_hub.types import Evaluation, Scan, ChatMessage, AgentOutput
@@ -720,7 +720,7 @@ from giskard_hub.types import Evaluation, Scan, ChatMessage, AgentOutput
 
 ## `hub.knowledge_bases`
 
-<ResourceSection name="hub.knowledge_bases" description="Create, search, and manage indexed document collections for grounded evaluations, document-based test generation, and knowledge-grounded vulnerability scans.">
+<ResourceSection description="Create, search, and manage indexed document collections for grounded evaluations, document-based test generation, and knowledge-grounded vulnerability scans.">
 
 ```python
 from giskard_hub.types import KnowledgeBase, KnowledgeBaseDocumentRow, KnowledgeBaseDocumentDetail
@@ -791,7 +791,7 @@ from giskard_hub.types import KnowledgeBase, KnowledgeBaseDocumentRow, Knowledge
 
 ## `hub.projects`
 
-<ResourceSection name="hub.projects" description="Top-level workspace that groups all related resources: agents, datasets, evaluations, scans, and more. Sub-resource: hub.projects.scenarios.">
+<ResourceSection description="Top-level workspace that groups all related resources: agents, datasets, evaluations, scans, and more. Sub-resource: hub.projects.scenarios.">
 
 ```python
 from giskard_hub.types import Project
@@ -856,7 +856,7 @@ from giskard_hub.types import Scenario, ScenarioPreview
 
 ## `hub.scans`
 
-<ResourceSection name="hub.scans" description="Launch automated vulnerability scans covering the OWASP LLM Top 10 and additional threat categories. Sub-resources: hub.scans.probes, hub.scans.attempts.">
+<ResourceSection description="Launch automated vulnerability scans covering the OWASP LLM Top 10 and additional threat categories. Sub-resources: hub.scans.probes, hub.scans.attempts.">
 
 ```python
 from giskard_hub.types import Scan, ScanCategory, ScanProbe
@@ -938,7 +938,7 @@ from giskard_hub.types.scan import ScanProbeAttempt, ReviewStatus, Severity
 
 ## `hub.scheduled_evaluations`
 
-<ResourceSection name="hub.scheduled_evaluations" description="Set up recurring evaluation runs on a daily, weekly, or monthly cadence for continuous quality monitoring.">
+<ResourceSection description="Set up recurring evaluation runs on a daily, weekly, or monthly cadence for continuous quality monitoring.">
 
 ```python
 from giskard_hub.types import ScheduledEvaluation, FrequencyOption
@@ -974,7 +974,7 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
 
 ## `hub.tasks`
 
-<ResourceSection name="hub.tasks" description="Lightweight issue tracker for managing findings from evaluations and scans. Link tasks to specific evaluation results, test cases, or probe attempts.">
+<ResourceSection description="Lightweight issue tracker for managing findings from evaluations and scans. Link tasks to specific evaluation results, test cases, or probe attempts.">
 
 ```python
 from giskard_hub.types import Task, TaskStatus, TaskPriority
@@ -1016,7 +1016,7 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
 
 ## `hub.test_cases`
 
-<ResourceSection name="hub.test_cases" description="Create, update, and manage individual test cases within datasets. Sub-resource: hub.test_cases.comments.">
+<ResourceSection description="Create, update, and manage individual test cases within datasets. Sub-resource: hub.test_cases.comments.">
 
 ```python
 from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
@@ -1102,7 +1102,7 @@ from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
 
 ## `hub.playground_chats`
 
-<ResourceSection name="hub.playground_chats" description="Access conversations captured from the Hub's interactive playground UI.">
+<ResourceSection description="Access conversations captured from the Hub's interactive playground UI.">
 
 ```python
 from giskard_hub.types import PlaygroundChat
@@ -1130,7 +1130,7 @@ from giskard_hub.types import PlaygroundChat
 
 ## `hub.audit_logs`
 
-<ResourceSection name="hub.audit_logs" description="Query the audit trail for compliance reporting, change history, and debugging. Every create, update, and delete action is recorded.">
+<ResourceSection description="Query the audit trail for compliance reporting, change history, and debugging. Every create, update, and delete action is recorded.">
 
 ```python
 from giskard_hub.types import Audit, AuditDisplay

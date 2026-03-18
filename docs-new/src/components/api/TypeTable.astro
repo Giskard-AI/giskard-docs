@@ -6,18 +6,23 @@ interface Props {
 const { name } = Astro.props;
 ---
 
-<details class="type-table" open>
-  <summary class="type-table-header">
+<div class="type-table" data-open="true">
+  <button class="type-table-header" aria-expanded="true" onclick="
+    const parent = this.parentElement;
+    const isOpen = parent.getAttribute('data-open') === 'true';
+    parent.setAttribute('data-open', String(!isOpen));
+    this.setAttribute('aria-expanded', String(!isOpen));
+  ">
     <code class="type-table-name">{name}</code>
     <span class="type-table-label">fields</span>
-    <svg class="type-table-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <svg class="type-table-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-  </summary>
+  </button>
   <div class="type-table-body">
     <slot />
   </div>
-</details>
+</div>
 
 <style>
   .type-table {
@@ -32,18 +37,17 @@ const { name } = Astro.props;
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1rem;
+    width: 100%;
     cursor: pointer;
     background: var(--api-type-table-header-bg);
     user-select: none;
-    list-style: none;
+    border: none;
+    text-align: left;
+    font-family: inherit;
   }
 
-  .type-table-header::-webkit-details-marker {
-    display: none;
-  }
-
-  .type-table-header::marker {
-    content: '';
+  .type-table-header:hover {
+    opacity: 0.85;
   }
 
   .type-table-name {
@@ -68,15 +72,19 @@ const { name } = Astro.props;
     margin-left: auto;
     transition: transform 0.2s ease;
     color: var(--sl-color-gray-3, #9ca3af);
+    flex-shrink: 0;
   }
 
-  .type-table[open] .type-table-chevron {
+  .type-table[data-open='true'] .type-table-chevron {
     transform: rotate(180deg);
   }
 
   .type-table-body {
     padding: 0 1rem 0.5rem;
-    border-top: 1px solid var(--sl-color-hairline);
+  }
+
+  .type-table[data-open='false'] .type-table-body {
+    display: none;
   }
 
   /* Light mode */
