@@ -1,5 +1,5 @@
 ---
-title: Audit Log
+title: Audit Logs
 description: Search and retrieve audit log events for compliance reporting, change history, and debugging.
 sidebar:
   order: 8
