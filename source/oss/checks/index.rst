@@ -30,25 +30,25 @@ Quick Links
    .. grid-item-card:: 🚀 Quickstart
       :link: ai-testing/quickstart
       :link-type: doc
-      
+
       Installation, configuration, and your first test
 
    .. grid-item-card:: 📚 AI Testing Guide
       :link: ai-testing/quickstart
       :link-type: doc
-      
+
       Learn core concepts, single-turn and multi-turn testing
 
    .. grid-item-card:: 💡 Tutorials
       :link: tutorials/index
       :link-type: doc
-      
+
       Practical examples for RAG, agents, and more
 
    .. grid-item-card:: 🔧 API Reference
       :link: api-reference/index
       :link-type: doc
-      
+
       Complete API documentation
 
 
@@ -59,7 +59,7 @@ Giskard Checks is designed for:
 
 * **RAG Evaluation**: Test groundedness, relevance, and context usage in retrieval-augmented generation systems
 * **Agent Testing**: Validate multi-step agent workflows with tool calls and complex reasoning
-* **Quality Assurance**: Ensure consistent output quality across model updates and deployments  
+* **Quality Assurance**: Ensure consistent output quality across model updates and deployments
 * **LLM Guardrails**: Implement safety checks, content moderation, and compliance validation
 * **Regression Testing**: Track model behavior changes over time with reproducible test suites
 
@@ -68,7 +68,7 @@ Giskard Checks is designed for:
    :caption: Getting Started
    :maxdepth: 1
    :hidden:
-   
+
    self
    getting-started/installation
 
@@ -77,7 +77,7 @@ Giskard Checks is designed for:
    :caption: Testing AI Agents
    :maxdepth: 2
    :hidden:
-   
+
    ai-testing/quickstart
    ai-testing/core-concepts
    ai-testing/single-turn
@@ -88,10 +88,20 @@ Giskard Checks is designed for:
    :caption: Tutorials
    :maxdepth: 2
    :hidden:
+
    tutorials/index
+   tutorials/rag-evaluation
+   tutorials/testing-agents
+   tutorials/chatbot-testing
+   tutorials/content-moderation
 
 .. toctree::
    :caption: API Reference
    :maxdepth: 2
    :hidden:
+
    api-reference/index
+   api-reference/core
+   api-reference/builtin-checks
+   api-reference/scenarios
+   api-reference/testing
