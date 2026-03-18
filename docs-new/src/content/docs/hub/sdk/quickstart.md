@@ -11,7 +11,13 @@ This tutorial walks you through installing the SDK, connecting to the Hub, and r
 
 - Python 3.10 or later
 - A running Giskard Hub instance (cloud or self-hosted)
-- An API key from the Hub UI (User Settings → API Keys)
+- An API key from the Hub UI
+
+### Finding your API key
+
+Click the user badge in the bottom-left corner of the Hub UI, then copy the **API Key** value:
+
+![Finding your API key in the Hub UI](../../../../assets/images/sdk/api-key.png)
 
 ## 1. Install the SDK
 
@@ -98,6 +104,9 @@ print(f"Scan started: {scan.id}")
 scan = hub.helpers.wait_for_completion(scan)
 
 print(f"Scan complete. Grade: {scan.grade}")
+
+# Print detailed probe results
+hub.helpers.print_metrics(scan)
 ```
 
 The grade ranges from **A** (no issues found) to **D** (critical vulnerabilities detected). See [Vulnerability Scanning](/hub/sdk/guides/scans) for the full tag catalogue, KB-grounded scans, and how to review probe results and turn successful attacks into test cases.
@@ -124,7 +133,6 @@ hub.test_cases.create(
         {
             "identifier": "correctness",
             "params": {
-                "type": "correctness",
                 "reference": "We offer a 30-day return policy for all items."
             },
         },
@@ -132,7 +140,7 @@ hub.test_cases.create(
 )
 ```
 
-The `checks` field controls which criteria are applied to each agent response — these can be LLM-judge, embedding similarity, or rule-based checks. See [Checks & Metrics](/hub/sdk/guides/checks) for the full list of built-in checks and how to define custom ones.
+The `checks` field controls which criteria are applied to each agent response -- these can be LLM-judge, embedding similarity, or rule-based checks. See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for the full list of built-in checks and how to define custom ones.
 
 ## 7. Run an evaluation
 
@@ -155,15 +163,24 @@ print("Evaluation complete!")
 
 ## 8. Read the results
 
-Once complete, fetch the per-test-case results and inspect the metrics:
+Once complete, print the metrics summary and inspect individual results:
 
 ```python
-evaluation_results = hub.evaluations.results.list(evaluation.id)
+# Print a formatted metrics table
+hub.helpers.print_metrics(evaluation)
+```
 
-for eval_result in evaluation_results:
-    print(f"Test case {eval_result.test_case.id}: {eval_result.state}")
-    for check_result in eval_result.results:
-        print(f"  {check_result.name}: {'✓' if check_result.passed else '✗'}")
+![Evaluation metrics output](../../../../assets/images/sdk/evaluation-metrics-output.png)
+
+You can also iterate over individual results programmatically:
+
+```python
+results = hub.evaluations.results.list(evaluation.id)
+
+for result in results:
+    print(f"Test case {result.test_case.id}: {result.state}")
+    for check in result.results:
+        print(f"  {check.name}: {'passed' if check.passed else 'failed'}")
 ```
 
 You can also view the full evaluation with aggregated metrics in the Hub UI.
@@ -171,7 +188,7 @@ You can also view the full evaluation with aggregated metrics in the Hub UI.
 ## Next steps
 
 - **Local agents**: evaluate a Python function directly without an HTTP endpoint — see [Evaluations](/hub/sdk/guides/evaluations#local-evaluations)
-- **Generate test cases automatically**: use scenarios or knowledge bases — see [Datasets](/hub/sdk/guides/datasets)
+- **Generate test cases automatically**: use scenarios or knowledge bases -- see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks)
 - **Vulnerability scanning**: find security weaknesses with [Scans](/hub/sdk/guides/scans)
 - **Schedule recurring runs**: see [Scheduled Evaluations](/hub/sdk/guides/evaluations#scheduled-evaluations)
 - **Full API details**: see the [API Reference](/hub/sdk/reference)

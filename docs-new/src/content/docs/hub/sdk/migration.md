@@ -49,7 +49,6 @@ export GISKARD_HUB_API_KEY="gsk_..."
 | `HubClient(url=..., token=...)` | `HubClient(base_url=..., api_key=...)` |
 
 ```python
-# main.py
 # v2.x
 from giskard_hub import HubClient
 hub = HubClient(url="https://...", token="gsk_...")
@@ -59,12 +58,23 @@ from giskard_hub import HubClient
 hub = HubClient(base_url="https://...", api_key="gsk_...")
 ```
 
-### 3. `hub.models` → `hub.agents`
+### 3. Type import path changed
+
+In v2.x, data types were imported from `giskard_hub.data`. In v3.x, they are imported from `giskard_hub.types`:
+
+```python
+# v2.x
+from giskard_hub.data import ChatMessage
+
+# v3.x
+from giskard_hub.types import ChatMessage
+```
+
+### 4. `hub.models` -> `hub.agents`
 
 The resource for LLM applications was renamed from `models` to `agents`, and the corresponding type from `ModelOutput` to `AgentOutput`.
 
 ```python
-# main.py
 # v2.x
 model = hub.models.create(
     project_id=project_id,
@@ -88,12 +98,13 @@ output = hub.agents.generate_completion(agent.id, messages=[...])
 print(output.response)
 ```
 
-### 4. `hub.chat_test_cases` → `hub.test_cases`
+Note that `model.chat()` no longer exists as an entity method. Instead, call `hub.agents.generate_completion()` passing the agent ID.
+
+### 5. `hub.chat_test_cases` -> `hub.test_cases`
 
 The resource for creating and managing test cases was renamed.
 
 ```python
-# main.py
 # v2.x
 hub.chat_test_cases.create(
     dataset_id=dataset_id,
@@ -109,13 +120,38 @@ hub.test_cases.create(
 )
 ```
 
-### 5. `hub.evaluate()`, `entity.wait_for_completion()` and `entity.print_metrics()` moved to `hub.helpers`
+### 6. `model_id` -> `agent_id` and `project_id` now required
 
-In v2.x, there was a top-level `hub.evaluate()` shortcut for creating both remote and local evaluations. In v3.x, this shortcut has been moved to `hub.helpers.evaluate()`. The `model` parameter was renamed to `agent`, and a `project` parameter is now required when running a remote evaluation. Entity methods such as `wait_for_completion()` and `print_metrics()` have also been moved to `hub.helpers.wait_for_completion()` and `hub.helpers.print_metrics()`.
+Across all resources, `model_id` was renamed to `agent_id`. In addition, `project_id` is now a required parameter for `evaluations.create` and `scans.create`.
 
 ```python
-# main.py
-# v2.x — remote evaluation
+# v2.x
+hub.evaluations.create(model_id=model_id, dataset_id=dataset_id, ...)
+hub.scans.create(model_id=model_id, ...)
+hub.scheduled_evaluations.create(model_id=model_id, ...)
+
+# v3.x
+hub.evaluations.create(agent_id=agent_id, dataset_id=dataset_id, project_id=project_id, ...)
+hub.scans.create(agent_id=agent_id, project_id=project_id, ...)
+hub.scheduled_evaluations.create(agent_id=agent_id, ...)
+```
+
+### 7. Entity methods moved to `hub.helpers`
+
+In v2.x, `hub.evaluate()` was a top-level shortcut, and entities had `wait_for_completion()` and `print_metrics()` methods. In v3.x, all of these have been moved to `hub.helpers`:
+
+| v2.x | v3.x |
+|---|---|
+| `hub.evaluate(model=..., dataset=...)` | `hub.helpers.evaluate(agent=..., dataset=..., project=...)` |
+| `entity.wait_for_completion()` | `entity = hub.helpers.wait_for_completion(entity)` |
+| `entity.print_metrics()` | `hub.helpers.print_metrics(entity)` |
+
+This applies to **all** entity types that previously had these methods — evaluations, scans, datasets, and knowledge bases.
+
+**Remote evaluations:**
+
+```python
+# v2.x
 remote_eval = hub.evaluate(model=my_model, dataset=my_dataset, name="eval run")
 remote_eval.wait_for_completion()
 remote_eval.print_metrics()
@@ -131,55 +167,171 @@ remote_eval = hub.helpers.wait_for_completion(remote_eval)
 hub.helpers.print_metrics(remote_eval)
 ```
 
-For local Python agents, use `hub.helpers.evaluate()` passing a `Callable` as `agent`:
+**Local evaluations:**
 
 ```python
-# main.py
-# v2.x — passing a local function
+# v2.x
 def my_agent(messages):
     return "Hello from local model"
 
 local_eval = hub.evaluate(model=my_agent, dataset=my_dataset, name="local run")
 
 # v3.x
-from giskard_hub.types import ChatMessage, AgentOutput
-
 def my_agent(messages):
     return "Hello from local model"
 
 local_eval = hub.helpers.evaluate(agent=my_agent, dataset=my_dataset, name="local run")
 ```
 
-### 6. Response objects are now Pydantic models
-
-In v2.x, most responses were plain Python objects with simple attribute access. In v3.x, responses return as `pydantic.BaseModel`:
+**Knowledge bases:**
 
 ```python
-# main.py
+# v2.x
+kb = hub.knowledge_bases.create(...)
+kb.wait_for_completion()
+
+# v3.x
+kb = hub.knowledge_bases.create(...)
+kb = hub.helpers.wait_for_completion(kb)
+```
+
+:::note
+`hub.helpers.wait_for_completion()` **returns** the refreshed entity. Always reassign the result: `entity = hub.helpers.wait_for_completion(entity)`.
+:::
+
+### 8. Scan type and access patterns changed
+
+The scan result type was renamed from `ScanResult` to `Scan`. Several properties and access patterns changed:
+
+| v2.x | v3.x |
+|---|---|
+| `ScanResult` | `Scan` |
+| `scan_result.model` | `scan.agent` |
+| `scan_result.grade.value` | `scan.grade` |
+| `scan_result.wait_for_completion(timeout=600)` | `scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)` |
+| `scan_result.print_metrics()` | `hub.helpers.print_metrics(scan)` |
+
+```python
+# v2.x
+scan_result = hub.scans.create(model_id=model_id)
+scan_result.wait_for_completion(timeout=600)
+print(scan_result.grade.value)
+print(scan_result.model.name)
+scan_result.print_metrics()
+
+# v3.x
+scan = hub.scans.create(agent_id=agent_id, project_id=project_id)
+scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)
+print(scan.grade)
+print(scan.agent.name)
+hub.helpers.print_metrics(scan)
+```
+
+:::tip
+In v2.x, `wait_for_completion(timeout=600)` accepted a single timeout in seconds. In v3.x, use `poll_interval` (seconds between polling) and `max_retries` to control the total timeout. For example, `poll_interval=5, max_retries=120` gives a 10-minute timeout (5s x 120 = 600s).
+:::
+
+### 9. Dataset generation methods changed
+
+#### `generate_adversarial` removed
+
+The `hub.datasets.generate_adversarial()` method has been removed. Use `hub.datasets.generate_scenario_based()` instead. Note that the new method takes a `scenario_id` instead of `categories`:
+
+```python
+# v2.x
+dataset = hub.datasets.generate_adversarial(
+    model_id=model_id,
+    categories=["prompt_injection", "harmful_content"],
+    description="Security test cases",
+    dataset_name="Adversarial Suite",
+)
+
+# v3.x — use generate_scenario_based instead
+dataset = hub.datasets.generate_scenario_based(
+    agent_id=agent_id,
+    project_id=project_id,
+    scenario_id=scenario_id,
+    dataset_name="Adversarial Suite",
+    n_examples=20,
+)
+```
+
+See [Projects & Scenarios](/hub/sdk/guides/projects#scenarios) for how to create scenarios.
+
+#### `generate_document_based` parameters changed
+
+```python
+# v2.x
+dataset = hub.datasets.generate_document_based(
+    model_id=model_id,
+    knowledge_base_id=kb_id,
+    n_questions=20,
+    dataset_name="KB suite",
+)
+
+# v3.x
+dataset = hub.datasets.generate_document_based(
+    agent_id=agent_id,
+    project_id=project_id,
+    knowledge_base_id=kb_id,
+    n_examples=20,  # renamed from n_questions
+    dataset_name="KB suite",
+)
+```
+
+#### `dataset.chat_test_cases` property removed
+
+The convenience property for accessing a dataset's test cases was removed. Use the resource method instead:
+
+```python
+# v2.x
+test_cases = dataset.chat_test_cases
+
+# v3.x
+test_cases = hub.datasets.search_test_cases(dataset.id)
+```
+
+#### `dataset.wait_for_completion()` moved to helpers
+
+```python
+# v2.x
+dataset = hub.datasets.generate_document_based(...)
+dataset.wait_for_completion()
+
+# v3.x
+dataset = hub.datasets.generate_document_based(...)
+dataset = hub.helpers.wait_for_completion(dataset)
+```
+
+### 10. Response objects are now Pydantic models
+
+In v2.x, most responses were plain Python objects with simple attribute access. In v3.x, responses are `pydantic.BaseModel` instances:
+
+```python
 # v2.x
 project = hub.projects.retrieve(project_id)
 print(project.name)
 
-# v3.x
+# v3.x — attribute access works the same
 project = hub.projects.retrieve(project_id)
 print(project.name)
+
+# v3.x — new Pydantic methods available
 print(project.model_dump()["name"])
+print(project.model_dump_json())
 ```
 
 All data objects are now Pydantic models. This means you have access to convenient methods like `.model_dump()`, `.model_dump_json()`, and the full range of Pydantic introspection features. Note that you cannot access properties using square bracket syntax (e.g., `my_object["key"]`); instead, use `.model_dump()` to convert the object to a dictionary if you need key-based access.
 
-### 7. Knowledge base creation — CSV support removed (since v2.0.0)
+### 11. Knowledge base creation -- CSV support removed (since v2.0.0)
 
 CSV files are no longer accepted when creating knowledge bases. Use JSON/JSONL or a list of dicts:
 
 ```python
-# main.py
 # v2.x (CSV no longer supported even in v2.0.0+)
-# hub.knowledge_bases.create(..., data="my_kb.csv")  # ❌
+# hub.knowledge_bases.create(..., data="my_kb.csv")  # removed
 
 # v3.x — from a Python list
-import json
-
 hub.knowledge_bases.create(
     project_id=project_id,
     name="My KB",
@@ -189,8 +341,6 @@ hub.knowledge_bases.create(
 )
 
 # v3.x — from a file on disk
-from pathlib import Path
-
 hub.knowledge_bases.create(
     project_id=project_id,
     name="My KB",
@@ -198,25 +348,11 @@ hub.knowledge_bases.create(
 )
 ```
 
-### 8. `model_id` → `agent_id`
+### 12. `Metric.percentage` -> `Metric.success_rate`
 
-In v2.x, the evaluation resource used `model_id` to refer to the agent. In v3.x, use `agent_id`:
-
-```python
-# main.py
-# v2.x
-hub.evaluations.create(model_id=model_id, dataset_id=dataset_id, ...)
-
-# v3.x
-hub.evaluations.create(agent_id=agent_id, dataset_id=dataset_id, ...)
-```
-
-### 9. `EvaluationRun.metrics` shape changed
-
-In v2.x, `eval_run.metrics` was a list of `Metric` objects with `.name` and `.percentage`. In v3.x, metrics are available on the `EvaluationAPIResource` object and the individual results:
+In v2.x, `eval_run.metrics` was a list of `Metric` objects with a `.percentage` field. In v3.x, the field was renamed to `.success_rate` (a float between 0 and 1):
 
 ```python
-# main.py
 # v2.x
 eval_run.wait_for_completion()
 
@@ -240,6 +376,8 @@ hub.helpers.print_metrics(eval_run)
 
 | v2.x feature | v3.x equivalent |
 |---|---|
+| `from giskard_hub.data import ChatMessage` | `from giskard_hub.types import ChatMessage` |
+| `HubClient(url=..., token=...)` | `HubClient(base_url=..., api_key=...)` |
 | `hub.models.create(...)` | `hub.agents.create(...)` |
 | `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...])` |
 | `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
@@ -247,23 +385,32 @@ hub.helpers.print_metrics(eval_run)
 | `hub.evaluate(model=fn, dataset=, name=)` | `hub.helpers.evaluate(agent=fn, dataset=, name=)` |
 | `entity.wait_for_completion()` | `entity = hub.helpers.wait_for_completion(entity)` |
 | `entity.print_metrics()` | `hub.helpers.print_metrics(entity)` |
+| `hub.evaluations.create(model_id=, dataset_id=)` | `hub.evaluations.create(agent_id=, dataset_id=, project_id=)` |
+| `hub.scans.create(model_id=)` | `hub.scans.create(agent_id=, project_id=)` |
+| `hub.scheduled_evaluations.create(model_id=)` | `hub.scheduled_evaluations.create(agent_id=)` |
 | `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...)` |
-| `kb.wait_for_completion()` | `kb = hub.helpers.wait_for_completion(kb)` |
-| `hub.evaluations.create(model_id=, ...)` | `hub.evaluations.create(agent_id=, ...)` |
-| `hub.scans.create(model_id=, ...)` | `hub.scans.create(agent_id=, ...)` |
-| `hub.scheduled_evaluations.create(model_id=, ...)` | `hub.scheduled_evaluations.create(agent_id=, ...)` |
+| `ScanResult` / `scan_result.grade.value` | `Scan` / `scan.grade` |
+| `ScanResult.model` | `Scan.agent` |
+| `hub.datasets.generate_adversarial(model_id=, categories=, ...)` | `hub.datasets.generate_scenario_based(agent_id=, scenario_id=, project_id=)` |
+| `hub.datasets.generate_document_based(model_id=, n_questions=)` | `hub.datasets.generate_document_based(agent_id=, n_examples=, project_id=)` |
+| `dataset.chat_test_cases` | `hub.datasets.search_test_cases(dataset.id)` |
+| `Metric.percentage` | `Metric.success_rate` (multiply by 100 for %) |
 
 ---
 
 ## Features new in v3 (no v2 equivalent)
 
-The following resources have no equivalent in v2.x and require no migration — they are purely additive:
+The following resources have no equivalent in v2.x and require no migration -- they are purely additive:
 
-- `hub.projects.scenarios` — scenario management and dataset generation
-- `hub.tasks` — issue tracking
-- `hub.playground_chats` — playground conversation access
-- `hub.audit_logs` — audit log
-- `hub.test_cases.comments` — test case annotations
-- `hub.scans.probes` / `hub.scans.attempts` — granular scan probe access
-- `hub.evaluations.results.search()` — filtered result queries
-- `AsyncHubClient` — async client
+- `hub.projects.scenarios` -- scenario management and dataset generation
+- `hub.tasks` -- issue tracking
+- `hub.playground_chats` -- playground conversation access
+- `hub.audit_logs` -- audit log
+- `hub.test_cases.comments` -- test case annotations
+- `hub.scans.probes` / `hub.scans.attempts` -- granular scan probe access
+- `hub.evaluations.results.search()` -- filtered result queries
+- `hub.evaluations.run_single()` -- evaluate a single test case ad hoc
+- `hub.evaluations.rerun_errored_results()` -- rerun only errored results
+- `hub.knowledge_bases.search_documents()` -- semantic search over documents
+- `hub.datasets.upload()` -- import datasets from files
+- `AsyncHubClient` -- async client

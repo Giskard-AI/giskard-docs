@@ -57,6 +57,36 @@ tc = hub.test_cases.create(
 print(tc.id)
 ```
 
+### Demo output and metadata
+
+The `demo_output` field is an optional recorded answer displayed alongside the test case in the Hub UI. It is **not** used during evaluation -- the agent always generates a fresh response. If your agent returns structured metadata (e.g. tool calls, categories, resolved status), include it in `demo_output.metadata`:
+
+```python
+hub.test_cases.create(
+    dataset_id="dataset-id",
+    messages=[{"role": "user", "content": "I need help with my order #12345"}],
+    demo_output={
+        "role": "assistant",
+        "content": "I've found your order. It was shipped on Monday and should arrive by Thursday.",
+        "metadata": {
+            "category": "order_status",
+            "resolved": True,
+            "tools_called": ["order_lookup"],
+        },
+    },
+    checks=[
+        {"identifier": "correctness", "params": {"reference": "Order #12345 shipped Monday, arrives Thursday."}},
+        {"identifier": "metadata", "params": {"json_path_rules": [
+            {"json_path": "$.category", "expected_value": "order_status", "expected_value_type": "string"},
+        ]}},
+    ],
+)
+```
+
+:::note
+Messages in the test case should **not** include the final assistant response. The last message should always be a user turn. The expected answer goes in `demo_output`, while metadata checks operate on the actual response returned by the agent during evaluation.
+:::
+
 ### Multi-turn conversations
 
 Include prior assistant turns to test multi-turn behaviour:
@@ -208,7 +238,10 @@ dataset = hub.datasets.generate_scenario_based(
     n_examples=10,
 )
 
-print(f"Generated {dataset.id}")
+# Generation is asynchronous — wait for it to finish
+dataset = hub.helpers.wait_for_completion(dataset)
+
+print(f"Generated dataset: {dataset.id} with {len(hub.datasets.list_test_cases(dataset.id))} test cases")
 ```
 
 ---
@@ -224,6 +257,22 @@ dataset = hub.datasets.generate_document_based(
     knowledge_base_id="kb-id",
     dataset_name="FAQ-grounded suite",
     n_examples=25,
+)
+
+# Generation is asynchronous — wait for it to finish
+dataset = hub.helpers.wait_for_completion(dataset)
+```
+
+You can optionally filter generation to specific topics in your knowledge base by passing `topic_ids`:
+
+```python
+dataset = hub.datasets.generate_document_based(
+    project_id="project-id",
+    agent_id="agent-id",
+    knowledge_base_id="kb-id",
+    dataset_name="Shipping-only suite",
+    topic_ids=["shipping-topic-id"],
+    n_examples=10,
 )
 ```
 
@@ -289,6 +338,8 @@ hub.datasets.delete("dataset-id")
 
 ## Built-in checks
 
+The Hub includes six built-in check types. Each check can be used directly in test cases by passing its `identifier` and the required `params`.
+
 | Identifier | Method | What it evaluates | Key params |
 |---|---|---|---|
 | `correctness` | LLM judge | Is the response factually correct relative to the expected output? | `reference` |
@@ -297,6 +348,101 @@ hub.datasets.delete("dataset-id")
 | `semantic_similarity` | Embedding similarity | Is the response semantically equivalent to the expected output? | `reference`, `threshold` |
 | `string_match` | Rule-based | Does the response contain a specific keyword or substring? | `keyword` |
 | `metadata` | Rule-based | Do JSON path values in the response metadata satisfy specified conditions? | `json_path_rules` |
+
+### Correctness
+
+Validates that all information from the **reference** answer is present in the agent's response, without contradiction. Uses an LLM judge.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `reference` | `str` | The expected correct answer |
+
+```python
+{"identifier": "correctness", "params": {"reference": "We offer a 30-day return policy."}}
+```
+
+### Conformity
+
+Checks that the agent's response follows one or more rules. Each rule should describe a single, distinct behaviour. Uses an LLM judge.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `rules` | `list[str]` | One or more rules the response must follow |
+
+```python
+{"identifier": "conformity", "params": {"rules": [
+    "The response must be written in a formal, professional tone.",
+    "The response must not include any personal opinions.",
+]}}
+```
+
+### Groundedness
+
+Validates that the agent's response is grounded in the provided context -- i.e., it does not introduce information absent from the context. Uses an LLM judge.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `context` | `str` | The reference context the response should be grounded in |
+
+```python
+{"identifier": "groundedness", "params": {"context": "Our return window is 30 days. We do not accept returns on clearance items."}}
+```
+
+:::tip
+Combine with `hub.knowledge_bases.search_documents()` to dynamically retrieve context from your knowledge base and pass it as the `context` field.
+:::
+
+### Semantic similarity
+
+Computes embedding-based similarity between the agent's response and a reference string. The check passes if the similarity score meets or exceeds the threshold. Does **not** use an LLM judge.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `reference` | `str` | The expected output to compare against |
+| `threshold` | `float` | Similarity threshold (0.0 to 1.0, default varies) |
+
+```python
+{"identifier": "semantic_similarity", "params": {"reference": "30-day return policy", "threshold": 0.8}}
+```
+
+### String match
+
+Checks whether the agent's response contains a specific keyword or substring. Case-insensitive. Does **not** use an LLM judge.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `keyword` | `str` | The keyword or substring to search for |
+
+```python
+{"identifier": "string_match", "params": {"keyword": "#12345"}}
+```
+
+### Metadata
+
+Validates values extracted via JSON path expressions from the response **metadata**. Useful for verifying structured outputs like tool calls, categories, or flags. Does **not** use an LLM judge.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `json_path_rules` | `list[dict]` | List of rules, each with `json_path`, `expected_value`, and `expected_value_type` |
+
+Each rule dict supports:
+
+| Key | Type | Description |
+|---|---|---|
+| `json_path` | `str` | JSON path expression (e.g. `$.category`, `$.tools_called[0]`) |
+| `expected_value` | `str` | The expected value |
+| `expected_value_type` | `str` | Type of the expected value (`"string"`, `"number"`, `"boolean"`) |
+
+```python
+{"identifier": "metadata", "params": {"json_path_rules": [
+    {"json_path": "$.category", "expected_value": "billing", "expected_value_type": "string"},
+    {"json_path": "$.resolved", "expected_value": "true", "expected_value_type": "boolean"},
+]}}
+```
+
+:::note
+Metadata checks operate on the `metadata` field of the agent's response (`AgentOutput.metadata`), not on the message content. Your agent endpoint must return metadata in its response for this check to work.
+:::
 
 ---
 

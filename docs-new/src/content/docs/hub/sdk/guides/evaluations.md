@@ -119,6 +119,10 @@ You can also use the helper to print a formatted summary of all metrics for an e
 hub.helpers.print_metrics(evaluation)
 ```
 
+The output is a rich terminal table showing per-check pass rates:
+
+![Evaluation metrics output from hub.helpers.print_metrics()](../../../../../assets/images/sdk/evaluation-metrics-output.png)
+
 ### Search and filter results
 
 ```python
@@ -167,6 +171,30 @@ hub.evaluations.results.update_visibility(
     hidden=True,
 )
 ```
+
+### Access aggregated metrics
+
+After an evaluation completes, access the per-check aggregated metrics programmatically:
+
+```python
+for metric in evaluation.metrics:
+    print(f"{metric.name}: {metric.success_rate * 100:.1f}% "
+          f"({metric.passed} passed, {metric.failed} failed, {metric.errored} errored)")
+```
+
+Each `Metric` object has the following fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `name` | `str` | Check identifier (e.g. `"correctness"`, `"global"`) |
+| `display_name` | `str` | Human-readable name |
+| `passed` | `int` | Number of test cases that passed |
+| `failed` | `int` | Number of test cases that failed |
+| `errored` | `int` | Number of test cases that errored |
+| `total` | `int` | Total number of test cases |
+| `success_rate` | `float` | Pass rate as a float between 0.0 and 1.0 |
+
+The special `"global"` metric aggregates across all checks.
 
 ---
 

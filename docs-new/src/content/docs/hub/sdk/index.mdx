@@ -32,13 +32,25 @@ evaluation = hub.evaluations.create(
 <CardGrid>
   <LinkCard title="Quickstart" href="/hub/sdk/quickstart" description="Install the SDK, set up authentication, and run your first evaluation in minutes." />
   <LinkCard title="Core Concepts" href="/hub/sdk/concepts" description="Understand how Projects, Agents, Datasets, Evaluations, and Scans fit together." />
-  <LinkCard title="How-to Guides" href="/hub/sdk/guides/projects-and-agents" description="Step-by-step guides for every feature: datasets, evaluations, scans, scheduling, and more." />
+  <LinkCard title="How-to Guides" href="/hub/sdk/guides/projects" description="Step-by-step guides for every feature: datasets, evaluations, scans, scheduling, and more." />
   <LinkCard title="API Reference" href="/hub/sdk/reference" description="Full reference for every resource, method, and type exported by the SDK." />
 </CardGrid>
 
-## Need Help?
+## Key capabilities
 
-- **Documentation**: Browse the [How-to Guides](/hub/sdk/guides/projects-and-agents) for step-by-step walkthroughs of every feature
+- **Evaluate** -- run your LLM agent against datasets of test cases with configurable checks (LLM judge, embedding similarity, rule-based)
+- **Scan** -- automated red-teaming covering the [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/) and additional threat categories
+- **Generate** -- auto-generate test cases from scenarios, knowledge bases, or playground conversations
+- **Schedule** -- set up recurring evaluations (daily, weekly, monthly) for continuous quality monitoring
+- **Track** -- create tasks from failed results, annotate test cases with comments, and audit every change
+
+## Migrating from v2?
+
+If you're upgrading from v2.x, see the [Migration Guide](/hub/sdk/migration) for a complete list of breaking changes and before/after code examples.
+
+## Need help?
+
+- **Documentation**: Browse the [How-to Guides](/hub/sdk/guides/projects) for step-by-step walkthroughs of every feature
 - **Examples**: Check our [GitHub repository](https://github.com/Giskard-AI/giskard-hub-python) for runnable examples and notebooks
 - **Community**: Join our [Discord](https://discord.com/invite/ABvfpbu69R) for support and discussions
 - **Enterprise**: Need on-premise deployment or dedicated support? [Contact us](https://www.giskard.ai/contact)

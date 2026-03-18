@@ -29,6 +29,14 @@ print(f"Scan complete. Grade: {scan.grade}")
 
 The `grade` property gives an overall security posture rating: **A** (best) through **D** (worst), or `N/A` if not enough data was collected.
 
+:::tip
+Scans can take several minutes. The default `wait_for_completion` timeout is 30 minutes (`poll_interval=5`, `max_retries=360`). To set a custom timeout, for example 10 minutes:
+
+```python
+scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)
+```
+:::
+
 ---
 
 ## Scope scans with tags
@@ -106,6 +114,10 @@ You can also use the helper to print a formatted summary of all metrics for a sc
 ```python
 hub.helpers.print_metrics(scan)
 ```
+
+The output is a rich terminal table showing each probe's category, severity, and results:
+
+![Scan metrics output from hub.helpers.print_metrics()](../../../../../assets/images/sdk/scan-metrics-output.png)
 
 ### Retrieve a specific probe
 

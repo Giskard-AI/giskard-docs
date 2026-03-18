@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-## v3.0.0b3 (current beta)
+## v3.0.0b6 (current beta)
 
 This release is the first public beta of the v3 SDK. It is a full rewrite based on a generated OpenAPI client, providing complete type safety, async support, and coverage of all Hub API endpoints.
 

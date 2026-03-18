@@ -28,7 +28,36 @@ agent = hub.agents.create(
 print(agent.id)
 ```
 
-The Hub sends a POST request to `url` with a JSON body containing a `messages` array of `{role, content}` objects. Your endpoint must return a JSON object with a `message` field.
+The Hub sends a POST request to `url` with a JSON body containing a `messages` array. Your endpoint must return a JSON object with a `message` field.
+
+**Request format** (sent by the Hub to your agent):
+
+```json
+{
+  "messages": [
+    {"role": "user", "content": "What is your return policy?"},
+    {"role": "assistant", "content": "We offer a 30-day return policy."},
+    {"role": "user", "content": "Does that apply to sale items?"}
+  ]
+}
+```
+
+**Response format** (expected from your agent):
+
+```json
+{
+  "response": {
+    "role": "assistant",
+    "content": "Sale items can be returned within 14 days."
+  },
+  "metadata": {
+    "category": "returns",
+    "tools_called": ["policy_lookup"]
+  }
+}
+```
+
+The `metadata` field is optional. If returned, it can be validated using `metadata` checks (see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#metadata)).
 
 ### Test the connection
 
@@ -118,8 +147,6 @@ print(kb.id)
 ### From a file on disk
 
 ```python
-from pathlib import Path
-
 kb = hub.knowledge_bases.create(
     project_id="project-id",
     name="Product Documentation",
@@ -129,8 +156,13 @@ kb = hub.knowledge_bases.create(
 ```
 
 :::note
-After creation, the Hub indexes the documents asynchronously. Depending on the size of your corpus, this may take a few seconds to a few minutes. Check `kb.status` before using the KB for generation or scanning.
+After creation, the Hub indexes the documents asynchronously. Wait for the indexing to complete before using the KB for generation or scanning:
 :::
+
+```python
+kb = hub.helpers.wait_for_completion(kb)
+print(f"Knowledge base ready: {kb.state}")  # "finished"
+```
 
 ## Retrieve and update a knowledge base
 
@@ -191,7 +223,7 @@ print(f"Generated dataset: {dataset.id} ({dataset.name})")
 
 The Hub samples documents from the KB, crafts questions whose answers are grounded in those documents, and creates test cases with a `groundedness` check pre-configured.
 
-See [Datasets, Test Cases & Checks](/hub/sdk/guides/datasets#generate-document-based-test-cases) for more detail.
+See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#generate-document-based-test-cases) for more detail.
 
 ---
 
