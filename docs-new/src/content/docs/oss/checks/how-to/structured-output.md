@@ -53,6 +53,8 @@ the model to reproduce exactly — no fuzzy matching needed.
 Use `Equals` with a `key` path to assert a specific field:
 
 ```python
+import asyncio
+
 from giskard.checks import Scenario, Equals
 
 tc = (
@@ -80,7 +82,7 @@ tc = (
     )
 )
 
-result = await tc.run()
+result = asyncio.run(tc.run())
 ```
 
 The `key` uses dot notation to navigate into the output object. Both attribute
@@ -140,7 +142,6 @@ For deeply nested data, use the `resolve` helper from
 ```python
 from pydantic import BaseModel
 from giskard.checks import Scenario, FnCheck
-from giskard.checks.core.extraction import resolve, NoMatch
 
 
 class Address(BaseModel):
@@ -314,9 +315,13 @@ class ExtractionTestSuite:
         )
 
 
-results = await ExtractionTestSuite(extract_info).run_all()
+results = asyncio.run(ExtractionTestSuite(extract_info).run_all())
 passed = sum(1 for r in results if r.passed)
 print(f"Results: {passed}/{len(results)} passed")
+```
+
+```
+Results: 3/3 passed
 ```
 
 ## Next steps

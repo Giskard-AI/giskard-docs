@@ -73,7 +73,150 @@ async def run_batch():
     return results
 
 
-results = await run_batch()
+asyncio.run(run_batch())
+```
+
+```
+Passed: 0/3 (0.0%)
+  FAIL: How long do we retain KYC records?
+    contains_expected: The answer does not contain the keyword '5 years'
+  FAIL: Can we share customer data with third parties?
+    contains_expected: The answer does not contain the keyword 'only with consent'
+  FAIL: Is medical advice allowed in the chatbot?
+    contains_expected: The answer does not contain the keyword 'no'
+
+
+[1m[[0m
+    [1;35mScenarioResult[0m[1m([0m
+        [33mscenario_name[0m=[32m'qa_0'[0m,
+        [33msteps[0m=[1m[[0m
+            [1;35mTestCaseResult[0m[1m([0m
+                [33mresults[0m=[1m[[0m
+                    [1;35mCheckResult[0m[1m([0m
+                        [33mstatus[0m=[1m<[0m[1;95mCheckStatus.FAIL:[0m[39m [0m[32m'fail'[0m[39m>,[0m
+[39m                        [0m[33mmessage[0m[39m=[0m[32m"The[0m[32m answer does not contain the keyword '5 years'"[0m[39m,[0m
+[39m                        [0m[33mmetrics[0m[39m=[0m[1;39m[[0m[1;39m][0m[39m,[0m
+[39m                        [0m[33mdetails[0m[39m=[0m[1;39m{[0m
+[39m                            [0m[32m'text'[0m[39m: [0m[32m'...'[0m[39m,[0m
+[39m                            [0m[32m'keyword'[0m[39m: [0m[32m'5 years'[0m[39m,[0m
+[39m                            [0m[32m'normalization_form'[0m[39m: [0m[32m'NFKC'[0m[39m,[0m
+[39m                            [0m[32m'case_sensitive'[0m[39m: [0m[3;92mTrue[0m[39m,[0m
+[39m                            [0m[32m'duration_ms'[0m[39m: [0m[1;36m15[0m[39m,[0m
+[39m                            [0m[32m'check_kind'[0m[39m: [0m[32m'string_matching'[0m[39m,[0m
+[39m                            [0m[32m'check_name'[0m[39m: [0m[32m'contains_expected'[0m[39m,[0m
+[39m                            [0m[32m'check_description'[0m[39m: [0m[3;35mNone[0m
+[39m                        [0m[1;39m}[0m
+[39m                    [0m[1;39m)[0m
+[39m                [0m[1;39m][0m[39m,[0m
+[39m                [0m[33mduration_ms[0m[39m=[0m[1;36m15[0m[39m,[0m
+[39m                [0m[33mstatus[0m[39m=<TestCaseStatus.FAIL: [0m[32m'fail'[0m[39m>[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m][0m[39m,[0m
+[39m        [0m[33mduration_ms[0m[39m=[0m[1;36m19[0m[39m,[0m
+[39m        [0m[33mfinal_trace[0m[39m=[0m[35mTrace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m            [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                Interaction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                    [0m[33minputs[0m[39m=[0m[32m'How long do we retain KYC records?'[0m[39m,[0m
+[39m                    [0m[33moutputs[0m[39m=[0m[32m'...'[0m[39m,[0m
+[39m                    [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                [0m[1;39m)[0m
+[39m            [0m[1;39m][0m[39m,[0m
+[39m            [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m            [0m[33mlast[0m[39m=[0m[35mInteraction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                [0m[33minputs[0m[39m=[0m[32m'How long do we retain KYC records?'[0m[39m,[0m
+[39m                [0m[33moutputs[0m[39m=[0m[32m'...'[0m[39m,[0m
+[39m                [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m)[0m[39m,[0m
+[39m        [0m[33mstatus[0m[39m=<ScenarioStatus.FAIL: [0m[32m'fail'[0m[39m>[0m
+[39m    [0m[1;39m)[0m[39m,[0m
+[39m    [0m[1;35mScenarioResult[0m[1;39m([0m
+[39m        [0m[33mscenario_name[0m[39m=[0m[32m'qa_1'[0m[39m,[0m
+[39m        [0m[33msteps[0m[39m=[0m[1;39m[[0m
+[39m            [0m[1;35mTestCaseResult[0m[1;39m([0m
+[39m                [0m[33mresults[0m[39m=[0m[1;39m[[0m
+[39m                    [0m[1;35mCheckResult[0m[1;39m([0m
+[39m                        [0m[33mstatus[0m[39m=<CheckStatus.FAIL: [0m[32m'fail'[0m[39m>,[0m
+[39m                        [0m[33mmessage[0m[39m=[0m[32m"The[0m[32m answer does not contain the keyword 'only with consent'"[0m[39m,[0m
+[39m                        [0m[33mmetrics[0m[39m=[0m[1;39m[[0m[1;39m][0m[39m,[0m
+[39m                        [0m[33mdetails[0m[39m=[0m[1;39m{[0m
+[39m                            [0m[32m'text'[0m[39m: [0m[32m'...'[0m[39m,[0m
+[39m                            [0m[32m'keyword'[0m[39m: [0m[32m'only with consent'[0m[39m,[0m
+[39m                            [0m[32m'normalization_form'[0m[39m: [0m[32m'NFKC'[0m[39m,[0m
+[39m                            [0m[32m'case_sensitive'[0m[39m: [0m[3;92mTrue[0m[39m,[0m
+[39m                            [0m[32m'duration_ms'[0m[39m: [0m[1;36m10[0m[39m,[0m
+[39m                            [0m[32m'check_kind'[0m[39m: [0m[32m'string_matching'[0m[39m,[0m
+[39m                            [0m[32m'check_name'[0m[39m: [0m[32m'contains_expected'[0m[39m,[0m
+[39m                            [0m[32m'check_description'[0m[39m: [0m[3;35mNone[0m
+[39m                        [0m[1;39m}[0m
+[39m                    [0m[1;39m)[0m
+[39m                [0m[1;39m][0m[39m,[0m
+[39m                [0m[33mduration_ms[0m[39m=[0m[1;36m10[0m[39m,[0m
+[39m                [0m[33mstatus[0m[39m=<TestCaseStatus.FAIL: [0m[32m'fail'[0m[39m>[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m][0m[39m,[0m
+[39m        [0m[33mduration_ms[0m[39m=[0m[1;36m10[0m[39m,[0m
+[39m        [0m[33mfinal_trace[0m[39m=[0m[35mTrace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m            [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                Interaction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                    [0m[33minputs[0m[39m=[0m[32m'Can we share customer data with third parties?'[0m[39m,[0m
+[39m                    [0m[33moutputs[0m[39m=[0m[32m'...'[0m[39m,[0m
+[39m                    [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                [0m[1;39m)[0m
+[39m            [0m[1;39m][0m[39m,[0m
+[39m            [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m            [0m[33mlast[0m[39m=[0m[35mInteraction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                [0m[33minputs[0m[39m=[0m[32m'Can we share customer data with third parties?'[0m[39m,[0m
+[39m                [0m[33moutputs[0m[39m=[0m[32m'...'[0m[39m,[0m
+[39m                [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m)[0m[39m,[0m
+[39m        [0m[33mstatus[0m[39m=<ScenarioStatus.FAIL: [0m[32m'fail'[0m[39m>[0m
+[39m    [0m[1;39m)[0m[39m,[0m
+[39m    [0m[1;35mScenarioResult[0m[1;39m([0m
+[39m        [0m[33mscenario_name[0m[39m=[0m[32m'qa_2'[0m[39m,[0m
+[39m        [0m[33msteps[0m[39m=[0m[1;39m[[0m
+[39m            [0m[1;35mTestCaseResult[0m[1;39m([0m
+[39m                [0m[33mresults[0m[39m=[0m[1;39m[[0m
+[39m                    [0m[1;35mCheckResult[0m[1;39m([0m
+[39m                        [0m[33mstatus[0m[39m=<CheckStatus.FAIL: [0m[32m'fail'[0m[39m>,[0m
+[39m                        [0m[33mmessage[0m[39m=[0m[32m"The[0m[32m answer does not contain the keyword 'no'"[0m[39m,[0m
+[39m                        [0m[33mmetrics[0m[39m=[0m[1;39m[[0m[1;39m][0m[39m,[0m
+[39m                        [0m[33mdetails[0m[39m=[0m[1;39m{[0m
+[39m                            [0m[32m'text'[0m[39m: [0m[32m'...'[0m[39m,[0m
+[39m                            [0m[32m'keyword'[0m[39m: [0m[32m'no'[0m[39m,[0m
+[39m                            [0m[32m'normalization_form'[0m[39m: [0m[32m'NFKC'[0m[39m,[0m
+[39m                            [0m[32m'case_sensitive'[0m[39m: [0m[3;92mTrue[0m[39m,[0m
+[39m                            [0m[32m'duration_ms'[0m[39m: [0m[1;36m9[0m[39m,[0m
+[39m                            [0m[32m'check_kind'[0m[39m: [0m[32m'string_matching'[0m[39m,[0m
+[39m                            [0m[32m'check_name'[0m[39m: [0m[32m'contains_expected'[0m[39m,[0m
+[39m                            [0m[32m'check_description'[0m[39m: [0m[3;35mNone[0m
+[39m                        [0m[1;39m}[0m
+[39m                    [0m[1;39m)[0m
+[39m                [0m[1;39m][0m[39m,[0m
+[39m                [0m[33mduration_ms[0m[39m=[0m[1;36m9[0m[39m,[0m
+[39m                [0m[33mstatus[0m[39m=<TestCaseStatus.FAIL: [0m[32m'fail'[0m[39m>[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m][0m[39m,[0m
+[39m        [0m[33mduration_ms[0m[39m=[0m[1;36m9[0m[39m,[0m
+[39m        [0m[33mfinal_trace[0m[39m=[0m[35mTrace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m            [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                Interaction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                    [0m[33minputs[0m[39m=[0m[32m'Is medical advice allowed in the chatbot?'[0m[39m,[0m
+[39m                    [0m[33moutputs[0m[39m=[0m[32m'...'[0m[39m,[0m
+[39m                    [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                [0m[1;39m)[0m
+[39m            [0m[1;39m][0m[39m,[0m
+[39m            [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m            [0m[33mlast[0m[39m=[0m[35mInteraction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                [0m[33minputs[0m[39m=[0m[32m'Is medical advice allowed in the chatbot?'[0m[39m,[0m
+[39m                [0m[33moutputs[0m[39m=[0m[32m'...'[0m[39m,[0m
+[39m                [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m)[0m[39m,[0m
+[39m        [0m[33mstatus[0m[39m=<ScenarioStatus.FAIL: [0m[32m'fail'[0m[1m>[0m
+    [1m)[0m
+[1m][0m
 ```
 
 ## Parameterised batch with pytest
@@ -179,7 +322,186 @@ async def run_summarisation_batch():
     return results
 
 
-results = await run_summarisation_batch()
+asyncio.run(run_summarisation_batch())
+```
+
+```
+Factual consistency: 3/3 passed
+
+
+[1m[[0m
+    [1;35mScenarioResult[0m[1m([0m
+        [33mscenario_name[0m=[32m'summary_0'[0m,
+        [33msteps[0m=[1m[[0m
+            [1;35mTestCaseResult[0m[1m([0m
+                [33mresults[0m=[1m[[0m
+                    [1;35mCheckResult[0m[1m([0m
+                        [33mstatus[0m=[1m<[0m[1;95mCheckStatus.PASS:[0m[39m [0m[32m'pass'[0m[39m>,[0m
+[39m                        [0m[33mmessage[0m[39m=[0m[32m'The summary is truncated but accurately reflects the original statement and contains no factual errors.'[0m[39m,[0m
+[39m                        [0m[33mmetrics[0m[39m=[0m[1;39m[[0m[1;39m][0m[39m,[0m
+[39m                        [0m[33mdetails[0m[39m=[0m[1;39m{[0m
+[39m                            [0m[32m'reason'[0m[39m: [0m[32m'The summary is truncated but accurately reflects the original statement and contains no factual errors.'[0m[39m,[0m
+[39m                            [0m[32m'inputs'[0m[39m: [0m[1;39m{[0m
+[39m                                [0m[32m'trace'[0m[39m: Trace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                                    [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                                        [0m[1;35mInteraction[0m[1;39m([0m
+[39m                                            [0m[33minputs[0m[39m=[0m[32m'The new policy requires all employees to complete security training annually.'[0m[39m,[0m
+[39m                                            [0m[33moutputs[0m[39m=[0m[32m'Summary of: The new policy requires all employees to...'[0m[39m,[0m
+[39m                                            [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                                        [0m[1;39m)[0m
+[39m                                    [0m[1;39m][0m[39m,[0m
+[39m                                    [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m                                    [0m[33mlast[0m[39m=[0m[1;35mInteraction[0m[1;39m([0m
+[39m                                        [0m[33minputs[0m[39m=[0m[32m'The new policy requires all employees to complete security training annually.'[0m[39m,[0m
+[39m                                        [0m[33moutputs[0m[39m=[0m[32m'Summary of: The new policy requires all employees to...'[0m[39m,[0m
+[39m                                        [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                                    [0m[1;39m)[0m
+[39m                                [0m[1;39m)[0m
+[39m                            [0m[1;39m}[0m[39m,[0m
+[39m                            [0m[32m'duration_ms'[0m[39m: [0m[1;36m5953[0m[39m,[0m
+[39m                            [0m[32m'check_kind'[0m[39m: [0m[32m'llm_judge'[0m[39m,[0m
+[39m                            [0m[32m'check_name'[0m[39m: [0m[32m'factual_consistency'[0m[39m,[0m
+[39m                            [0m[32m'check_description'[0m[39m: [0m[3;35mNone[0m
+[39m                        [0m[1;39m}[0m
+[39m                    [0m[1;39m)[0m
+[39m                [0m[1;39m][0m[39m,[0m
+[39m                [0m[33mduration_ms[0m[39m=[0m[1;36m5953[0m[39m,[0m
+[39m                [0m[33mstatus[0m[39m=<TestCaseStatus.PASS: [0m[32m'pass'[0m[39m>[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m][0m[39m,[0m
+[39m        [0m[33mduration_ms[0m[39m=[0m[1;36m5953[0m[39m,[0m
+[39m        [0m[33mfinal_trace[0m[39m=[0m[35mTrace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m            [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                Interaction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                    [0m[33minputs[0m[39m=[0m[32m'The new policy requires all employees to complete security training annually.'[0m[39m,[0m
+[39m                    [0m[33moutputs[0m[39m=[0m[32m'Summary of: The new policy requires all employees to...'[0m[39m,[0m
+[39m                    [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                [0m[1;39m)[0m
+[39m            [0m[1;39m][0m[39m,[0m
+[39m            [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m            [0m[33mlast[0m[39m=[0m[35mInteraction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                [0m[33minputs[0m[39m=[0m[32m'The new policy requires all employees to complete security training annually.'[0m[39m,[0m
+[39m                [0m[33moutputs[0m[39m=[0m[32m'Summary of: The new policy requires all employees to...'[0m[39m,[0m
+[39m                [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m)[0m[39m,[0m
+[39m        [0m[33mstatus[0m[39m=<ScenarioStatus.PASS: [0m[32m'pass'[0m[39m>[0m
+[39m    [0m[1;39m)[0m[39m,[0m
+[39m    [0m[1;35mScenarioResult[0m[1;39m([0m
+[39m        [0m[33mscenario_name[0m[39m=[0m[32m'summary_1'[0m[39m,[0m
+[39m        [0m[33msteps[0m[39m=[0m[1;39m[[0m
+[39m            [0m[1;35mTestCaseResult[0m[1;39m([0m
+[39m                [0m[33mresults[0m[39m=[0m[1;39m[[0m
+[39m                    [0m[1;35mCheckResult[0m[1;39m([0m
+[39m                        [0m[33mstatus[0m[39m=<CheckStatus.PASS: [0m[32m'pass'[0m[39m>,[0m
+[39m                        [0m[33mmessage[0m[39m=[0m[32m'Summary matches the original statement; truncated but contains no factual inaccuracies.'[0m[39m,[0m
+[39m                        [0m[33mmetrics[0m[39m=[0m[1;39m[[0m[1;39m][0m[39m,[0m
+[39m                        [0m[33mdetails[0m[39m=[0m[1;39m{[0m
+[39m                            [0m[32m'reason'[0m[39m: [0m[32m'Summary matches the original statement; truncated but contains no factual inaccuracies.'[0m[39m,[0m
+[39m                            [0m[32m'inputs'[0m[39m: [0m[1;39m{[0m
+[39m                                [0m[32m'trace'[0m[39m: Trace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                                    [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                                        [0m[1;35mInteraction[0m[1;39m([0m
+[39m                                            [0m[33minputs[0m[39m=[0m[32m'The quarterly report shows a 12% increase in revenue compared to last year.'[0m[39m,[0m
+[39m                                            [0m[33moutputs[0m[39m=[0m[32m'Summary of: The quarterly report shows a 12% increas...'[0m[39m,[0m
+[39m                                            [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                                        [0m[1;39m)[0m
+[39m                                    [0m[1;39m][0m[39m,[0m
+[39m                                    [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m                                    [0m[33mlast[0m[39m=[0m[1;35mInteraction[0m[1;39m([0m
+[39m                                        [0m[33minputs[0m[39m=[0m[32m'The quarterly report shows a 12% increase in revenue compared to last year.'[0m[39m,[0m
+[39m                                        [0m[33moutputs[0m[39m=[0m[32m'Summary of: The quarterly report shows a 12% increas...'[0m[39m,[0m
+[39m                                        [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                                    [0m[1;39m)[0m
+[39m                                [0m[1;39m)[0m
+[39m                            [0m[1;39m}[0m[39m,[0m
+[39m                            [0m[32m'duration_ms'[0m[39m: [0m[1;36m5623[0m[39m,[0m
+[39m                            [0m[32m'check_kind'[0m[39m: [0m[32m'llm_judge'[0m[39m,[0m
+[39m                            [0m[32m'check_name'[0m[39m: [0m[32m'factual_consistency'[0m[39m,[0m
+[39m                            [0m[32m'check_description'[0m[39m: [0m[3;35mNone[0m
+[39m                        [0m[1;39m}[0m
+[39m                    [0m[1;39m)[0m
+[39m                [0m[1;39m][0m[39m,[0m
+[39m                [0m[33mduration_ms[0m[39m=[0m[1;36m5623[0m[39m,[0m
+[39m                [0m[33mstatus[0m[39m=<TestCaseStatus.PASS: [0m[32m'pass'[0m[39m>[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m][0m[39m,[0m
+[39m        [0m[33mduration_ms[0m[39m=[0m[1;36m5623[0m[39m,[0m
+[39m        [0m[33mfinal_trace[0m[39m=[0m[35mTrace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m            [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                Interaction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                    [0m[33minputs[0m[39m=[0m[32m'The quarterly report shows a 12% increase in revenue compared to last year.'[0m[39m,[0m
+[39m                    [0m[33moutputs[0m[39m=[0m[32m'Summary of: The quarterly report shows a 12% increas...'[0m[39m,[0m
+[39m                    [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                [0m[1;39m)[0m
+[39m            [0m[1;39m][0m[39m,[0m
+[39m            [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m            [0m[33mlast[0m[39m=[0m[35mInteraction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                [0m[33minputs[0m[39m=[0m[32m'The quarterly report shows a 12% increase in revenue compared to last year.'[0m[39m,[0m
+[39m                [0m[33moutputs[0m[39m=[0m[32m'Summary of: The quarterly report shows a 12% increas...'[0m[39m,[0m
+[39m                [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m)[0m[39m,[0m
+[39m        [0m[33mstatus[0m[39m=<ScenarioStatus.PASS: [0m[32m'pass'[0m[39m>[0m
+[39m    [0m[1;39m)[0m[39m,[0m
+[39m    [0m[1;35mScenarioResult[0m[1;39m([0m
+[39m        [0m[33mscenario_name[0m[39m=[0m[32m'summary_2'[0m[39m,[0m
+[39m        [0m[33msteps[0m[39m=[0m[1;39m[[0m
+[39m            [0m[1;35mTestCaseResult[0m[1;39m([0m
+[39m                [0m[33mresults[0m[39m=[0m[1;39m[[0m
+[39m                    [0m[1;35mCheckResult[0m[1;39m([0m
+[39m                        [0m[33mstatus[0m[39m=<CheckStatus.PASS: [0m[32m'pass'[0m[39m>,[0m
+[39m                        [0m[33mmessage[0m[39m=[0m[32m'Check passed'[0m[39m,[0m
+[39m                        [0m[33mmetrics[0m[39m=[0m[1;39m[[0m[1;39m][0m[39m,[0m
+[39m                        [0m[33mdetails[0m[39m=[0m[1;39m{[0m
+[39m                            [0m[32m'reason'[0m[39m: [0m[3;35mNone[0m[39m,[0m
+[39m                            [0m[32m'inputs'[0m[39m: [0m[1;39m{[0m
+[39m                                [0m[32m'trace'[0m[39m: Trace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                                    [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                                        [0m[1;35mInteraction[0m[1;39m([0m
+[39m                                            [0m[33minputs[0m[39m=[0m[32m'Our refund policy allows returns within 30 days of purchase with a receipt.'[0m[39m,[0m
+[39m                                            [0m[33moutputs[0m[39m=[0m[32m'Summary of: Our refund policy allows returns within ...'[0m[39m,[0m
+[39m                                            [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                                        [0m[1;39m)[0m
+[39m                                    [0m[1;39m][0m[39m,[0m
+[39m                                    [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m                                    [0m[33mlast[0m[39m=[0m[1;35mInteraction[0m[1;39m([0m
+[39m                                        [0m[33minputs[0m[39m=[0m[32m'Our refund policy allows returns within 30 days of purchase with a receipt.'[0m[39m,[0m
+[39m                                        [0m[33moutputs[0m[39m=[0m[32m'Summary of: Our refund policy allows returns within ...'[0m[39m,[0m
+[39m                                        [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                                    [0m[1;39m)[0m
+[39m                                [0m[1;39m)[0m
+[39m                            [0m[1;39m}[0m[39m,[0m
+[39m                            [0m[32m'duration_ms'[0m[39m: [0m[1;36m5622[0m[39m,[0m
+[39m                            [0m[32m'check_kind'[0m[39m: [0m[32m'llm_judge'[0m[39m,[0m
+[39m                            [0m[32m'check_name'[0m[39m: [0m[32m'factual_consistency'[0m[39m,[0m
+[39m                            [0m[32m'check_description'[0m[39m: [0m[3;35mNone[0m
+[39m                        [0m[1;39m}[0m
+[39m                    [0m[1;39m)[0m
+[39m                [0m[1;39m][0m[39m,[0m
+[39m                [0m[33mduration_ms[0m[39m=[0m[1;36m5622[0m[39m,[0m
+[39m                [0m[33mstatus[0m[39m=<TestCaseStatus.PASS: [0m[32m'pass'[0m[39m>[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m][0m[39m,[0m
+[39m        [0m[33mduration_ms[0m[39m=[0m[1;36m5622[0m[39m,[0m
+[39m        [0m[33mfinal_trace[0m[39m=[0m[35mTrace[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m            [0m[33minteractions[0m[39m=[0m[1;39m[[0m
+[39m                Interaction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                    [0m[33minputs[0m[39m=[0m[32m'Our refund policy allows returns within 30 days of purchase with a receipt.'[0m[39m,[0m
+[39m                    [0m[33moutputs[0m[39m=[0m[32m'Summary of: Our refund policy allows returns within ...'[0m[39m,[0m
+[39m                    [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m                [0m[1;39m)[0m
+[39m            [0m[1;39m][0m[39m,[0m
+[39m            [0m[33mannotations[0m[39m=[0m[1;39m{[0m[1;39m}[0m[39m,[0m
+[39m            [0m[33mlast[0m[39m=[0m[35mInteraction[0m[1;39m[[0m[39mTypeVar, TypeVar[0m[1;39m][0m[1;39m([0m
+[39m                [0m[33minputs[0m[39m=[0m[32m'Our refund policy allows returns within 30 days of purchase with a receipt.'[0m[39m,[0m
+[39m                [0m[33moutputs[0m[39m=[0m[32m'Summary of: Our refund policy allows returns within ...'[0m[39m,[0m
+[39m                [0m[33mmetadata[0m[39m=[0m[1;39m{[0m[1;39m}[0m
+[39m            [0m[1;39m)[0m
+[39m        [0m[1;39m)[0m[39m,[0m
+[39m        [0m[33mstatus[0m[39m=<ScenarioStatus.PASS: [0m[32m'pass'[0m[1m>[0m
+    [1m)[0m
+[1m][0m
 ```
 
 ## Tracking metrics across a batch
@@ -225,12 +547,17 @@ async def run_with_metrics():
 
     results = await asyncio.gather(*(s.run() for s in scenarios))
 
-    word_counts = [len(r.trace.last.outputs.split()) for r in results]
+    word_counts = [len(r.final_trace.last.outputs.split()) for r in results]
     print(f"Average word count: {sum(word_counts) / len(word_counts):.1f}")
     print(f"Passed: {sum(1 for r in results if r.passed)}/{len(results)}")
 
 
-await run_with_metrics()
+asyncio.run(run_with_metrics())
+```
+
+```
+Average word count: 5.7
+Passed: 2/3
 ```
 
 ## Next steps

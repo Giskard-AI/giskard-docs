@@ -90,11 +90,17 @@ scenarios = [
     for i in range(3)
 ]
 
-results = await asyncio.gather(*(s.run() for s in scenarios))
+results = asyncio.run(asyncio.gather(*(s.run() for s in scenarios)))
 
 for i, result in enumerate(results):
     status = "PASS" if result.passed else "FAIL"
     print(f"[{status}] test_{i}: {result.steps[0].results[0].message}")
+```
+
+```
+[PASS] test_0: Output is unique
+[FAIL] test_1: Duplicate output detected: 'I can help with that.'
+[FAIL] test_2: Duplicate output detected: 'I can help with that.'
 ```
 
 Expected output (because all three return the same string):

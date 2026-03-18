@@ -113,6 +113,12 @@ for name, r in zip(scenarios, results):
     print(f"  [{status}] {name}")
 ```
 
+```
+Results: 2/2 passed (pass rate: 100%)
+  [PASS] greeting
+  [PASS] empty_input
+```
+
 When a scenario fails, use `(cr for step in r.steps for cr in step.results)` to see which check broke.
 
 ## Next step

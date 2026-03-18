@@ -71,6 +71,10 @@ result = await test_scenario.run()
 print(f"Scenario passed: {result.passed}")
 ```
 
+```
+Scenario passed: True
+```
+
 Add a check after every `.interact()` call — not just at the end. This pinpoints
 exactly which turn broke the expected behavior.
 
@@ -88,7 +92,7 @@ system where the chatbot maintains its own conversation history and must recall
 information from an earlier turn.
 
 ```python
-from giskard.checks import Scenario, FnCheck
+from giskard.checks import Scenario, FnCheck, StringMatching
 
 
 class Chatbot:
@@ -139,11 +143,10 @@ test_scenario = (
         outputs=lambda inputs: bot.chat(inputs),
     )
     .check(
-        FnCheck(fn=
-            lambda trace: "SEC-1042" in trace.last.outputs,
+        StringMatching(
             name="remembers_case_id",
-            success_message="Correctly recalled the case ID",
-            failure_message="Failed to recall the case ID",
+            keyword="SEC-1042",
+            text_key="trace.last.outputs",
         )
     )
 )

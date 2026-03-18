@@ -713,7 +713,7 @@ class AgentTestSuite:
 
         print(f"\n{'='*60}")
         print(
-            f"Agent Test Suite Results: {passed}/{total} passed ({passed/total*100:.1f}%)"
+            f"Agent Test Suite Results: {passed}/{total} passed ({passed/total*100 if total > 0 else 0:.1f}%)"
         )
         print(f"{'='*60}\n")
 
@@ -735,14 +735,29 @@ async def main():
     agent = SimpleAgent()
     suite = AgentTestSuite(agent)
 
-    # Add tests (from examples above)
-    # suite.add_test(...)
-    # suite.add_scenario(...)
+    # Add a basic test
+    from giskard.checks import Scenario, FnCheck
+    tc = (
+        Scenario("hello_agent")
+        .interact(inputs="Hello", outputs=lambda inputs: agent.run(inputs))
+    )
+    suite.add_test(tc)
 
     await suite.run_all()
 
 
 asyncio.run(main())
+```
+
+```
+Running test cases...
+Running scenarios...
+
+============================================================
+Agent Test Suite Results: 1/1 passed (100.0%)
+============================================================
+
+  ✓ [test] hello_agent
 ```
 
 ## Best Practices
@@ -776,6 +791,32 @@ LLMJudge(
     name="step_reasoning",
     prompt="Is this reasoning step logical? {{ outputs.steps[0].thought }}",
 )
+```
+
+```
+
+
+[1;35mLLMJudge[0m[1m([0m
+    [33mgenerator[0m=[1;35mLiteLLMGenerator[0m[1m([0m
+        [33mparams[0m=[1;35mGenerationParams[0m[1m([0m
+            [33mtemperature[0m=[1;36m1[0m[1;36m.0[0m,
+            [33mmax_tokens[0m=[3;35mNone[0m,
+            [33mresponse_format[0m=[3;35mNone[0m,
+            [33mtools[0m=[1m[[0m[1m][0m,
+            [33mtimeout[0m=[3;35mNone[0m
+        [1m)[0m,
+        [33mretry_policy[0m=[1;35mRetryPolicy[0m[1m([0m[33mmax_attempts[0m=[1;36m3[0m, [33mbase_delay[0m=[1;36m1[0m[1;36m.0[0m, [33mmax_delay[0m=[3;35mNone[0m[1m)[0m,
+        [33mrate_limiter[0m=[3;35mNone[0m,
+        [33mmiddlewares[0m=[1m[[0m[1m][0m,
+        [33mmodel[0m=[32m'openai/gpt-5-mini'[0m,
+        [33mkind[0m=[32m'litellm'[0m
+    [1m)[0m,
+    [33mname[0m=[32m'step_reasoning'[0m,
+    [33mdescription[0m=[3;35mNone[0m,
+    [33mprompt[0m=[32m'Is this reasoning step logical? [0m[32m{[0m[32m{[0m[32m outputs.steps[0m[32m[[0m[32m0[0m[32m][0m[32m.thought [0m[32m}[0m[32m}[0m[32m'[0m,
+    [33mprompt_path[0m=[3;35mNone[0m,
+    [33mkind[0m=[32m'llm_judge'[0m
+[1m)[0m
 ```
 
 **3. Test Error Paths**

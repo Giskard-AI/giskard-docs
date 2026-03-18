@@ -74,19 +74,50 @@ function cellSource(cell) {
   return src ?? '';
 }
 
+function cellOutputText(cell) {
+  const outputs = cell.outputs;
+  if (!Array.isArray(outputs) || outputs.length === 0) return '';
+
+  const lines = [];
+  for (const out of outputs) {
+    if (out.output_type === 'stream') {
+      // stdout / stderr
+      const text = Array.isArray(out.text) ? out.text.join('') : (out.text ?? '');
+      if (text) lines.push(text.replace(/\n$/, ''));
+    } else if (out.output_type === 'execute_result' || out.output_type === 'display_data') {
+      // Prefer plain text; skip images and other non-text mime types
+      const plain = out.data?.['text/plain'];
+      if (plain) {
+        const text = Array.isArray(plain) ? plain.join('') : plain;
+        lines.push(text.replace(/\n$/, ''));
+      }
+    } else if (out.output_type === 'error') {
+      lines.push(`${out.ename}: ${out.evalue}`);
+    }
+  }
+
+  if (lines.length === 0) return '';
+  return '```\n' + lines.join('\n') + '\n```';
+}
+
 function convertNotebook(notebookPath) {
   const nb = JSON.parse(readFileSync(notebookPath, 'utf8'));
   const cells = nb.cells ?? [];
 
-  // 1. Extract frontmatter from the first raw cell
+  // 1. Extract frontmatter from the first raw cell that starts with "---".
+  //    Some notebooks have setup code cells (e.g. nest-asyncio-setup) before
+  //    the frontmatter, so we scan rather than hard-coding index 0.
   let frontmatter = '';
   let startIdx = 0;
 
-  if (cells[0]?.cell_type === 'raw') {
-    const src = cellSource(cells[0]).trim();
-    if (src.startsWith('---')) {
-      frontmatter = src;
-      startIdx = 1;
+  for (let i = 0; i < cells.length; i++) {
+    if (cells[i].cell_type === 'raw') {
+      const src = cellSource(cells[i]).trim();
+      if (src.startsWith('---')) {
+        frontmatter = src;
+        startIdx = i + 1;
+      }
+      break; // stop after first raw cell regardless
     }
   }
 
@@ -108,6 +139,8 @@ function convertNotebook(notebookPath) {
       // Skip colab-only cells (e.g. !pip install)
       if (src.trimStart().startsWith('# colab-only')) continue;
       parts.push('```python\n' + src + '\n```');
+      const outText = cellOutputText(cell);
+      if (outText) parts.push(outText);
     }
     // raw cells (non-frontmatter) are intentionally skipped
   }

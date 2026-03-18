@@ -6,8 +6,13 @@ sidebar:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/how-to/spy-on-calls.ipynb)
 
-Inspect function calls made during scenario execution using `WithSpy` to
-diagnose unexpected behavior.
+`WithSpy` wraps an `InteractionSpec` and patches a target function — identified
+by its import path — with a `MagicMock`. After each interaction completes, the
+mock's call history (`call_count`, `call_args`, etc.) is injected into
+`Interaction.metadata` under the `target` key, and the mock is reset before the
+next interaction. Use it to verify that internal calls happen with the right
+arguments — for example, that a database query inside a tool call received the
+expected parameters.
 
 ## 1. Import `WithSpy` and `Interact`
 
@@ -29,8 +34,13 @@ it, so your existing interaction logic stays the same.
 Define your interaction as you normally would with `Interact`.
 
 ```python
+def call_llm(text: str) -> str:
+    # This is the function we will spy on
+    return f"Our return policy allows returns within 30 days. {text}"
+
+
 def my_agent(inputs: str) -> str:
-    # The function under test
+    # The function under test — delegates to call_llm internally
     return call_llm(inputs)
 
 
@@ -52,7 +62,7 @@ the value you want to capture.
 ```python
 spied_spec = WithSpy(
     interaction_generator=interaction_spec,
-    target="trace.last.outputs",
+    target="__main__.call_llm",  # Python import path for mock.patch
 )
 ```
 
@@ -94,9 +104,13 @@ metadata under the `target` key. Use `result.final_trace.last.metadata.get(targe
 to retrieve it.
 
 ```python
-target = "trace.last.outputs"
+target = "__main__.call_llm"
 spy_data = result.final_trace.last.metadata.get(target)
 print(spy_data)
+```
+
+```
+{'call_args_list': [call('What is the return policy?')], 'call_count': 1, 'call_args': call('What is the return policy?'), 'mock_calls': [call('What is the return policy?')]}
 ```
 
 ## 7. Assert on captured values
@@ -109,17 +123,19 @@ phrase before any post-processing occurred.
 Use the spy data to verify call counts or inspect intermediate values.
 
 ```python
-# Check that the agent was called
+# Check that call_llm was called at least once
 assert spy_data is not None, "No spy data recorded — check your WithSpy setup"
+assert spy_data["call_count"] >= 1, "call_llm was not called"
 
-# Inspect what was captured (call_args.args[0] for the last call's first argument)
-captured_output = spy_data["call_args"].args[0] if spy_data["call_args"] else None
-print(f"Captured output: {captured_output}")
+# Inspect call arguments
+if spy_data["call_args"]:
+    first_arg = spy_data["call_args"].args[0]
+    print(f"call_llm was called with: {first_arg!r}")
 
-# Assert on content
-assert (
-    "return" in str(captured_output).lower()
-), f"Expected output to mention returns, got: {captured_output}"
+```
+
+```
+call_llm was called with: 'What is the return policy?'
 ```
 
 ## Complete example
@@ -133,9 +149,13 @@ import asyncio
 from giskard.checks import Scenario, Interact, WithSpy, FnCheck
 
 
+def call_llm_internal(text: str) -> str:
+    # Replace with your actual LLM call
+    return f"Our return policy is 30 days from purchase. {text}"
+
+
 def my_support_agent(inputs: str) -> str:
-    # Replace with your actual agent call
-    return f"Our return policy is 30 days from purchase. {inputs}"
+    return call_llm_internal(inputs)
 
 
 async def debug_scenario():
@@ -146,7 +166,7 @@ async def debug_scenario():
 
     spied_spec = WithSpy(
         interaction_generator=interaction_spec,
-        target="trace.last.outputs",
+        target="__main__.call_llm_internal",  # Python import path
     )
 
     scenario = (
@@ -162,16 +182,32 @@ async def debug_scenario():
 
     result = await scenario.run()
 
-    # Inspect spy data (stored in last interaction's metadata under the target key)
-    target = "trace.last.outputs"
+    # Inspect spy data (stored in metadata under the target key)
+    target = "__main__.call_llm_internal"
     spy_data = result.final_trace.last.metadata.get(target)
-    print(f"Spy data: {spy_data}")
+    print(f"call_llm called {spy_data["call_count"]} time(s)")
     print(f"Test passed: {result.passed}")
 
     return result
 
 
 asyncio.run(debug_scenario())
+```
+
+```
+call_llm called 1 time(s)
+Test passed: False
+
+
+
+[1;31m──────────────────────────────────────────────────── [0m❌ FAILED[1;31m ────────────────────────────────────────────────────[0m
+[1;31mmentions_return_window[0m  [31mFAIL[0m
+No specific error message provided
+[1;31m────────────────────────────────────────────────────── [0mTrace[1;31m ──────────────────────────────────────────────────────[0m
+[1m────────────────────────────────────────────────── [0mInteraction [1;36m1[0m[1m ──────────────────────────────────────────────────[0m
+Inputs: [32m'What is your return policy?'[0m
+Outputs: [1m<[0m[1;95mMagicMock[0m[39m [0m[33mname[0m[39m=[0m[32m'mock[0m[32m([0m[32m)[0m[32m'[0m[39m [0m[33mid[0m[39m=[0m[32m'4754003952'[0m[1m>[0m
+[1;31m────────────────────────────────────────────────── [0m[1;36m1[0m step in 0ms[1;31m ──────────────────────────────────────────────────[0m
 ```
 
 `WithSpy` is a debugging tool. Remove it (or replace `.add_interaction()` with

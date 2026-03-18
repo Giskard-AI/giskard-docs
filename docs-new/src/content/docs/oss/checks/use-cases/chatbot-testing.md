@@ -130,6 +130,11 @@ class SimpleChatbot:
                 return f"Yes, your name is {self.context.user_name}."
             return "I don't believe you've told me your name yet."
 
+        # Name introduction
+        if "my name is" in msg_lower or "i'm" in msg_lower or "im " in msg_lower:
+            if self.context.user_name:
+                return f"Nice to meet you, {self.context.user_name}! How can I help you today?"
+
         # Support queries
         if self.context.conversation_type == "support":
             return (
@@ -231,6 +236,10 @@ async def test_basic_conversation():
 
 
 asyncio.run(test_basic_conversation())
+```
+
+```
+✓ Basic conversation flow test passed
 ```
 
 ## Test 2: Context Switching
@@ -661,9 +670,10 @@ class ChatbotTestSuite:
     def _print_report(self, results):
         total = len(results)
         passed = sum(1 for _, _, r in results if r.passed)
+        pct = (passed / total * 100) if total > 0 else 0
 
         print(f"\n{'='*70}")
-        print(f"Results: {passed}/{total} passed ({passed/total*100:.1f}%)")
+        print(f"Results: {passed}/{total} passed ({pct:.1f}%)")
         print(f"{'='*70}\n")
 
         for test_type, name, result in results:
@@ -674,9 +684,7 @@ class ChatbotTestSuite:
                 for step in result.steps:
                     for check_result in step.results:
                         if not check_result.passed:
-                            print(
-                                f"    → {check_result.message}"
-                            )
+                            print(f"    → {check_result.message}")
 
 
 # Usage
@@ -685,13 +693,29 @@ async def main():
     suite = ChatbotTestSuite(bot)
 
     # Add all scenarios and tests
-    # suite.add_scenario(...)
-    # suite.add_test(...)
+    bot2 = SimpleChatbot()
+    greeting_scenario = (
+        Scenario("quick_greeting")
+        .interact(inputs="Hello", outputs=lambda inputs: bot2.chat(inputs))
+    )
+    suite.add_scenario(greeting_scenario)
 
     await suite.run_all()
 
 
 asyncio.run(main())
+```
+
+```
+Running Chatbot Test Suite
+
+  Running scenario: quick_greeting
+
+======================================================================
+Results: 1/1 passed (100.0%)
+======================================================================
+
+✓ [Scenario] quick_greeting
 ```
 
 ## Best Practices
@@ -704,10 +728,11 @@ maintain reliable chatbot tests as the bot evolves.
 Don't just test individual responses—test complete conversation flows:
 
 ```python
+# Example: build a complete support flow scenario
 test_scenario = (
     Scenario("complete_support_flow")
     # Greeting -> Problem statement -> Information collection -> Resolution
-    ...
+    .interact(inputs="Hello", outputs=lambda inputs: SimpleChatbot().chat(inputs))
 )
 ```
 
@@ -723,6 +748,19 @@ FnCheck(fn=
     ),
     name="retains_user_info",
 )
+```
+
+```
+
+
+[1;35mFnCheck[0m[1m([0m
+    [33mname[0m=[32m'retains_user_info'[0m,
+    [33mdescription[0m=[3;35mNone[0m,
+    [33msuccess_message[0m=[3;35mNone[0m,
+    [33mfailure_message[0m=[3;35mNone[0m,
+    [33mdetails[0m=[1m{[0m[1m}[0m,
+    [33mkind[0m=[32m'fn'[0m
+[1m)[0m
 ```
 
 **3. Test Tone Consistency**
@@ -742,6 +780,32 @@ LLMJudge(
     Return 'passed: true' if tone is consistent.
     """,
 )
+```
+
+```
+
+
+[1;35mLLMJudge[0m[1m([0m
+    [33mgenerator[0m=[1;35mLiteLLMGenerator[0m[1m([0m
+        [33mparams[0m=[1;35mGenerationParams[0m[1m([0m
+            [33mtemperature[0m=[1;36m1[0m[1;36m.0[0m,
+            [33mmax_tokens[0m=[3;35mNone[0m,
+            [33mresponse_format[0m=[3;35mNone[0m,
+            [33mtools[0m=[1m[[0m[1m][0m,
+            [33mtimeout[0m=[3;35mNone[0m
+        [1m)[0m,
+        [33mretry_policy[0m=[1;35mRetryPolicy[0m[1m([0m[33mmax_attempts[0m=[1;36m3[0m, [33mbase_delay[0m=[1;36m1[0m[1;36m.0[0m, [33mmax_delay[0m=[3;35mNone[0m[1m)[0m,
+        [33mrate_limiter[0m=[3;35mNone[0m,
+        [33mmiddlewares[0m=[1m[[0m[1m][0m,
+        [33mmodel[0m=[32m'openai/gpt-5-mini'[0m,
+        [33mkind[0m=[32m'litellm'[0m
+    [1m)[0m,
+    [33mname[0m=[32m'consistent_tone'[0m,
+    [33mdescription[0m=[3;35mNone[0m,
+    [33mprompt[0m=[32m"\n    Evaluate tone consistency across responses.\n\n    [0m[32m{[0m[32m% for interaction in interactions %[0m[32m}[0m[32m\n    Response [0m[32m{[0m[32m{[0m[32m loop.index [0m[32m}[0m[32m}[0m[32m: [0m[32m{[0m[32m{[0m[32m interaction.outputs.message [0m[32m}[0m[32m}[0m[32m\n    [0m[32m{[0m[32m% endfor %[0m[32m}[0m[32m\n\n    Return 'passed: true' if tone is consistent.\n    "[0m,
+    [33mprompt_path[0m=[3;35mNone[0m,
+    [33mkind[0m=[32m'llm_judge'[0m
+[1m)[0m
 ```
 
 **4. Handle Edge Cases**

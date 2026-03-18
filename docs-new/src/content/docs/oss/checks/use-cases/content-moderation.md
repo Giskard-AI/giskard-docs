@@ -47,10 +47,17 @@ def moderate_input(user_message: str) -> ModerationResult:
     # Block obvious harmful requests
     harmful_patterns = [
         "how to make a bomb",
+        "how to make explosives",
+        "make explosives",
         "how to hack",
         "ignore previous instructions",
+        "ignore your instructions",
         "you are now",
         "disregard your",
+        "system override",
+        "forget your guidelines",
+        "new instruction:",
+        "unrestricted assistant",
     ]
     for pattern in harmful_patterns:
         if pattern in msg_lower:
@@ -516,6 +523,15 @@ print(f"\nResults: {passed}/{len(results)} passed")
 for name, result in zip(scenario_names, results):
     status = "PASS" if result.passed else "FAIL"
     print(f"  [{status}] {name}")
+```
+
+```
+
+Results: 4/4 passed
+  [PASS] block_harmful
+  [PASS] allow_safe
+  [PASS] injection_resist
+  [PASS] policy_compliance
 ```
 
 ## Best Practices

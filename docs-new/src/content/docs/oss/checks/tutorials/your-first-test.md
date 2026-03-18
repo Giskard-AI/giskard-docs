@@ -76,6 +76,10 @@ result = await scenario.run()
 print(result.passed)  # True
 ```
 
+```
+True
+```
+
 ### In a Python script
 
 Outside a notebook there is no running event loop, so you wrap the call with
@@ -109,6 +113,10 @@ result = asyncio.run(scenario.run())
 print(result.passed)  # True
 ```
 
+```
+True
+```
+
 ## Read the result
 
 `result` is a `ScenarioResult` with three useful attributes:
@@ -127,6 +135,10 @@ assertion succeeded or broke and why.
 for check_result in result.steps[0].results:
     status = "PASS" if check_result.passed else "FAIL"
     print(f"[{status}] {check_result.message}")
+```
+
+```
+[PASS] The actual value 'Hello, Alice!' is equal to the expected value 'Hello, Alice!'.
 ```
 
 Expected output:
@@ -162,6 +174,11 @@ print(result.passed)  # False
 print(
     result.steps[0].results[0].message
 )  # expected "Hi, Alice!" but got "Hello, Alice!"
+```
+
+```
+False
+Expected value equal to 'Hi, Alice!' but got 'Hello, Alice!'
 ```
 
 Failures are descriptive — the message tells you the expected vs. actual value.

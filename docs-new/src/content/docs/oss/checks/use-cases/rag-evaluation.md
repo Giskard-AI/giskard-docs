@@ -231,6 +231,13 @@ asyncio.run(test_basic_qa())
 
 ```
 
+```
+Test passed: True
+  pass
+  pass
+  pass
+```
+
 ## Test 2: Groundedness Check
 
 Building on Test 1, we now verify that the answer doesn't introduce facts absent
@@ -617,9 +624,10 @@ class RAGTestSuite:
                 .interact(inputs=question, outputs=lambda q: self.rag.answer(q))
                 .check(
                     FnCheck(fn=
-                        lambda trace: trace.last.outputs.answer,
+                        lambda trace: len(trace.last.outputs.answer) > 0,
                         name="provides_response",
                         success_message="System provided a response",
+                        failure_message="System did not provide a response",
                     )
                 )
             )
@@ -662,6 +670,24 @@ async def main():
 
 
 asyncio.run(main())
+```
+
+```
+
+Test Suite Results: 9/10 passed (90.0%)
+
+Detailed Results:
+  ✓ qa_Paris
+  ✓ qa_1889
+  ✗ qa_programming_language
+      - The answer does not contain the keyword 'programming language'
+  ✓ groundedness_What is the capital
+  ✓ groundedness_Tell me about the Ei
+  ✓ groundedness_What is machine lear
+  ✓ edge_case_empty_query
+  ✓ edge_case_whitespace_query
+  ✓ edge_case_out_of_scope
+  ✓ edge_case_gibberish
 ```
 
 ## Best Practices for RAG Testing

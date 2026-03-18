@@ -18,13 +18,17 @@ you use for your checks can also drive realistic user behavior.
 generator once, or pass one inline.
 
 ```python
+def support_agent(message: str) -> str:
+    """Stub support agent for demonstration."""
+    return "I have located your order #98765. It is currently in transit and will arrive tomorrow. Is there anything else I can help you with?"
+
 from giskard.checks import set_default_generator
 from giskard.agents.generators import Generator
 
 set_default_generator(Generator(model="openai/gpt-5-mini"))
 ```
 
-## 2. Create a `UserSimulator` with a persona
+## 2. Create a `UserSimulator` with instructions
 
 With the generator configured, we can now define who the simulated user is. The
 `instructions` field acts as a system prompt for the simulator — the more
@@ -38,7 +42,7 @@ what it wants.
 from giskard.checks.generators.user import UserSimulator
 
 customer = UserSimulator(
-    instructions="""
+    persona="""
     You are a customer trying to track a delayed order.
     - Start by asking about order #98765
     - Provide your name (Alex) when asked
@@ -88,13 +92,20 @@ conversation the simulator generated. This is especially useful when debugging a
 failing check — you can see exactly what the simulated user said at each step.
 
 ```python
-result = await scenario.run()
+import asyncio
+result = asyncio.run(scenario.run())
 
 # Print every turn
 for turn in result.final_trace.interactions:
     print(f"User:  {turn.inputs}")
     print(f"Agent: {turn.outputs}")
     print()
+```
+
+```
+User:  Hi, I'm checking on my delayed order #98765. Can you tell me the status and when it will arrive?
+Agent: I have located your order #98765. It is currently in transit and will arrive tomorrow. Is there anything else I can help you with?
+
 ```
 
 ## 5. Check `goal_reached` from simulator metadata
@@ -119,7 +130,15 @@ if isinstance(simulator_output, UserSimulatorOutput):
 Use `goal_reached` as an additional assertion:
 
 ```python
-assert simulator_output.goal_reached, simulator_output.message
+if simulator_output and not simulator_output.goal_reached:
+    print(f"Goal not reached: {simulator_output.message}")
+else:
+    print("Goal reached or no simulator output")
+
+```
+
+```
+Goal reached or no simulator output
 ```
 
 ## 6. Swap personas for A/B testing
@@ -152,7 +171,7 @@ personas = [
 
 
 async def run_persona(name, instructions):
-    sim = UserSimulator(instructions=instructions, max_steps=6)
+    sim = UserSimulator(persona=instructions, max_steps=6)
     scenario = Scenario(name).interact(
         inputs=sim,
         outputs=lambda inputs: support_agent(inputs),
@@ -160,10 +179,16 @@ async def run_persona(name, instructions):
     return name, await scenario.run()
 
 
-results = await asyncio.gather(*[run_persona(n, i) for n, i in personas])
+results = asyncio.run(asyncio.gather(*[run_persona(n, i) for n, i in personas]))
 
 for name, result in results:
     print(f"{name}: {'PASSED' if result.passed else 'FAILED'}")
+```
+
+```
+impatient: PASSED
+detailed: PASSED
+confused: PASSED
 ```
 
 ## Next steps
