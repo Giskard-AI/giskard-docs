@@ -1,0 +1,93 @@
+---
+interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+---
+
+<details class="type-table" open>
+  <summary class="type-table-header">
+    <code class="type-table-name">{name}</code>
+    <span class="type-table-label">fields</span>
+    <svg class="type-table-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </summary>
+  <div class="type-table-body">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .type-table {
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: 8px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+
+  .type-table-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    cursor: pointer;
+    background: var(--api-type-table-header-bg);
+    user-select: none;
+    list-style: none;
+  }
+
+  .type-table-header::-webkit-details-marker {
+    display: none;
+  }
+
+  .type-table-header::marker {
+    content: '';
+  }
+
+  .type-table-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--sl-color-text);
+    background: none;
+    padding: 0;
+  }
+
+  .type-table-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--sl-color-gray-3, #9ca3af);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    background: var(--api-type-table-label-bg);
+  }
+
+  .type-table-chevron {
+    margin-left: auto;
+    transition: transform 0.2s ease;
+    color: var(--sl-color-gray-3, #9ca3af);
+  }
+
+  .type-table[open] .type-table-chevron {
+    transform: rotate(180deg);
+  }
+
+  .type-table-body {
+    padding: 0 1rem 0.5rem;
+    border-top: 1px solid var(--sl-color-hairline);
+  }
+
+  /* Light mode */
+  :root:not([data-theme='dark']) {
+    --api-type-table-header-bg: #fafafa;
+    --api-type-table-label-bg: #f1f5f9;
+  }
+
+  /* Dark mode */
+  :root[data-theme='dark'] {
+    --api-type-table-header-bg: #0D3636;
+    --api-type-table-label-bg: rgba(64, 222, 223, 0.08);
+  }
+</style>
