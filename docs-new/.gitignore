@@ -19,3 +19,9 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# Generated from notebooks — do not commit
+src/content/docs/oss/checks/quickstart.md
+src/content/docs/oss/checks/how-to/*.md
+src/content/docs/oss/checks/tutorials/*.md
+src/content/docs/oss/checks/use-cases/*.md
