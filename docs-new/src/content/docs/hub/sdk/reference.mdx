@@ -408,8 +408,16 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
   <Property name="project_id" type="str | None">Project ID to filter by.</Property>
 </MethodCard>
 
-<MethodCard name=".delete() / .bulk_delete()" returnType="None">
-  Delete one or multiple datasets.
+<MethodCard name=".delete()" returnType="None">
+  Delete a dataset by its ID.
+
+  <Property name="dataset_id" type="str" required>Dataset ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple datasets at once.
+
+  <Property name="dataset_ids" type="list[str]" required>IDs of datasets to delete.</Property>
 </MethodCard>
 
 <MethodCard name=".list_tags()" returnType="list[str]">
@@ -519,8 +527,37 @@ from giskard_hub.types import Evaluation, Metric, CheckResult
   <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve() / .update() / .list() / .delete() / .bulk_delete()" returnType="varies">
-  Standard CRUD operations. `.retrieve()` and `.list()` accept an optional `include` parameter (`["agent", "dataset"]`) to embed related objects.
+<MethodCard name=".retrieve()" returnType="Evaluation">
+  Retrieve an evaluation by its ID, with optional related resource inclusion.
+
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+  <Property name="include" type='list[Literal["agent", "dataset"]] | None'>Embed the full agent and/or dataset objects instead of references.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Evaluation">
+  Update an evaluation's name.
+
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+  <Property name="name" type="str" required>New name for the evaluation.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Evaluation]">
+  List all evaluations for a project.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="include" type='list[Literal["agent", "dataset"]] | None'>Embed related objects.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete an evaluation by its ID.
+
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple evaluations at once.
+
+  <Property name="evaluation_ids" type="list[str]" required>IDs of evaluations to delete.</Property>
 </MethodCard>
 
 <TypeTable name="Evaluation">
@@ -767,8 +804,36 @@ from giskard_hub.types import KnowledgeBase, KnowledgeBaseDocumentRow, Knowledge
   <Property name="document_id" type="str" required>Document ID.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve() / .update() / .list() / .delete() / .bulk_delete()" returnType="varies">
-  Standard CRUD operations. `.update()` accepts `name` and `description`.
+<MethodCard name=".retrieve()" returnType="KnowledgeBase">
+  Retrieve a knowledge base by its ID, including its topics.
+
+  <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="KnowledgeBase">
+  Update a knowledge base's metadata.
+
+  <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
+  <Property name="name" type="str | None">Updated name.</Property>
+  <Property name="description" type="str | None">Updated description.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[KnowledgeBase]">
+  List all knowledge bases, optionally filtered by project.
+
+  <Property name="project_id" type="str | None">Project ID to filter by.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a knowledge base by its ID.
+
+  <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple knowledge bases at once.
+
+  <Property name="knowledge_base_ids" type="list[str]" required>IDs of knowledge bases to delete.</Property>
 </MethodCard>
 
 <TypeTable name="KnowledgeBase">
@@ -809,8 +874,26 @@ from giskard_hub.types import Project
   <Property name="failure_categories" type="Iterable[FailureCategoryParam] | None">Project-level failure classifications.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve() / .list() / .delete() / .bulk_delete()" returnType="varies">
-  Standard CRUD operations.
+<MethodCard name=".retrieve()" returnType="Project">
+  Retrieve a project by its ID.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Project]">
+  List all projects accessible to the current user.
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a project by its ID.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple projects at once.
+
+  <Property name="project_ids" type="list[str]" required>IDs of projects to delete.</Property>
 </MethodCard>
 
 <TypeTable name="Project">
@@ -846,8 +929,34 @@ from giskard_hub.types import Scenario, ScenarioPreview
   <Property name="rules" type="list[str]">Scenario rules.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve() / .update() / .list() / .delete()" returnType="varies">
-  Standard CRUD operations. All methods require `project_id`.
+<MethodCard name=".retrieve()" returnType="Scenario">
+  Retrieve a scenario by its ID within a project.
+
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Scenario">
+  Update an existing scenario's definition.
+
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="name" type="str | None">Updated name.</Property>
+  <Property name="description" type="str | None">Updated description.</Property>
+  <Property name="rules" type="list[str] | None">Updated rules.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Scenario]">
+  List all scenarios for a project.
+
+  <Property name="project_id" type="str" required>Project ID (positional).</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a scenario from a project.
+
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
 </MethodCard>
 
 </ResourceSection>
@@ -893,8 +1002,30 @@ from giskard_hub.types.scan import ScanProbeAttempt, ReviewStatus, Severity
   <Property name="scan_id" type="str" required>Scan ID.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve() / .list() / .delete() / .bulk_delete()" returnType="varies">
-  Standard CRUD operations. `.retrieve()` and `.list()` accept `include` (`["agent", "knowledge_base"]`).
+<MethodCard name=".retrieve()" returnType="Scan">
+  Retrieve a scan result by its ID, with optional related resource inclusion.
+
+  <Property name="scan_id" type="str" required>Scan ID.</Property>
+  <Property name="include" type='list[Literal["agent", "knowledge_base"]] | None'>Embed related objects.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Scan]">
+  List all scan results, optionally filtered by project.
+
+  <Property name="project_id" type="str | None">Project ID to filter by.</Property>
+  <Property name="include" type='list[Literal["agent", "knowledge_base"]] | None'>Embed related objects.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a scan result by its ID.
+
+  <Property name="scan_id" type="str" required>Scan ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple scan results at once.
+
+  <Property name="scan_ids" type="list[str]" required>IDs of scans to delete.</Property>
 </MethodCard>
 
 <TypeTable name="Scan">
@@ -964,8 +1095,43 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
   <Property name="include" type="list[str] | None">Embed related resources.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve() / .update() / .list() / .delete() / .bulk_delete()" returnType="varies">
-  Standard CRUD operations. `.retrieve()` and `.list()` accept `include` (`["agent", "dataset"]`).
+<MethodCard name=".retrieve()" returnType="ScheduledEvaluation">
+  Retrieve a scheduled evaluation by its ID.
+
+  <Property name="scheduled_evaluation_id" type="str" required>Scheduled evaluation ID.</Property>
+  <Property name="include" type='list[Literal["evaluations"]] | None'>Embed recent evaluation runs.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="ScheduledEvaluation">
+  Update a scheduled evaluation's configuration.
+
+  <Property name="scheduled_evaluation_id" type="str" required>Scheduled evaluation ID.</Property>
+  <Property name="name" type="str | None">Updated name.</Property>
+  <Property name="frequency" type="FrequencyOption | None">Updated frequency.</Property>
+  <Property name="time" type="str | None">Updated time (HH:MM, UTC).</Property>
+  <Property name="day_of_week" type="int | None">Updated day of week (1--7).</Property>
+  <Property name="day_of_month" type="int | None">Updated day of month (1--28).</Property>
+  <Property name="run_count" type="int | None">Updated run count.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[ScheduledEvaluation]">
+  List all scheduled evaluations for a project.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="include" type='list[Literal["evaluations"]] | None'>Embed recent runs.</Property>
+  <Property name="last_days" type="int | None">Filter to schedules active within the last N days.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a scheduled evaluation by its ID.
+
+  <Property name="scheduled_evaluation_id" type="str" required>Scheduled evaluation ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple scheduled evaluations at once.
+
+  <Property name="scheduled_evaluation_ids" type="list[str]" required>IDs to delete.</Property>
 </MethodCard>
 
 </ResourceSection>
@@ -993,8 +1159,39 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
   <Property name="hide_result" type="bool">Hide the linked evaluation result.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve() / .update() / .list() / .delete() / .bulk_delete()" returnType="varies">
-  Standard CRUD operations. `.update()` accepts `status`, `priority`, `description`, `assignee_ids`, `set_test_case_status`.
+<MethodCard name=".retrieve()" returnType="Task">
+  Retrieve a task by its ID.
+
+  <Property name="task_id" type="str" required>Task ID.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Task">
+  Update an existing task's metadata and assignees.
+
+  <Property name="task_id" type="str" required>Task ID.</Property>
+  <Property name="status" type="TaskStatus | None">Updated status: `"open"`, `"in_progress"`, or `"resolved"`.</Property>
+  <Property name="priority" type="TaskPriority | None">Updated priority: `"low"`, `"medium"`, or `"high"`.</Property>
+  <Property name="description" type="str | None">Updated description.</Property>
+  <Property name="assignee_ids" type="list[str] | None">Updated user IDs to assign.</Property>
+  <Property name="set_test_case_status" type="str | None">Also set the linked test case's status.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Task]">
+  List all tasks for a project, ordered by creation date descending.
+
+  <Property name="project_id" type="str | None">Project ID to filter by.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a task by its ID.
+
+  <Property name="task_id" type="str" required>Task ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple tasks at once.
+
+  <Property name="task_ids" type="list[str]" required>IDs of tasks to delete.</Property>
 </MethodCard>
 
 <TypeTable name="Task">
@@ -1039,8 +1236,28 @@ from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
   <Property name="tags" type="list[str]">Tags for filtering.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve() / .update() / .delete()" returnType="varies">
-  Standard CRUD operations. `.update()` accepts `messages`, `checks`, `demo_output`, `status`, `tags`, `dataset_id`.
+<MethodCard name=".retrieve()" returnType="TestCase">
+  Retrieve a test case by its ID.
+
+  <Property name="test_case_id" type="str" required>Test case ID.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="TestCase">
+  Update an existing test case's messages, checks, tags, or status.
+
+  <Property name="test_case_id" type="str" required>Test case ID.</Property>
+  <Property name="messages" type="Iterable[ChatMessageParam] | None">Updated conversation messages.</Property>
+  <Property name="checks" type="Iterable[CheckConfigParam] | None">Updated checks.</Property>
+  <Property name="demo_output" type="str | ChatMessageWithMetadataParam | None">Updated expected output.</Property>
+  <Property name="status" type='"active" | "draft" | None'>Updated status.</Property>
+  <Property name="tags" type="list[str] | None">Updated tags.</Property>
+  <Property name="dataset_id" type="str | None">Move the test case to a different dataset.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a test case by its ID.
+
+  <Property name="test_case_id" type="str" required>Test case ID.</Property>
 </MethodCard>
 
 <MethodCard name=".bulk_delete()" returnType="None">
@@ -1120,8 +1337,16 @@ from giskard_hub.types import PlaygroundChat
   <Property name="include" type='list[str] | None'>Embed related resources (`["agent"]`).</Property>
 </MethodCard>
 
-<MethodCard name=".delete() / .bulk_delete()" returnType="None">
-  Delete one or multiple playground chats.
+<MethodCard name=".delete()" returnType="None">
+  Delete a playground chat by its ID.
+
+  <Property name="chat_id" type="str" required>Chat ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple playground chats at once.
+
+  <Property name="chat_ids" type="list[str]" required>IDs of chats to delete.</Property>
 </MethodCard>
 
 </ResourceSection>
