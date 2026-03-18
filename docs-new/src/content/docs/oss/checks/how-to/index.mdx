@@ -1,0 +1,53 @@
+---
+title: Overview
+sidebar:
+  order: 1
+  label: Overview
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+Task-oriented guides for writing tests with Giskard Checks. These guides assume you're familiar with scenarios and checks. Each guide focuses on getting a specific job done.
+
+<CardGrid>
+  <LinkCard
+    title="Run Tests with pytest"
+    description="Configure pytest-asyncio and write async test functions for Giskard Checks scenarios"
+    href="/oss/checks/how-to/run-in-pytest/"
+  />
+  <LinkCard
+    title="Simulate Users"
+    description="Use UserSimulator to drive multi-turn tests with LLM-generated user inputs and personas"
+    href="/oss/checks/how-to/simulate-users/"
+  />
+  <LinkCard
+    title="Debug with Spy"
+    description="Inspect function calls during scenario execution using WithSpy to diagnose unexpected behavior"
+    href="/oss/checks/how-to/spy-on-calls/"
+  />
+  <LinkCard
+    title="Testing Structured Outputs"
+    description="Validate Pydantic models, JSON objects, and nested fields using Equals, FnCheck, and JSONPath extraction"
+    href="/oss/checks/how-to/structured-output/"
+  />
+  <LinkCard
+    title="Batch Evaluation"
+    description="Run the same scenario pattern across many inputs and aggregate pass/fail results"
+    href="/oss/checks/how-to/batch-evaluation/"
+  />
+  <LinkCard
+    title="Stateful Checks"
+    description="Track uniqueness, counts, and cross-scenario consistency with checks that accumulate state across runs"
+    href="/oss/checks/how-to/stateful-checks/"
+  />
+  <LinkCard
+    title="Custom Checks"
+    description="Build domain-specific validation logic using FnCheck, Check subclasses, metrics, and LLM-based checks"
+    href="/oss/checks/how-to/custom-checks/"
+  />
+  <LinkCard
+    title="CI/CD Integration"
+    description="Run Giskard Checks in GitHub Actions with environment variable setup and pytest invocation"
+    href="/oss/checks/how-to/ci-cd/"
+  />
+</CardGrid>

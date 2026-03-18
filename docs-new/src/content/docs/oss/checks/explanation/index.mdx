@@ -1,0 +1,33 @@
+---
+title: Overview
+sidebar:
+  order: 1
+  label: Overview
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+Understanding-oriented articles that explain the _why_ behind Giskard Checks design decisions.
+
+<CardGrid>
+  <LinkCard
+    title="Core Concepts"
+    description="The key primitives — Interaction, Trace, Check, Scenario — and how they fit together at runtime"
+    href="/oss/checks/explanation/core-concepts/"
+  />
+  <LinkCard
+    title="When to Use Which Check"
+    description="Rule-based vs. semantic similarity vs. LLM-as-judge: tradeoffs, cost, latency, and reliability"
+    href="/oss/checks/explanation/when-to-use-which-check/"
+  />
+  <LinkCard
+    title="Async Design & pytest"
+    description="Why checks are async-first, how to use them in scripts, pytest, and notebooks"
+    href="/oss/checks/explanation/async-and-pytest/"
+  />
+  <LinkCard
+    title="JSONPath in Checks"
+    description="The trace.last.outputs syntax, the trace. prefix requirement, and NoMatch behavior"
+    href="/oss/checks/explanation/jsonpath-in-checks/"
+  />
+</CardGrid>

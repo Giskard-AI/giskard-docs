@@ -4,7 +4,7 @@ sidebar:
   order: 2
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
 Base classes and fundamental types for building checks and scenarios.
 
@@ -23,7 +23,7 @@ The `Check` class provides the foundation for all validation logic in Giskard. C
 ### Attributes
 
 | Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
+| --- | --- | --- | --- |
 | `name` | `str \| None` | `None` | Optional check name for reporting |
 | `description` | `str \| None` | `None` | Human-readable description of what the check validates |
 
@@ -34,19 +34,20 @@ The `Check` class provides the foundation for all validation logic in Giskard. C
 Execute the check logic against the provided trace.
 
 **Parameters:**
+
 - `trace` (`Trace`): The trace containing interaction history. Access the current interaction via `trace.last` or `trace.interactions[-1]`
 
 **Returns:**
+
 - `CheckResult`: Success, failure, error, or skip result
 
-:::note
-The `run` method may be async. Use `await check.run(trace)` when calling asynchronously.
-:::
+:::note The `run` method may be async. Use `await check.run(trace)` when calling asynchronously. :::
 
 ### Creating Custom Checks
 
 ```python
 from giskard.checks import Check, CheckResult, Trace
+
 
 @Check.register("my_custom_check")
 class MyCustomCheck(Check):
@@ -59,12 +60,12 @@ class MyCustomCheck(Check):
         if score >= self.threshold:
             return CheckResult.success(
                 message=f"Score {score} meets threshold",
-                metrics={"score": score}
+                details={"score": score},
             )
         else:
             return CheckResult.failure(
                 message=f"Score {score} below threshold {self.threshold}",
-                metrics={"score": score}
+                details={"score": score},
             )
 
     def _calculate_score(self, trace: Trace) -> float:
@@ -72,9 +73,7 @@ class MyCustomCheck(Check):
         return 0.85
 ```
 
-:::tip[Best Practice]
-Use the `@Check.register()` decorator to make your check discoverable and enable polymorphic serialization. This allows your checks to be saved, loaded, and shared across your testing suite.
-:::
+:::tip[Best Practice] Use the `@Check.register()` decorator to make your check discoverable and enable polymorphic serialization. This allows your checks to be saved, loaded, and shared across your testing suite. :::
 
 ---
 
@@ -91,7 +90,7 @@ Immutable result produced by running a check.
 ### Attributes
 
 | Attribute | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `status` | `CheckStatus` | Outcome status (PASS, FAIL, ERROR, SKIP) |
 | `message` | `str \| None` | Optional short message to surface to users |
 | `metrics` | `list[Metric]` | List of auxiliary metrics captured by the check |
@@ -106,37 +105,35 @@ from giskard.checks import CheckResult
 
 # Success - check passed
 result = CheckResult.success(
-    message="All validations passed",
-    details={"score": 0.95, "threshold": 0.8}
+    message="All validations passed", details={"score": 0.95, "threshold": 0.8}
 )
 
 # Failure - check did not pass
 result = CheckResult.failure(
     message="Score below threshold",
-    details={"score": 0.65, "threshold": 0.8, "reason": "low confidence"}
+    details={"score": 0.65, "threshold": 0.8, "reason": "low confidence"},
 )
 
 # Error - unexpected exception or condition
 result = CheckResult.error(
-    message="Failed to connect to API",
-    details={"error": "Connection timeout"}
+    message="Failed to connect to API", details={"error": "Connection timeout"}
 )
 
 # Skip - precondition not met
 result = CheckResult.skip(
     message="Skipped: No outputs available",
-    details={"reason": "empty_response"}
+    details={"reason": "empty_response"},
 )
 ```
 
 ### Instance Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `passed` | `bool` | True if status is PASS |
-| `failed` | `bool` | True if status is FAIL |
+| Property  | Type   | Description             |
+| --------- | ------ | ----------------------- |
+| `passed`  | `bool` | True if status is PASS  |
+| `failed`  | `bool` | True if status is FAIL  |
 | `errored` | `bool` | True if status is ERROR |
-| `skipped` | `bool` | True if status is SKIP |
+| `skipped` | `bool` | True if status is SKIP  |
 
 ```python
 result = CheckResult.success(message="Check passed")
@@ -154,12 +151,12 @@ Enumeration of possible check execution outcomes.
 
 ### Values
 
-| Status | Description |
-|--------|-------------|
-| `PASS` | Check validation succeeded |
-| `FAIL` | Check validation failed |
-| `ERROR` | Unexpected error during check execution |
-| `SKIP` | Check was skipped (e.g., precondition not met) |
+| Status  | Description                                    |
+| ------- | ---------------------------------------------- |
+| `PASS`  | Check validation succeeded                     |
+| `FAIL`  | Check validation failed                        |
+| `ERROR` | Unexpected error during check execution        |
+| `SKIP`  | Check was skipped (e.g., precondition not met) |
 
 ```python
 from giskard.checks import CheckStatus
@@ -186,7 +183,7 @@ An interaction represents one exchange in a conversation or workflow, capturing 
 ### Attributes
 
 | Attribute | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `inputs` | `InputType` | Input values for this interaction (e.g., user message, API request) |
 | `outputs` | `OutputType` | Output values produced in response (e.g., assistant reply, API response) |
 | `metadata` | `dict[str, Any]` | Optional metadata (timing, tool calls, intermediate states, etc.) |
@@ -200,20 +197,18 @@ from giskard.checks import Interaction
 interaction = Interaction(
     inputs="What is the capital of France?",
     outputs="The capital of France is Paris.",
-    metadata={"model": "gpt-4", "tokens": 15}
+    metadata={"model": "gpt-5", "tokens": 15},
 )
 
 # Structured interaction
 interaction = Interaction(
     inputs={"query": "weather", "location": "Paris"},
     outputs={"temperature": 20, "conditions": "sunny"},
-    metadata={"api": "weather_service", "latency_ms": 120}
+    metadata={"api": "weather_service", "latency_ms": 120},
 )
 ```
 
-:::note
-Interactions are typically created through the scenario builder's `.interact()` method rather than directly instantiated.
-:::
+:::note Interactions are typically created through the scenario builder's `.interact()` method rather than directly instantiated. :::
 
 ---
 
@@ -232,7 +227,7 @@ The trace is immutable (frozen), ensuring that checks and specs cannot accidenta
 ### Attributes
 
 | Attribute | Type | Description |
-|-----------|------|-------------|
+| --- | --- | --- |
 | `interactions` | `list[Interaction]` | Ordered list of all interactions. Most recent at `[-1]` |
 | `last` | `Interaction \| None` | Computed property returning the last interaction, or None if empty |
 
@@ -248,6 +243,7 @@ test_scenario = (
     .interact(inputs="How are you?", outputs="I'm well!")
 )
 
+
 # Access trace in checks
 @Check.register("trace_check")
 class TraceCheck(Check):
@@ -261,14 +257,10 @@ class TraceCheck(Check):
         # Count interactions
         count = len(trace.interactions)
 
-        return CheckResult.success(
-            message=f"Processed {count} interactions"
-        )
+        return CheckResult.success(message=f"Processed {count} interactions")
 ```
 
-:::tip[Accessing Trace in Templates]
-The `trace.last` property is available in Jinja2 prompt templates and JSONPath expressions, making it easy to reference the most recent interaction.
-:::
+:::tip[Accessing Trace in Templates] The `trace.last` property is available in Jinja2 prompt templates and JSONPath expressions, making it easy to reference the most recent interaction. :::
 
 ---
 
@@ -288,36 +280,25 @@ Declarative specification for generating interactions.
 from giskard.checks import Scenario
 
 # Static values
-test_case = (
-    Scenario("static_example")
-    .interact(
-        inputs="test input",
-        outputs="test output"
-    )
+test_case = Scenario("static_example").interact(
+    inputs="test input", outputs="test output"
 )
 
 # Callable outputs - dynamic generation
-test_case = (
-    Scenario("dynamic_example")
-    .interact(
-        inputs="test query",
-        outputs=lambda inputs: my_model(inputs)
-    )
+test_case = Scenario("dynamic_example").interact(
+    inputs="test query", outputs=lambda inputs: my_model(inputs)
 )
 
 # Access trace context
-test_case = (
-    Scenario("context_example")
-    .interact(
-        inputs=lambda trace: f"Previous: {trace.last.outputs if trace.last else 'None'}",
-        outputs=lambda inputs: generate_response(inputs)
-    )
+test_case = Scenario("context_example").interact(
+    inputs=lambda trace: (
+        f"Previous: {trace.last.outputs if trace.last else 'None'}"
+    ),
+    outputs=lambda inputs: generate_response(inputs),
 )
 ```
 
-:::tip[Dynamic Interactions]
-Use callables for `inputs` and `outputs` when you need to generate values based on the current trace context or previous interactions.
-:::
+:::tip[Dynamic Interactions] Use callables for `inputs` and `outputs` when you need to generate values based on the current trace context or previous interactions. :::
 
 ---
 
@@ -334,7 +315,7 @@ A `Scenario` represents a multi-step test workflow combining interactions and ch
 ### Building Scenarios
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 # Create a multi-step scenario
 test_scenario = (
@@ -342,17 +323,25 @@ test_scenario = (
     # First interaction
     .interact(inputs="Hello", outputs="Hi there!")
     # Check after first interaction
-    .check(from_fn(lambda trace: "Hi" in trace.last.outputs, name="greeting_check"))
+    .check(
+        FnCheck(
+            fn=lambda trace: "Hi" in trace.last.outputs, name="greeting_check"
+        )
+    )
     # Second interaction
     .interact(inputs="What's the weather?", outputs="It's sunny!")
     # Final validation
-    .check(from_fn(lambda trace: len(trace.interactions) == 2, name="count_check"))
+    .check(
+        FnCheck(
+            fn=lambda trace: len(trace.interactions) == 2, name="count_check"
+        )
+    )
 )
 
 # Run the scenario
 result = await test_scenario.run()
 print(f"Status: {result.status}")
-print(f"Interactions: {len(result.trace.interactions)}")
+print(f"Interactions: {len(result.final_trace.interactions)}")
 ```
 
 ### Methods
@@ -362,6 +351,7 @@ print(f"Interactions: {len(result.trace.interactions)}")
 Add an interaction spec to the scenario.
 
 **Parameters:**
+
 - `inputs`: Static value or callable `(trace) -> value`
 - `outputs`: Static value or callable `(inputs) -> value` or `(trace, inputs) -> value`
 - `metadata`: Optional metadata dict
@@ -373,6 +363,7 @@ Add an interaction spec to the scenario.
 Add a check to the scenario.
 
 **Parameters:**
+
 - `check`: A Check instance to validate the trace at this point
 
 **Returns:** The scenario (for chaining)
@@ -395,21 +386,19 @@ Container for running multiple test scenarios.
 
 A `TestCase` groups multiple scenarios for batch execution. Each scenario runs independently with its own trace.
 
-:::note[Internal Implementation]
-`TestCase` is an internal implementation detail. Users should always use the `Scenario()` class to create scenarios. The TestCase provides the execution engine that runs scenarios.
-:::
+:::note[Internal Implementation] `TestCase` is an internal implementation detail. Users should always use the `Scenario()` class to create scenarios. The TestCase provides the execution engine that runs scenarios. :::
 
 ### Using Scenarios (Recommended)
 
 ```python
-from giskard.checks import Scenario, from_fn
+from giskard.checks import Scenario, FnCheck
 
 # Create individual scenarios (recommended approach)
 test_scenario = (
     Scenario("my_test")
     .interact(inputs="test", outputs="result")
-    .check(from_fn(lambda trace: True, name="check1"))
-    .check(from_fn(lambda trace: True, name="check2"))
+    .check(FnCheck(fn=lambda trace: True, name="check1"))
+    .check(FnCheck(fn=lambda trace: True, name="check2"))
 )
 
 # Run the scenario
@@ -430,6 +419,7 @@ Base class for extracting values from traces.
 
 ```python
 from giskard.checks.core.extraction import Extractor
+
 
 class CustomExtractor(Extractor):
     def extract(self, trace: Trace) -> Any:
@@ -458,13 +448,13 @@ model_name = resolve(trace, "trace.interactions[0].metadata.model")
 
 **Common JSONPath Patterns:**
 
-| Pattern | Description |
-|---------|-------------|
-| `trace.last.inputs` | Last interaction inputs |
-| `trace.last.outputs` | Last interaction outputs |
-| `trace.last.metadata.key` | Metadata from last interaction |
-| `trace.interactions[0]` | First interaction |
-| `trace.interactions[-1]` | Last interaction (same as trace.last) |
+| Pattern                   | Description                           |
+| ------------------------- | ------------------------------------- |
+| `trace.last.inputs`       | Last interaction inputs               |
+| `trace.last.outputs`      | Last interaction outputs              |
+| `trace.last.metadata.key` | Metadata from last interaction        |
+| `trace.interactions[0]`   | First interaction                     |
+| `trace.interactions[-1]`  | Last interaction (same as trace.last) |
 
 ---
 
@@ -483,7 +473,7 @@ from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
 # Configure default generator
-set_default_generator(Generator(model="openai/gpt-4"))
+set_default_generator(Generator(model="openai/gpt-5"))
 
 # Now LLM checks will use this generator by default
 from giskard.checks import Groundedness
@@ -492,6 +482,7 @@ check = Groundedness()  # Uses the default generator
 ```
 
 **Parameters:**
+
 - `generator` (`Generator`): The generator instance to use as default
 
 ### get_default_generator
@@ -506,6 +497,7 @@ print(f"Using generator: {generator.model}")
 ```
 
 **Returns:**
+
 - `Generator`: The current default generator instance
 
 ---
@@ -520,14 +512,12 @@ Low-level runner for executing scenarios.
 
 `ScenarioRunner` provides the execution engine for running scenarios. Most users should use the higher-level `Scenario(...).run()` API rather than using ScenarioRunner directly.
 
-:::note
-This is a low-level API. Prefer using `Scenario(...).run()` for most use cases.
-:::
+:::note This is a low-level API. Prefer using `Scenario(...).run()` for most use cases. :::
 
 ---
 
 ## See Also
 
-- [Built-in Checks](/oss/checks/reference/builtin-checks/) - Ready-to-use validation checks
+- [Built-in Checks](/oss/checks/reference/checks/) - Ready-to-use validation checks
 - [Scenarios](/oss/checks/reference/scenarios/) - Multi-step workflow testing
 - [Testing Utilities](/oss/checks/reference/utils/) - Testing utilities and helpers

@@ -3,11 +3,14 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node scripts/convert-notebooks.mjs && astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "npm run format && node scripts/convert-notebooks.mjs && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "prettier --write 'src/**/*.{md,mdx}' && node scripts/format-code-blocks.mjs",
+    "format:prose": "prettier --write 'src/**/*.{md,mdx}'",
+    "format:code": "node scripts/format-code-blocks.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
@@ -22,6 +25,7 @@
     "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
+    "prettier": "^3.8.1",
     "wrangler": "^4.64.0"
   }
 }
