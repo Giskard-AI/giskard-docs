@@ -172,7 +172,7 @@ tc = (
     .check(
         FnCheck(fn=
             lambda trace: (
-                resolve(trace, "trace.last.outputs.address.city") == "London"
+                trace.last.outputs.address.city == "London"
             ),
             name="correct_city",
         )
