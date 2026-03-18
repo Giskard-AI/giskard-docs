@@ -145,7 +145,7 @@ test_cases = [
 dataset = hub.datasets.upload(
     project_id="project-id",
     name="Imported Suite",
-    file=test_cases,
+    data=test_cases,
 )
 
 print(dataset.id)
@@ -159,7 +159,7 @@ from pathlib import Path
 dataset = hub.datasets.upload(
     project_id="project-id",
     name="Imported Suite",
-    file=Path("import_data.jsonl"),
+    data="import_data.jsonl",
 )
 ```
 
