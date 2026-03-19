@@ -1,5 +1,6 @@
 ---
 title: JSONPath in checks
+description: "How JSONPath expressions work in check parameters — the trace. prefix, trace.last shorthand, and common extraction patterns."
 sidebar:
   order: 4
 ---

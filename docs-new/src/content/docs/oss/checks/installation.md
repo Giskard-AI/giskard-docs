@@ -1,5 +1,6 @@
 ---
 title: Install & Configure
+description: "Install Giskard Checks via pip, configure your LLM provider, and set up environment variables for LLM-based checks."
 sidebar:
   order: 2
 ---
@@ -53,4 +54,4 @@ We use the `giskard-agents` library to handle LLM generations.
 
 ## Next Steps
 
-For a step-by-step lesson with no API key, try [Your First Test](/oss/checks/tutorials/your-first-test/) first. Or head to the [Quickstart](/oss/checks/quickstart/) for a single example.
+For a step-by-step lesson with no API key, try [Your First Test](/oss/checks/tutorials/your-first-test) first. Or head to the [Quickstart](/oss/checks/quickstart) for a single example.
