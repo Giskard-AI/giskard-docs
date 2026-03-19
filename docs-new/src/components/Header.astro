@@ -13,7 +13,7 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
         <a href="https://docs.giskard.ai/" class="nav-link">Overview</a>
         <a href="https://docs.giskard.ai/hub/ui" class="nav-link">Hub UI</a>
         <a href="/hub/sdk" class="nav-link" aria-current={Astro.url.pathname.startsWith('/hub/sdk') ? 'page' : undefined}>Hub SDK</a>
-        <a href="/oss/" class="nav-link" aria-current={Astro.url.pathname.startsWith('/oss') ? 'page' : undefined}>Open Source</a>
+        <a href="/oss" class="nav-link" aria-current={Astro.url.pathname.startsWith('/oss') ? 'page' : undefined}>Open Source</a>
     </div>
 	<div class="search-container sl-flex">
 		<Search {...Astro.props} />

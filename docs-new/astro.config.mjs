@@ -11,6 +11,7 @@ import cloudflare from '@astrojs/cloudflare';
 // https://astro.build/config
 export default defineConfig({
     site: 'https://docs.giskard.ai',
+    trailingSlash: 'never',
 
     integrations: [
         starlight({
@@ -51,7 +52,9 @@ export default defineConfig({
                 // Configure expressive code if needed, defaults are usually good
                 themes: ['dracula', 'github-light'],
             },
+            lastUpdated: true,
             components: {
+                Head: './src/components/Head.astro',
                 Header: './src/components/Header.astro',
                 Pagination: './src/components/Pagination.astro',
                 MarkdownContent: './src/components/MarkdownContent.astro',
