@@ -16,13 +16,23 @@ Multi-step workflow testing with scenario builders and runners.
 
 **Module:** `giskard.checks.core.scenario`
 
-The recommended entry point for creating test scenarios. Provides a fluent API for building multi-step test workflows.
+The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Call `.run()` to execute against the SUT. You can also use `Scenario.from_sequence(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
 
 <MethodCard name="Scenario()" returnType="Scenario">
   Create a new scenario.
 
   <Property name="name" type="str | None" defaultValue="None">Scenario name for identification.</Property>
   <Property name="trace_type" type="type[TraceType] | None" defaultValue="None">Optional custom trace type for advanced use cases.</Property>
+</MethodCard>
+
+<MethodCard name="from_sequence()" returnType="Scenario">
+  Class method: build a scenario from a flat sequence of `InteractionSpec` and/or `Check` objects in execution order (alternative to chaining `.interact()` / `.check()`).
+
+  <Property name="*components" type="InteractionSpec | Check" required>Steps to run in order.</Property>
+  <Property name="name" type="str" defaultValue="'Unnamed Scenario'">Scenario name.</Property>
+  <Property name="trace_type" type="type[TraceType] | None" defaultValue="None">Optional custom trace type.</Property>
+  <Property name="annotations" type="dict | None" defaultValue="None">Optional annotations dict.</Property>
+  <Property name="target" type="Callable | None" defaultValue="(default SUT)">Optional SUT for this scenario; if omitted, the process default target is used.</Property>
 </MethodCard>
 
 <MethodCard name=".interact()" returnType="self">
@@ -45,12 +55,14 @@ The recommended entry point for creating test scenarios. Provides a fluent API f
   <Property name="interaction" type="Interaction | InteractionSpec" required>The interaction or spec to add.</Property>
 </MethodCard>
 
-<MethodCard name=".build()" returnType="Scenario">
-  Build and return the Scenario instance.
+<MethodCard name=".extend()" returnType="self">
+  Append one or more interaction specs and/or checks. Returns self for chaining.
+
+  <Property name="*components" type="InteractionSpec | Check" required>Components to append in order.</Property>
 </MethodCard>
 
 <MethodCard name=".run()" returnType="ScenarioResult">
-  Build and immediately execute the scenario.
+  Execute the scenario against the SUT and return results.
 
   <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
 </MethodCard>
