@@ -4,6 +4,10 @@ sidebar:
   order: 2
 ---
 
+:::caution
+⚠️ Note: Giskard v3 is currently in Pre-release (Beta). We are actively refining the APIs and welcome early adopters to provide feedback and report issues as we move toward a stable 3.0.0 release.
+:::
+
 ## Install the Python package
 
 Giskard Checks requires **Python 3.12 or higher**. Install using pip:

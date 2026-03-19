@@ -6,7 +6,11 @@ title: Giskard Library
 
 The library is available on [GitHub](https://github.com/Giskard-AI/giskard) and formed the basis for the [Red Teaming LLM Applications](https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/) course on DeepLearning.AI.
 
-The third version of the library is available as a pre-release (alpha). This version is a major rewrite and includes new features such as [Checks](/oss/checks/).
+:::caution
+⚠️ Note: Giskard v3 is currently in Pre-release (Beta). We are actively refining the APIs and welcome early adopters to provide feedback and report issues as we move toward a stable 3.0.0 release.
+:::
+
+The third version of the library is available as a pre-release (Beta). This version is a major rewrite and includes new features such as [Checks](/oss/checks/).
 
 ## Need Help?
 
