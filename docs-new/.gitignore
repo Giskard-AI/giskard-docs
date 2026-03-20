@@ -24,5 +24,8 @@ pnpm-debug.log*
 src/content/docs/oss/checks/quickstart.mdx
 src/content/docs/oss/checks/quickstart.mdx
 src/content/docs/oss/checks/how-to/*.mdx
+!src/content/docs/oss/checks/how-to/index.mdx
 src/content/docs/oss/checks/tutorials/*.mdx
+!src/content/docs/oss/checks/tutorials/index.mdx
 src/content/docs/oss/checks/use-cases/*.mdx
+!src/content/docs/oss/checks/use-cases/index.mdx
