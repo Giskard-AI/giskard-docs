@@ -4,7 +4,8 @@
  * Converts every *.ipynb under src/content/docs/ to a co-located .mdx file,
  * injecting a Colab badge after the frontmatter. Rich display outputs (e.g.
  * Giskard HTML reports) are rendered like the hand-written docs: Starlight
- * Card + <pre set:html={...}> so colors match the notebook.
+ * Card + <pre class="notebook-output-rich" set:html={...}>; base text uses
+ * --sl-color-text and custom.css remaps Jupyter hex colors in dark theme.
  *
  * Algorithm per notebook:
  *  1. JSON.parse the .ipynb file
@@ -48,6 +49,7 @@ const PRE_STYLE_PROPS = `  style={{
     overflowX: "auto",
     lineHeight: "normal",
     fontFamily: "Menlo, DejaVu Sans Mono, consolas, Courier New, monospace",
+    color: "var(--sl-color-text)",
   }}`;
 
 const CARD_IMPORT = 'import { Card } from "@astrojs/starlight/components";';
@@ -112,6 +114,7 @@ function isSafeMdxCardLiteral(text) {
 
 function preSetHtml(innerHtml) {
   return `<pre
+  class="notebook-output-rich"
 ${PRE_STYLE_PROPS}
   set:html={${JSON.stringify(innerHtml)}}
 />`;
