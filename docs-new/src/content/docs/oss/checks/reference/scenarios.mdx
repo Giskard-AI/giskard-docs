@@ -4,9 +4,9 @@ sidebar:
   order: 4
 ---
 
-import Property from '../../../../../components/api/Property.astro';
-import MethodCard from '../../../../../components/api/MethodCard.astro';
-import TypeTable from '../../../../../components/api/TypeTable.astro';
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
 
 Multi-step workflow testing with scenario builders and runners.
 
@@ -78,7 +78,12 @@ result = await (
         inputs="I need help with my account",
         outputs="I'd be happy to help! What's your account number?",
     )
-    .check(FnCheck(fn=lambda trace: "help" in trace.last.outputs.lower(), name="helpful"))
+    .check(
+        FnCheck(
+            fn=lambda trace: "help" in trace.last.outputs.lower(),
+            name="helpful",
+        )
+    )
     .interact(inputs="12345", outputs="Thank you! I've found your account.")
     .check(Equals(expected_value=True, key="trace.last.metadata.account_found"))
     .run()
@@ -94,9 +99,9 @@ def generate_response(inputs):
         return "It's sunny today!"
     return "I don't understand."
 
-scenario = (
-    Scenario("dynamic_test")
-    .interact(inputs="What's the weather?", outputs=generate_response)
+
+scenario = Scenario("dynamic_test").interact(
+    inputs="What's the weather?", outputs=generate_response
 )
 ```
 
@@ -122,11 +127,21 @@ scenario = (
 Result of scenario execution with trace and check results.
 
 <TypeTable name="ScenarioResult">
-  <Property name="status" type="ScenarioStatus">Overall status (PASS/FAIL/ERROR/SKIP).</Property>
-  <Property name="steps" type="list[TestCaseResult]">Results for each step (interact + check).</Property>
-  <Property name="final_trace" type="Trace">Complete trace of all interactions.</Property>
-  <Property name="passed" type="bool">True when all steps passed.</Property>
-  <Property name="duration_ms" type="int">Total execution time in milliseconds.</Property>
+  <Property name="status" type="ScenarioStatus">
+    Overall status (PASS/FAIL/ERROR/SKIP).
+  </Property>
+  <Property name="steps" type="list[TestCaseResult]">
+    Results for each step (interact + check).
+  </Property>
+  <Property name="final_trace" type="Trace">
+    Complete trace of all interactions.
+  </Property>
+  <Property name="passed" type="bool">
+    True when all steps passed.
+  </Property>
+  <Property name="duration_ms" type="int">
+    Total execution time in milliseconds.
+  </Property>
 </TypeTable>
 
 ```python
@@ -137,7 +152,9 @@ if result.passed:
 
 print(f"Total interactions: {len(result.final_trace.interactions)}")
 
-for i, check_result in enumerate(r for step in result.steps for r in step.results):
+for i, check_result in enumerate(
+    r for step in result.steps for r in step.results
+):
     print(f"Check {i}: {check_result.status}")
 ```
 
@@ -150,8 +167,12 @@ for i, check_result in enumerate(r for step in result.steps for r in step.result
 Group multiple scenarios and run them together.
 
 <MethodCard name="Suite()" returnType="Suite">
-  <Property name="name" type="str" required>Suite identifier.</Property>
-  <Property name="target" type="Callable">Optional suite-level target SUT.</Property>
+  <Property name="name" type="str" required>
+    Suite identifier.
+  </Property>
+  <Property name="target" type="Callable">
+    Optional suite-level target SUT.
+  </Property>
 </MethodCard>
 
 <MethodCard name=".append()" returnType="None">
@@ -186,11 +207,21 @@ print(result.pass_rate)
 Aggregate result from suite execution.
 
 <TypeTable name="SuiteResult">
-  <Property name="results" type="list[ScenarioResult]">Scenario results in order.</Property>
-  <Property name="pass_rate" type="float">Fraction of non-skipped scenarios that passed.</Property>
-  <Property name="duration_ms" type="int">Total execution time in milliseconds.</Property>
-  <Property name="passed_count" type="int">Number of passed scenarios.</Property>
-  <Property name="failed_count" type="int">Number of failed scenarios.</Property>
+  <Property name="results" type="list[ScenarioResult]">
+    Scenario results in order.
+  </Property>
+  <Property name="pass_rate" type="float">
+    Fraction of non-skipped scenarios that passed.
+  </Property>
+  <Property name="duration_ms" type="int">
+    Total execution time in milliseconds.
+  </Property>
+  <Property name="passed_count" type="int">
+    Number of passed scenarios.
+  </Property>
+  <Property name="failed_count" type="int">
+    Number of failed scenarios.
+  </Property>
 </TypeTable>
 
 ---
@@ -202,8 +233,12 @@ Aggregate result from suite execution.
 Low-level runner for executing scenarios. Most users should use `Scenario(...).run()` instead.
 
 <MethodCard name=".run()" returnType="ScenarioResult">
-  <Property name="scenario" type="Scenario" required>The scenario to execute.</Property>
-  <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
+  <Property name="scenario" type="Scenario" required>
+    The scenario to execute.
+  </Property>
+  <Property name="return_exception" type="bool" defaultValue="False">
+    Return results on exceptions.
+  </Property>
 </MethodCard>
 
 <MethodCard name="get_runner()" returnType="ScenarioRunner">

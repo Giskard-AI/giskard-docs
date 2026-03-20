@@ -4,10 +4,10 @@ sidebar:
   order: 6
 ---
 
-import Property from '../../../../../components/api/Property.astro';
-import MethodCard from '../../../../../components/api/MethodCard.astro';
-import ResourceSection from '../../../../../components/api/ResourceSection.astro';
-import TypeTable from '../../../../../components/api/TypeTable.astro';
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import ResourceSection from "../../../../../components/api/ResourceSection.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
 
 Input generators for creating dynamic test data and simulating user interactions.
 
@@ -19,9 +19,15 @@ Input generators for creating dynamic test data and simulating user interactions
 
 **Module:** `giskard.checks.generators.user`
 
-<Property name="instructions" type="str" required>Instructions defining the user's behavior and goals.</Property>
-<Property name="max_steps" type="int" defaultValue="10">Maximum number of interaction steps to generate.</Property>
-<Property name="generator" type="BaseGenerator | None" defaultValue="None">LLM generator for simulating user behavior.</Property>
+<Property name="instructions" type="str" required>
+  Instructions defining the user's behavior and goals.
+</Property>
+<Property name="max_steps" type="int" defaultValue="10">
+  Maximum number of interaction steps to generate.
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  LLM generator for simulating user behavior.
+</Property>
 
 ```python
 from giskard.checks.generators.user import UserSimulator
@@ -50,7 +56,12 @@ test_scenario = (
         inputs=user_sim,
         outputs=lambda inputs: booking_agent(inputs),
     )
-    .check(FnCheck(fn=lambda trace: "booked" in trace.last.outputs.lower(), name="completed"))
+    .check(
+        FnCheck(
+            fn=lambda trace: "booked" in trace.last.outputs.lower(),
+            name="completed",
+        )
+    )
 )
 
 result = await test_scenario.run()
@@ -78,8 +89,12 @@ if isinstance(output, UserSimulatorOutput):
 Output format for user simulator results.
 
 <TypeTable name="UserSimulatorOutput">
-  <Property name="goal_reached" type="bool">Whether the simulator achieved its goal.</Property>
-  <Property name="message" type="str | None">Optional message about the simulation outcome.</Property>
+  <Property name="goal_reached" type="bool">
+    Whether the simulator achieved its goal.
+  </Property>
+  <Property name="message" type="str | None">
+    Optional message about the simulation outcome.
+  </Property>
 </TypeTable>
 
 ---
@@ -101,6 +116,7 @@ Output format for user simulator results.
 ```python
 from giskard.checks.core.input_generator import InputGenerator
 
+
 class SequentialInputGenerator(InputGenerator):
     def __init__(self, inputs_list: list[str]):
         self.inputs_list = inputs_list
@@ -113,9 +129,12 @@ class SequentialInputGenerator(InputGenerator):
         self.index += 1
         return input_value
 
+
 gen = SequentialInputGenerator(["Hello", "How are you?", "Goodbye"])
 
-scenario = Scenario("sequential").interact(inputs=gen, outputs=lambda inputs: chatbot(inputs))
+scenario = Scenario("sequential").interact(
+    inputs=gen, outputs=lambda inputs: chatbot(inputs)
+)
 ```
 
 ### Context-aware generator
@@ -150,15 +169,26 @@ class ContextAwareGenerator(InputGenerator):
 from giskard.checks.generators.user import UserSimulator
 
 personas = [
-    {"name": "impatient", "instructions": "You are impatient and want quick answers."},
-    {"name": "detailed", "instructions": "You like detailed explanations. Ask follow-ups."},
-    {"name": "confused", "instructions": "You are confused and need things explained simply."},
+    {
+        "name": "impatient",
+        "instructions": "You are impatient and want quick answers.",
+    },
+    {
+        "name": "detailed",
+        "instructions": "You like detailed explanations. Ask follow-ups.",
+    },
+    {
+        "name": "confused",
+        "instructions": "You are confused and need things explained simply.",
+    },
 ]
 
 results = {}
 for persona in personas:
     sim = UserSimulator(instructions=persona["instructions"], max_steps=5)
-    scenario = Scenario(persona["name"]).interact(inputs=sim, outputs=lambda inputs: agent(inputs))
+    scenario = Scenario(persona["name"]).interact(
+        inputs=sim, outputs=lambda inputs: agent(inputs)
+    )
     results[persona["name"]] = await scenario.run()
 
 for name, result in results.items():

@@ -37,18 +37,23 @@ tc = hub.test_cases.create(
     messages=[
         {"role": "user", "content": "What is your refund policy?"},
     ],
-    demo_output={"role": "assistant", "content": "We offer a 30-day return policy for all unused items."},
+    demo_output={
+        "role": "assistant",
+        "content": "We offer a 30-day return policy for all unused items.",
+    },
     checks=[
         {
             "identifier": "correctness",
             "params": {
                 "reference": "We offer a 30-day return policy for all unused items.",
-            }, 
+            },
         },
         {
             "identifier": "conformity",
             "params": {
-                "rules": ["The agent must answer the question in exactly the same language as the question was asked."]
+                "rules": [
+                    "The agent must answer the question in exactly the same language as the question was asked."
+                ]
             },
         },
     ],
@@ -75,10 +80,24 @@ hub.test_cases.create(
         },
     },
     checks=[
-        {"identifier": "correctness", "params": {"reference": "Order #12345 shipped Monday, arrives Thursday."}},
-        {"identifier": "metadata", "params": {"json_path_rules": [
-            {"json_path": "$.category", "expected_value": "order_status", "expected_value_type": "string"},
-        ]}},
+        {
+            "identifier": "correctness",
+            "params": {
+                "reference": "Order #12345 shipped Monday, arrives Thursday."
+            },
+        },
+        {
+            "identifier": "metadata",
+            "params": {
+                "json_path_rules": [
+                    {
+                        "json_path": "$.category",
+                        "expected_value": "order_status",
+                        "expected_value_type": "string",
+                    },
+                ]
+            },
+        },
     ],
 )
 ```
@@ -96,10 +115,16 @@ hub.test_cases.create(
     dataset_id="dataset-id",
     messages=[
         {"role": "user", "content": "I ordered a jacket last week."},
-        {"role": "assistant", "content": "Happy to help! What's your order number?"},
+        {
+            "role": "assistant",
+            "content": "Happy to help! What's your order number?",
+        },
         {"role": "user", "content": "It's #12345. I want to return it."},
     ],
-    demo_output={"role": "assistant", "content": "I've initiated a return for order #12345. You'll receive a prepaid label by email."},
+    demo_output={
+        "role": "assistant",
+        "content": "I've initiated a return for order #12345. You'll receive a prepaid label by email.",
+    },
     checks=[
         {
             "identifier": "string_match",
@@ -125,8 +150,8 @@ hub.test_cases.create(
             "identifier": "groundedness",
             "params": {
                 "type": "groundedness",
-                "context": "We don't ship outside the EU"
-            }, 
+                "context": "We don't ship outside the EU",
+            },
         },
     ],
     tags=["shipping", "faq"],
@@ -148,7 +173,9 @@ comment = hub.test_cases.comments.add(
 print(comment.id)
 
 # Edit a comment
-hub.test_cases.comments.edit("comment-id", test_case_id="test-case-id", content="Updated comment text.")
+hub.test_cases.comments.edit(
+    "comment-id", test_case_id="test-case-id", content="Updated comment text."
+)
 
 # Delete a comment
 hub.test_cases.comments.delete("comment-id", test_case_id="test-case-id")
@@ -168,8 +195,32 @@ from giskard_hub import HubClient
 hub = HubClient()
 
 test_cases = [
-    {"messages": [{"role": "user", "content": "What is your return policy?"}], "checks": [{"identifier": "correctness", "params": {"reference": "We accept returns within 30 days of purchase."}}]},
-    {"messages": [{"role": "user", "content": "Do you offer free shipping?"}], "checks": [{"identifier": "correctness", "params": {"reference": "Free shipping is available on all orders over $50."}}]},
+    {
+        "messages": [
+            {"role": "user", "content": "What is your return policy?"}
+        ],
+        "checks": [
+            {
+                "identifier": "correctness",
+                "params": {
+                    "reference": "We accept returns within 30 days of purchase."
+                },
+            }
+        ],
+    },
+    {
+        "messages": [
+            {"role": "user", "content": "Do you offer free shipping?"}
+        ],
+        "checks": [
+            {
+                "identifier": "correctness",
+                "params": {
+                    "reference": "Free shipping is available on all orders over $50."
+                },
+            }
+        ],
+    },
 ]
 
 dataset = hub.datasets.upload(
@@ -207,11 +258,21 @@ for sample in testset.samples:
 
     # Add correctness check
     if getattr(sample, "reference_answer", None):
-        checks.append({"identifier": "correctness", "params": {"reference": sample.reference_answer}})
+        checks.append(
+            {
+                "identifier": "correctness",
+                "params": {"reference": sample.reference_answer},
+            }
+        )
 
     # Add groundedness check
     if getattr(sample, "reference_context", None):
-        checks.append({"identifier": "groundedness", "params": {"context": sample.reference_context}})
+        checks.append(
+            {
+                "identifier": "groundedness",
+                "params": {"context": sample.reference_context},
+            }
+        )
 
     hub.test_cases.create(
         dataset_id=dataset.id,
@@ -241,7 +302,9 @@ dataset = hub.datasets.generate_scenario_based(
 # Generation is asynchronous — wait for it to finish
 dataset = hub.helpers.wait_for_completion(dataset)
 
-print(f"Generated dataset: {dataset.id} with {len(hub.datasets.list_test_cases(dataset.id))} test cases")
+print(
+    f"Generated dataset: {dataset.id} with {len(hub.datasets.list_test_cases(dataset.id))} test cases"
+)
 ```
 
 ---
@@ -340,52 +403,65 @@ hub.datasets.delete("dataset-id")
 
 The Hub includes six built-in check types. Each check can be used directly in test cases by passing its `identifier` and the required `params`.
 
-| Identifier | Method | What it evaluates | Key params |
-|---|---|---|---|
-| `correctness` | LLM judge | Is the response factually correct relative to the expected output? | `reference` |
-| `conformity` | LLM judge | Does the response follow specified format, tone, or style requirements? | `rules` |
-| `groundedness` | LLM judge | Is the response grounded in the provided context, without hallucinations? | `context` |
-| `semantic_similarity` | Embedding similarity | Is the response semantically equivalent to the expected output? | `reference`, `threshold` |
-| `string_match` | Rule-based | Does the response contain a specific keyword or substring? | `keyword` |
-| `metadata` | Rule-based | Do JSON path values in the response metadata satisfy specified conditions? | `json_path_rules` |
+| Identifier            | Method               | What it evaluates                                                          | Key params               |
+| --------------------- | -------------------- | -------------------------------------------------------------------------- | ------------------------ |
+| `correctness`         | LLM judge            | Is the response factually correct relative to the expected output?         | `reference`              |
+| `conformity`          | LLM judge            | Does the response follow specified format, tone, or style requirements?    | `rules`                  |
+| `groundedness`        | LLM judge            | Is the response grounded in the provided context, without hallucinations?  | `context`                |
+| `semantic_similarity` | Embedding similarity | Is the response semantically equivalent to the expected output?            | `reference`, `threshold` |
+| `string_match`        | Rule-based           | Does the response contain a specific keyword or substring?                 | `keyword`                |
+| `metadata`            | Rule-based           | Do JSON path values in the response metadata satisfy specified conditions? | `json_path_rules`        |
 
 ### Correctness
 
 Validates that all information from the **reference** answer is present in the agent's response, without contradiction. Uses an LLM judge.
 
-| Parameter | Type | Description |
-|---|---|---|
+| Parameter   | Type  | Description                 |
+| ----------- | ----- | --------------------------- |
 | `reference` | `str` | The expected correct answer |
 
 ```python
-{"identifier": "correctness", "params": {"reference": "We offer a 30-day return policy."}}
+{
+    "identifier": "correctness",
+    "params": {"reference": "We offer a 30-day return policy."},
+}
 ```
 
 ### Conformity
 
 Checks that the agent's response follows one or more rules. Each rule should describe a single, distinct behaviour. Uses an LLM judge.
 
-| Parameter | Type | Description |
-|---|---|---|
-| `rules` | `list[str]` | One or more rules the response must follow |
+| Parameter | Type        | Description                                |
+| --------- | ----------- | ------------------------------------------ |
+| `rules`   | `list[str]` | One or more rules the response must follow |
 
 ```python
-{"identifier": "conformity", "params": {"rules": [
-    "The response must be written in a formal, professional tone.",
-    "The response must not include any personal opinions.",
-]}}
+{
+    "identifier": "conformity",
+    "params": {
+        "rules": [
+            "The response must be written in a formal, professional tone.",
+            "The response must not include any personal opinions.",
+        ]
+    },
+}
 ```
 
 ### Groundedness
 
 Validates that the agent's response is grounded in the provided context -- i.e., it does not introduce information absent from the context. Uses an LLM judge.
 
-| Parameter | Type | Description |
-|---|---|---|
+| Parameter | Type  | Description                                              |
+| --------- | ----- | -------------------------------------------------------- |
 | `context` | `str` | The reference context the response should be grounded in |
 
 ```python
-{"identifier": "groundedness", "params": {"context": "Our return window is 30 days. We do not accept returns on clearance items."}}
+{
+    "identifier": "groundedness",
+    "params": {
+        "context": "Our return window is 30 days. We do not accept returns on clearance items."
+    },
+}
 ```
 
 :::tip
@@ -396,21 +472,24 @@ Combine with `hub.knowledge_bases.search_documents()` to dynamically retrieve co
 
 Computes embedding-based similarity between the agent's response and a reference string. The check passes if the similarity score meets or exceeds the threshold. Does **not** use an LLM judge.
 
-| Parameter | Type | Description |
-|---|---|---|
-| `reference` | `str` | The expected output to compare against |
+| Parameter   | Type    | Description                                       |
+| ----------- | ------- | ------------------------------------------------- |
+| `reference` | `str`   | The expected output to compare against            |
 | `threshold` | `float` | Similarity threshold (0.0 to 1.0, default varies) |
 
 ```python
-{"identifier": "semantic_similarity", "params": {"reference": "30-day return policy", "threshold": 0.8}}
+{
+    "identifier": "semantic_similarity",
+    "params": {"reference": "30-day return policy", "threshold": 0.8},
+}
 ```
 
 ### String match
 
 Checks whether the agent's response contains a specific keyword or substring. Case-insensitive. Does **not** use an LLM judge.
 
-| Parameter | Type | Description |
-|---|---|---|
+| Parameter | Type  | Description                            |
+| --------- | ----- | -------------------------------------- |
 | `keyword` | `str` | The keyword or substring to search for |
 
 ```python
@@ -421,23 +500,36 @@ Checks whether the agent's response contains a specific keyword or substring. Ca
 
 Validates values extracted via JSON path expressions from the response **metadata**. Useful for verifying structured outputs like tool calls, categories, or flags. Does **not** use an LLM judge.
 
-| Parameter | Type | Description |
-|---|---|---|
+| Parameter         | Type         | Description                                                                       |
+| ----------------- | ------------ | --------------------------------------------------------------------------------- |
 | `json_path_rules` | `list[dict]` | List of rules, each with `json_path`, `expected_value`, and `expected_value_type` |
 
 Each rule dict supports:
 
-| Key | Type | Description |
-|---|---|---|
-| `json_path` | `str` | JSON path expression (e.g. `$.category`, `$.tools_called[0]`) |
-| `expected_value` | `str` | The expected value |
+| Key                   | Type  | Description                                                      |
+| --------------------- | ----- | ---------------------------------------------------------------- |
+| `json_path`           | `str` | JSON path expression (e.g. `$.category`, `$.tools_called[0]`)    |
+| `expected_value`      | `str` | The expected value                                               |
 | `expected_value_type` | `str` | Type of the expected value (`"string"`, `"number"`, `"boolean"`) |
 
 ```python
-{"identifier": "metadata", "params": {"json_path_rules": [
-    {"json_path": "$.category", "expected_value": "billing", "expected_value_type": "string"},
-    {"json_path": "$.resolved", "expected_value": "true", "expected_value_type": "boolean"},
-]}}
+{
+    "identifier": "metadata",
+    "params": {
+        "json_path_rules": [
+            {
+                "json_path": "$.category",
+                "expected_value": "billing",
+                "expected_value_type": "string",
+            },
+            {
+                "json_path": "$.resolved",
+                "expected_value": "true",
+                "expected_value_type": "boolean",
+            },
+        ]
+    },
+}
 ```
 
 :::note
@@ -460,7 +552,9 @@ check = hub.checks.create(
     description="The response must use formal, professional language with no slang.",
     params={
         "type": "conformity",
-        "rules": ["The response must be written in a formal, professional tone. It must not contain slang, contractions, or casual phrasing."],
+        "rules": [
+            "The response must be written in a formal, professional tone. It must not contain slang, contractions, or casual phrasing."
+        ],
     },
 )
 
@@ -491,7 +585,9 @@ hub.checks.create(
     description="The response must not contain harmful, violent, or offensive content.",
     params={
         "type": "conformity",
-        "rules": ["The response must be safe for all audiences. It must not contain violence, hate speech, sexual content, or self-harm."],
+        "rules": [
+            "The response must be safe for all audiences. It must not contain violence, hate speech, sexual content, or self-harm."
+        ],
     },
 )
 ```
@@ -526,4 +622,3 @@ hub.checks.update("check-id", name="Updated name")
 
 hub.checks.delete("check-id")
 ```
-

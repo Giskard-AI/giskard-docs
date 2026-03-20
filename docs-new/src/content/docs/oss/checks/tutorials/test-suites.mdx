@@ -1,0 +1,289 @@
+---
+title: Test Suites
+sidebar:
+  order: 5
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Giskard-AI/giskard-docs/blob/main/docs-new/src/content/docs/oss/checks/tutorials/test-suites.ipynb)
+
+Individual scenarios let you validate one behaviour at a time. A `Suite` groups
+related scenarios so you can run them all with a single `await`, get a unified
+pass/fail report, and pinpoint exactly which scenario and which check broke.
+
+## What you'll build
+
+By the end of this tutorial you will have:
+
+- A `Suite` that runs four scenarios covering a customer-support chatbot
+- A **parametric suite** built from a list of test cases — the data-driven
+  pattern you'll use most in real projects
+- Experience reading a `SuiteResult` and drilling into a failing check
+
+## Prerequisites
+
+- Completed [Dynamic Scenarios](/oss/checks/tutorials/dynamic-scenarios/) or
+  [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn/)
+- Basic `async/await` knowledge
+
+## The system under test
+
+All scenarios in this tutorial test the same chatbot. It handles greetings,
+order lookups, returns, and empty inputs:
+
+```python
+def chatbot(message: str) -> str:
+    message = message.strip()
+    if not message:
+        return "I didn't receive a message. Could you please try again?"
+    if message.lower().startswith(("hello", "hi", "hey")):
+        return "Hello! How can I help you today?"
+    if "order" in message.lower() and any(c.isdigit() for c in message):
+        order_id = next(w for w in message.split() if any(c.isdigit() for c in w))
+        return f"Order {order_id} is on its way and will arrive in 2–3 days."
+    if "return" in message.lower() or "refund" in message.lower():
+        return "You can return any item within 30 days for a full refund."
+    return "I'm not sure how to help with that. Could you rephrase?"
+```
+
+## Define four scenarios
+
+Write one scenario per behaviour you want to verify. Keeping scenarios focused
+on a single capability makes failure reports precise — when `order_lookup` fails
+you know immediately which feature broke.
+
+```python
+from giskard.checks import Scenario, FnCheck, StringMatching
+
+greeting_scenario = (
+    Scenario("greeting")
+    .interact(
+        inputs="Hello there",
+        outputs=lambda inputs: chatbot(inputs),
+    )
+    .check(
+        FnCheck(
+            fn=lambda trace: "Hello" in trace.last.outputs,
+            name="responds_with_greeting",
+        )
+    )
+)
+
+order_lookup_scenario = (
+    Scenario("order_lookup")
+    .interact(
+        inputs="Where is my order #12345?",
+        outputs=lambda inputs: chatbot(inputs),
+    )
+    .check(
+        StringMatching(
+            name="order_id_echoed",
+            keyword="12345",
+            text_key="trace.last.outputs",
+        )
+    )
+    .check(
+        StringMatching(
+            name="delivery_estimate_given",
+            keyword="days",
+            text_key="trace.last.outputs",
+        )
+    )
+)
+
+return_policy_scenario = (
+    Scenario("return_policy")
+    .interact(
+        inputs="Can I return an item?",
+        outputs=lambda inputs: chatbot(inputs),
+    )
+    .check(
+        StringMatching(
+            name="mentions_30_days",
+            keyword="30 days",
+            text_key="trace.last.outputs",
+        )
+    )
+)
+
+empty_input_scenario = (
+    Scenario("empty_input")
+    .interact(
+        inputs="",
+        outputs=lambda inputs: chatbot(inputs),
+    )
+    .check(
+        FnCheck(
+            fn=lambda trace: "try again" in trace.last.outputs.lower(),
+            name="handles_empty_input",
+        )
+    )
+)
+```
+
+## Create and run a suite
+
+Use `Suite` to group the four scenarios and run them in one call. The suite
+runs scenarios serially and returns a `SuiteResult` with a unified pass/fail
+summary, per-scenario results, and a total duration.
+
+```python
+from giskard.checks import Suite
+
+suite = Suite(name="chatbot_suite")
+suite.append(greeting_scenario)
+suite.append(order_lookup_scenario)
+suite.append(return_policy_scenario)
+suite.append(empty_input_scenario)
+
+result = await suite.run()
+```
+
+## Inspect the results
+
+`SuiteResult` exposes three top-level attributes:
+
+| Attribute         | Type                    | What it contains                         |
+| ----------------- | ----------------------- | ---------------------------------------- |
+| `results`         | `list[ScenarioResult]`  | One entry per scenario, in order         |
+| `pass_rate`       | `float`                 | Fraction of scenarios that passed        |
+| `duration_ms`     | `int`                   | Total wall-clock time in milliseconds    |
+
+Iterate over `results` to build a readable report:
+
+```python
+passed = sum(1 for r in result.results if r.passed)
+total = len(result.results)
+
+print(f"Suite: {passed}/{total} passed ({result.pass_rate:.0%}) in {result.duration_ms} ms\n")
+
+scenarios = [greeting_scenario, order_lookup_scenario, return_policy_scenario, empty_input_scenario]
+for scenario, r in zip(scenarios, result.results):
+    status = "PASS" if r.passed else "FAIL"
+    print(f"  [{status}] {scenario.name}")
+```
+
+## Diagnosing a failure
+
+When a scenario fails you need to know which check broke and what it saw. Each
+`ScenarioResult` has a `steps` list — one `StepResult` per `.interact()` call.
+Each step has a `results` list of `CheckResult` objects.
+
+To see this in action, build a scenario with a deliberate bug — the expected
+keyword is wrong so the check will always fail:
+
+```python
+buggy_scenario = (
+    Scenario("buggy_greeting")
+    .interact(
+        inputs="Hello there",
+        outputs=lambda inputs: chatbot(inputs),
+    )
+    .check(
+        StringMatching(
+            name="wrong_keyword",
+            keyword="Howdy",  # chatbot never says this
+            text_key="trace.last.outputs",
+        )
+    )
+)
+
+debug_suite = Suite(name="debug_suite")
+debug_suite.append(buggy_scenario)
+
+debug_result = await debug_suite.run()
+print(f"Suite passed: {debug_result.results[0].passed}")
+```
+
+Drill into the first (and only) scenario result to see which check broke:
+
+```python
+scenario_result = debug_result.results[0]
+
+for step in scenario_result.steps:
+    for check_result in step.results:
+        status = "PASS" if check_result.passed else "FAIL"
+        print(f"  [{status}] {check_result.name}: {check_result.message}")
+```
+
+## Parametric suites
+
+Real projects often have many similar test cases that differ only in their
+inputs and expected outputs. Writing one scenario per case by hand doesn't
+scale. Instead, keep your test data in a list and generate scenarios
+programmatically.
+
+Here is the data-driven pattern: define a list of `(name, input, keyword)`
+tuples and build a `Scenario` for each one in a loop:
+
+```python
+test_cases = [
+    ("greeting_hello",  "Hello!",                   "Hello"),
+    ("greeting_hi",     "Hi there",                  "Hello"),
+    ("greeting_hey",    "Hey!",                       "Hello"),
+    ("order_99",        "Status of order #99?",       "99"),
+    ("order_777",       "Track order #777 please",    "777"),
+    ("return_query",    "I want to return something", "30 days"),
+    ("refund_query",    "Can I get a refund?",        "30 days"),
+]
+
+parametric_suite = Suite(name="parametric_chatbot_suite")
+
+for name, user_input, keyword in test_cases:
+    scenario = (
+        Scenario(name)
+        .interact(
+            inputs=user_input,
+            outputs=lambda inputs: chatbot(inputs),
+        )
+        .check(
+            StringMatching(
+                name=f"contains_{keyword.replace(' ', '_')}",
+                keyword=keyword,
+                text_key="trace.last.outputs",
+            )
+        )
+    )
+    parametric_suite.append(scenario)
+
+param_result = await parametric_suite.run()
+
+passed = sum(1 for r in param_result.results if r.passed)
+print(f"{passed}/{len(param_result.results)} passed ({param_result.pass_rate:.0%})")
+
+for (name, _, _), r in zip(test_cases, param_result.results):
+    status = "PASS" if r.passed else "FAIL"
+    print(f"  [{status}] {name}")
+```
+
+This pattern scales to hundreds of cases without any extra boilerplate. You can
+load `test_cases` from a CSV, a YAML file, or a database — the suite-building
+loop stays the same.
+
+## Run a suite in a Python script
+
+Outside a notebook there is no running event loop, so wrap the call with
+`asyncio.run`:
+
+```python
+import asyncio
+from giskard.checks import Suite
+
+# result = asyncio.run(suite.run())
+```
+
+## Next step
+
+You now know how to organise scenarios into suites and debug failures. The next
+step is integrating suites into your CI pipeline so they run automatically on
+every pull request:
+
+[Run in pytest](/oss/checks/how-to/run-in-pytest/)
+
+## See also
+
+- [Run in pytest](/oss/checks/how-to/run-in-pytest/) — integrate suites into CI
+  with proper failure reporting
+- [Dynamic Scenarios](/oss/checks/tutorials/dynamic-scenarios/) — build
+  context-aware scenarios to feed into a suite
+- [Batch Evaluation](/oss/checks/how-to/batch-evaluation/) — run scenarios over
+  a dataset and collect aggregate metrics

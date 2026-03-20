@@ -80,14 +80,14 @@ Scans can optionally be anchored to a Knowledge Base to generate attacks that ar
 
 A **Check** is a criterion evaluated on an agent's response. Checks belong to a project and can be reused across any dataset in that project. Not all checks use an LLM judge — some are purely rule-based:
 
-| Identifier | How it evaluates | What it checks |
-|---|---|---|
-| `correctness` | LLM judge | Is the response factually correct relative to the expected output? |
-| `conformity` | LLM judge | Does the response follow specified format, tone, or style rules? |
-| `groundedness` | LLM judge | Is the response grounded in the provided context (no hallucinations)? |
-| `semantic_similarity` | Embedding similarity | Is the response semantically close to the expected output? |
-| `string_match` | Rule-based | Does the response contain a specific keyword or substring? |
-| `metadata` | Rule-based | Do JSON path values in the response metadata meet specified conditions? |
+| Identifier            | How it evaluates     | What it checks                                                          |
+| --------------------- | -------------------- | ----------------------------------------------------------------------- |
+| `correctness`         | LLM judge            | Is the response factually correct relative to the expected output?      |
+| `conformity`          | LLM judge            | Does the response follow specified format, tone, or style rules?        |
+| `groundedness`        | LLM judge            | Is the response grounded in the provided context (no hallucinations)?   |
+| `semantic_similarity` | Embedding similarity | Is the response semantically close to the expected output?              |
+| `string_match`        | Rule-based           | Does the response contain a specific keyword or substring?              |
+| `metadata`            | Rule-based           | Do JSON path values in the response metadata meet specified conditions? |
 
 You can also define **custom checks** via `hub.checks.create()` — a named, reusable configuration of any built-in check type with pre-set parameters, so you don't have to repeat them across test cases.
 

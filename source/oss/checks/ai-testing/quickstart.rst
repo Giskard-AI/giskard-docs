@@ -52,7 +52,7 @@ We can now run the scenario and inspect the results. In a notebook, the ``Scenar
 .. code-block:: python
 
     result = await test_scenario.run()
-    result
+    result.print_report()
 
 .. image:: /_static/images/oss/checks/quickstart-simple_example_result.png
    :alt: Rich display for a ScenarioResult with trace and check results
@@ -67,7 +67,7 @@ We can now run the scenario and inspect the results. In a notebook, the ``Scenar
 
       async def main():
           result = await test_scenario.run()
-          print(result)
+          result.print_report()
 
       asyncio.run(main())
 
