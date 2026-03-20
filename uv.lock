@@ -461,7 +461,7 @@ wheels = [
 
 [[package]]
 name = "giskard-agents"
-version = "1.0.1a1"
+version = "1.0.2a1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "giskard-core" },
@@ -474,14 +474,14 @@ dependencies = [
     { name = "tenacity" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/12/3e/a697a587930e45b8bbf8815b5ca3b4bb0aeedc901c139302fa5bdfca86d2/giskard_agents-1.0.1a1.tar.gz", hash = "sha256:0eedc6140fd2714176fc1387785412f20add50005c4ea23615fa5a019b149b82", size = 41590, upload-time = "2026-03-12T08:36:47.957Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/53/97/677cb1c54faadd028e82a75277a96233dcd7c898c21d60120c10fefce576/giskard_agents-1.0.2a1.tar.gz", hash = "sha256:8ff0776485b696637c395bc10fe26b22298d7cded385392aa3c68ed1413b0875", size = 41870, upload-time = "2026-03-17T11:07:52.26Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/7e/562a4ed4e5112e79687ec3bcfcd45d838fc446bbe4c27bd722e39c6ed8bb/giskard_agents-1.0.1a1-py3-none-any.whl", hash = "sha256:d782877c0d2736369e3601ebec4534af64021b20366c678d320c37a053f3d942", size = 32873, upload-time = "2026-03-12T08:36:46.808Z" },
+    { url = "https://files.pythonhosted.org/packages/35/17/8cd89d4adb83973f5eac8b7b18cb7b51ce31dcb6febf17928f796dda1ba6/giskard_agents-1.0.2a1-py3-none-any.whl", hash = "sha256:0f6b04de0f6c0cd4427d1ce7fb5953c00133b8c13d455ea6d8f3edd76298f848", size = 33099, upload-time = "2026-03-17T11:07:53.092Z" },
 ]
 
 [[package]]
 name = "giskard-checks"
-version = "1.0.1a1"
+version = "1.0.1a2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "giskard-agents" },
@@ -492,9 +492,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/19/b7/eb0b658b15ff6f1fa25de2cc5ee211bea37f2af9bd334044dd4a1b361485/giskard_checks-1.0.1a1.tar.gz", hash = "sha256:89d4e91f38b60465c12019676876f4a5a68775993dc52f1e1bbbc1a07184b853", size = 42209, upload-time = "2026-03-12T08:42:07.807Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/80/c748095a5bc2325ab43c0a43147f568515dfc0b455f0ab059bf8a6acbdec/giskard_checks-1.0.1a2.tar.gz", hash = "sha256:c04708a68e5d7004d20b69238fbdae939957bdf54e51b33616dfcf0508fff0f2", size = 41281, upload-time = "2026-03-20T02:14:31.681Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/47/88/0f179cd64a506ec5907e4b5489f17fedf58bd323b256fde8b6c32e0e1757/giskard_checks-1.0.1a1-py3-none-any.whl", hash = "sha256:0043060550d5a89f641af25e19f5af4b222aa34722ef2ddd75bcb073020ed0b8", size = 59435, upload-time = "2026-03-12T08:42:06.558Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/15/da7fc427e51b4eff79c1a3ad6dde98e15f0f608a7dc00ef3c7603bf68dd4/giskard_checks-1.0.1a2-py3-none-any.whl", hash = "sha256:8ebe73e12afbd8a317668db6fdddfa45cbda19d6195544077779025c440b021c", size = 58101, upload-time = "2026-03-20T02:14:32.494Z" },
 ]
 
 [[package]]
@@ -538,8 +538,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "giskard-agents", specifier = "==1.0.1a1" },
-    { name = "giskard-checks", specifier = "==1.0.1a1" },
+    { name = "giskard-agents", specifier = "==1.0.2a1" },
+    { name = "giskard-checks", specifier = "==1.0.1a2" },
     { name = "giskard-core", specifier = "==1.0.1a1" },
 ]
 
