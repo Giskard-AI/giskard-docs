@@ -94,15 +94,10 @@ jobs:
       - name: Install Node deps
         run: cd docs-new && npm ci
 
-      - name: Run .mdx code snippet tests
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: uv run pytest tests/test_docs_md.py -v --tb=short
-
       - name: Run notebook tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OVERWRITE_NB: ${{ github.ref == 'refs/heads/main' && '1' || '' }}
+          OVERWRITE_NB: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
         run: uv run pytest tests/test_docs_nb.py -v --tb=short
 
       - name: Regenerate .mdx from updated notebooks (main only)

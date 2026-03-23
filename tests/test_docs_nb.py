@@ -5,8 +5,8 @@ End-to-end tests for Jupyter notebooks in docs-new/.
 Cells tagged skip-execution (the colab-install cells) are skipped automatically.
 
 - No OPENAI_API_KEY → only NO_API_NOTEBOOKS run; the rest skip.
-- OVERWRITE_NB=1    → fresh outputs are written back into each .ipynb.
-                      Afterwards, run the JS converter to regenerate .mdx:
+- OVERWRITE_NB=0    → skip writing outputs back (default is to overwrite).
+                      After the run, regenerate .mdx files:
                       cd docs-new && node scripts/convert-notebooks.mjs
 
 Run from the project root:
@@ -57,6 +57,6 @@ def test_notebook(nb_path):
     result = run.execute()
     assert result.error is None, f"Notebook {nb_path.name} failed:\n{result.error}"
 
-    if os.environ.get("OVERWRITE_NB"):
+    if os.environ.get("OVERWRITE_NB", "1") != "0":
         with open(nb_path, "w", encoding="utf-8") as fh:
             nbformat.write(result.nb, fh)

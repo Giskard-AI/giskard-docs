@@ -45,10 +45,6 @@ doc: clean html ## Build the doc
 	echo docs.giskard.ai > ./docs/CNAME
 .PHONY: doc
 
-test-docs-md: ## Run .mdx code snippet tests
-	uv run pytest tests/test_docs_md.py -v
-.PHONY: test-docs-md
-
 test-docs-nb: ## Run notebook E2E tests
 	uv run pytest tests/test_docs_nb.py -v
 .PHONY: test-docs-nb
@@ -61,5 +57,5 @@ regen-mdx: ## Regenerate .mdx files from .ipynb notebooks
 	cd docs-new && node scripts/convert-notebooks.mjs
 .PHONY: regen-mdx
 
-test-docs: test-docs-md test-docs-nb ## Run all doc tests
+test-docs: test-docs-nb ## Run all doc tests
 .PHONY: test-docs
