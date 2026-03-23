@@ -44,3 +44,22 @@ doc: clean html ## Build the doc
 	rm -rf ./docs && mkdir -p ./docs && touch ./docs/.nojekyll && mv ./build/html/* ./docs
 	echo docs.giskard.ai > ./docs/CNAME
 .PHONY: doc
+
+test-docs-md: ## Run .mdx code snippet tests
+	uv run pytest tests/test_docs_md.py -v
+.PHONY: test-docs-md
+
+test-docs-nb: ## Run notebook E2E tests
+	uv run pytest tests/test_docs_nb.py -v
+.PHONY: test-docs-nb
+
+test-docs-nb-overwrite: ## Run notebooks and write fresh outputs back into .ipynb files
+	OVERWRITE_NB=1 uv run pytest tests/test_docs_nb.py -v
+.PHONY: test-docs-nb-overwrite
+
+regen-mdx: ## Regenerate .mdx files from .ipynb notebooks
+	cd docs-new && node scripts/convert-notebooks.mjs
+.PHONY: regen-mdx
+
+test-docs: test-docs-md test-docs-nb ## Run all doc tests
+.PHONY: test-docs

@@ -23,6 +23,15 @@ DOCS_ROOT = (
     / "docs-new" / "src" / "content" / "docs" / "oss" / "checks"
 )
 
+# Reference docs contain intentionally incomplete code snippets (type signatures,
+# partial examples) and are not designed to run as standalone scripts.
+SKIP_ALWAYS = {
+    "reference/core.mdx",
+    "reference/generators.mdx",
+    "reference/scenarios.mdx",
+    "reference/utils.mdx",
+}
+
 # .mdx files known to call LLM-based checks — need OPENAI_API_KEY.
 # Remove entries here once you confirm a file is API-free.
 REQUIRES_API = {
@@ -86,6 +95,9 @@ def pytest_generate_tests(metafunc):
 
 
 def test_mdx_codeblocks(mdx_path):
+    rel = str(mdx_path.relative_to(DOCS_ROOT))
+    if rel in SKIP_ALWAYS:
+        pytest.skip("reference doc — intentionally incomplete snippets")
     if _needs_api(mdx_path):
         if not os.environ.get("OPENAI_API_KEY"):
             pytest.skip("OPENAI_API_KEY not set")
