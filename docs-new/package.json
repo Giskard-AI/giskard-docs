@@ -6,6 +6,7 @@
     "dev": "node scripts/convert-notebooks.mjs && astro dev",
     "start": "astro dev",
     "build": "npm run format && node scripts/convert-notebooks.mjs && astro build",
+    "build:ci": "node scripts/convert-notebooks.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write 'src/**/*.{md,mdx}' && node scripts/format-code-blocks.mjs",
@@ -26,6 +27,6 @@
   },
   "devDependencies": {
     "prettier": "^3.8.1",
-    "wrangler": "^4.64.0"
+    "wrangler": "^4.50.0"
   }
 }
