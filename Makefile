@@ -45,13 +45,13 @@ doc: clean html ## Build the doc
 	echo docs.giskard.ai > ./docs/CNAME
 .PHONY: doc
 
-test-docs-nb: ## Run notebook E2E tests
+test-docs-nb: ## Run notebook E2E tests (overwrites outputs by default; set OVERWRITE_NB=0 to skip)
 	uv run pytest tests/test_docs_nb.py -v
 .PHONY: test-docs-nb
 
-test-docs-nb-overwrite: ## Run notebooks and write fresh outputs back into .ipynb files
-	OVERWRITE_NB=1 uv run pytest tests/test_docs_nb.py -v
-.PHONY: test-docs-nb-overwrite
+test-docs-nb-readonly: ## Run notebook tests without writing outputs back
+	OVERWRITE_NB=0 uv run pytest tests/test_docs_nb.py -v
+.PHONY: test-docs-nb-readonly
 
 regen-mdx: ## Regenerate .mdx files from .ipynb notebooks
 	cd docs-new && node scripts/convert-notebooks.mjs
