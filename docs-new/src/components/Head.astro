@@ -3,6 +3,7 @@ import Default from '@astrojs/starlight/components/Head.astro';
 
 const route = Astro.locals.starlightRoute;
 const siteUrl = 'https://docs-v3.giskard.ai';
+const ogImageUrl = `${siteUrl}/default-og-image.png`;
 // Normalize: strip trailing slash to match canonical URL format
 const pageUrl = new URL(Astro.url.pathname, siteUrl).href.replace(/\/$/, '');
 
@@ -62,12 +63,20 @@ if (route.entry.data.description) {
 	articleJsonLd.description = route.entry.data.description;
 }
 
+articleJsonLd.image = ogImageUrl;
+
 if (route.lastUpdated) {
 	articleJsonLd.dateModified = route.lastUpdated.toISOString();
 }
 ---
 
 <Default {...Astro.props}><slot /></Default>
+
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta name="twitter:image" content={ogImageUrl} />
 
 <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
 <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
