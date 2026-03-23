@@ -1,5 +1,6 @@
 ---
 title: Async design & pytest
+description: "Why Giskard Checks are async-first and how to use them correctly in scripts, pytest, and Jupyter notebooks."
 sidebar:
   order: 3
 ---
@@ -14,7 +15,7 @@ Every check invocation is a potential network call — to an LLM API, an embeddi
 - **Concurrent scenarios**: a suite's `run_all()` also uses `asyncio.gather`, so all scenarios run in parallel.
 - **No blocking**: a slow LLM call in one check does not delay other checks from making progress.
 
-The tradeoff is that you need an event loop to call `Scenario.run()`. Giskard Checks works in three environments — scripts, pytest, and notebooks — each of which provides the loop differently. See [Run Tests with pytest](/oss/checks/how-to/run-in-pytest/) for the setup steps.
+The tradeoff is that you need an event loop to call `Scenario.run()`. Giskard Checks works in three environments — scripts, pytest, and notebooks — each of which provides the loop differently. See [Run Tests with pytest](/oss/checks/how-to/run-in-pytest) for the setup steps.
 
 ## Common Pitfalls
 

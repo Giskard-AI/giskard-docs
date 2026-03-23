@@ -1,5 +1,6 @@
 ---
 title: When to use which check
+description: "Compare rule-based checks, semantic similarity, and LLM-as-a-judge — tradeoffs in cost, latency, determinism, and reliability."
 sidebar:
   order: 2
 ---

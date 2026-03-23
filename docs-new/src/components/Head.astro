@@ -1,0 +1,74 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+
+const route = Astro.locals.starlightRoute;
+const siteUrl = 'https://docs-v3.giskard.ai';
+// Normalize: strip trailing slash to match canonical URL format
+const pageUrl = new URL(Astro.url.pathname, siteUrl).href.replace(/\/$/, '');
+
+// Build breadcrumb from URL path
+const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
+const breadcrumbItems = [
+	{ name: 'Home', url: siteUrl },
+	...pathSegments.map((segment, i) => ({
+		name: segment
+			.split('-')
+			.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join(' '),
+		url: `${siteUrl}/${pathSegments.slice(0, i + 1).join('/')}`,
+	})),
+];
+
+const breadcrumbJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: breadcrumbItems.map((item, i) => ({
+		'@type': 'ListItem',
+		position: i + 1,
+		name: item.name,
+		item: item.url,
+	})),
+};
+
+const organizationJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Organization',
+	name: 'Giskard',
+	url: 'https://giskard.ai',
+	logo: `${siteUrl}/favicon.ico`,
+	sameAs: [
+		'https://github.com/Giskard-AI/giskard-oss',
+		'https://discord.com/invite/ABvfpbu69R',
+	],
+};
+
+const articleJsonLd: Record<string, unknown> = {
+	'@context': 'https://schema.org',
+	'@type': 'TechArticle',
+	headline: route.entry.data.title,
+	url: pageUrl,
+	publisher: {
+		'@type': 'Organization',
+		name: 'Giskard',
+		url: 'https://giskard.ai',
+	},
+	mainEntityOfPage: {
+		'@type': 'WebPage',
+		'@id': pageUrl,
+	},
+};
+
+if (route.entry.data.description) {
+	articleJsonLd.description = route.entry.data.description;
+}
+
+if (route.lastUpdated) {
+	articleJsonLd.dateModified = route.lastUpdated.toISOString();
+}
+---
+
+<Default {...Astro.props}><slot /></Default>
+
+<script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />

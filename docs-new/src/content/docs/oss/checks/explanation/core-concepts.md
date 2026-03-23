@@ -1,5 +1,6 @@
 ---
 title: Core Concepts
+description: "The key primitives of Giskard Checks — Interaction, Trace, Check, and Scenario — and how they work together at runtime."
 sidebar:
   order: 1
 ---
@@ -63,7 +64,7 @@ spec = InteractionSpec(
 )
 ```
 
-Specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn/) for practical examples.
+Specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn) for practical examples.
 
 ## Trace
 
@@ -96,7 +97,7 @@ Giskard provides several families of checks:
 - **Semantic similarity** — `SemanticSimilarity`: compare meaning rather than exact text. Uses embeddings; good when phrasing varies.
 - **LLM-as-judge** — `Groundedness`, `Conformity`, `LLMJudge`: qualitative evaluation (tone, policy compliance, reasoning). Uses an LLM call; more flexible but slower and non-deterministic.
 
-For guidance on choosing the right check, see [When to Use Which Check](/oss/checks/explanation/when-to-use-which-check/). For the full API, see the [Checks reference](/oss/checks/reference/checks/). To build your own validation logic, see [Custom Checks](/oss/checks/how-to/custom-checks/).
+For guidance on choosing the right check, see [When to Use Which Check](/oss/checks/explanation/when-to-use-which-check). For the full API, see the [Checks reference](/oss/checks/reference/checks). To build your own validation logic, see [Custom Checks](/oss/checks/how-to/custom-checks).
 
 ```python
 from giskard.checks import Groundedness
@@ -179,4 +180,4 @@ import asyncio
 result = asyncio.run(test_scenario.run())
 ```
 
-For a practical introduction to the fluent API, see [Quickstart](/oss/checks/quickstart/).
+For a practical introduction to the fluent API, see [Quickstart](/oss/checks/quickstart).
