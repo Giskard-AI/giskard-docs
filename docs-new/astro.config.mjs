@@ -10,7 +10,7 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://docs.giskard.ai',
+    site: 'https://docs-v3.giskard.ai',
     trailingSlash: 'never',
 
     integrations: [

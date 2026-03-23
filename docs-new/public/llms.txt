@@ -11,7 +11,7 @@ Every documentation page is available as raw Markdown by appending `.md` to any 
 Giskard provides tools for testing, evaluating, and red-teaming LLM-based applications. The company offers an enterprise platform (Giskard Hub) and an open-source Python library (Giskard Checks) for AI quality assurance.
 
 - Website: https://giskard.ai
-- Documentation: https://docs.giskard.ai
+- Documentation: https://docs-v3.giskard.ai
 - GitHub: https://github.com/Giskard-AI/giskard-oss
 - Discord: https://discord.com/invite/ABvfpbu69R
 
@@ -29,60 +29,60 @@ Open research on AI safety and security, including the Phare multilingual benchm
 ## Documentation Structure
 
 ### Hub SDK
-- Introduction: https://docs.giskard.ai/hub/sdk.md
-- Quickstart: https://docs.giskard.ai/hub/sdk/quickstart.md
-- Core Concepts: https://docs.giskard.ai/hub/sdk/concepts.md
-- API Reference: https://docs.giskard.ai/hub/sdk/reference.md
-- Migration Guide: https://docs.giskard.ai/hub/sdk/migration.md
+- Introduction: https://docs-v3.giskard.ai/hub/sdk.md
+- Quickstart: https://docs-v3.giskard.ai/hub/sdk/quickstart.md
+- Core Concepts: https://docs-v3.giskard.ai/hub/sdk/concepts.md
+- API Reference: https://docs-v3.giskard.ai/hub/sdk/reference.md
+- Migration Guide: https://docs-v3.giskard.ai/hub/sdk/migration.md
 
 ### Hub SDK Guides
-- Projects: https://docs.giskard.ai/hub/sdk/guides/projects.md
-- Evaluations: https://docs.giskard.ai/hub/sdk/guides/evaluations.md
-- Datasets & Checks: https://docs.giskard.ai/hub/sdk/guides/datasets-and-checks.md
-- Vulnerability Scanning: https://docs.giskard.ai/hub/sdk/guides/scans.md
-- Agents & Knowledge Bases: https://docs.giskard.ai/hub/sdk/guides/agents-and-knowledge-bases.md
-- Playground Chats: https://docs.giskard.ai/hub/sdk/guides/playground-chats.md
-- Tasks: https://docs.giskard.ai/hub/sdk/guides/tasks.md
-- Audit Logs: https://docs.giskard.ai/hub/sdk/guides/audit.md
+- Projects: https://docs-v3.giskard.ai/hub/sdk/guides/projects.md
+- Evaluations: https://docs-v3.giskard.ai/hub/sdk/guides/evaluations.md
+- Datasets & Checks: https://docs-v3.giskard.ai/hub/sdk/guides/datasets-and-checks.md
+- Vulnerability Scanning: https://docs-v3.giskard.ai/hub/sdk/guides/scans.md
+- Agents & Knowledge Bases: https://docs-v3.giskard.ai/hub/sdk/guides/agents-and-knowledge-bases.md
+- Playground Chats: https://docs-v3.giskard.ai/hub/sdk/guides/playground-chats.md
+- Tasks: https://docs-v3.giskard.ai/hub/sdk/guides/tasks.md
+- Audit Logs: https://docs-v3.giskard.ai/hub/sdk/guides/audit.md
 
 ### Giskard Checks (Open Source)
-- What are Giskard Checks?: https://docs.giskard.ai/oss/checks.md
-- Install & Configure: https://docs.giskard.ai/oss/checks/installation.md
-- Quickstart: https://docs.giskard.ai/oss/checks/quickstart.md
+- What are Giskard Checks?: https://docs-v3.giskard.ai/oss/checks.md
+- Install & Configure: https://docs-v3.giskard.ai/oss/checks/installation.md
+- Quickstart: https://docs-v3.giskard.ai/oss/checks/quickstart.md
 
 ### Checks Tutorials
-- Your First Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md
-- Your First LLM Call: https://docs.giskard.ai/oss/checks/tutorials/single-turn.md
-- Multi-Turn Scenarios: https://docs.giskard.ai/oss/checks/tutorials/multi-turn.md
-- Dynamic Scenarios: https://docs.giskard.ai/oss/checks/tutorials/dynamic-scenarios.md
-- Test Suites: https://docs.giskard.ai/oss/checks/tutorials/test-suites.md
+- Your First Test: https://docs-v3.giskard.ai/oss/checks/tutorials/your-first-test.md
+- Your First LLM Call: https://docs-v3.giskard.ai/oss/checks/tutorials/single-turn.md
+- Multi-Turn Scenarios: https://docs-v3.giskard.ai/oss/checks/tutorials/multi-turn.md
+- Dynamic Scenarios: https://docs-v3.giskard.ai/oss/checks/tutorials/dynamic-scenarios.md
+- Test Suites: https://docs-v3.giskard.ai/oss/checks/tutorials/test-suites.md
 
 ### Checks How-to Guides
-- Run Tests with pytest: https://docs.giskard.ai/oss/checks/how-to/run-in-pytest.md
-- Simulate Users: https://docs.giskard.ai/oss/checks/how-to/simulate-users.md
-- Spy on Internal Calls: https://docs.giskard.ai/oss/checks/how-to/spy-on-calls.md
-- Testing Structured Outputs: https://docs.giskard.ai/oss/checks/how-to/structured-output.md
-- Batch Evaluation: https://docs.giskard.ai/oss/checks/how-to/batch-evaluation.md
-- Stateful Checks: https://docs.giskard.ai/oss/checks/how-to/stateful-checks.md
-- Custom Checks: https://docs.giskard.ai/oss/checks/how-to/custom-checks.md
-- CI/CD Integration: https://docs.giskard.ai/oss/checks/how-to/ci-cd.md
+- Run Tests with pytest: https://docs-v3.giskard.ai/oss/checks/how-to/run-in-pytest.md
+- Simulate Users: https://docs-v3.giskard.ai/oss/checks/how-to/simulate-users.md
+- Spy on Internal Calls: https://docs-v3.giskard.ai/oss/checks/how-to/spy-on-calls.md
+- Testing Structured Outputs: https://docs-v3.giskard.ai/oss/checks/how-to/structured-output.md
+- Batch Evaluation: https://docs-v3.giskard.ai/oss/checks/how-to/batch-evaluation.md
+- Stateful Checks: https://docs-v3.giskard.ai/oss/checks/how-to/stateful-checks.md
+- Custom Checks: https://docs-v3.giskard.ai/oss/checks/how-to/custom-checks.md
+- CI/CD Integration: https://docs-v3.giskard.ai/oss/checks/how-to/ci-cd.md
 
 ### Checks API Reference
-- Core API: https://docs.giskard.ai/oss/checks/reference/core.md
-- Checks: https://docs.giskard.ai/oss/checks/reference/checks.md
-- Scenarios: https://docs.giskard.ai/oss/checks/reference/scenarios.md
-- Testing Utilities: https://docs.giskard.ai/oss/checks/reference/testing-utils.md
-- Generators: https://docs.giskard.ai/oss/checks/reference/generators.md
-- Utilities: https://docs.giskard.ai/oss/checks/reference/utils.md
+- Core API: https://docs-v3.giskard.ai/oss/checks/reference/core.md
+- Checks: https://docs-v3.giskard.ai/oss/checks/reference/checks.md
+- Scenarios: https://docs-v3.giskard.ai/oss/checks/reference/scenarios.md
+- Testing Utilities: https://docs-v3.giskard.ai/oss/checks/reference/testing-utils.md
+- Generators: https://docs-v3.giskard.ai/oss/checks/reference/generators.md
+- Utilities: https://docs-v3.giskard.ai/oss/checks/reference/utils.md
 
 ### Checks Explanation
-- Core Concepts: https://docs.giskard.ai/oss/checks/explanation/core-concepts.md
-- When to Use Which Check: https://docs.giskard.ai/oss/checks/explanation/when-to-use-which-check.md
-- Async Design & pytest: https://docs.giskard.ai/oss/checks/explanation/async-and-pytest.md
-- JSONPath in Checks: https://docs.giskard.ai/oss/checks/explanation/jsonpath-in-checks.md
+- Core Concepts: https://docs-v3.giskard.ai/oss/checks/explanation/core-concepts.md
+- When to Use Which Check: https://docs-v3.giskard.ai/oss/checks/explanation/when-to-use-which-check.md
+- Async Design & pytest: https://docs-v3.giskard.ai/oss/checks/explanation/async-and-pytest.md
+- JSONPath in Checks: https://docs-v3.giskard.ai/oss/checks/explanation/jsonpath-in-checks.md
 
 ### Checks Use Cases
-- RAG Evaluation: https://docs.giskard.ai/oss/checks/use-cases/rag-evaluation.md
-- Testing Agents: https://docs.giskard.ai/oss/checks/use-cases/testing-agents.md
-- Chatbot Testing: https://docs.giskard.ai/oss/checks/use-cases/chatbot-testing.md
-- Content Moderation: https://docs.giskard.ai/oss/checks/use-cases/content-moderation.md
+- RAG Evaluation: https://docs-v3.giskard.ai/oss/checks/use-cases/rag-evaluation.md
+- Testing Agents: https://docs-v3.giskard.ai/oss/checks/use-cases/testing-agents.md
+- Chatbot Testing: https://docs-v3.giskard.ai/oss/checks/use-cases/chatbot-testing.md
+- Content Moderation: https://docs-v3.giskard.ai/oss/checks/use-cases/content-moderation.md
