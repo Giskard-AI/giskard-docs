@@ -3,7 +3,7 @@ title: Welcome to Giskard
 description: Your comprehensive guide to LLM agent testing and evaluation.
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 Welcome to Giskard! This section will help you understand what Giskard is, choose the right offering for your needs, and get started quickly.
 
@@ -27,14 +27,16 @@ Welcome to Giskard! This section will help you understand what Giskard is, choos
 - **Knowledge bases** - Store and manage domain knowledge to enhance testing scenarios
 
 <CardGrid>
-  <Card title="Giskard Hub UI" icon="laptop" href="/hub/ui">
-    As a business user, you can use the Giskard Hub to create test datasets, run
-    evaluations, and manage your team.
-  </Card>
-  <Card title="Giskard Hub SDK" icon="code" href="/hub/sdk">
-    As a developer, you can use an SDK to interact with the Giskard Hub
-    programmatically.
-  </Card>
+  <LinkCard
+    title="Giskard Hub UI"
+    description="As a business user, use the Giskard Hub to create test datasets, run evaluations, and manage your team."
+    href="/hub/ui"
+  />
+  <LinkCard
+    title="Giskard Hub SDK"
+    description="As a developer, use the SDK to interact with the Giskard Hub programmatically."
+    href="/hub/sdk"
+  />
 </CardGrid>
 
 **Experience Giskard Hub Today:** Ready to unlock the full potential of enterprise-grade AI testing? Try **Giskard Hub** with a free trial and discover advanced team collaboration, continuous red teaming, and enterprise security features. [Start your free enterprise trial](/start/enterprise-trial) and see how Giskard Hub can transform your AI testing workflow.
@@ -49,18 +51,16 @@ The library provides a set of tools for testing and evaluating LLMs, including:
 - Automated detection of business logic failures using RAG Evaluation Toolkit.
 
 <CardGrid>
-  <Card title="Giskard Open Source" icon="github" href="/oss/sdk">
-    As a developer, you can use the Open Source SDK to get familiar with basic
-    testset generation for business and security failures.
-  </Card>
-  <Card
-    title="Deeplearning.AI"
-    icon="external"
+  <LinkCard
+    title="Giskard Open Source"
+    description="Use the Open Source SDK to get familiar with basic testset generation for business and security failures."
+    href="/oss"
+  />
+  <LinkCard
+    title="Deeplearning.AI Course"
+    description="Our course on red teaming LLM applications helps you understand how to test, red team, and evaluate LLM applications."
     href="https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/"
-  >
-    Our course on red teaming LLM applications on Deeplearning.AI helps you
-    understand how to test, red team and evaluate LLM applications.
-  </Card>
+  />
 </CardGrid>
 
 **Unsure about the difference between Open Source and Hub?** Check out our [comparison](/start/comparison) guide to learn more about the different features.
@@ -70,26 +70,23 @@ The library provides a set of tools for testing and evaluating LLMs, including:
 **Giskard Research** contributes to research on AI safety and security to showcase and understand the latest advancements in the field. Some work has been funded by the [the European Commission](https://commission.europa.eu/index_en), [Bpifrance](https://www.bpifrance.com/), and we've collaborated with leading AI research organizations like the [AI Incident Database](https://incidentdatabase.ai/) and [Google DeepMind](https://deepmind.google/).
 
 <CardGrid>
-  <Card title="Phare" icon="document">
-    Phare is a multilingual benchmark to evaluate LLMs across key safety & security dimensions, including hallucination, factual accuracy, bias, and potential harm.
-
-    - [Phare website](https://phare.giskard.ai/)
-    - [Phare arXiv paper](https://arxiv.org/abs/2505.11365)
-
-  </Card>
-  <Card title="RealHarm" icon="document">
-    RealHarm is a dataset of problematic interactions with textual AI agents built from a systematic review of publicly reported incidents.
-
-    - [RealHarm website](https://realharm.giskard.ai/)
-    - [RealHarm arXiv paper](https://arxiv.org/abs/2504.10277)
-
-  </Card>
-  <Card title="RealPerformance" icon="document">
-    RealPerformance is a dataset of functional issues of language models that mirrors failure patterns identified through rigorous testing in real LLM agents.
-
-    - [RealPerformance website](https://realperformance.giskard.ai/)
-
-  </Card>
+  <LinkCard
+    title="Phare"
+    description="Multilingual benchmark to evaluate LLMs across key safety & security dimensions, including hallucination, factual accuracy, bias, and potential harm."
+    href="https://phare.giskard.ai/"
+  />
+  <LinkCard
+    title="RealHarm"
+    description="Dataset of problematic interactions with textual AI agents built from a systematic review of publicly reported incidents."
+    href="https://realharm.giskard.ai/"
+  />
+  <LinkCard
+    title="RealPerformance"
+    description="Dataset of functional issues of language models that mirrors failure patterns identified through rigorous testing in real LLM agents."
+    href="https://realperformance.giskard.ai/"
+  />
 </CardGrid>
+
+**Papers:** [Phare (arXiv)](https://arxiv.org/abs/2505.11365) | [RealHarm (arXiv)](https://arxiv.org/abs/2504.10277)
 
 Are you interested in supporting our research? Check out our [Open Collective funding page for Phare](https://opencollective.com/phare-llm-benchmark).
