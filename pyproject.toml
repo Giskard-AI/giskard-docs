@@ -35,6 +35,9 @@ dev = [
     "python-dotenv>=1.0",
 ]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
 [project.urls]
 Homepage = "https://github.com/Giskard-AI/giskard-hub"
 Repository = "https://github.com/Giskard-AI/giskard-hub"
