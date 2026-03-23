@@ -36,8 +36,8 @@ Alternatively, you can run a remote evaluation using the convenient helper metho
 ```python
 evaluation = hub.helpers.evaluate(
     name="v2.2. regression run",
-    project=my_project, # giskard_hub.types.Project or str
-    dataset=my_dataset, # giskard_hub.types.Dataset or str
+    project=my_project,  # giskard_hub.types.Project or str
+    dataset=my_dataset,  # giskard_hub.types.Dataset or str
     agent=my_agent,  # giskard_hub.types.Agent or str
 )
 ```
@@ -81,14 +81,16 @@ Simply pass your callable as the `agent` parameter; this will automatically run 
 ```python
 from giskard_hub.types import ChatMessage, AgentOutput
 
+
 def my_agent(messages: list[ChatMessage]) -> str | ChatMessage | AgentOutput:
     # Call your local model or chain here
     user_input = messages[-1].content
 
     return ChatMessage(
         role="assistant",
-        content=f"Echo: {user_input}"  # replace with real inference
+        content=f"Echo: {user_input}",  # replace with real inference
     )
+
 
 evaluation = hub.helpers.evaluate(
     dataset="dataset-id",
@@ -155,8 +157,8 @@ hub.evaluations.results.update(
     failure_category={
         "identifier": "contradiction",
         "title": "Contradiction",
-        "description": "The agent incorrectly provides an answer that contradicts the information given in the context (for groundedness checks) or in the reference (for correctness checks)."
-    }
+        "description": "The agent incorrectly provides an answer that contradicts the information given in the context (for groundedness checks) or in the reference (for correctness checks).",
+    },
 )
 ```
 
@@ -178,21 +180,23 @@ After an evaluation completes, access the per-check aggregated metrics programma
 
 ```python
 for metric in evaluation.metrics:
-    print(f"{metric.name}: {metric.success_rate * 100:.1f}% "
-          f"({metric.passed} passed, {metric.failed} failed, {metric.errored} errored)")
+    print(
+        f"{metric.name}: {metric.success_rate * 100:.1f}% "
+        f"({metric.passed} passed, {metric.failed} failed, {metric.errored} errored)"
+    )
 ```
 
 Each `Metric` object has the following fields:
 
-| Field | Type | Description |
-|---|---|---|
-| `name` | `str` | Check identifier (e.g. `"correctness"`, `"global"`) |
-| `display_name` | `str` | Human-readable name |
-| `passed` | `int` | Number of test cases that passed |
-| `failed` | `int` | Number of test cases that failed |
-| `errored` | `int` | Number of test cases that errored |
-| `total` | `int` | Total number of test cases |
-| `success_rate` | `float` | Pass rate as a float between 0.0 and 1.0 |
+| Field          | Type    | Description                                         |
+| -------------- | ------- | --------------------------------------------------- |
+| `name`         | `str`   | Check identifier (e.g. `"correctness"`, `"global"`) |
+| `display_name` | `str`   | Human-readable name                                 |
+| `passed`       | `int`   | Number of test cases that passed                    |
+| `failed`       | `int`   | Number of test cases that failed                    |
+| `errored`      | `int`   | Number of test cases that errored                   |
+| `total`        | `int`   | Total number of test cases                          |
+| `success_rate` | `float` | Pass rate as a float between 0.0 and 1.0            |
 
 The special `"global"` metric aggregates across all checks.
 
@@ -209,7 +213,9 @@ hub.evaluations.rerun_errored_results("evaluation-id")
 Rerun a single specific result:
 
 ```python
-hub.evaluations.results.rerun_test_case("result-id", evaluation_id="evaluation-id")
+hub.evaluations.results.rerun_test_case(
+    "result-id", evaluation_id="evaluation-id"
+)
 ```
 
 ---
@@ -241,7 +247,9 @@ except Exception as e:
 global_metrics = [m for m in evaluation.metrics if m.name == "global"][0]
 pass_rate = global_metrics.success_rate * 100
 
-print(f"Pass rate: {pass_rate:.2f}% ({global_metrics.passed}/{global_metrics.total})")
+print(
+    f"Pass rate: {pass_rate:.2f}% ({global_metrics.passed}/{global_metrics.total})"
+)
 
 THRESHOLD = 90.0
 if pass_rate < THRESHOLD:
@@ -262,7 +270,11 @@ from giskard_hub.types import ChatMessage
 
 results = hub.evaluations.run_single(
     project_id="project-id",
-    agent_output={"response": ChatMessage(role="assistant", content="You can return anything within 30 days.")},
+    agent_output={
+        "response": ChatMessage(
+            role="assistant", content="You can return anything within 30 days."
+        )
+    },
     messages=[{"role": "user", "content": "What is your return policy?"}],
     checks=[
         {"identifier": "tone_professional"},
@@ -300,8 +312,8 @@ schedule = hub.scheduled_evaluations.create(
     dataset_id="dataset-id",
     name="Weekly regression check",
     frequency="weekly",
-    time="09:00",       # UTC time of day
-    day_of_week=1,      # 1 = Monday, 7 = Sunday
+    time="09:00",  # UTC time of day
+    day_of_week=1,  # 1 = Monday, 7 = Sunday
 )
 
 print(f"Scheduled evaluation created: {schedule.id}")
@@ -309,11 +321,11 @@ print(f"Scheduled evaluation created: {schedule.id}")
 
 ### Frequency options
 
-| `frequency` | Description | Required extra params |
-|---|---|---|
-| `"daily"` | Runs every day at the specified time | `time` |
-| `"weekly"` | Runs once a week | `time`, `day_of_week` (1–7) |
-| `"monthly"` | Runs once a month | `time`, `day_of_month` (1–28) |
+| `frequency` | Description                          | Required extra params         |
+| ----------- | ------------------------------------ | ----------------------------- |
+| `"daily"`   | Runs every day at the specified time | `time`                        |
+| `"weekly"`  | Runs once a week                     | `time`, `day_of_week` (1–7)   |
+| `"monthly"` | Runs once a month                    | `time`, `day_of_month` (1–28) |
 
 ```python
 # Daily at 06:00 UTC
@@ -357,7 +369,9 @@ scheduled_evaluation = hub.scheduled_evaluations.retrieve(
 
 print(f"Schedule: {scheduled_evaluation.name}")
 for evaluation in scheduled_evaluation.evaluations:
-    print(f"  Run {evaluation.id}: {evaluation.state} at {evaluation.created_at}")
+    print(
+        f"  Run {evaluation.id}: {evaluation.state} at {evaluation.created_at}"
+    )
 ```
 
 ### List past evaluation runs

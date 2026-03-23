@@ -1,8 +1,11 @@
 /**
  * convert-notebooks.mjs
  *
- * Converts every *.ipynb file found under src/content/docs/ to a co-located
- * .md file, injecting a Colab badge immediately after the frontmatter block.
+ * Converts every *.ipynb under src/content/docs/ to a co-located .mdx file,
+ * injecting a Colab badge after the frontmatter. Rich display outputs (e.g.
+ * Giskard HTML reports) are rendered like the hand-written docs: Starlight
+ * Card + <pre class="notebook-output-rich" set:html={...}>; base text uses
+ * --sl-color-text and custom.css remaps Jupyter hex colors in dark theme.
  *
  * Algorithm per notebook:
  *  1. JSON.parse the .ipynb file
@@ -10,14 +13,15 @@
  *  3. Remaining cells:
  *       "markdown" → emit source as-is
  *       "code"     → skip if first line is "# colab-only"; else wrap in ```python
+ *                     optional: following cell outputs → <Card title="Output">…{/Card>
  *       "raw"      → skip
- *  4. Build Colab URL from the file's path relative to repo root
- *  5. Write: frontmatter + "\n\n" + COLAB_BADGE + "\n\n" + body
+ *  4. Build Colab URL from path relative to git root
+ *  5. Write .mdx; remove sibling .md if present (avoid duplicate Starlight routes)
  *
  * Pure Node.js – no Python / Jupyter required.
  */
 
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, existsSync, unlinkSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
@@ -25,8 +29,6 @@ import { execSync } from 'node:child_process';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
-// Resolve the actual git repository root so the Colab path is correct for
-// notebooks that live in a subdirectory (e.g. docs-new/) of the repo.
 let GIT_ROOT = ROOT;
 let GITHUB_SLUG = 'Giskard-AI/giskard-docs'; // fallback
 try {
@@ -36,12 +38,21 @@ try {
   const remoteUrl = execSync('git remote get-url origin', { cwd: ROOT })
     .toString()
     .trim();
-  // Handles both https://github.com/org/repo.git and git@github.com:org/repo.git
   const match = remoteUrl.match(/github\.com[/:](.+?)(?:\.git)?$/);
   if (match) GITHUB_SLUG = match[1];
 } catch {
   // Not a git repo or no remote — fall back to the values above.
 }
+
+const PRE_STYLE_PROPS = `  style={{
+    whiteSpace: "pre",
+    overflowX: "auto",
+    lineHeight: "normal",
+    fontFamily: "Menlo, DejaVu Sans Mono, consolas, Courier New, monospace",
+    color: "var(--sl-color-text)",
+  }}`;
+
+const CARD_IMPORT = 'import { Card } from "@astrojs/starlight/components";';
 
 // ---------------------------------------------------------------------------
 // File discovery
@@ -65,7 +76,7 @@ function* walkSync(dir) {
 }
 
 // ---------------------------------------------------------------------------
-// Conversion
+// Conversion helpers
 // ---------------------------------------------------------------------------
 
 function cellSource(cell) {
@@ -74,39 +85,113 @@ function cellSource(cell) {
   return src ?? '';
 }
 
-function cellOutputText(cell) {
-  const outputs = cell.outputs;
-  if (!Array.isArray(outputs) || outputs.length === 0) return '';
+function normalizeText(t) {
+  return String(t ?? '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n$/, '');
+}
 
-  const lines = [];
+/** Inner HTML of top-level Rich/HTML repr (<pre style=…>…</pre>) or whole fragment. */
+function htmlDisplayFragment(html) {
+  const s = Array.isArray(html) ? html.join('') : String(html ?? '');
+  const m = s.match(/^<pre[^>]*>([\s\S]*)<\/pre>\s*$/i);
+  if (m) return m[1].trimEnd();
+  return s.trim();
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Plain stream/plain output: safe to emit as literal text inside <Card> (not inside braces). */
+function isSafeMdxCardLiteral(text) {
+  return !/[<>{}]/.test(text);
+}
+
+function preSetHtml(innerHtml) {
+  return `<pre
+  class="notebook-output-rich"
+${PRE_STYLE_PROPS}
+  set:html={${JSON.stringify(innerHtml)}}
+/>`;
+}
+
+function preEscapedText(text) {
+  return preSetHtml(escapeHtml(normalizeText(text)));
+}
+
+/**
+ * Flatten notebook outputs to ordered segments (stream text vs HTML rich blocks).
+ */
+function outputSegments(outputs) {
+  if (!Array.isArray(outputs) || outputs.length === 0) return [];
+
+  const chunks = [];
   for (const out of outputs) {
     if (out.output_type === 'stream') {
-      // stdout / stderr
-      const text = Array.isArray(out.text) ? out.text.join('') : (out.text ?? '');
-      if (text) lines.push(text.replace(/\n$/, ''));
+      const text = normalizeText(Array.isArray(out.text) ? out.text.join('') : (out.text ?? ''));
+      if (text) chunks.push({ kind: 'stream', name: out.name || 'stdout', text });
     } else if (out.output_type === 'execute_result' || out.output_type === 'display_data') {
-      // Prefer plain text; skip images and other non-text mime types
-      const plain = out.data?.['text/plain'];
+      const data = out.data || {};
+      const html = data['text/html'];
+      if (html) {
+        chunks.push({ kind: 'html', inner: htmlDisplayFragment(html) });
+        continue;
+      }
+      const plain = data['text/plain'];
       if (plain) {
-        const text = Array.isArray(plain) ? plain.join('') : plain;
-        lines.push(text.replace(/\n$/, ''));
+        const text = normalizeText(Array.isArray(plain) ? plain.join('') : plain);
+        if (text) chunks.push({ kind: 'stream', name: 'result', text });
       }
     } else if (out.output_type === 'error') {
-      lines.push(`${out.ename}: ${out.evalue}`);
+      const tb = Array.isArray(out.traceback) ? out.traceback.join('\n') : '';
+      const msg = normalizeText(`${out.ename || 'Error'}: ${out.evalue || ''}${tb ? '\n' + tb : ''}`);
+      if (msg) chunks.push({ kind: 'stream', name: 'stderr', text: msg });
     }
   }
 
-  if (lines.length === 0) return '';
-  return '```\n' + lines.join('\n') + '\n```';
+  // Merge consecutive stream chunks (stdout often splits across stream messages).
+  const merged = [];
+  for (const c of chunks) {
+    if (c.kind === 'stream' && merged.length && merged[merged.length - 1].kind === 'stream') {
+      merged[merged.length - 1].text += `\n${c.text}`;
+    } else {
+      merged.push({ ...c });
+    }
+  }
+  return merged;
+}
+
+function cellOutputsMdx(outputs) {
+  const segments = outputSegments(outputs);
+  if (segments.length === 0) return { mdx: '', usesCard: false };
+
+  const bodyParts = [];
+  for (const seg of segments) {
+    if (seg.kind === 'html') {
+      bodyParts.push(preSetHtml(seg.inner));
+    } else {
+      const t = normalizeText(seg.text);
+      if (isSafeMdxCardLiteral(t)) {
+        bodyParts.push(t);
+      } else {
+        bodyParts.push(preEscapedText(t));
+      }
+    }
+  }
+
+  const mdx = `<Card title="Output">\n\n${bodyParts.join('\n\n')}\n\n</Card>`;
+  return { mdx, usesCard: true };
 }
 
 function convertNotebook(notebookPath) {
   const nb = JSON.parse(readFileSync(notebookPath, 'utf8'));
   const cells = nb.cells ?? [];
 
-  // 1. Extract frontmatter from the first raw cell that starts with "---".
-  //    Some notebooks have setup code cells (e.g. nest-asyncio-setup) before
-  //    the frontmatter, so we scan rather than hard-coding index 0.
   let frontmatter = '';
   let startIdx = 0;
 
@@ -117,18 +202,17 @@ function convertNotebook(notebookPath) {
         frontmatter = src;
         startIdx = i + 1;
       }
-      break; // stop after first raw cell regardless
+      break;
     }
   }
 
-  // 2. Build Colab badge — path must be relative to the git repo root, not
-  //    just the docs-new/ working directory.
   const relPath = relative(GIT_ROOT, notebookPath).replace(/\\/g, '/');
   const colabUrl = `https://colab.research.google.com/github/${GITHUB_SLUG}/blob/main/${relPath}`;
   const colabBadge = `[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](${colabUrl})`;
 
-  // 3. Convert remaining cells
   const parts = [];
+  let needsCardImport = false;
+
   for (let i = startIdx; i < cells.length; i++) {
     const cell = cells[i];
     const src = cellSource(cell);
@@ -136,25 +220,31 @@ function convertNotebook(notebookPath) {
     if (cell.cell_type === 'markdown') {
       parts.push(src);
     } else if (cell.cell_type === 'code') {
-      // Skip colab-only cells (e.g. !pip install)
       if (src.trimStart().startsWith('# colab-only')) continue;
       parts.push('```python\n' + src + '\n```');
-      const outText = cellOutputText(cell);
-      if (outText) parts.push(outText);
+      const { mdx: outMdx, usesCard } = cellOutputsMdx(cell.outputs);
+      if (outMdx) {
+        parts.push(outMdx);
+        if (usesCard) needsCardImport = true;
+      }
     }
-    // raw cells (non-frontmatter) are intentionally skipped
   }
 
   const body = parts.join('\n\n');
 
-  // 4. Assemble output
-  const output = frontmatter
-    ? frontmatter + '\n\n' + colabBadge + '\n\n' + body
-    : colabBadge + '\n\n' + body;
+  const importBlock = needsCardImport ? `${CARD_IMPORT}\n\n` : '';
+  const afterFm = frontmatter
+    ? `${frontmatter}\n\n${importBlock}${colabBadge}\n\n${body}`
+    : `${importBlock}${colabBadge}\n\n${body}`;
 
-  // 5. Write .md next to the .ipynb
-  const outPath = notebookPath.replace(/\.ipynb$/, '.md');
-  writeFileSync(outPath, output, 'utf8');
+  const outPath = notebookPath.replace(/\.ipynb$/, '.mdx');
+  writeFileSync(outPath, afterFm, 'utf8');
+
+  const legacyMd = notebookPath.replace(/\.ipynb$/, '.md');
+  if (existsSync(legacyMd)) {
+    unlinkSync(legacyMd);
+    console.log(`  removed legacy: ${relative(GIT_ROOT, legacyMd)}`);
+  }
 
   const relOut = relative(GIT_ROOT, outPath);
   console.log(`  converted: ${relPath} → ${relOut}`);
@@ -168,7 +258,6 @@ const contentDir = join(ROOT, 'src', 'content', 'docs');
 const notebooks = [...walkSync(contentDir)];
 
 if (notebooks.length === 0) {
-  // Safe no-op: astro build will use the pre-committed .md files
   process.exit(0);
 }
 

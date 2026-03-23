@@ -35,9 +35,9 @@ The Hub sends a POST request to `url` with a JSON body containing a `messages` a
 ```json
 {
   "messages": [
-    {"role": "user", "content": "What is your return policy?"},
-    {"role": "assistant", "content": "We offer a 30-day return policy."},
-    {"role": "user", "content": "Does that apply to sale items?"}
+    { "role": "user", "content": "What is your return policy?" },
+    { "role": "assistant", "content": "We offer a 30-day return policy." },
+    { "role": "user", "content": "Does that apply to sale items?" }
   ]
 }
 ```
@@ -129,9 +129,18 @@ Documents are provided as a JSON or JSONL file where each record has a `text` fi
 
 ```python
 documents = [
-    {"text": "Our return policy allows returns within 30 days of purchase.", "topic": "Returns"},
-    {"text": "Free shipping is available on all orders over $50.", "topic": "Shipping"},
-    {"text": "You can track your order via the link in your confirmation email.", "topic": "Shipping"},
+    {
+        "text": "Our return policy allows returns within 30 days of purchase.",
+        "topic": "Returns",
+    },
+    {
+        "text": "Free shipping is available on all orders over $50.",
+        "topic": "Shipping",
+    },
+    {
+        "text": "You can track your order via the link in your confirmation email.",
+        "topic": "Shipping",
+    },
 ]
 
 kb = hub.knowledge_bases.create(
@@ -236,7 +245,7 @@ scan = hub.scans.create(
     project_id="project-id",
     agent_id="agent-id",
     knowledge_base_id="kb-id",
-    tags=["gsk:threat-type='hallucination'"], # Hallucination
+    tags=["gsk:threat-type='hallucination'"],  # Hallucination
 )
 ```
 

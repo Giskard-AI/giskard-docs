@@ -49,20 +49,36 @@ Complete API documentation for Giskard Checks -- a comprehensive testing framewo
 ```python
 from giskard.checks import (
     # Core types
-    Check, CheckResult, CheckStatus,
-    Interaction, Trace,
-    InteractionSpec, Scenario, TestCase,
+    Check,
+    CheckResult,
+    CheckStatus,
+    Interaction,
+    Trace,
+    InteractionSpec,
+    Scenario,
+    TestCase,
     # Built-in checks
-    FnCheck, StringMatching, Equals, NotEquals,
-    LesserThan, GreaterThan, LesserThanEquals, GreaterEquals,
+    FnCheck,
+    StringMatching,
+    Equals,
+    NotEquals,
+    LesserThan,
+    GreaterThan,
+    LesserThanEquals,
+    GreaterEquals,
     # Configuration
-    set_default_generator, get_default_generator,
+    set_default_generator,
+    get_default_generator,
 )
 
 # LLM-based checks
 from giskard.checks import (
-    BaseLLMCheck, LLMCheckResult,
-    Groundedness, Conformity, LLMJudge, SemanticSimilarity,
+    BaseLLMCheck,
+    LLMCheckResult,
+    Groundedness,
+    Conformity,
+    LLMJudge,
+    SemanticSimilarity,
 )
 ```
 

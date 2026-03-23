@@ -5,9 +5,9 @@ sidebar:
   order: 2
 ---
 
-import Property from '../../../../../components/api/Property.astro';
-import MethodCard from '../../../../../components/api/MethodCard.astro';
-import TypeTable from '../../../../../components/api/TypeTable.astro';
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
 
 Base classes and fundamental types for building checks and scenarios.
 
@@ -20,8 +20,12 @@ Base classes and fundamental types for building checks and scenarios.
 Base class for all checks. Subclass and register with `@Check.register("kind")` to create custom validation logic.
 
 <TypeTable name="Check">
-  <Property name="name" type="str | None" defaultValue="None">Optional check name for reporting.</Property>
-  <Property name="description" type="str | None" defaultValue="None">Human-readable description of what the check validates.</Property>
+  <Property name="name" type="str | None" defaultValue="None">
+    Optional check name for reporting.
+  </Property>
+  <Property name="description" type="str | None" defaultValue="None">
+    Human-readable description of what the check validates.
+  </Property>
 </TypeTable>
 
 <MethodCard name=".run()" returnType="CheckResult">
@@ -34,6 +38,7 @@ Base class for all checks. Subclass and register with `@Check.register("kind")` 
 
 ```python
 from giskard.checks import Check, CheckResult, Trace
+
 
 @Check.register("my_custom_check")
 class MyCustomCheck(Check):
@@ -67,10 +72,18 @@ Use the `@Check.register()` decorator to make your check discoverable and enable
 Immutable result produced by running a check.
 
 <TypeTable name="CheckResult">
-  <Property name="status" type="CheckStatus">Outcome status (PASS, FAIL, ERROR, SKIP).</Property>
-  <Property name="message" type="str | None">Optional short message to surface to users.</Property>
-  <Property name="metrics" type="list[Metric]">List of auxiliary metrics captured by the check.</Property>
-  <Property name="details" type="dict[str, Any]">Arbitrary structured payload with additional context.</Property>
+  <Property name="status" type="CheckStatus">
+    Outcome status (PASS, FAIL, ERROR, SKIP).
+  </Property>
+  <Property name="message" type="str | None">
+    Optional short message to surface to users.
+  </Property>
+  <Property name="metrics" type="list[Metric]">
+    List of auxiliary metrics captured by the check.
+  </Property>
+  <Property name="details" type="dict[str, Any]">
+    Arbitrary structured payload with additional context.
+  </Property>
 </TypeTable>
 
 ### Factory methods
@@ -80,8 +93,12 @@ Use the static factory methods to create results:
 ```python
 from giskard.checks import CheckResult
 
-result = CheckResult.success(message="All validations passed", details={"score": 0.95})
-result = CheckResult.failure(message="Score below threshold", details={"score": 0.65})
+result = CheckResult.success(
+    message="All validations passed", details={"score": 0.95}
+)
+result = CheckResult.failure(
+    message="Score below threshold", details={"score": 0.65}
+)
 result = CheckResult.error(message="Failed to connect to API")
 result = CheckResult.skip(message="Skipped: No outputs available")
 ```
@@ -89,10 +106,18 @@ result = CheckResult.skip(message="Skipped: No outputs available")
 ### Instance properties
 
 <TypeTable name="CheckResult properties">
-  <Property name="passed" type="bool">True if status is PASS.</Property>
-  <Property name="failed" type="bool">True if status is FAIL.</Property>
-  <Property name="errored" type="bool">True if status is ERROR.</Property>
-  <Property name="skipped" type="bool">True if status is SKIP.</Property>
+  <Property name="passed" type="bool">
+    True if status is PASS.
+  </Property>
+  <Property name="failed" type="bool">
+    True if status is FAIL.
+  </Property>
+  <Property name="errored" type="bool">
+    True if status is ERROR.
+  </Property>
+  <Property name="skipped" type="bool">
+    True if status is SKIP.
+  </Property>
 </TypeTable>
 
 ---
@@ -103,12 +128,12 @@ result = CheckResult.skip(message="Skipped: No outputs available")
 
 Enumeration of possible check execution outcomes.
 
-| Status | Description |
-|---|---|
-| `PASS` | Check validation succeeded |
-| `FAIL` | Check validation failed |
-| `ERROR` | Unexpected error during check execution |
-| `SKIP` | Check was skipped (e.g. precondition not met) |
+| Status  | Description                                   |
+| ------- | --------------------------------------------- |
+| `PASS`  | Check validation succeeded                    |
+| `FAIL`  | Check validation failed                       |
+| `ERROR` | Unexpected error during check execution       |
+| `SKIP`  | Check was skipped (e.g. precondition not met) |
 
 ```python
 from giskard.checks import CheckStatus
@@ -126,9 +151,15 @@ if result.status == CheckStatus.PASS:
 A single exchange between inputs and outputs.
 
 <TypeTable name="Interaction">
-  <Property name="inputs" type="InputType">Input values for this interaction (e.g. user message, API request).</Property>
-  <Property name="outputs" type="OutputType">Output values produced in response (e.g. assistant reply, API response).</Property>
-  <Property name="metadata" type="dict[str, Any]">Optional metadata (timing, tool calls, intermediate states, etc.).</Property>
+  <Property name="inputs" type="InputType">
+    Input values for this interaction (e.g. user message, API request).
+  </Property>
+  <Property name="outputs" type="OutputType">
+    Output values produced in response (e.g. assistant reply, API response).
+  </Property>
+  <Property name="metadata" type="dict[str, Any]">
+    Optional metadata (timing, tool calls, intermediate states, etc.).
+  </Property>
 </TypeTable>
 
 ```python
@@ -162,8 +193,12 @@ Interactions are typically created through the scenario builder's `.interact()` 
 Immutable history of all interactions in a scenario. Passed to checks for validation and to interaction specs for generating subsequent interactions.
 
 <TypeTable name="Trace">
-  <Property name="interactions" type="list[Interaction]">Ordered list of all interactions. Most recent at `[-1]`.</Property>
-  <Property name="last" type="Interaction | None">Computed property returning the last interaction, or None if empty.</Property>
+  <Property name="interactions" type="list[Interaction]">
+    Ordered list of all interactions. Most recent at `[-1]`.
+  </Property>
+  <Property name="last" type="Interaction | None">
+    Computed property returning the last interaction, or None if empty.
+  </Property>
 </TypeTable>
 
 ```python
@@ -171,7 +206,7 @@ Immutable history of all interactions in a scenario. Passed to checks for valida
 @Check.register("trace_check")
 class TraceCheck(Check):
     async def run(self, trace: Trace) -> CheckResult:
-        last = trace.last               # most recent interaction
+        last = trace.last  # most recent interaction
         all_interactions = trace.interactions  # full history
         count = len(trace.interactions)
         return CheckResult.success(message=f"Processed {count} interactions")
@@ -193,7 +228,9 @@ Declarative specification for generating interactions. Supports static values or
 from giskard.checks import Scenario
 
 # Static values
-scenario = Scenario("static").interact(inputs="test input", outputs="test output")
+scenario = Scenario("static").interact(
+    inputs="test input", outputs="test output"
+)
 
 # Callable outputs — dynamic generation
 scenario = Scenario("dynamic").interact(
@@ -240,7 +277,9 @@ from giskard.checks import Scenario, FnCheck
 result = await (
     Scenario("multi_step_flow")
     .interact(inputs="Hello", outputs="Hi there!")
-    .check(FnCheck(fn=lambda trace: "Hi" in trace.last.outputs, name="greeting"))
+    .check(
+        FnCheck(fn=lambda trace: "Hi" in trace.last.outputs, name="greeting")
+    )
     .interact(inputs="What's the weather?", outputs="It's sunny!")
     .check(FnCheck(fn=lambda trace: len(trace.interactions) == 2, name="count"))
     .run()
@@ -260,8 +299,12 @@ print(f"Status: {result.status}")
 Extract values using JSONPath expressions from a trace.
 
 <MethodCard name="resolve()" returnType="Any | NoMatch">
-  <Property name="trace" type="Trace" required>The trace to extract from.</Property>
-  <Property name="path" type="str" required>JSONPath expression.</Property>
+  <Property name="trace" type="Trace" required>
+    The trace to extract from.
+  </Property>
+  <Property name="path" type="str" required>
+    JSONPath expression.
+  </Property>
 </MethodCard>
 
 ```python
@@ -276,13 +319,13 @@ model_name = resolve(trace, "trace.interactions[0].metadata.model")
 
 **Common JSONPath patterns:**
 
-| Pattern | Description |
-|---|---|
-| `trace.last.inputs` | Last interaction inputs |
-| `trace.last.outputs` | Last interaction outputs |
-| `trace.last.metadata.key` | Metadata from last interaction |
-| `trace.interactions[0]` | First interaction |
-| `trace.interactions[-1]` | Last interaction (same as `trace.last`) |
+| Pattern                   | Description                             |
+| ------------------------- | --------------------------------------- |
+| `trace.last.inputs`       | Last interaction inputs                 |
+| `trace.last.outputs`      | Last interaction outputs                |
+| `trace.last.metadata.key` | Metadata from last interaction          |
+| `trace.interactions[0]`   | First interaction                       |
+| `trace.interactions[-1]`  | Last interaction (same as `trace.last`) |
 
 ---
 
@@ -308,6 +351,7 @@ set_default_generator(Generator(model="openai/gpt-5"))
 
 # Now LLM checks will use this generator by default
 from giskard.checks import Groundedness
+
 check = Groundedness()  # uses the default generator
 ```
 

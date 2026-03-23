@@ -5,10 +5,10 @@ sidebar:
   order: 3
 ---
 
-import Property from '../../../../../components/api/Property.astro';
-import MethodCard from '../../../../../components/api/MethodCard.astro';
-import ResourceSection from '../../../../../components/api/ResourceSection.astro';
-import TypeTable from '../../../../../components/api/TypeTable.astro';
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import ResourceSection from "../../../../../components/api/ResourceSection.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
 
 Ready-to-use validation checks for common testing scenarios, including function-based checks, string matching, comparisons, and LLM-powered semantic validation.
 
@@ -22,12 +22,24 @@ Ready-to-use validation checks for common testing scenarios, including function-
 
 **Module:** `giskard.checks.builtin.fn`
 
-<Property name="fn" type="Callable" required>Function taking a `Trace`, returning `bool` or `CheckResult`.</Property>
-<Property name="name" type="str | None" defaultValue="None">Optional check name.</Property>
-<Property name="description" type="str | None" defaultValue="None">Optional description.</Property>
-<Property name="success_message" type="str | None" defaultValue="None">Message when check passes.</Property>
-<Property name="failure_message" type="str | None" defaultValue="None">Message when check fails.</Property>
-<Property name="details" type="dict | None" defaultValue="None">Additional details to include in result.</Property>
+<Property name="fn" type="Callable" required>
+  Function taking a `Trace`, returning `bool` or `CheckResult`.
+</Property>
+<Property name="name" type="str | None" defaultValue="None">
+  Optional check name.
+</Property>
+<Property name="description" type="str | None" defaultValue="None">
+  Optional description.
+</Property>
+<Property name="success_message" type="str | None" defaultValue="None">
+  Message when check passes.
+</Property>
+<Property name="failure_message" type="str | None" defaultValue="None">
+  Message when check fails.
+</Property>
+<Property name="details" type="dict | None" defaultValue="None">
+  Additional details to include in result.
+</Property>
 
 ```python
 from giskard.checks import FnCheck
@@ -40,10 +52,12 @@ check = FnCheck(
     failure_message="No output found",
 )
 
+
 # Async check
 async def validate_response(trace):
     is_valid = await external_validator(trace.last.outputs)
     return is_valid
+
 
 check = FnCheck(fn=validate_response, name="async_validation")
 ```
@@ -60,10 +74,18 @@ check = FnCheck(fn=validate_response, name="async_validation")
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="keyword" type="str">Substring to search for (or use `keyword_key` to extract from trace).</Property>
-<Property name="keyword_key" type="str">JSONPath to extract keyword from trace.</Property>
-<Property name="text_key" type="str" defaultValue='"trace.last.outputs"'>JSONPath to extract text to search in.</Property>
-<Property name="case_sensitive" type="bool" defaultValue="True">Whether matching is case-sensitive.</Property>
+<Property name="keyword" type="str">
+  Substring to search for (or use `keyword_key` to extract from trace).
+</Property>
+<Property name="keyword_key" type="str">
+  JSONPath to extract keyword from trace.
+</Property>
+<Property name="text_key" type="str" defaultValue='"trace.last.outputs"'>
+  JSONPath to extract text to search in.
+</Property>
+<Property name="case_sensitive" type="bool" defaultValue="True">
+  Whether matching is case-sensitive.
+</Property>
 
 ```python
 from giskard.checks import StringMatching
@@ -71,7 +93,9 @@ from giskard.checks import StringMatching
 check = StringMatching(keyword="success", text_key="trace.last.outputs")
 
 # Case-insensitive
-check = StringMatching(keyword="error", text_key="trace.last.outputs", case_sensitive=False)
+check = StringMatching(
+    keyword="error", text_key="trace.last.outputs", case_sensitive=False
+)
 ```
 
 </ResourceSection>
@@ -82,8 +106,12 @@ check = StringMatching(keyword="error", text_key="trace.last.outputs", case_sens
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="pattern" type="str" required>Regular expression pattern.</Property>
-<Property name="text_key" type="str" defaultValue='"trace.last.outputs"'>JSONPath to extract text to match against.</Property>
+<Property name="pattern" type="str" required>
+  Regular expression pattern.
+</Property>
+<Property name="text_key" type="str" defaultValue='"trace.last.outputs"'>
+  JSONPath to extract text to match against.
+</Property>
 
 ```python
 from giskard.checks import RegexMatching
@@ -106,10 +134,18 @@ Validate numeric and comparable values against expected thresholds.
 
 All comparison checks share these parameters:
 
-<Property name="expected_value" type="Any | None">Static expected value.</Property>
-<Property name="expected_value_key" type="str | None">JSONPath to extract expected value from trace.</Property>
-<Property name="key" type="str" required>JSONPath to extract the actual value from the trace.</Property>
-<Property name="normalization_form" type="str | None">Unicode normalization: `"NFC"`, `"NFD"`, `"NFKC"`, `"NFKD"`.</Property>
+<Property name="expected_value" type="Any | None">
+  Static expected value.
+</Property>
+<Property name="expected_value_key" type="str | None">
+  JSONPath to extract expected value from trace.
+</Property>
+<Property name="key" type="str" required>
+  JSONPath to extract the actual value from the trace.
+</Property>
+<Property name="normalization_form" type="str | None">
+  Unicode normalization: `"NFC"`, `"NFD"`, `"NFKC"`, `"NFKD"`.
+</Property>
 
 Provide exactly one of `expected_value` or `expected_value_key`.
 
@@ -136,6 +172,7 @@ Check that extracted values do **not** equal an expected value.
 
 ```python
 from giskard.checks import NotEquals
+
 check = NotEquals(expected_value="error", key="trace.last.outputs.status")
 ```
 
@@ -144,7 +181,9 @@ check = NotEquals(expected_value="error", key="trace.last.outputs.status")
 ```python
 from giskard.checks import GreaterThan, GreaterEquals
 
-check = GreaterThan(expected_value=0.8, key="trace.last.metadata.confidence_score")
+check = GreaterThan(
+    expected_value=0.8, key="trace.last.metadata.confidence_score"
+)
 check = GreaterEquals(expected_value=100, key="trace.last.outputs.user_count")
 ```
 
@@ -154,7 +193,9 @@ check = GreaterEquals(expected_value=100, key="trace.last.outputs.user_count")
 from giskard.checks import LesserThan, LesserThanEquals
 
 check = LesserThan(expected_value=500, key="trace.last.metadata.latency_ms")
-check = LesserThanEquals(expected_value=1000, key="trace.last.metadata.token_count")
+check = LesserThanEquals(
+    expected_value=1000, key="trace.last.metadata.token_count"
+)
 ```
 
 ---
@@ -170,12 +211,22 @@ Validation checks powered by Large Language Models for semantic understanding.
 **Module:** `giskard.checks.judges.base`
 
 <TypeTable name="BaseLLMCheck">
-  <Property name="generator" type="BaseGenerator | None" defaultValue="None">LLM generator for evaluation. Falls back to the global default if not provided.</Property>
-  <Property name="name" type="str | None" defaultValue="None">Optional check name.</Property>
-  <Property name="description" type="str | None" defaultValue="None">Optional description.</Property>
+  <Property name="generator" type="BaseGenerator | None" defaultValue="None">
+    LLM generator for evaluation. Falls back to the global default if not
+    provided.
+  </Property>
+  <Property name="name" type="str | None" defaultValue="None">
+    Optional check name.
+  </Property>
+  <Property name="description" type="str | None" defaultValue="None">
+    Optional description.
+  </Property>
 </TypeTable>
 
-<MethodCard name=".get_prompt()" returnType="str | Message | MessageTemplate | TemplateReference">
+<MethodCard
+  name=".get_prompt()"
+  returnType="str | Message | MessageTemplate | TemplateReference"
+>
   Returns the prompt to send to the LLM. Subclasses must implement this method.
 </MethodCard>
 
@@ -194,6 +245,7 @@ Validation checks powered by Large Language Models for semantic understanding.
 ```python
 from giskard.checks.judges.base import BaseLLMCheck
 
+
 @BaseLLMCheck.register("custom_llm_check")
 class CustomLLMCheck(BaseLLMCheck):
     custom_instruction: str
@@ -208,7 +260,10 @@ class CustomLLMCheck(BaseLLMCheck):
         Return passed=true if criteria are met, passed=false otherwise.
         """
 
-check = CustomLLMCheck(custom_instruction="Response must be concise and helpful")
+
+check = CustomLLMCheck(
+    custom_instruction="Response must be concise and helpful"
+)
 ```
 
 </ResourceSection>
@@ -220,8 +275,12 @@ check = CustomLLMCheck(custom_instruction="Response must be concise and helpful"
 Default result model for LLM-based checks. This is the structured output format expected from the LLM.
 
 <TypeTable name="LLMCheckResult">
-  <Property name="passed" type="bool">Whether the check passed.</Property>
-  <Property name="reason" type="str | None">Optional explanation for the result.</Property>
+  <Property name="passed" type="bool">
+    Whether the check passed.
+  </Property>
+  <Property name="reason" type="str | None">
+    Optional explanation for the result.
+  </Property>
 </TypeTable>
 
 ---
@@ -232,11 +291,25 @@ Default result model for LLM-based checks. This is the structured output format 
 
 **Module:** `giskard.checks.judges.groundedness`
 
-<Property name="answer" type="str | None">The answer text to evaluate (static).</Property>
-<Property name="answer_key" type="str" defaultValue='"trace.last.outputs"'>JSONPath to extract answer from trace.</Property>
-<Property name="context" type="str | list[str] | None">Context document(s) that should support the answer (static).</Property>
-<Property name="context_key" type="str" defaultValue='"trace.last.metadata.context"'>JSONPath to extract context from trace.</Property>
-<Property name="generator" type="BaseGenerator | None">LLM generator for evaluation.</Property>
+<Property name="answer" type="str | None">
+  The answer text to evaluate (static).
+</Property>
+<Property name="answer_key" type="str" defaultValue='"trace.last.outputs"'>
+  JSONPath to extract answer from trace.
+</Property>
+<Property name="context" type="str | list[str] | None">
+  Context document(s) that should support the answer (static).
+</Property>
+<Property
+  name="context_key"
+  type="str"
+  defaultValue='"trace.last.metadata.context"'
+>
+  JSONPath to extract context from trace.
+</Property>
+<Property name="generator" type="BaseGenerator | None">
+  LLM generator for evaluation.
+</Property>
 
 ```python
 from giskard.checks import Groundedness
@@ -244,7 +317,10 @@ from giskard.checks import Groundedness
 # Static values
 check = Groundedness(
     answer="The Eiffel Tower is in Paris.",
-    context=["Paris is the capital of France.", "The Eiffel Tower is a famous landmark."],
+    context=[
+        "Paris is the capital of France.",
+        "The Eiffel Tower is a famous landmark.",
+    ],
 )
 
 # Extract from trace
@@ -264,8 +340,13 @@ check = Groundedness(
 
 **Module:** `giskard.checks.judges.conformity`
 
-<Property name="rule" type="str" required>The conformity rule to evaluate. Supports Jinja2 templating with access to the `trace` object.</Property>
-<Property name="generator" type="BaseGenerator | None">LLM generator for evaluation (falls back to default).</Property>
+<Property name="rule" type="str" required>
+  The conformity rule to evaluate. Supports Jinja2 templating with access to the
+  `trace` object.
+</Property>
+<Property name="generator" type="BaseGenerator | None">
+  LLM generator for evaluation (falls back to default).
+</Property>
 
 ```python
 from giskard.checks import Conformity
@@ -279,7 +360,9 @@ check = Conformity(
 )
 
 # Reference metadata
-check = Conformity(rule="Use a {{ trace.last.metadata.tone }} tone in the response")
+check = Conformity(
+    rule="Use a {{ trace.last.metadata.tone }} tone in the response"
+)
 ```
 
 </ResourceSection>
@@ -292,21 +375,27 @@ check = Conformity(rule="Use a {{ trace.last.metadata.tone }} tone in the respon
 
 **Module:** `giskard.checks.judges.judge`
 
-<Property name="prompt" type="str | None">Inline prompt content with Jinja2 templating support.</Property>
-<Property name="prompt_path" type="str | None">Path to a template file (e.g. `"checks::my_template.j2"`).</Property>
-<Property name="generator" type="BaseGenerator | None">LLM generator for evaluation.</Property>
+<Property name="prompt" type="str | None">
+  Inline prompt content with Jinja2 templating support.
+</Property>
+<Property name="prompt_path" type="str | None">
+  Path to a template file (e.g. `"checks::my_template.j2"`).
+</Property>
+<Property name="generator" type="BaseGenerator | None">
+  LLM generator for evaluation.
+</Property>
 
 Exactly one of `prompt` or `prompt_path` must be provided.
 
 **Template variables available in prompts:**
 
-| Variable | Description |
-|---|---|
-| `trace` | Full trace object with all interactions |
-| `trace.interactions` | List of all interactions in order |
-| `trace.last` | Most recent interaction |
-| `trace.last.inputs` | Inputs from the most recent interaction |
-| `trace.last.outputs` | Outputs from the most recent interaction |
+| Variable              | Description                               |
+| --------------------- | ----------------------------------------- |
+| `trace`               | Full trace object with all interactions   |
+| `trace.interactions`  | List of all interactions in order         |
+| `trace.last`          | Most recent interaction                   |
+| `trace.last.inputs`   | Inputs from the most recent interaction   |
+| `trace.last.outputs`  | Outputs from the most recent interaction  |
 | `trace.last.metadata` | Metadata from the most recent interaction |
 
 ```python
@@ -341,11 +430,12 @@ check = LLMJudge(
 ```
 
 :::tip[When to use LLMJudge]
+
 - Custom evaluation criteria not covered by other checks
 - Multi-turn conversation analysis
 - Complex decision trees requiring LLM reasoning
 - Domain-specific validation logic
-:::
+  :::
 
 </ResourceSection>
 
@@ -357,11 +447,29 @@ check = LLMJudge(
 
 **Module:** `giskard.checks.builtin.semantic_similarity`
 
-<Property name="reference_text" type="str | None">Reference text to compare against (static).</Property>
-<Property name="reference_text_key" type="str" defaultValue='"trace.last.metadata.reference_text"'>JSONPath to extract reference text from trace.</Property>
-<Property name="actual_answer_key" type="str" defaultValue='"trace.last.outputs"'>JSONPath to extract actual value from trace.</Property>
-<Property name="threshold" type="float" defaultValue="0.8">Similarity threshold (0.0 to 1.0).</Property>
-<Property name="generator" type="BaseGenerator | None">LLM generator for evaluation.</Property>
+<Property name="reference_text" type="str | None">
+  Reference text to compare against (static).
+</Property>
+<Property
+  name="reference_text_key"
+  type="str"
+  defaultValue='"trace.last.metadata.reference_text"'
+>
+  JSONPath to extract reference text from trace.
+</Property>
+<Property
+  name="actual_answer_key"
+  type="str"
+  defaultValue='"trace.last.outputs"'
+>
+  JSONPath to extract actual value from trace.
+</Property>
+<Property name="threshold" type="float" defaultValue="0.8">
+  Similarity threshold (0.0 to 1.0).
+</Property>
+<Property name="generator" type="BaseGenerator | None">
+  LLM generator for evaluation.
+</Property>
 
 ```python
 from giskard.checks import SemanticSimilarity
@@ -390,9 +498,17 @@ scenario = (
         inputs="What is the capital of France?",
         outputs=lambda inputs: "Paris is the capital of France.",
     )
-    .check(Groundedness(context=["France is a country in Europe.", "Paris is the capital."]))
+    .check(
+        Groundedness(
+            context=["France is a country in Europe.", "Paris is the capital."]
+        )
+    )
     .check(Conformity(rule="The response must be a complete sentence"))
-    .check(LLMJudge(prompt="Is the response educational? Return passed=true/false."))
+    .check(
+        LLMJudge(
+            prompt="Is the response educational? Return passed=true/false."
+        )
+    )
 )
 ```
 
@@ -416,6 +532,7 @@ check3 = LLMJudge(prompt="...")
 ```python
 from giskard.checks import Check, CheckResult, Trace
 
+
 @Check.register("custom_business_logic")
 class CustomBusinessCheck(Check):
     threshold: float = 0.9
@@ -429,7 +546,10 @@ class CustomBusinessCheck(Check):
         if category not in self.allowed_categories:
             return CheckResult.failure(
                 message=f"Invalid category: {category}",
-                details={"category": category, "allowed": self.allowed_categories},
+                details={
+                    "category": category,
+                    "allowed": self.allowed_categories,
+                },
             )
 
         if confidence < self.threshold:
@@ -439,7 +559,10 @@ class CustomBusinessCheck(Check):
 
         return CheckResult.success(message="Validation passed")
 
-check = CustomBusinessCheck(threshold=0.85, allowed_categories=["sports", "news"])
+
+check = CustomBusinessCheck(
+    threshold=0.85, allowed_categories=["sports", "news"]
+)
 ```
 
 ---

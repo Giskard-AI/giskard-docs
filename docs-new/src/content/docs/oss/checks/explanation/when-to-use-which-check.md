@@ -9,13 +9,13 @@ Three check families cover most use cases. Pick the simplest one that can expres
 
 ## Tradeoffs at a Glance
 
-|  | Rule-based | Semantic similarity | LLM-as-judge |
-| --- | --- | --- | --- |
-| **Examples** | `Equals`, `StringMatching`, `FnCheck` | `SemanticSimilarity` | `Groundedness`, `Conformity`, `LLMJudge` |
-| **Cost** | Free | Low (embedding call) | Medium–High (LLM call) |
-| **Latency** | <1 ms | ~50–200 ms | ~1–10 s |
-| **Deterministic** | Yes | Near-deterministic | No |
-| **Best for** | Exact values, keywords, formats | Meaning-equivalent answers | Tone, reasoning, policy compliance |
+|                   | Rule-based                            | Semantic similarity        | LLM-as-judge                             |
+| ----------------- | ------------------------------------- | -------------------------- | ---------------------------------------- |
+| **Examples**      | `Equals`, `StringMatching`, `FnCheck` | `SemanticSimilarity`       | `Groundedness`, `Conformity`, `LLMJudge` |
+| **Cost**          | Free                                  | Low (embedding call)       | Medium–High (LLM call)                   |
+| **Latency**       | <1 ms                                 | ~50–200 ms                 | ~1–10 s                                  |
+| **Deterministic** | Yes                                   | Near-deterministic         | No                                       |
+| **Best for**      | Exact values, keywords, formats       | Meaning-equivalent answers | Tone, reasoning, policy compliance       |
 
 ## Choosing the Right Check
 

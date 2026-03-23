@@ -35,6 +35,7 @@ Scans can take several minutes. The default `wait_for_completion` timeout is 30 
 ```python
 scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)
 ```
+
 :::
 
 ---
@@ -43,19 +44,19 @@ scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)
 
 Use tags to focus the scan on specific vulnerability categories. Giskard covers a subset of the [OWASP LLM Top 10 (2025)](https://genai.owasp.org/llm-top-10/) as well as additional categories that go beyond the OWASP framework.
 
-| Tag | Category | OWASP mapping |
-|---|---|---|
-| `gsk:threat-type='prompt-injection'` | Prompt Injection | LLM01 |
-| `gsk:threat-type='data-privacy-exfiltration'` | Data Privacy & Exfiltration | LLM05 |
-| `gsk:threat-type='excessive-agency'` | Excessive Agency | LLM06 |
-| `gsk:threat-type='internal-information-exposure'` | Internal Information Exposure | LLM01-07 |
-| `gsk:threat-type='training-data-extraction'` | Training Data Extraction | LLM02 |
-| `gsk:threat-type='denial-of-service'` | Denial of Service | LLM10 |
-| `gsk:threat-type='hallucination'` | Misinformation / Hallucination | LLM09 |
-| `gsk:threat-type='harmful-content-generation'` | Harmful Content Generation | — |
-| `gsk:threat-type='misguidance-and-unauthorized-advice'` | Misguidance & Unauthorized Advice | — |
-| `gsk:threat-type='legal-and-financial-risk'` | Legal & Financial Risk | — |
-| `gsk:threat-type='brand-damaging-and-reputation'` | Brand Damaging & Reputation | — |
+| Tag                                                     | Category                          | OWASP mapping |
+| ------------------------------------------------------- | --------------------------------- | ------------- |
+| `gsk:threat-type='prompt-injection'`                    | Prompt Injection                  | LLM01         |
+| `gsk:threat-type='data-privacy-exfiltration'`           | Data Privacy & Exfiltration       | LLM05         |
+| `gsk:threat-type='excessive-agency'`                    | Excessive Agency                  | LLM06         |
+| `gsk:threat-type='internal-information-exposure'`       | Internal Information Exposure     | LLM01-07      |
+| `gsk:threat-type='training-data-extraction'`            | Training Data Extraction          | LLM02         |
+| `gsk:threat-type='denial-of-service'`                   | Denial of Service                 | LLM10         |
+| `gsk:threat-type='hallucination'`                       | Misinformation / Hallucination    | LLM09         |
+| `gsk:threat-type='harmful-content-generation'`          | Harmful Content Generation        | —             |
+| `gsk:threat-type='misguidance-and-unauthorized-advice'` | Misguidance & Unauthorized Advice | —             |
+| `gsk:threat-type='legal-and-financial-risk'`            | Legal & Financial Risk            | —             |
+| `gsk:threat-type='brand-damaging-and-reputation'`       | Brand Damaging & Reputation       | —             |
 
 ```python
 scan = hub.scans.create(
@@ -136,7 +137,9 @@ attempts = hub.scans.probes.list_attempts("probe-id")
 for attempt in attempts:
     print(f"Prompt: {[m.content for m in attempt.messages[:-1]]}")
     print(f"Response: {attempt.messages[-1].content}")
-    print(f"Severity: {attempt.severity}")  # higher than 0 means the attack succeeded
+    print(
+        f"Severity: {attempt.severity}"
+    )  # higher than 0 means the attack succeeded
     print("---")
 ```
 
@@ -174,9 +177,17 @@ for probe in probes:
         if attempt.severity > 0:
             hub.test_cases.create(
                 dataset_id=dataset.id,
-                messages=[{"role": m.role, "content": m.content} for m in attempt.messages[:-1]],
-                demo_output={"role": "assistant", "content": attempt.messages[-1].content},
-                checks=[{"identifier": "no-harmful-content"}],  # or any relevant check
+                messages=[
+                    {"role": m.role, "content": m.content}
+                    for m in attempt.messages[:-1]
+                ],
+                demo_output={
+                    "role": "assistant",
+                    "content": attempt.messages[-1].content,
+                },
+                checks=[
+                    {"identifier": "no-harmful-content"}
+                ],  # or any relevant check
                 tags=[probe.category],
             )
 
@@ -233,12 +244,12 @@ print("Security gate passed.")
 
 ## Interpreting scan grades
 
-| Grade | Meaning |
-|---|---|
-| **A** | No vulnerabilities detected |
-| **B** | Minor issues — low severity findings only |
-| **C** | Moderate issues — some high severity findings |
-| **D** | Serious issues — critical severity findings |
-| **N/A** | Insufficient data to compute a grade |
+| Grade   | Meaning                                       |
+| ------- | --------------------------------------------- |
+| **A**   | No vulnerabilities detected                   |
+| **B**   | Minor issues — low severity findings only     |
+| **C**   | Moderate issues — some high severity findings |
+| **D**   | Serious issues — critical severity findings   |
+| **N/A** | Insufficient data to compute a grade          |
 
 Grades are computed from the proportion and severity of probes that successfully elicited harmful or undesired behaviour from the agent.

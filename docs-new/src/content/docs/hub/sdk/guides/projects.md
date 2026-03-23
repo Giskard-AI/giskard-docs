@@ -80,7 +80,9 @@ print(preview.conversation)
 ```python
 scenarios = hub.projects.scenarios.list("project-id")
 
-hub.projects.scenarios.update("scenario-id", project_id="project-id", name="Updated name")
+hub.projects.scenarios.update(
+    "scenario-id", project_id="project-id", name="Updated name"
+)
 
 hub.projects.scenarios.delete("scenario-id", project_id="project-id")
 ```

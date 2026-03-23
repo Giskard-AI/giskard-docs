@@ -235,3 +235,33 @@ h6 {
     padding-block: 0.75rem !important;
   }
 }
+
+/*
+ * Notebook → MDX rich outputs (Giskard terminal HTML): Jupyter uses fixed hex
+ * colors that are unreadable on our dark background. Remap only inside
+ * .notebook-output-rich so other content is unaffected.
+ */
+:root[data-theme='dark'] .notebook-output-rich span[style*='#800000'] {
+  color: #f87171 !important;
+  text-decoration-color: #f87171 !important;
+}
+
+:root[data-theme='dark'] .notebook-output-rich span[style*='#008000'] {
+  color: #4ade80 !important;
+  text-decoration-color: #4ade80 !important;
+}
+
+:root[data-theme='dark'] .notebook-output-rich span[style*='#008080'] {
+  color: #40dedf !important;
+  text-decoration-color: #40dedf !important;
+}
+
+:root[data-theme='dark'] .notebook-output-rich span[style*='#000080'] {
+  color: #a5b4fc !important;
+  text-decoration-color: #a5b4fc !important;
+}
+
+:root[data-theme='dark'] .notebook-output-rich span[style*='#000000'] {
+  color: var(--sl-color-text) !important;
+  text-decoration-color: var(--sl-color-text) !important;
+}

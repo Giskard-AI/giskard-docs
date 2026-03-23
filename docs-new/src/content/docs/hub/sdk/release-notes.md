@@ -31,9 +31,9 @@ See the [Migration Guide](/hub/sdk/migration) for a complete list of breaking ch
 
 The v2.x series release notes are maintained in the [legacy documentation](https://docs.giskard.ai/en/latest/hub/sdk/release_notes/). Key milestones:
 
-| Version | Date | Summary |
-|---|---|---|
-| **2.1.0** | 2025-10-30 | Added vulnerability scanning via `hub.scans.create()` |
-| **2.0.2** | 2025-10-06 | Fixed health-check endpoint (replaced OpenAPI endpoint) |
-| **2.0.1** | 2025-10-01 | Fixed `dataset.create_test_case` attribute filtering |
+| Version   | Date       | Summary                                                                                                        |
+| --------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
+| **2.1.0** | 2025-10-30 | Added vulnerability scanning via `hub.scans.create()`                                                          |
+| **2.0.2** | 2025-10-06 | Fixed health-check endpoint (replaced OpenAPI endpoint)                                                        |
+| **2.0.1** | 2025-10-01 | Fixed `dataset.create_test_case` attribute filtering                                                           |
 | **2.0.0** | 2025-09-23 | BREAKING: removed CSV support for KB creation; dropped Python 3.9; renamed `conversations` → `chat_test_cases` |

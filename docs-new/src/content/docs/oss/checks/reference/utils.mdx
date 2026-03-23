@@ -5,9 +5,9 @@ sidebar:
   order: 7
 ---
 
-import Property from '../../../../../components/api/Property.astro';
-import MethodCard from '../../../../../components/api/MethodCard.astro';
-import TypeTable from '../../../../../components/api/TypeTable.astro';
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
 
 Helper functions and utilities for normalization, value providers, and parameter injection.
 
@@ -36,7 +36,9 @@ Utilities for normalizing strings and data structures using Unicode normalizatio
 ```python
 from giskard.checks.utils.normalization import normalize_string, normalize_data
 
-normalized = normalize_string("cafe\u0301", normalization_form="NFC")  # "cafe" -> "cafe"
+normalized = normalize_string(
+    "cafe\u0301", normalization_form="NFC"
+)  # "cafe" -> "cafe"
 
 data = {"name": "cafe\u0301", "items": ["nai\u0308ve", "re\u0301sume\u0301"]}
 normalized_data = normalize_data(data, normalization_form="NFC")
@@ -44,11 +46,11 @@ normalized_data = normalize_data(data, normalization_form="NFC")
 
 ### Normalization forms
 
-| Form | Description | Use case |
-|---|---|---|
-| `NFC` | Canonical Composition | Most common; combines characters |
-| `NFD` | Canonical Decomposition | Separates base + combining characters |
-| `NFKC` | Compatibility Composition | Combines + converts compatibility chars |
+| Form   | Description                 | Use case                                 |
+| ------ | --------------------------- | ---------------------------------------- |
+| `NFC`  | Canonical Composition       | Most common; combines characters         |
+| `NFD`  | Canonical Decomposition     | Separates base + combining characters    |
+| `NFKC` | Compatibility Composition   | Combines + converts compatibility chars  |
 | `NFKD` | Compatibility Decomposition | Separates + converts compatibility chars |
 
 :::tip[When to use]
@@ -75,7 +77,9 @@ Abstract base class for value providers.
 
 Provider for static values.
 
-<Property name="value" type="R" required>The static value to provide.</Property>
+<Property name="value" type="R" required>
+  The static value to provide.
+</Property>
 
 ```python
 from giskard.checks.utils.value_provider import StaticValueProvider
@@ -88,8 +92,12 @@ result = await provider.provide()  # "hello"
 
 Provider that wraps a callable with parameter injection.
 
-<Property name="callable" type="Callable" required>Function to call for value.</Property>
-<Property name="injection_mapping" type="CallableInjectionMapping" required>Parameter injection configuration.</Property>
+<Property name="callable" type="Callable" required>
+  Function to call for value.
+</Property>
+<Property name="injection_mapping" type="CallableInjectionMapping" required>
+  Parameter injection configuration.
+</Property>
 
 ### `ValueGeneratorProvider`
 
@@ -98,9 +106,11 @@ Provider for generator-based values.
 ```python
 from giskard.checks.utils.value_provider import ValueGeneratorProvider
 
+
 async def value_generator():
     yield "first"
     yield "second"
+
 
 provider = ValueGeneratorProvider.from_mapping(value_generator)
 ```
@@ -137,8 +147,12 @@ Maps parameters to inject into a callable.
 
 Configuration for a single parameter injection.
 
-<Property name="name" type="str" required>Parameter name.</Property>
-<Property name="source" type="str" required>Source of the injected value.</Property>
+<Property name="name" type="str" required>
+  Parameter name.
+</Property>
+<Property name="source" type="str" required>
+  Source of the injected value.
+</Property>
 
 :::note
 Parameter injection is primarily used internally for dependency injection in checks and interaction specs.
@@ -163,10 +177,12 @@ from giskard.checks.utils.generator import a_generator
 async for value in a_generator("hello"):
     print(value)
 
+
 # Sync generator -> async
 def sync_gen():
     yield 1
     yield 2
+
 
 async for value in a_generator(sync_gen()):
     print(value)

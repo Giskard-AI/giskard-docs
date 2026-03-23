@@ -25,28 +25,28 @@ python -c "import giskard_hub; print(giskard_hub.__version__)"
 
 Use this table as a quick reference for every renamed API, parameter, and pattern.
 
-| v2.x | v3.x |
-|---|---|
-| `from giskard_hub.data import ChatMessage` | `from giskard_hub.types import ChatMessage` |
-| `HubClient(url=..., token=...)` | `HubClient(base_url=..., api_key=...)` |
-| `GISKARD_HUB_URL` / `GISKARD_HUB_TOKEN` | `GISKARD_HUB_BASE_URL` / `GISKARD_HUB_API_KEY` |
-| `hub.models.create(...)` | `hub.agents.create(...)` |
-| `model.chat(messages=[...])` | `hub.agents.generate_completion(agent_id, messages=[...])` |
-| `hub.chat_test_cases.create(...)` | `hub.test_cases.create(...)` |
-| `hub.evaluate(model=, dataset=, name=)` | `hub.helpers.evaluate(agent=, dataset=, project=, name=)` |
-| `hub.evaluate(model=fn, dataset=, name=)` | `hub.helpers.evaluate(agent=fn, dataset=, name=)` |
-| `entity.wait_for_completion()` | `entity = hub.helpers.wait_for_completion(entity)` |
-| `entity.print_metrics()` | `hub.helpers.print_metrics(entity)` |
-| `hub.evaluations.create(model_id=, dataset_id=)` | `hub.evaluations.create(agent_id=, dataset_id=, project_id=)` |
-| `hub.scans.create(model_id=)` | `hub.scans.create(agent_id=, project_id=)` |
-| `hub.scheduled_evaluations.create(model_id=)` | `hub.scheduled_evaluations.create(agent_id=)` |
-| `hub.knowledge_bases.create(...)` | `hub.knowledge_bases.create(...)` |
-| `ScanResult` / `scan_result.grade.value` | `Scan` / `scan.grade` |
-| `ScanResult.model` | `Scan.agent` |
+| v2.x                                                             | v3.x                                                                         |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `from giskard_hub.data import ChatMessage`                       | `from giskard_hub.types import ChatMessage`                                  |
+| `HubClient(url=..., token=...)`                                  | `HubClient(base_url=..., api_key=...)`                                       |
+| `GISKARD_HUB_URL` / `GISKARD_HUB_TOKEN`                          | `GISKARD_HUB_BASE_URL` / `GISKARD_HUB_API_KEY`                               |
+| `hub.models.create(...)`                                         | `hub.agents.create(...)`                                                     |
+| `model.chat(messages=[...])`                                     | `hub.agents.generate_completion(agent_id, messages=[...])`                   |
+| `hub.chat_test_cases.create(...)`                                | `hub.test_cases.create(...)`                                                 |
+| `hub.evaluate(model=, dataset=, name=)`                          | `hub.helpers.evaluate(agent=, dataset=, project=, name=)`                    |
+| `hub.evaluate(model=fn, dataset=, name=)`                        | `hub.helpers.evaluate(agent=fn, dataset=, name=)`                            |
+| `entity.wait_for_completion()`                                   | `entity = hub.helpers.wait_for_completion(entity)`                           |
+| `entity.print_metrics()`                                         | `hub.helpers.print_metrics(entity)`                                          |
+| `hub.evaluations.create(model_id=, dataset_id=)`                 | `hub.evaluations.create(agent_id=, dataset_id=, project_id=)`                |
+| `hub.scans.create(model_id=)`                                    | `hub.scans.create(agent_id=, project_id=)`                                   |
+| `hub.scheduled_evaluations.create(model_id=)`                    | `hub.scheduled_evaluations.create(agent_id=)`                                |
+| `hub.knowledge_bases.create(...)`                                | `hub.knowledge_bases.create(...)`                                            |
+| `ScanResult` / `scan_result.grade.value`                         | `Scan` / `scan.grade`                                                        |
+| `ScanResult.model`                                               | `Scan.agent`                                                                 |
 | `hub.datasets.generate_adversarial(model_id=, categories=, ...)` | `hub.datasets.generate_scenario_based(agent_id=, scenario_id=, project_id=)` |
-| `hub.datasets.generate_document_based(model_id=, n_questions=)` | `hub.datasets.generate_document_based(agent_id=, n_examples=, project_id=)` |
-| `dataset.chat_test_cases` | `hub.datasets.search_test_cases(dataset.id)` |
-| `Metric.percentage` | `Metric.success_rate` (multiply by 100 for %) |
+| `hub.datasets.generate_document_based(model_id=, n_questions=)`  | `hub.datasets.generate_document_based(agent_id=, n_examples=, project_id=)`  |
+| `dataset.chat_test_cases`                                        | `hub.datasets.search_test_cases(dataset.id)`                                 |
+| `Metric.percentage`                                              | `Metric.success_rate` (multiply by 100 for %)                                |
 
 ---
 
@@ -73,10 +73,10 @@ The following resources have no equivalent in v2.x and require no migration -- t
 
 ### 1. Environment variables renamed
 
-| v2.x | v3.x |
-|---|---|
-| `GISKARD_HUB_URL` | `GISKARD_HUB_BASE_URL` |
-| `GISKARD_HUB_TOKEN` | `GISKARD_HUB_API_KEY` |
+| v2.x                | v3.x                   |
+| ------------------- | ---------------------- |
+| `GISKARD_HUB_URL`   | `GISKARD_HUB_BASE_URL` |
+| `GISKARD_HUB_TOKEN` | `GISKARD_HUB_API_KEY`  |
 
 Update your shell configuration, `.env` files, and CI/CD secrets accordingly.
 
@@ -87,23 +87,25 @@ export GISKARD_HUB_TOKEN="gsk_..."
 
 # v3.x
 export GISKARD_HUB_BASE_URL="https://your-hub.example.com"
-export GISKARD_HUB_API_KEY="gsk_..."
+export GISKARD_HUB_API_KEY="gsk_"
 ```
 
 ### 2. Constructor parameter names changed
 
-| v2.x | v3.x |
-|---|---|
+| v2.x                            | v3.x                                   |
+| ------------------------------- | -------------------------------------- |
 | `HubClient(url=..., token=...)` | `HubClient(base_url=..., api_key=...)` |
 
 ```python
 # main.py
 # v2.x
 from giskard_hub import HubClient
+
 hub = HubClient(url="https://...", token="gsk_...")
 
 # v3.x
 from giskard_hub import HubClient
+
 hub = HubClient(base_url="https://...", api_key="gsk_...")
 ```
 
@@ -193,11 +195,11 @@ hub.scheduled_evaluations.create(agent_id=agent_id, ...)
 
 In v2.x, `hub.evaluate()` was a top-level shortcut, and entities had `wait_for_completion()` and `print_metrics()` methods. In v3.x, all of these have been moved to `hub.helpers`:
 
-| v2.x | v3.x |
-|---|---|
+| v2.x                                   | v3.x                                                        |
+| -------------------------------------- | ----------------------------------------------------------- |
 | `hub.evaluate(model=..., dataset=...)` | `hub.helpers.evaluate(agent=..., dataset=..., project=...)` |
-| `entity.wait_for_completion()` | `entity = hub.helpers.wait_for_completion(entity)` |
-| `entity.print_metrics()` | `hub.helpers.print_metrics(entity)` |
+| `entity.wait_for_completion()`         | `entity = hub.helpers.wait_for_completion(entity)`          |
+| `entity.print_metrics()`               | `hub.helpers.print_metrics(entity)`                         |
 
 This applies to **all** entity types that previously had these methods -- evaluations, scans, datasets, and knowledge bases.
 
@@ -229,13 +231,18 @@ hub.helpers.print_metrics(remote_eval)
 def my_agent(messages):
     return "Hello from local model"
 
+
 local_eval = hub.evaluate(model=my_agent, dataset=my_dataset, name="local run")
+
 
 # v3.x
 def my_agent(messages):
     return "Hello from local model"
 
-local_eval = hub.helpers.evaluate(agent=my_agent, dataset=my_dataset, name="local run")
+
+local_eval = hub.helpers.evaluate(
+    agent=my_agent, dataset=my_dataset, name="local run"
+)
 ```
 
 **Knowledge bases:**
@@ -259,13 +266,13 @@ kb = hub.helpers.wait_for_completion(kb)
 
 The scan result type was renamed from `ScanResult` to `Scan`. Several properties and access patterns changed:
 
-| v2.x | v3.x |
-|---|---|
-| `ScanResult` | `Scan` |
-| `scan_result.model` | `scan.agent` |
-| `scan_result.grade.value` | `scan.grade` |
+| v2.x                                           | v3.x                                                                             |
+| ---------------------------------------------- | -------------------------------------------------------------------------------- |
+| `ScanResult`                                   | `Scan`                                                                           |
+| `scan_result.model`                            | `scan.agent`                                                                     |
+| `scan_result.grade.value`                      | `scan.grade`                                                                     |
 | `scan_result.wait_for_completion(timeout=600)` | `scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)` |
-| `scan_result.print_metrics()` | `hub.helpers.print_metrics(scan)` |
+| `scan_result.print_metrics()`                  | `hub.helpers.print_metrics(scan)`                                                |
 
 ```python
 # main.py

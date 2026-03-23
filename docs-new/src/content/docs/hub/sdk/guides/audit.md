@@ -20,7 +20,9 @@ events = hub.audit_logs.search(
 )
 
 for event in events:
-    print(f"[{event.created_at}] {event.action} on {event.entity_type} {event.entity_id} by {event.user_id}")
+    print(
+        f"[{event.created_at}] {event.action} on {event.entity_type} {event.entity_id} by {event.user_id}"
+    )
 ```
 
 ### Filter by time range
@@ -50,7 +52,9 @@ events = hub.audit_logs.search(
 )
 
 for event in events:
-    print(f"Evaluation {event.entity_id} deleted by {event.user_id} at {event.created_at}")
+    print(
+        f"Evaluation {event.entity_id} deleted by {event.user_id} at {event.created_at}"
+    )
 ```
 
 ---
