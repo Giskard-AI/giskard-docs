@@ -207,6 +207,11 @@ function convertNotebook(notebookPath) {
   }
 
   const relPath = relative(GIT_ROOT, notebookPath).replace(/\\/g, '/');
+
+  if (frontmatter && !/^description:\s/m.test(frontmatter)) {
+    console.warn(`  ⚠  missing description: ${relPath}`);
+  }
+
   const colabUrl = `https://colab.research.google.com/github/${GITHUB_SLUG}/blob/main/${relPath}`;
   const colabBadge = `[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](${colabUrl})`;
 
