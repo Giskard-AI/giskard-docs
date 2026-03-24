@@ -24,12 +24,12 @@ When reviewing a failure directly from a test execution (not from a task), follo
 ```mermaid
 graph LR
     A[Review Failure] --> B{Agent Answer<br/>Correct?}
-    B -->|No| C[<a href="task-management" target="_self">Open Task<br/>Assign to Developer<br/>or KB Manager</a>]
+    B -->|No| C[<a href="/hub/ui/annotate/task-management" target="_self">Open Task<br/>Assign to Developer<br/>or KB Manager</a>]
     B -->|Yes| F{Rewrite Now?}
-    B -->|Don't Know| E[<a href="task-management" target="_self">Put in Draft<br/>Open Task<br/>Assign to Domain Expert</a>]
+    B -->|Don't Know| E[<a href="/hub/ui/annotate/task-management" target="_self">Put in Draft<br/>Open Task<br/>Assign to Domain Expert</a>]
     F -->|Yes| G{Can Answer<br/>Questions?}
-    F -->|No| H[<a href="task-management" target="_self">Draft Test Case<br/>Create Task<br/>Assign to PO</a>]
-    G -->|Yes| I[<a href="modify-test-cases" target="_self">Rewrite Test<br/>Retest<br/>Save</a>]
+    F -->|No| H[<a href="/hub/ui/annotate/task-management" target="_self">Draft Test Case<br/>Create Task<br/>Assign to PO</a>]
+    G -->|Yes| I[<a href="/hub/ui/annotate/modify-test-cases" target="_self">Rewrite Test<br/>Retest<br/>Save</a>]
     G -->|No| J{Has Value?}
     J -->|No| K[Remove Test]
     J -->|Yes| H
@@ -106,9 +106,9 @@ When reviewing a task that has been assigned to you, follow these steps:
 ```mermaid
 graph LR
     B[Review Failure] --> C{Agent Answer<br/>Correct?}
-    C -->|No| D[<a href="task-management" target="_self">Assign to Developer</a>]
-    C -->|Yes| E[<a href="task-management" target="_self">Update Task Description<br/>Assign to Product Owner</a>]
-    C -->|Don't Know| F[<a href="task-management" target="_self">Update Task Description<br/>Assign to Expert or PO</a>]
+    C -->|No| D[<a href="/hub/ui/annotate/task-management" target="_self">Assign to Developer</a>]
+    C -->|Yes| E[<a href="/hub/ui/annotate/task-management" target="_self">Update Task Description<br/>Assign to Product Owner</a>]
+    C -->|Don't Know| F[<a href="/hub/ui/annotate/task-management" target="_self">Update Task Description<br/>Assign to Expert or PO</a>]
 ```
 
 :::tip

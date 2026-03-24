@@ -8,6 +8,8 @@ import starlightAutoSidebar from 'starlight-auto-sidebar'
 
 import cloudflare from '@astrojs/cloudflare';
 
+import mermaid from 'astro-mermaid';
+
 // https://astro.build/config
 export default defineConfig({
     site: 'https://docs-v3.giskard.ai',
@@ -71,10 +73,11 @@ export default defineConfig({
         }),
         react(),
         tailwind({
-            // Disable base styles to avoid conflict with Starlight if needed, 
+            // Disable base styles to avoid conflict with Starlight if needed,
             // but Starlight's tailwind plugin handles this.
             applyBaseStyles: false,
         }),
+        mermaid(),
     ],
 
     adapter: cloudflare(),

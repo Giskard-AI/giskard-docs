@@ -265,3 +265,11 @@ h6 {
   color: var(--sl-color-text) !important;
   text-decoration-color: var(--sl-color-text) !important;
 }
+
+/* Responsive video embeds */
+iframe[src*="youtube.com"],
+iframe[src*="vimeo.com"] {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: auto;
+}
