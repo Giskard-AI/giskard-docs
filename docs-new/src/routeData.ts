@@ -62,5 +62,13 @@ export const onRequest = defineRouteMiddleware(async (context, next) => {
 			entryBelongsToSection(entry, currentSection),
 		);
 	}
+
+	// Replace the default "Overview" TOC label with the page title
+	if (route.toc && route.entry?.data?.title) {
+		const topItem = route.toc.items?.find((item: any) => item.slug === '_top');
+		if (topItem && topItem.text === 'Overview') {
+			topItem.text = route.entry.data.title;
+		}
+	}
 });
 
