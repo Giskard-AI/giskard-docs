@@ -3,7 +3,7 @@ import type { Props } from '@astrojs/starlight/props';
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 
 const navLinks = [
-  { label: 'Overview', href: '/', active: Astro.url.pathname === '/' },
+  { label: 'Overview', href: '/', active: Astro.url.pathname === '/' || Astro.url.pathname.startsWith('/start') },
   { label: 'Hub UI', href: '/hub/ui', active: Astro.url.pathname.startsWith('/hub/ui') },
   { label: 'Hub SDK', href: '/hub/sdk', active: Astro.url.pathname.startsWith('/hub/sdk') },
   { label: 'Open Source', href: '/oss', active: Astro.url.pathname.startsWith('/oss') },

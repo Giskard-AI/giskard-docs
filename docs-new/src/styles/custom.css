@@ -266,6 +266,13 @@ h6 {
   text-decoration-color: var(--sl-color-text) !important;
 }
 
+/* External links in sidebar */
+.sidebar-content a[href^="https://"]::after {
+  content: ' ↗';
+  font-size: 0.75em;
+  margin-left: 0.25em;
+}
+
 /* Responsive video embeds */
 iframe[src*="youtube.com"],
 iframe[src*="vimeo.com"] {

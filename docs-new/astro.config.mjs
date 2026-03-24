@@ -32,6 +32,23 @@ export default defineConfig({
                 { label: 'Discord', href: 'https://discord.com/invite/ABvfpbu69R', icon: 'discord' },
             ],
             sidebar: [
+                // Overview sidebar
+                {
+                    label: 'Overview',
+                    items: [
+                        { slug: 'index', label: 'Welcome to Giskard' },
+                        { slug: 'start/comparison', label: 'Open Source vs Hub' },
+                        { slug: 'start/enterprise-trial', label: 'Request your enterprise trial' },
+                        {
+                            label: 'Knowledge Glossary',
+                            collapsed: true,
+                            autogenerate: { directory: 'start/glossary', collapsed: true },
+                        },
+                        { slug: 'start/release-notes', label: 'Release Notes' },
+                        { label: 'Contact us', link: 'https://www.giskard.ai/contact', attrs: { target: '_blank' } },
+                        { label: 'Blog', link: 'https://www.giskard.ai/knowledge-categories/blog', attrs: { target: '_blank' } },
+                    ],
+                },
                 // Hub UI sidebar
                 {
                     label: 'Hub UI',

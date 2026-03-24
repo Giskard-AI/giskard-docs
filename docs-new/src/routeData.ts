@@ -5,11 +5,10 @@ import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
  * Returns the section name (e.g., 'oss', 'hub') or null if no match.
  */
 function getCurrentSection(pathname: string): string | null {
-	if (pathname == '/') return '';
+	if (pathname === '/' || pathname.startsWith('/start')) return 'overview';
 	if (pathname.startsWith('/hub/ui')) return 'hub/ui';
 	if (pathname.startsWith('/hub/sdk')) return 'hub/sdk';
 	if (pathname.startsWith('/oss')) return 'oss';
-	// Add more sections here as needed
 	return null;
 }
 
@@ -19,18 +18,27 @@ function getCurrentSection(pathname: string): string | null {
  * belong to the section's URL prefix.
  */
 function entryBelongsToSection(entry: any, section: string): boolean {
+	// The overview section matches hrefs "/", "/start/...", and external links
+	if (section === 'overview') {
+		if (entry.type === 'link' && entry.href) {
+			return entry.href === '/' || entry.href.startsWith('/start') || entry.href.startsWith('https://');
+		}
+		if (entry.type === 'group' && entry.entries) {
+			return entry.entries.some((item: any) => entryBelongsToSection(item, section));
+		}
+		return false;
+	}
+
 	const sectionPrefix = `/${section}`;
-	
-	// Check if this is a link entry with an href
+
 	if (entry.type === 'link' && entry.href) {
 		return entry.href.startsWith(sectionPrefix);
 	}
-	
-	// Check if this is a group with nested entries
+
 	if (entry.type === 'group' && entry.entries) {
 		return entry.entries.some((item: any) => entryBelongsToSection(item, section));
 	}
-	
+
 	return false;
 }
 

@@ -10,7 +10,7 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
 		<SiteTitle {...Astro.props} />
 	</div>
     <div class="nav-links sl-flex">
-        <a href="/" class="nav-link" aria-current={Astro.url.pathname === '/' ? 'page' : undefined}>Overview</a>
+        <a href="/" class="nav-link" aria-current={Astro.url.pathname === '/' || Astro.url.pathname.startsWith('/start') ? 'page' : undefined}>Overview</a>
         <a href="/hub/ui" class="nav-link" aria-current={Astro.url.pathname.startsWith('/hub/ui') ? 'page' : undefined}>Hub UI</a>
         <a href="/hub/sdk" class="nav-link" aria-current={Astro.url.pathname.startsWith('/hub/sdk') ? 'page' : undefined}>Hub SDK</a>
         <a href="/oss" class="nav-link" aria-current={Astro.url.pathname.startsWith('/oss') ? 'page' : undefined}>Open Source</a>
