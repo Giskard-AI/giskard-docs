@@ -81,14 +81,6 @@ Open research on AI safety and security, including the Phare multilingual benchm
 
 ### Hub UI — Release Notes
 - Release Notes: https://docs-v3.giskard.ai/hub/ui/release-notes.md
-- 2.3.0 (2026-02-03): https://docs-v3.giskard.ai/hub/ui/release-notes/2026-02-03.md
-- 2.2.1 (2025-12-17): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-12-17.md
-- 2.2.0 (2025-12-16): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-12-16.md
-- 2.1.2 (2025-12-04): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-12-04.md
-- 2.1.1 (2025-11-25): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-11-25.md
-- 2.1.0 (2025-11-24): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-11-24.md
-- 2.0.1 (2025-10-24): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-10-24.md
-- 2.0.0 (2025-09-25): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-09-25.md
 
 ### Hub SDK
 - Introduction: https://docs-v3.giskard.ai/hub/sdk.md
@@ -96,6 +88,7 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Core Concepts: https://docs-v3.giskard.ai/hub/sdk/concepts.md
 - API Reference: https://docs-v3.giskard.ai/hub/sdk/reference.md
 - Migration Guide: https://docs-v3.giskard.ai/hub/sdk/migration.md
+- Release Notes: https://docs-v3.giskard.ai/hub/sdk/release-notes.md
 
 ### Hub SDK Guides
 - Projects: https://docs-v3.giskard.ai/hub/sdk/guides/projects.md

@@ -1,0 +1,107 @@
+---
+title: Release Notes
+description: Changelog for the Giskard Hub Python SDK.
+sidebar:
+  order: 5
+---
+
+Below you will find the release notes for each version of Giskard Hub SDK. Each entry covers new features, improvements, and bug fixes included in that release.
+
+---
+
+## 3.0.0
+
+This release is the first of the v3 SDK. It is a full rewrite based on a generated OpenAPI client, providing complete type safety, async support, and coverage of all Hub API endpoints.
+
+### New features
+
+- **`AsyncHubClient`** — a fully async client with identical API surface to `HubClient`, using `httpx` or optionally `aiohttp` as the HTTP backend.
+- **Scenarios** — create and manage reusable persona/behaviour templates via `hub.projects.scenarios`, and generate datasets from them with `hub.datasets.generate_scenario_based()`.
+- **Tasks** — `hub.tasks` provides a lightweight issue tracker for managing findings from evaluations and scans.
+- **Playground Chats** — `hub.playground_chats` lets you access conversations captured from the Hub UI playground and create datasets from them.
+- **Audit Logs** — `hub.audit_logs` provides searchable, paginated audit event history.
+- **Test case comments** — `hub.test_cases.comments` supports collaborative annotation of test cases.
+- **Scan probes and attempts** — `hub.scans.probes` and `hub.scans.attempts` give granular access to scan probe results and individual adversarial attempts.
+- **Evaluation result controls** — rerun errored results, update review status, control per-result visibility, and search/filter results via `hub.evaluations.results`.
+- **Full CRUD for most resources** — nearly every resource now supports `create`, `retrieve`, `update`, `list`, `delete`, and `bulk_delete`.
+
+### Breaking changes from v2
+
+See the [Migration Guide](/hub/sdk/migration) for a complete list of breaking changes and before/after code examples.
+
+---
+
+## 2.1.0 (2025-10-30)
+
+We launched support for the LLM vulnerability scan feature that was released in the [2.0.1 Hub UI release](/hub/ui/release-notes#201-2025-10-24).
+
+### What's new?
+
+- SDK support for the LLM vulnerability scan feature in the Hub UI through `.scans.create()`.
+
+### How to get started?
+
+```python
+import os
+import sys
+from giskard_hub import HubClient
+
+hub = HubClient(...)
+model_id = os.getenv("GISKARD_HUB_MODEL_ID")
+knowledge_base_id = os.getenv("GISKARD_HUB_KNOWLEDGE_BASE_ID")
+
+# Run security scan with specific tags
+scan_result = hub.scans.create(
+    model_id=model_id,
+    knowledge_base_id=knowledge_base_id,
+    tags=[
+        "gsk:threat-type='prompt-injection'",
+        "owasp:llm-top-10-2025='LLM01'",
+    ],
+)
+
+# Wait for completion and check result metrics
+scan_result.wait_for_completion(timeout=1200)
+scan_result.print_metrics()
+
+# Check if the grade is worse than A or B (C, D or N/A)
+if scan_result.grade not in ["A", "B"]:
+    print(f"❌ Security check failed: Scan with Grade {scan_result.grade.value}")
+    sys.exit(1)
+
+print(f"✅ Security check passed: Scan with Grade {scan_result.grade.value}")
+```
+
+:::tip
+Check out the [Scans](/hub/sdk/guides/scans) section for a full guide on how to use the scan feature with the SDK.
+:::
+
+---
+
+## 2.0.2 (2025-10-06)
+
+### What's fixed?
+
+- Fixed usage of OpenAPI description endpoint as health check and replaced with a custom health check endpoint.
+
+---
+
+## 2.0.1 (2025-10-01)
+
+### What's fixed?
+
+- Fixed a bug where `dataset.create_test_case` did not filter out attributes that are not allowed to be set by the API.
+
+---
+
+## 2.0.0 (2025-09-23)
+
+### What's changed?
+
+- **[BREAKING]** Removed CSV support for knowledge base creation. Only JSON and JSONL formats are now supported.
+- **[BREAKING]** Dropped Python 3.9 support.
+- **[BREAKING]** Renamed `conversations` to `chat_test_cases` to improve clarity and consistency across the product.
+
+### What's fixed?
+
+- Local evaluations do not have failure categories in the job results, thus the failure classifier is skipped.

@@ -2,7 +2,7 @@
 title: "Continuous red teaming"
 description: "Implement proactive threat detection and continuous vulnerability assessment for your LLM agents. Monitor for emerging security risks and maintain robust AI safety with automated red teaming."
 sidebar:
-  order: 9
+  order: 7
 ---
 
 Continuous red teaming is a proactive approach to AI security that involves continuously testing your LLM agents for new vulnerabilities and emerging threats.

@@ -2,7 +2,7 @@
 title: "Track event logs"
 description: "Track every change made to entities in Giskard Hub with comprehensive event logs. View complete history of modifications to checks, datasets, and test cases for full traceability."
 sidebar:
-  order: 10
+  order: 8
 ---
 
 Event logs provide full traceability for all changes made to entities within Giskard Hub. This feature allows you to keep track of every change that every person has made on every entity, providing complete audit trails for your evaluation configurations.
