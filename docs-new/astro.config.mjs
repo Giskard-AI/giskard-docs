@@ -56,8 +56,10 @@ export default defineConfig({
             ],
             routeMiddleware: './src/routeData.ts',
             expressiveCode: {
-                // Configure expressive code if needed, defaults are usually good
-                themes: ['dracula', 'github-light'],
+                themes: ['catppuccin-mocha', 'catppuccin-latte'],
+                styleOverrides: {
+                    borderRadius: '0.5rem',
+                },
             },
             lastUpdated: true,
             components: {
