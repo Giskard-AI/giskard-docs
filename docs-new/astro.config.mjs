@@ -30,6 +30,11 @@ export default defineConfig({
                 { label: 'Discord', href: 'https://discord.com/invite/ABvfpbu69R', icon: 'discord' },
             ],
             sidebar: [
+                // Hub UI sidebar
+                {
+                    label: 'Hub UI',
+                    autogenerate: { directory: 'hub/ui', collapsed: false },
+                },
                 // Hub SDK sidebar
                 {
                     label: 'Hub SDK',

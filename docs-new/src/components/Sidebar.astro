@@ -3,8 +3,8 @@ import type { Props } from '@astrojs/starlight/props';
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 
 const navLinks = [
-  { label: 'Overview', href: 'https://docs.giskard.ai/' },
-  { label: 'Hub UI', href: 'https://docs.giskard.ai/hub/ui' },
+  { label: 'Overview', href: '/', active: Astro.url.pathname === '/' },
+  { label: 'Hub UI', href: '/hub/ui', active: Astro.url.pathname.startsWith('/hub/ui') },
   { label: 'Hub SDK', href: '/hub/sdk', active: Astro.url.pathname.startsWith('/hub/sdk') },
   { label: 'Open Source', href: '/oss', active: Astro.url.pathname.startsWith('/oss') },
 ];
