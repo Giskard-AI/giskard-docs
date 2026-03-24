@@ -28,6 +28,68 @@ Open research on AI safety and security, including the Phare multilingual benchm
 
 ## Documentation Structure
 
+### Hub UI
+- Introduction: https://docs-v3.giskard.ai/hub/ui.md
+- Access Rights: https://docs-v3.giskard.ai/hub/ui/access-rights.md
+- Continuous Red Teaming: https://docs-v3.giskard.ai/hub/ui/continuous-red-teaming.md
+- Event Logs: https://docs-v3.giskard.ai/hub/ui/event-logs.md
+
+### Hub UI — Setup
+- Setup Overview: https://docs-v3.giskard.ai/hub/ui/setup.md
+- Projects: https://docs-v3.giskard.ai/hub/ui/setup/projects.md
+- Agents: https://docs-v3.giskard.ai/hub/ui/setup/agents.md
+- Knowledge Bases: https://docs-v3.giskard.ai/hub/ui/setup/knowledge-bases.md
+
+### Hub UI — Datasets
+- Datasets Overview: https://docs-v3.giskard.ai/hub/ui/datasets.md
+- Import Tests: https://docs-v3.giskard.ai/hub/ui/datasets/import.md
+- Create Manual Tests: https://docs-v3.giskard.ai/hub/ui/datasets/manual.md
+- Scenario-Based Tests: https://docs-v3.giskard.ai/hub/ui/datasets/scenario.md
+- Knowledge Base Tests: https://docs-v3.giskard.ai/hub/ui/datasets/knowledge-base.md
+
+### Hub UI — Evaluations
+- Evaluations Overview: https://docs-v3.giskard.ai/hub/ui/evaluations.md
+- Run and Review: https://docs-v3.giskard.ai/hub/ui/evaluations/create.md
+- Compare Evaluations: https://docs-v3.giskard.ai/hub/ui/evaluations/compare.md
+- Schedule Evaluations: https://docs-v3.giskard.ai/hub/ui/evaluations/schedule.md
+
+### Hub UI — Scan
+- Scan Overview: https://docs-v3.giskard.ai/hub/ui/scan.md
+- Launch a Scan: https://docs-v3.giskard.ai/hub/ui/scan/launch-scan.md
+- Review Scan Results: https://docs-v3.giskard.ai/hub/ui/scan/review-scan-results.md
+
+### Hub UI — Vulnerability Categories
+- Attack Categories Overview: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories.md
+- Harmful Content Generation: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/harmful-content-generation.md
+- Internal Information Exposure: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/internal-information-exposure.md
+- Prompt Injection: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/prompt-injection.md
+- Data Privacy Exfiltration: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/data-privacy-exfiltration.md
+- Training Data Extraction: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/training-data-extraction.md
+- Excessive Agency: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/excessive-agency.md
+- Hallucination: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/hallucination.md
+- Denial Of Service: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/denial-of-service.md
+- Brand Damaging And Reputation: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/brand-damaging-and-reputation.md
+- Legal And Financial Risk: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/legal-and-financial-risk.md
+- Misguidance And Unauthorized Advice: https://docs-v3.giskard.ai/hub/ui/scan/vulnerability-categories/misguidance-and-unauthorized-advice.md
+
+### Hub UI — Annotate
+- Annotate Overview: https://docs-v3.giskard.ai/hub/ui/annotate.md
+- Metrics, Failure Categories & Tags: https://docs-v3.giskard.ai/hub/ui/annotate/overview.md
+- Task Management: https://docs-v3.giskard.ai/hub/ui/annotate/task-management.md
+- Review Test Results: https://docs-v3.giskard.ai/hub/ui/annotate/review-test-results.md
+- Modify Test Cases: https://docs-v3.giskard.ai/hub/ui/annotate/modify-test-cases.md
+
+### Hub UI — Release Notes
+- Release Notes: https://docs-v3.giskard.ai/hub/ui/release-notes.md
+- 2.3.0 (2026-02-03): https://docs-v3.giskard.ai/hub/ui/release-notes/2026-02-03.md
+- 2.2.1 (2025-12-17): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-12-17.md
+- 2.2.0 (2025-12-16): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-12-16.md
+- 2.1.2 (2025-12-04): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-12-04.md
+- 2.1.1 (2025-11-25): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-11-25.md
+- 2.1.0 (2025-11-24): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-11-24.md
+- 2.0.1 (2025-10-24): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-10-24.md
+- 2.0.0 (2025-09-25): https://docs-v3.giskard.ai/hub/ui/release-notes/2025-09-25.md
+
 ### Hub SDK
 - Introduction: https://docs-v3.giskard.ai/hub/sdk.md
 - Quickstart: https://docs-v3.giskard.ai/hub/sdk/quickstart.md
