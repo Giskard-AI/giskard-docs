@@ -80,7 +80,7 @@ These metrics help quantify how well your models protect sensitive information a
 ## Examples of Information Disclosure in AI
 
 :::tip
-You can find examples of security vulnerabilities in our [RealHarm dataset](https://realharm.giskard.ai/).
+You can find examples of security vulnerabilities in our [RealHarm dataset ↗](https://realharm.giskard.ai/).
 :::
 
 **Example 1: System Prompt Leakage**

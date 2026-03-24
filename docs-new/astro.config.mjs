@@ -44,9 +44,8 @@ export default defineConfig({
                             collapsed: true,
                             autogenerate: { directory: 'start/glossary', collapsed: true },
                         },
-                        { slug: 'start/release-notes', label: 'Release Notes' },
-                        { label: 'Contact us', link: 'https://www.giskard.ai/contact', attrs: { target: '_blank' } },
-                        { label: 'Blog', link: 'https://www.giskard.ai/knowledge-categories/blog', attrs: { target: '_blank' } },
+                        { label: 'Contact us ↗', link: 'https://www.giskard.ai/contact', attrs: { target: '_blank' } },
+                        { label: 'Blog ↗', link: 'https://www.giskard.ai/knowledge-categories/blog', attrs: { target: '_blank' } },
                     ],
                 },
                 // Hub UI sidebar

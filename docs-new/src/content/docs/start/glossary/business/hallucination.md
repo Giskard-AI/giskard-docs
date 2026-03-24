@@ -66,7 +66,7 @@ These metrics help quantify how well your models provide accurate, grounded resp
 ## Examples of Hallucination & Misinformation in AI
 
 :::tip
-You can find examples of business vulnerabilities in our [RealPerformance dataset](https://realperformance.giskard.ai/?taxonomy=Omission%2CAddition+of+information%2CContradiction).
+You can find examples of business vulnerabilities in our [RealPerformance dataset ↗](https://realperformance.giskard.ai/?taxonomy=Omission%2CAddition+of+information%2CContradiction).
 :::
 
 **Example 1: Invented Facts**

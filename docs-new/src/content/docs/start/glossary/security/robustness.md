@@ -80,7 +80,7 @@ These metrics help quantify how well your models handle edge cases and maintain 
 ## Examples of Robustness Issues in AI
 
 :::tip
-You can find examples of security vulnerabilities in our [RealHarm dataset](https://realharm.giskard.ai/).
+You can find examples of security vulnerabilities in our [RealHarm dataset ↗](https://realharm.giskard.ai/).
 :::
 
 **Example 1: Input Sensitivity**

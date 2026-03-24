@@ -18,18 +18,18 @@ sidebar:
   - A quota for API calls needed to run synthetic generation of LLM agent tests and LLM judges
 
 :::tip
-Unsure if our trial infrastructure meets your company's security standards? Visit our [trust center](https://trust.giskard.ai) to learn more about our security practices and compliance.
+**🔒 Unsure if our trial infrastructure meets your company's security standards?** Visit our [trust center ↗](https://trust.giskard.ai) to learn more about our security practices and compliance.
 :::
 
 ## Getting started
 
 1. **Request your trial**
 
-   - Visit our [contact page](https://www.giskard.ai/contact)
+   - Visit our [contact page ↗](https://www.giskard.ai/contact)
    - We suggest adding some information about your organization and LLM use case.
 
 :::tip
-A quick heads-up from the Giskard team! To make sure every trial gets the treatment they deserve, we run trials in small, focused batches.
+**🚦 A quick heads-up from the Giskard team!** To make sure every trial gets the treatment they deserve, we run trials in small, focused batches.
 This means we can't provide access to everyone at once. Priority goes to teams with the most mission-critical agent use cases.
 If you're not in the first wave, don't worry: we will reach out as soon as a spot opens up.
 Thanks for helping us keep things personal and impactful!
@@ -81,6 +81,6 @@ Additionally, all results and outputs generated from tests on the platform will 
 
 ## Need more help deciding?
 
-- **Request a demo** - Get in touch [here](https://www.giskard.ai/contact)
+- **Request a demo** - Get in touch [here ↗](https://www.giskard.ai/contact)
 - **Compare our offerings** - Explore our [comparison](/start/comparison) guide
-- **Explore our documentation** – See the [UI Quickstart](/hub/ui) and [SDK Quickstart](/hub/sdk) guides
+- **Explore our documentation** – See the [Hub UI Quickstart](/hub/ui) and [Hub SDK Quickstart](/hub/sdk/quickstart) guides

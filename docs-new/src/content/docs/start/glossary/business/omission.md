@@ -80,7 +80,7 @@ These metrics help quantify how well your models provide comprehensive responses
 ## Examples of Omission in AI
 
 :::tip
-You can find examples of business vulnerabilities in our [RealPerformance dataset](https://realperformance.giskard.ai/?taxonomy=Omission).
+You can find examples of business vulnerabilities in our [RealPerformance dataset ↗](https://realperformance.giskard.ai/?taxonomy=Omission).
 :::
 
 **Example 1: Selective Omission**

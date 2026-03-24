@@ -26,7 +26,7 @@ These benchmarks assess how well LLMs can:
 
 **Description**: MultiMedQA combines six existing medical question-answering datasets spanning professional medicine, research, and consumer queries. The benchmark evaluates model answers along multiple axes: factuality, comprehension, reasoning, possible harm, and bias.
 
-**Resources**: [MultiMedQA datasets](https://research.google/pubs/large-language-models-encode-clinical-knowledge/) | [MultiMedQA Paper](https://arxiv.org/abs/2212.13138)
+**Resources**: [MultiMedQA datasets ↗](https://research.google/pubs/large-language-models-encode-clinical-knowledge/) | [MultiMedQA Paper ↗](https://arxiv.org/abs/2212.13138)
 
 ### FinBen
 
@@ -34,7 +34,7 @@ These benchmarks assess how well LLMs can:
 
 **Description**: FinBen includes 36 datasets covering 24 tasks in seven financial domains: information extraction, text analysis, question answering, text generation, risk management, forecasting, and decision-making. It's the first benchmark to evaluate stock trading capabilities.
 
-**Resources**: [FinBen dataset](https://github.com/THUDM/FinBen) | [FinBen Paper](https://arxiv.org/abs/2401.09657)
+**Resources**: [FinBen dataset ↗](https://github.com/THUDM/FinBen) | [FinBen Paper ↗](https://arxiv.org/abs/2401.09657)
 
 ### LegalBench
 
@@ -44,7 +44,7 @@ These benchmarks assess how well LLMs can:
 
 **Use Cases**: Legal AI evaluation, legal reasoning assessment, and legal application development.
 
-**Resources**: [LegalBench datasets](https://github.com/nguha/legalbench) | [LegalBench Paper](https://arxiv.org/abs/2308.11462)
+**Resources**: [LegalBench datasets ↗](https://github.com/nguha/legalbench) | [LegalBench Paper ↗](https://arxiv.org/abs/2308.11462)
 
 ### Berkeley Function-Calling Leaderboard (BFCL)
 
@@ -52,7 +52,7 @@ These benchmarks assess how well LLMs can:
 
 **Description**: BFCL evaluates function-calling capabilities using 2,000 question-answer pairs in multiple languages including Python, Java, JavaScript, and REST API. The benchmark supports multiple and parallel function calls, as well as function relevance detection.
 
-**Resources**: [BFCL dataset](https://github.com/berkeley-function-calling-leaderboard/bfcl) | [Research](https://berkeley-function-calling-leaderboard.github.io/)
+**Resources**: [BFCL dataset ↗](https://github.com/berkeley-function-calling-leaderboard/bfcl) | [Research ↗](https://berkeley-function-calling-leaderboard.github.io/)
 
 Domain-specific evaluation is also included in other benchmarks such as MMLU, which tests knowledge across multiple academic subjects including specialized domains, and BigBench, which covers various reasoning types that can be applied to specific professional contexts.
 

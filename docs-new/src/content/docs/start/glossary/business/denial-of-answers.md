@@ -78,7 +78,7 @@ These metrics help quantify how well your models provide helpful responses and a
 ## Examples of Denial of Answers in AI
 
 :::tip
-You can find examples of business vulnerabilities in our [RealPerformance dataset](https://realperformance.giskard.ai/?taxonomy=Denial+of+answer).
+You can find examples of business vulnerabilities in our [RealPerformance dataset ↗](https://realperformance.giskard.ai/?taxonomy=Denial+of+answer).
 :::
 
 **Example 1: Overly Restrictive Filtering**

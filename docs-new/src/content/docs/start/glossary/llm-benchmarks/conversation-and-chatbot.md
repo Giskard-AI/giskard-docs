@@ -26,7 +26,7 @@ These benchmarks assess how well LLMs can:
 
 **Description**: Chatbot Arena uses crowdsourced human evaluations to compare different LLMs in conversational scenarios. Users rate responses based on helpfulness, harmlessness, and overall quality, creating a preference-based ranking system.
 
-**Resources**: [Chatbot Arena](https://chat.lmsys.org/) | [Chatbot Arena Paper](https://arxiv.org/abs/2403.04132)
+**Resources**: [Chatbot Arena ↗](https://chat.lmsys.org/) | [Chatbot Arena Paper ↗](https://arxiv.org/abs/2403.04132)
 
 ### MT-Bench
 
@@ -34,7 +34,7 @@ These benchmarks assess how well LLMs can:
 
 **Description**: MT-Bench evaluates an LLM's ability to maintain context and coherence across multiple conversation turns. The benchmark tests how well models can follow conversation threads and provide consistent responses.
 
-**Resources**: [MT-Bench dataset](https://github.com/lm-sys/FastChat)
+**Resources**: [MT-Bench dataset ↗](https://github.com/lm-sys/FastChat)
 
 Conversation quality is also evaluated in other benchmarks such as BigBench, which includes dialogue and conversational tasks as part of its comprehensive evaluation framework.
 

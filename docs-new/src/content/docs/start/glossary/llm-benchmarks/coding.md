@@ -26,7 +26,7 @@ These benchmarks assess how well LLMs can:
 
 **Description**: HumanEval presents LLMs with function signatures and docstrings, asking them to complete the function implementation. The benchmark tests the model's ability to understand requirements and generate working code.
 
-**Resources**: [HumanEval dataset](https://github.com/openai/human-eval) | [HumanEval Paper](https://arxiv.org/abs/2107.03374)
+**Resources**: [HumanEval dataset ↗](https://github.com/openai/human-eval) | [HumanEval Paper ↗](https://arxiv.org/abs/2107.03374)
 
 ### MBPP (Mostly Basic Python Programming)
 
@@ -34,7 +34,7 @@ These benchmarks assess how well LLMs can:
 
 **Description**: MBPP consists of 974 programming problems that test fundamental Python concepts, data structures, and algorithms. The benchmark evaluates both code correctness and solution efficiency.
 
-**Resources**: [MBPP dataset](https://github.com/google-research/google-research/tree/master/mbpp) | [MBPP Paper](https://arxiv.org/abs/2108.07732)
+**Resources**: [MBPP dataset ↗](https://github.com/google-research/google-research/tree/master/mbpp) | [MBPP Paper ↗](https://arxiv.org/abs/2108.07732)
 
 ### CodeContests
 
@@ -42,7 +42,7 @@ These benchmarks assess how well LLMs can:
 
 **Description**: CodeContests presents programming challenges similar to those found in competitive programming competitions. The benchmark tests an LLM's ability to solve complex algorithmic problems efficiently.
 
-**Resources**: [CodeContests dataset](https://github.com/deepmind/code_contests) | [CodeContests Paper](https://arxiv.org/abs/2202.07917)
+**Resources**: [CodeContests dataset ↗](https://github.com/deepmind/code_contests) | [CodeContests Paper ↗](https://arxiv.org/abs/2202.07917)
 
 Coding tasks are also included in other benchmarks such as BigBench, which covers various reasoning types including programming and algorithmic problem-solving.
 

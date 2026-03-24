@@ -80,7 +80,7 @@ These metrics help quantify how well your models maintain business boundaries an
 ## Examples of Business Out of Scope in AI
 
 :::tip
-You can find examples of business vulnerabilities in our [RealPerformance dataset](https://realperformance.giskard.ai/?taxonomy=Business+out+of+scope).
+You can find examples of business vulnerabilities in our [RealPerformance dataset ↗](https://realperformance.giskard.ai/?taxonomy=Business+out+of+scope).
 :::
 
 **Example 1: Internal Metrics Disclosure**

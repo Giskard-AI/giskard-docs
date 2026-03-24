@@ -35,7 +35,7 @@ These benchmarks assess how well LLMs can:
 
 **Use Cases**: Safety evaluation, bias detection, content moderation assessment, and ethical AI development.
 
-**Resources**: [SafetyBench dataset](https://github.com/thu-coai/SafetyBench) | [SafetyBench Paper](https://arxiv.org/abs/2309.07045)
+**Resources**: [SafetyBench dataset ↗](https://github.com/thu-coai/SafetyBench) | [SafetyBench Paper ↗](https://arxiv.org/abs/2309.07045)
 
 ### AgentHarm
 
@@ -52,7 +52,7 @@ These benchmarks assess how well LLMs can:
 
 **Use Cases**: Agent safety testing, multi-step task evaluation, and safety mechanism validation.
 
-**Resources**: [AgentHarm dataset](https://github.com/THUDM/AgentBench) | [AgentHarm Paper](https://arxiv.org/abs/2308.03688)
+**Resources**: [AgentHarm dataset ↗](https://github.com/THUDM/AgentBench) | [AgentHarm Paper ↗](https://arxiv.org/abs/2308.03688)
 
 ### TruthfulQA
 
@@ -69,7 +69,7 @@ These benchmarks assess how well LLMs can:
 
 **Use Cases**: Factual accuracy evaluation, misinformation resistance testing, and truthfulness assessment.
 
-**Resources**: [TruthfulQA dataset](https://github.com/sylinrl/TruthfulQA) | [TruthfulQA Paper](https://arxiv.org/abs/2109.07958)
+**Resources**: [TruthfulQA dataset ↗](https://github.com/sylinrl/TruthfulQA) | [TruthfulQA Paper ↗](https://arxiv.org/abs/2109.07958)
 
 Safety evaluation is also included in other benchmarks such as BigBench, which covers various reasoning types including safety and ethical considerations, and domain-specific benchmarks that evaluate safety within specific professional contexts.
 
@@ -88,7 +88,7 @@ Safety evaluation is also included in other benchmarks such as BigBench, which c
 
 **Use Cases**: Safety evaluation, bias detection, content moderation assessment, and ethical AI development.
 
-**Resources**: [Phare dataset](https://phare.giskard.ai/) | [Phare Paper](https://arxiv.org/abs/2505.11365)
+**Resources**: [Phare dataset ↗](https://phare.giskard.ai/) | [Phare Paper ↗](https://arxiv.org/abs/2505.11365)
 
 ## Related Topics
 

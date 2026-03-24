@@ -80,7 +80,7 @@ These metrics help quantify how well your models balance content safety with bus
 ## Examples of Moderation Issues in AI
 
 :::tip
-You can find examples of business vulnerabilities in our [RealPerformance dataset](https://realperformance.giskard.ai/?taxonomy=Wrong+moderation).
+You can find examples of business vulnerabilities in our [RealPerformance dataset ↗](https://realperformance.giskard.ai/?taxonomy=Wrong+moderation).
 :::
 
 **Example 1: Overly Restrictive Filtering**

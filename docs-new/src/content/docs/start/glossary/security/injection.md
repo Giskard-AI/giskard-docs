@@ -70,7 +70,7 @@ These metrics help quantify how well your models resist prompt injection attempt
 ## Examples of Prompt Injection in AI
 
 :::tip
-You can find examples of security vulnerabilities in our [RealHarm dataset](https://realharm.giskard.ai/).
+You can find examples of security vulnerabilities in our [RealHarm dataset ↗](https://realharm.giskard.ai/).
 :::
 
 **Example 1: System Prompt Override**
