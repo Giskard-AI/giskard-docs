@@ -35,6 +35,7 @@ docs-new/
 │   ├── components/       # Starlight component overrides
 │   ├── content/
 │   │   └── docs/
+│   │       ├── start/    # Overview pages (comparison, trial, glossary)
 │   │       ├── hub/ui/   # Hub UI documentation (for business users)
 │   │       ├── hub/sdk/  # Hub SDK documentation (for developers)
 │   │       └── oss/      # Open Source (Checks) documentation
