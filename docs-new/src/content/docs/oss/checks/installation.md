@@ -6,7 +6,7 @@ sidebar:
 ---
 
 :::caution
-⚠️ Note: Giskard v3 is currently in Pre-release (Beta). We are actively refining the APIs and welcome early adopters to provide feedback and report issues as we move toward a stable 3.0.0 release.
+Giskard v3 is currently in Pre-release (Beta). We are actively refining the APIs and welcome early adopters to provide feedback and report issues as we move toward a stable 3.0.0 release.
 :::
 
 ## Install the Python package
