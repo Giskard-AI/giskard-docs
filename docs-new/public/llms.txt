@@ -28,6 +28,42 @@ Open research on AI safety and security, including the Phare multilingual benchm
 
 ## Documentation Structure
 
+### Overview
+- Welcome to Giskard: https://docs-v3.giskard.ai/.md
+- Open Source vs Hub: https://docs-v3.giskard.ai/start/comparison.md
+- Request your Enterprise Trial: https://docs-v3.giskard.ai/start/enterprise-trial.md
+
+### Knowledge Glossary
+- Introduction: https://docs-v3.giskard.ai/start/glossary.md
+- Testing Methodologies: https://docs-v3.giskard.ai/start/glossary/testing-methodologies.md
+
+### Glossary — Business Failures
+- Overview: https://docs-v3.giskard.ai/start/glossary/business.md
+- Addition of Information: https://docs-v3.giskard.ai/start/glossary/business/addition-of-information.md
+- Business Out of Scope: https://docs-v3.giskard.ai/start/glossary/business/business-out-of-scope.md
+- Denial of Answers: https://docs-v3.giskard.ai/start/glossary/business/denial-of-answers.md
+- Hallucination: https://docs-v3.giskard.ai/start/glossary/business/hallucination.md
+- Moderation Issues: https://docs-v3.giskard.ai/start/glossary/business/moderation-issues.md
+- Omission: https://docs-v3.giskard.ai/start/glossary/business/omission.md
+
+### Glossary — Security Vulnerabilities
+- Overview: https://docs-v3.giskard.ai/start/glossary/security.md
+- Prompt Injection: https://docs-v3.giskard.ai/start/glossary/security/injection.md
+- Harmful Content: https://docs-v3.giskard.ai/start/glossary/security/harmful-content.md
+- Information Disclosure: https://docs-v3.giskard.ai/start/glossary/security/information-disclosure.md
+- Output Formatting: https://docs-v3.giskard.ai/start/glossary/security/formatting.md
+- Robustness: https://docs-v3.giskard.ai/start/glossary/security/robustness.md
+- Stereotypes & Discrimination: https://docs-v3.giskard.ai/start/glossary/security/stereotypes.md
+
+### Glossary — LLM Benchmarks
+- Overview: https://docs-v3.giskard.ai/start/glossary/llm-benchmarks.md
+- Reasoning and Language: https://docs-v3.giskard.ai/start/glossary/llm-benchmarks/reasoning-and-language.md
+- Math Problems: https://docs-v3.giskard.ai/start/glossary/llm-benchmarks/math-problems.md
+- Coding: https://docs-v3.giskard.ai/start/glossary/llm-benchmarks/coding.md
+- Conversation and Chatbot: https://docs-v3.giskard.ai/start/glossary/llm-benchmarks/conversation-and-chatbot.md
+- Safety: https://docs-v3.giskard.ai/start/glossary/llm-benchmarks/safety.md
+- Domain-Specific: https://docs-v3.giskard.ai/start/glossary/llm-benchmarks/domain-specific.md
+
 ### Hub UI
 - Introduction: https://docs-v3.giskard.ai/hub/ui.md
 - Access Rights: https://docs-v3.giskard.ai/hub/ui/access-rights.md
@@ -101,6 +137,7 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Audit Logs: https://docs-v3.giskard.ai/hub/sdk/guides/audit.md
 
 ### Giskard Checks (Open Source)
+- Giskard Library: https://docs-v3.giskard.ai/oss.md
 - What are Giskard Checks?: https://docs-v3.giskard.ai/oss/checks.md
 - Install & Configure: https://docs-v3.giskard.ai/oss/checks/installation.md
 - Quickstart: https://docs-v3.giskard.ai/oss/checks/quickstart.md
