@@ -1,0 +1,65 @@
+---
+title: "Overview"
+description: "Business vulnerabilities are failures that affect the business logic, accuracy, and reliability of AI systems."
+sidebar:
+  order: 1
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+Business vulnerabilities are failures that affect the business logic, accuracy, and reliability of AI systems. These include issues that impact the model's ability to provide accurate, reliable, and appropriate responses in normal usage scenarios.
+
+## Understanding Business Failures
+
+Business vulnerabilities differ from security vulnerabilities in that they focus on the model's ability to provide correct and grounded responses with respect to a knowledge base taken as ground truth. These failures can occur in Retrieval-Augmented Generation (RAG) systems and other AI applications where accuracy and reliability are critical for business operations.
+
+:::tip
+You can find examples of business vulnerabilities in our [RealPerformance dataset ↗](https://realperformance.giskard.ai/).
+:::
+
+## Types of Business Failures
+
+<CardGrid>
+  <LinkCard
+    title="Addition of Information"
+    description="The AI incorrectly adds information that was not present in the context of the groundedness check."
+    href="/start/glossary/business/addition-of-information"
+  />
+  <LinkCard
+    title="Business Out of Scope"
+    description="The AI provides answers about products or services outside their defined business scope."
+    href="/start/glossary/business/business-out-of-scope"
+  />
+  <LinkCard
+    title="Denial of Answers"
+    description="The AI incorrectly refuses to answer legitimate questions that are in scope."
+    href="/start/glossary/business/denial-of-answers"
+  />
+  <LinkCard
+    title="Hallucinations"
+    description="The AI generates information not present in your knowledge base."
+    href="/start/glossary/business/hallucination"
+  />
+  <LinkCard
+    title="Moderation Issues"
+    description="The AI incorrectly provides the wrong default moderation answer."
+    href="/start/glossary/business/moderation-issues"
+  />
+  <LinkCard
+    title="Omission"
+    description="The AI incorrectly omits information that is present in the reference context."
+    href="/start/glossary/business/omission"
+  />
+</CardGrid>
+
+## Getting Started with Business Testing
+
+To begin testing your AI systems for business failures:
+
+<CardGrid>
+  <LinkCard
+    title="Giskard Hub UI Business Dataset"
+    description="Our state-of-the-art enterprise-grade business failure testing."
+    href="/hub/ui/datasets/knowledge-base"
+  />
+</CardGrid>

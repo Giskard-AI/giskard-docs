@@ -1,0 +1,31 @@
+<!-- Whitepaper Download Banner -->
+<script>
+	function createBanner() {
+		if (document.querySelector('.whitepaper-banner')) return;
+		if (sessionStorage.getItem('whitepaper-banner-closed') === 'true') return;
+
+		const banner = document.createElement('div');
+		banner.className = 'whitepaper-banner';
+
+		banner.innerHTML = `
+			<span>📄 Learn about the research behind our Red Teaming: <a class="whitepaper-banner-link" href="https://www.giskard.ai/knowledge/llm-security-50-adversarial-attacks-for-ai-red-teaming" target="_blank" rel="noopener">Download our LLM Security Attacks Whitepaper</a></span>
+			<button class="close-btn" aria-label="Close banner">×</button>
+		`;
+
+		document.body.prepend(banner);
+		document.body.classList.add('banner-visible');
+
+		banner.querySelector('.close-btn')!.addEventListener('click', () => {
+			banner.style.transform = 'translateY(-100%)';
+			banner.style.opacity = '0';
+			setTimeout(() => {
+				banner.remove();
+				document.body.classList.remove('banner-visible');
+				sessionStorage.setItem('whitepaper-banner-closed', 'true');
+			}, 300);
+		});
+	}
+
+	createBanner();
+	document.addEventListener('astro:after-swap', createBanner);
+</script>

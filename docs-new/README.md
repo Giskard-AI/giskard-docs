@@ -35,7 +35,9 @@ docs-new/
 │   ├── components/       # Starlight component overrides
 │   ├── content/
 │   │   └── docs/
-│   │       ├── hub/sdk/  # Hub SDK documentation
+│   │       ├── start/    # Overview pages (comparison, trial, glossary)
+│   │       ├── hub/ui/   # Hub UI documentation (for business users)
+│   │       ├── hub/sdk/  # Hub SDK documentation (for developers)
 │   │       └── oss/      # Open Source (Checks) documentation
 │   └── styles/custom.css # Global CSS overrides
 ├── astro.config.mjs      # Astro + Starlight configuration

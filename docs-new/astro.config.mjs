@@ -8,6 +8,8 @@ import starlightAutoSidebar from 'starlight-auto-sidebar'
 
 import cloudflare from '@astrojs/cloudflare';
 
+import mermaid from 'astro-mermaid';
+
 // https://astro.build/config
 export default defineConfig({
     site: 'https://docs-v3.giskard.ai',
@@ -30,6 +32,27 @@ export default defineConfig({
                 { label: 'Discord', href: 'https://discord.com/invite/ABvfpbu69R', icon: 'discord' },
             ],
             sidebar: [
+                // Overview sidebar
+                {
+                    label: 'Overview',
+                    items: [
+                        { slug: 'index', label: 'Welcome to Giskard' },
+                        { slug: 'start/comparison', label: 'Open Source vs Hub' },
+                        { slug: 'start/enterprise-trial', label: 'Request your enterprise trial' },
+                        {
+                            label: 'Knowledge Glossary',
+                            collapsed: true,
+                            autogenerate: { directory: 'start/glossary', collapsed: true },
+                        },
+                        { label: 'Contact us ↗', link: 'https://www.giskard.ai/contact', attrs: { target: '_blank' } },
+                        { label: 'Blog ↗', link: 'https://www.giskard.ai/knowledge-categories/blog', attrs: { target: '_blank' } },
+                    ],
+                },
+                // Hub UI sidebar
+                {
+                    label: 'Hub UI',
+                    autogenerate: { directory: 'hub/ui', collapsed: false },
+                },
                 // Hub SDK sidebar
                 {
                     label: 'Hub SDK',
@@ -49,8 +72,10 @@ export default defineConfig({
             ],
             routeMiddleware: './src/routeData.ts',
             expressiveCode: {
-                // Configure expressive code if needed, defaults are usually good
-                themes: ['dracula', 'github-light'],
+                themes: ['catppuccin-mocha', 'catppuccin-latte'],
+                styleOverrides: {
+                    borderRadius: '0.5rem',
+                },
             },
             lastUpdated: true,
             components: {
@@ -66,10 +91,11 @@ export default defineConfig({
         }),
         react(),
         tailwind({
-            // Disable base styles to avoid conflict with Starlight if needed, 
+            // Disable base styles to avoid conflict with Starlight if needed,
             // but Starlight's tailwind plugin handles this.
             applyBaseStyles: false,
         }),
+        mermaid(),
     ],
 
     adapter: cloudflare(),
