@@ -7,6 +7,25 @@ sidebar:
 
 This tutorial walks you through installing the SDK, connecting to the Hub, and running a complete evaluation against an LLM agent — from dataset creation to reading results.
 
+## Install with a coding agent
+
+The fastest way to set up the Giskard Hub SDK. Paste a single URL into your coding agent and it handles everything — dependency installation, authentication, and environment setup.
+
+:::tip[Get Started — Paste this into your coding agent:]
+```
+Follow the instructions from https://docs-v3.giskard.ai/hub/sdk/quickstart.md and install giskard-hub in my project.
+```
+:::
+
+### How it works
+
+1. **Paste the URL** into any coding agent (Claude Code, Cursor, Windsurf, Copilot, etc.)
+2. **The agent reads** the quickstart instructions from this page
+3. **The agent installs** `giskard-hub` and configures authentication
+4. **You review** the changes and start running evaluations
+
+---
+
 ## Prerequisites
 
 - Python 3.10 or later
