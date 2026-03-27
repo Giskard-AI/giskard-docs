@@ -83,6 +83,23 @@ trace = Trace(
 
 Traces are typically created during scenario execution by resolving each `InteractionSpec` into a frozen interaction.
 
+Each trace also carries optional **`annotations`**: a dictionary of scenario-level metadata (for example tenant id or experiment name). When you build a scenario, pass `annotations={...}`; the runner copies them onto the initial trace so checks and callables can read `trace.annotations` without attaching the same data to every interaction.
+
+For a **custom trace type**, subclass `Trace` and pass `trace_type=YourTrace` on `Scenario`. Use this when you want extra computed fields, helpers, or custom Rich rendering for the conversation history. See [Custom trace types](/oss/checks/how-to/custom-trace).
+
+```python
+from giskard.checks import Scenario, Trace
+
+class MyTrace(Trace[str, str]):
+    pass
+
+scenario = Scenario(
+    "with_custom_trace",
+    trace_type=MyTrace,
+    annotations={"tenant": "acme"},
+)
+```
+
 ## Checks
 
 A `Check` validates something about a trace and returns a `CheckResult`. Checks run after each interaction in a scenario and can inspect any part of the trace — including outputs from earlier turns.

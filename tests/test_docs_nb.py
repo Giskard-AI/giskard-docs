@@ -24,6 +24,7 @@ DOCS_ROOT = (
 # Notebooks confirmed to need no API key.
 NO_API_NOTEBOOKS = {
     "tutorials/your-first-test.ipynb",
+    "how-to/custom-trace.ipynb",
 }
 
 

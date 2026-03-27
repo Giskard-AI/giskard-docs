@@ -146,7 +146,7 @@ if result.status == CheckStatus.PASS:
 
 ## `Interaction`
 
-**Module:** `giskard.checks.core.trace`
+**Module:** `giskard.checks.core.interaction` (also exported from `giskard.checks`)
 
 A single exchange between inputs and outputs.
 
@@ -188,13 +188,16 @@ Interactions are typically created through the scenario builder's `.interact()` 
 
 ## `Trace`
 
-**Module:** `giskard.checks.core.trace`
+**Module:** `giskard.checks.core.interaction` (also exported from `giskard.checks`)
 
 Immutable history of all interactions in a scenario. Passed to checks for validation and to interaction specs for generating subsequent interactions.
 
 <TypeTable name="Trace">
   <Property name="interactions" type="list[Interaction]">
     Ordered list of all interactions. Most recent at `[-1]`.
+  </Property>
+  <Property name="annotations" type="dict[str, Any]">
+    Optional scenario-level metadata (for example tenant id or experiment name). Populated from `Scenario(..., annotations=...)` when the runner creates the initial trace.
   </Property>
   <Property name="last" type="Interaction | None">
     Computed property returning the last interaction, or None if empty.
@@ -215,6 +218,16 @@ class TraceCheck(Check):
 :::tip[Accessing Trace in Templates]
 `trace.last` is available in Jinja2 prompt templates and JSONPath expressions.
 :::
+
+### Custom trace types
+
+Pass `trace_type=YourTrace` on [`Scenario`](/oss/checks/reference/scenarios) when you subclass `Trace` to add computed fields, helpers, or custom **Rich** rendering (`__rich_console__` / `__rich__`). The scenario runner constructs the initial trace with `YourTrace(annotations=scenario.annotations)`.
+
+`ScenarioResult.final_trace` is validated as the base `Trace` type; after `run()`, rebuild your subclass from `final_trace.interactions` and `final_trace.annotations` if you need the custom Rich layout in a report. Checks still receive your subclass during execution. See [Custom trace types](/oss/checks/how-to/custom-trace).
+
+### Rich rendering
+
+The default `Trace.__rich_console__` prints each interaction under a titled rule. Override it on a subclass for conversation-style or domain-specific layouts. [`ScenarioResult.print_report()`](/oss/checks/reference/scenarios/#scenarioresult) renders `final_trace` with Rich using that protocol when the stored trace implements it.
 
 ---
 
@@ -361,4 +374,5 @@ check = Groundedness()  # uses the default generator
 
 - [Built-in Checks](/oss/checks/reference/checks) -- Ready-to-use validation checks
 - [Scenarios](/oss/checks/reference/scenarios) -- Multi-step workflow testing
+- [Custom trace types](/oss/checks/how-to/custom-trace) -- Subclass `Trace`, `trace_type`, annotations, and Rich transcripts
 - [Testing Utilities](/oss/checks/reference/testing-utils) -- Test runners and helpers
