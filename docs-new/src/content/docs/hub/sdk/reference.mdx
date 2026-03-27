@@ -195,7 +195,7 @@ All methods documented below are shown in their synchronous form. The async vari
 <ResourceSection description="Register, test, and invoke LLM agents. An agent represents your LLM application -- either a remote HTTP endpoint or a local Python callable.">
 
 ```python
-from giskard_hub.types import Agent, AgentOutput, ChatMessage
+from giskard_hub.types import Agent, AgentDetectStatefulness, AgentOutput, ChatMessage
 ```
 
 <MethodCard name=".create()" returnType="Agent">
@@ -218,6 +218,9 @@ from giskard_hub.types import Agent, AgentOutput, ChatMessage
   </Property>
   <Property name="description" type="str | None">
     Human-readable description.
+  </Property>
+  <Property name="stateful" type="bool | None">
+    Whether the agent is stateful.
   </Property>
 
 ```python title="Example"
@@ -306,6 +309,12 @@ print(output.metadata)
   <Property name="agent_id" type="str" required>ID of the agent.</Property>
 </MethodCard>
 
+<MethodCard name=".detect_statefulness()" returnType="AgentDetectStatefulness">
+  Detect whether the agent is stateful by analyzing its behavior.
+
+  <Property name="agent_id" type="str" required>ID of the agent to detect statefulness for.</Property>
+</MethodCard>
+
 <TypeTable name="Agent">
   <Property name="id" type="str">
     Unique identifier.
@@ -328,11 +337,20 @@ print(output.metadata)
   <Property name="headers" type="list[Header]">
     HTTP headers.
   </Property>
+  <Property name="stateful" type="bool">
+    Whether the agent is stateful.
+  </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
   </Property>
   <Property name="updated_at" type="datetime">
     Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AgentDetectStatefulness">
+  <Property name="stateful" type="bool">
+    Whether the agent is stateful.
   </Property>
 </TypeTable>
 
@@ -942,11 +960,26 @@ from giskard_hub.types.evaluation import TestCaseEvaluation, FailureCategory
   <Property name="hidden" type="bool">
     Whether this result is hidden.
   </Property>
+  <Property name="divergence_warnings" type="list[DivergenceWarning] | None">
+    List of divergence warnings detected during multi-turn evaluation.
+  </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
   </Property>
   <Property name="updated_at" type="datetime">
     Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="DivergenceWarning">
+  <Property name="turn" type="int">
+    The conversation turn where divergence was detected.
+  </Property>
+  <Property name="expected" type="str">
+    The expected message content.
+  </Property>
+  <Property name="actual" type="str">
+    The actual message content received.
   </Property>
 </TypeTable>
 
@@ -1346,6 +1379,9 @@ from giskard_hub.types.scan import ScanProbeAttempt, ReviewStatus, Severity
 </Property>
 <Property name="knowledge_base_id" type="str | None">
   Anchor probes to KB documents for domain-specific attacks.
+</Property>
+<Property name="probe_ids" type="list[str] | None">
+  List of specific LIDAR probe IDs to run in the scan.
 </Property>
 <Property name="tags" type="list[str] | None">
   Limit scan to specific threat categories (e.g.
