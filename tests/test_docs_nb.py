@@ -1,13 +1,13 @@
 # tests/test_docs_nb.py
 """
-End-to-end tests for Jupyter notebooks in docs-new/.
+End-to-end tests for Jupyter notebooks.
 
 Cells tagged skip-execution (the colab-install cells) are skipped automatically.
 
 - No OPENAI_API_KEY → only NO_API_NOTEBOOKS run; the rest skip.
 - OVERWRITE_NB=0    → skip writing outputs back (default is to overwrite).
                       After the run, regenerate .mdx files:
-                      cd docs-new && node scripts/convert-notebooks.mjs
+                      node scripts/convert-notebooks.mjs
 
 Run from the project root:
     uv run pytest tests/test_docs_nb.py
@@ -18,7 +18,7 @@ from pathlib import Path
 
 DOCS_ROOT = (
     Path(__file__).parent.parent
-    / "docs-new" / "src" / "content" / "docs" / "oss" / "checks"
+    / "src" / "content" / "docs" / "oss" / "checks"
 )
 
 # Notebooks confirmed to need no API key.

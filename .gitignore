@@ -1,41 +1,44 @@
+# Python
 *.pyc
 *.egg
 *.so
 *.swp
-
-.auto/
-.dir-locals.el
-.cache/
-.idea
 .mypy_cache/
 .pytest_cache/
-.ropeproject/
-.vscode/
-TAGS
-.tags
-.tox/
-.tx/
 .venv/
 venv/
+env/
 .coverage
 htmlcov
-.DS_Store
-sphinx/pycode/Grammar*pickle
 distribute-*
-
-env/
 build/
 dist/
-docker/
-Sphinx.egg-info/
-doc/_build/
-doc/locale/
 tests/.coverage
 tests/build/
-tests/js/roots/*/_build
-tests/test-server.lock
-utils/regression_test.js
-source/_templates/sidebars
 
+# Node / Astro
+.astro/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
 .env
-test.py
+.env.production
+
+# macOS
+.DS_Store
+
+# IDE / Editor
+.idea
+.vscode/
+.tags
+TAGS
+
+# Generated from notebooks — do not commit
+src/content/docs/oss/checks/quickstart.mdx
+src/content/docs/oss/checks/how-to/*.mdx
+src/content/docs/oss/checks/tutorials/*.mdx
+src/content/docs/oss/checks/use-cases/*.mdx

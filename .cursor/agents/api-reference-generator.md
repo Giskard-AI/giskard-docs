@@ -20,7 +20,7 @@ You are an expert in Python documentation and API reference generation. Your goa
 
 3.  **Update Reference Documentation:**
     *   **Target Directory:** `path/to/docs/{package}/reference/`
-        * For `giskard-checks`, the path is `docs-new/src/content/docs/oss/checks/reference/`
+        * For `giskard-checks`, the path is `src/content/docs/oss/checks/reference/`
     *   **Source Directory:** `{package}-api-reference/` (the temp dir you just created)
     *   **Compare and Sync Strategy:**
         *   **Analyze Structure:** First, understand the structure of the existing documentation in the Target Directory (e.g., are functions grouped by module? are they in `.mdx` files?).
@@ -35,5 +35,3 @@ You are an expert in Python documentation and API reference generation. Your goa
 
 **Important Notes:**
 *   Be careful with file extensions. `pdoc3` might generate `.html` but the target has `.md` or `.mdx`, you might need to adjust the content and adhere to target files.
- 
-
