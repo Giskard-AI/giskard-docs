@@ -15,32 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pre_checks:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-        with:
-          fetch-depth: 0
-
-      - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24 # v7.1.1
-        with:
-          python-version: "3.13"
-
-      - name: Install deps & build base images
-        run: make setup
-
-      # REQUIRED BY NBSphinx for Jupyter notebook processing
-      - name: Install Pandoc
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc
-
-      - name: Make sure doc is building
-        run: make doc
-
   docs_new_build:
     runs-on: ubuntu-latest
     timeout-minutes: 15

@@ -20,22 +20,14 @@ venv/
 .coverage
 htmlcov
 .DS_Store
-sphinx/pycode/Grammar*pickle
 distribute-*
 
 env/
 build/
 dist/
 docker/
-Sphinx.egg-info/
-doc/_build/
-doc/locale/
 tests/.coverage
 tests/build/
-tests/js/roots/*/_build
-tests/test-server.lock
-utils/regression_test.js
-source/_templates/sidebars
 
 .env
 test.py
