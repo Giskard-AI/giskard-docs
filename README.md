@@ -1,6 +1,6 @@
 # Giskard Docs (Starlight)
 
-New documentation site built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build), deployed to Cloudflare Pages at `docs-v3.giskard.ai`.
+Documentation site built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build), deployed to Cloudflare Pages at `docs-v3.giskard.ai`.
 
 ## Requirements
 
@@ -8,8 +8,6 @@ New documentation site built with [Astro](https://astro.build) + [Starlight](htt
 - Python 3 + `black` (optional — only needed for `npm run format`)
 
 ## Commands
-
-Run from inside the `docs-new/` directory:
 
 | Command                 | Description                                                           |
 | :---------------------- | :-------------------------------------------------------------------- |
@@ -25,7 +23,6 @@ Run from inside the `docs-new/` directory:
 ## Project structure
 
 ```
-docs-new/
 ├── public/               # Static assets (fonts, favicon, og image, llms.txt)
 ├── scripts/
 │   ├── convert-notebooks.mjs   # Converts .ipynb -> .mdx at build time
@@ -60,8 +57,6 @@ docs-new/
 ## Testing notebooks
 
 Notebook tests are run with [nbmake](https://github.com/treebeardtech/nbmake) via pytest. Tests require an `OPENAI_API_KEY` in the environment (notebooks that need no key are listed in `NO_API_NOTEBOOKS` in `tests/test_docs_nb.py`).
-
-Run from the **project root** (not `docs-new/`):
 
 | Command | Description |
 | :--- | :--- |

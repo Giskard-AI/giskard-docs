@@ -1,6 +1,6 @@
 {
 	"main": "dist/_worker.js/index.js",
-	"name": "docs-new",
+	"name": "giskard-docs",
   "compatibility_date": "2026-02-12",
   "compatibility_flags": [
     "nodejs_compat",

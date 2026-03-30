@@ -5,12 +5,12 @@ pre-commit-install: ## Setup pre-commit hooks
 .PHONY: pre-commit-install
 
 install: ## Install project dependencies
-	uv sync --all-extras && cd docs-new && npm install
+	uv sync --all-extras && npm install
 .PHONY: setup
 
 
 dev: ## Start development server
-	cd docs-new && npm run dev
+	npm run dev
 .PHONY: dev
 
 test-docs-nb: ## Run notebook E2E tests (overwrites outputs by default; set OVERWRITE_NB=0 to skip)
@@ -22,7 +22,7 @@ test-docs-nb-readonly: ## Run notebook tests without writing outputs back
 .PHONY: test-docs-nb-readonly
 
 regen-mdx: ## Regenerate .mdx files from .ipynb notebooks
-	cd docs-new && node scripts/convert-notebooks.mjs
+	node scripts/convert-notebooks.mjs
 .PHONY: regen-mdx
 
 test-docs: test-docs-nb ## Run all doc tests

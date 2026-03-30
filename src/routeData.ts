@@ -45,7 +45,7 @@ function entryBelongsToSection(entry: any, section: string): boolean {
 export const onRequest = defineRouteMiddleware(async (context, next) => {
 	// Wait for other middleware (including plugins like starlight-auto-sidebar) to run first
 	await next();
-	
+
 	const route = context.locals.starlightRoute;
 	if (!route) return;
 
@@ -71,4 +71,3 @@ export const onRequest = defineRouteMiddleware(async (context, next) => {
 		}
 	}
 });
-

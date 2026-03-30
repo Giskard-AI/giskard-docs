@@ -12,7 +12,7 @@ When invoked to test a package (e.g., "test the package giskard-checks"):
 1.  **Locate Documentation**:
     - Identify the documentation directory for the given package.
     - Recursively find all `.md` and `.mdx` files.
-    * For `giskard-checks`, the documentation is available on `docs-new/src/content/docs/oss/checks/`
+    * For `giskard-checks`, the documentation is available on `src/content/docs/oss/checks/`
 
 2.  **Extract Snippets**:
     - Parse each file for Python code blocks (```python ... ```).
