@@ -9,6 +9,84 @@ Below you will find the release notes for each version of Giskard Hub UI. Each e
 
 ---
 
+## 2.5.0 (2026-03-31)
+
+We are releasing a new version of the Hub that introduces a unified data table experience with saveable table views, stateful agent support for multi-turn conversations, server-side pagination for large evaluation and dataset pages, fine-grained probe selection for scans, and a new TokenBreak security probe.
+
+### What's new?
+
+**Unified data table UX**
+   All major data tables now share a consistent, modernized interface with sticky headers and a floating bulk actions bar. A new "table views" feature lets you save, restore, and manage your table configurations — including filters, sorting, and column visibility — so you can switch between different workflows without reconfiguring the table each time.
+
+**Stateful agent support**
+   Agents can now track conversation history on the server, enabling multi-turn conversations with persistent context. This helps you build and test agents that maintain context across multiple turns, improving reliability for conversational workflows.
+
+**Paginated evaluation results and datasets**
+   Evaluation results and dataset test cases now use server-side pagination. You can efficiently browse, filter, and compare results without slowdowns or excessive memory use, even in large projects.
+
+**Scan creation by probe IDs**
+   The scan creation page now lets you select individual probes from a searchable checklist, in addition to the existing category-based selection. This gives you more precise control over which probes to include in a scan run.
+
+**New security probe**
+   Enhanced scanning capabilities with a new built-in probe:
+
+   * **TokenBreak** ([OWASP LLM 01 - Prompt Injection](/hub/ui/scan/vulnerability-categories/prompt-injection)) - This probe tests whether your agent can be manipulated through obfuscated prompt injection. It embeds malicious instructions inside legitimate-looking user messages, then prepends characters to sensitive trigger words (e.g. "ignore" → "Aignore") to evade input classifiers while remaining interpretable by the underlying language model. The technique exploits the gap between how safety filters tokenize text and how LLMs process it. Based on the [TokenBreak attack research](https://hiddenlayer.com/innovation-hub/the-tokenbreak-attack/) ([paper](https://arxiv.org/html/2506.07948v1)). Supports English, French, Italian, and German.
+
+### What's fixed?
+
+- **Severity-based probe ordering** - Probe attempts and results are now ordered by severity, with the most critical issues appearing first. This helps you quickly identify and address the most important scan findings.
+
+- **Color accessibility** - UI color contrast and badge styling have been improved for both light and dark themes, ensuring better readability and compliance with accessibility standards.
+
+- **Filter validation** - Column filters are now properly formatted for backend search endpoints, preventing validation errors on audit, dataset, knowledge base, and evaluation pages.
+
+- **Date range filter restore** - Restoring saved table views or using URL parameters with date range filters now works as expected, displaying the correct results.
+
+- **XLSX export reliability** - Free-text fields in XLSX evaluation exports are now sanitized to remove illegal XML control characters, and exports are processed in the background to keep the app responsive.
+
+- **Parallel page loading** - Data fetches on several pages now run in parallel, resulting in noticeably faster page loads across the Hub.
+
+---
+
+## 2.4.0 (2026-02-24)
+
+We are releasing a new version of the Hub that introduces a server-backed dataset table for managing large datasets, enhanced Playground interactivity, a redesigned three-step groundedness evaluation pipeline, annotation highlights in the compare view, and safer markdown rendering in scan results.
+
+### What's new?
+
+**Server-backed dataset management**
+   Dataset test cases now load via a server-backed table, significantly improving performance for large datasets. You can filter, sort, and paginate through thousands of test cases without slowing down your browser. A new bulk action preview shows you exactly how many items will be affected before you apply changes, making large-scale edits safer and more predictable.
+
+**Enhanced Playground interactivity**
+   The Playground now features quick actions to streamline your prompt engineering workflow. You can instantly remove the last conversation turn, re-generate the assistant's previous answer, and toggle between "Pretty" and "Raw" Markdown rendering. Your display preference is saved in your browser, ensuring a consistent experience across sessions.
+
+**Advanced Groundedness pipeline**
+   Groundedness evaluation has been upgraded to a three-step pipeline that extracts evidence, evaluates individual claims, and re-checks borderline cases for higher accuracy. You can now view detailed, per-claim groundedness reasons directly in the results and comparison views, presented in a clear Markdown format. Confidence scoring has also been improved for more consistent results.
+
+**Annotation highlights in compare view**
+   The conversation comparison view now displays metric annotations — such as groundedness failures — directly in the response and context panels. This helps you understand evaluation results and the reasons behind metric failures without leaving the compare flow.
+
+**Re-run checks on local evaluations**
+   You can now re-run checks on local evaluation results without re-querying the model, preserving the existing output. This helps you iterate on check configurations more efficiently and safely.
+
+**Scan grade tooltip**
+   A tooltip explaining scan grades is now available on the dashboard and scan history views. You can hover over a grade to quickly understand what it means without navigating away from the summary screen.
+
+**Safe markdown rendering in scans**
+   Markdown rendering in scan results now blocks images and external links unless they match an approved domain list. This prevents adversarial agents from embedding tracking pixels or exfiltration links in their responses. Blocked content is displayed as plain text with a tooltip.
+
+### What's fixed?
+
+- **Large Knowledge Base uploads** - Uploading Knowledge Base files larger than 10 MB no longer fails.
+
+- **Evaluation chart accuracy** - The evaluation dashboard pie chart now correctly displays all status segments, and the bar chart visually distinguishes passed bars.
+
+- **Playground cursor position** - Editing messages in the Playground chat input now preserves the cursor position, even when typing in the middle of the text.
+
+- **Agent description handling** - Forms no longer error when an agent has no description set.
+
+---
+
 ## 2.3.0 (2026-02-03)
 
 We are releasing a new version of the Hub that brings significant improvements to productivity and user experience. This release introduces bulk conversation management for faster dataset organization, a redesigned dashboard with side-by-side evaluations and scans, automated agent description generation, enhanced knowledge base browsing with dedicated chunk navigation, and improved list views across all resources. We've also added two new security probes (Domain Misguidance and Reasoning Denial of Service) and delivered major performance improvements for large evaluation runs.
