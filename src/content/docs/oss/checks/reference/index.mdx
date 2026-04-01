@@ -1,0 +1,120 @@
+---
+title: Overview
+description: "Complete API documentation for all Giskard Checks modules — core types, built-in checks, scenarios, and utilities."
+sidebar:
+  order: 1
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+Complete API documentation for Giskard Checks -- a comprehensive testing framework for AI applications.
+
+## API Modules
+
+<CardGrid>
+  <LinkCard
+    title="Core"
+    description="Base classes and fundamental types: Check, Trace, Interaction, Scenario, TestCase"
+    href="/oss/checks/reference/core"
+  />
+  <LinkCard
+    title="Checks"
+    description="Ready-to-use validation checks: string matching, comparisons, LLM-based checks"
+    href="/oss/checks/reference/checks"
+  />
+  <LinkCard
+    title="Scenarios"
+    description="Multi-step workflow testing with scenario builders and runners"
+    href="/oss/checks/reference/scenarios"
+  />
+  <LinkCard
+    title="Testing Utilities"
+    description="Testing utilities: test runners, spies, and debugging helpers"
+    href="/oss/checks/reference/testing-utils"
+  />
+  <LinkCard
+    title="Generators"
+    description="Input generators for creating dynamic test data and scenarios"
+    href="/oss/checks/reference/generators"
+  />
+  <LinkCard
+    title="Utilities"
+    description="Helper functions for normalization, value providers, and parameter injection"
+    href="/oss/checks/reference/utils"
+  />
+</CardGrid>
+
+## Quick reference
+
+```python
+from giskard.checks import (
+    # Core types
+    Check,
+    CheckResult,
+    CheckStatus,
+    Interaction,
+    Trace,
+    InteractionSpec,
+    Scenario,
+    TestCase,
+    # Built-in checks
+    FnCheck,
+    StringMatching,
+    Equals,
+    NotEquals,
+    LesserThan,
+    GreaterThan,
+    LesserThanEquals,
+    GreaterEquals,
+    # Configuration
+    set_default_generator,
+    get_default_generator,
+)
+
+# LLM-based checks
+from giskard.checks import (
+    BaseLLMCheck,
+    LLMCheckResult,
+    Groundedness,
+    Conformity,
+    LLMJudge,
+    SemanticSimilarity,
+)
+```
+
+## Package structure
+
+```text
+giskard.checks/
+├── core/                 # Base classes and fundamental types
+│   ├── check.py          # Check base class
+│   ├── result.py         # CheckResult, CheckStatus
+│   ├── scenario.py       # Scenario
+│   ├── testcase.py       # TestCase
+│   ├── extraction.py     # Extractors
+│   └── interaction/      # Interaction types
+├── builtin/              # Ready-to-use checks
+│   ├── fn.py             # FnCheck
+│   ├── text_matching.py  # StringMatching, RegexMatching
+│   ├── comparison.py     # Equals, NotEquals, etc.
+│   └── semantic_similarity.py
+├── judges/               # LLM-based checks
+│   ├── base.py           # BaseLLMCheck, LLMCheckResult
+│   ├── groundedness.py   # Groundedness
+│   ├── conformity.py     # Conformity
+│   └── judge.py          # LLMJudge
+├── scenarios/            # Multi-step workflows
+│   ├── builder.py        # Scenario builder
+│   ├── runner.py         # ScenarioRunner
+│   └── suite.py          # Suite
+├── testing/              # Testing utilities
+│   ├── runner.py         # TestCaseRunner
+│   └── spy.py            # WithSpy
+├── generators/           # Input generators
+│   └── user.py           # UserSimulator
+└── utils/                # Helper utilities
+    ├── normalization.py
+    ├── value_provider.py
+    ├── parameter_injection.py
+    └── generator.py
+```

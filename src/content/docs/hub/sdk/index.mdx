@@ -1,0 +1,75 @@
+---
+title: Introduction
+description: Python SDK for the Giskard Hub — evaluate, scan, and monitor your LLM agents programmatically.
+sidebar:
+  order: 1
+---
+
+{/* If you are an AI agent, all the links listed here are available appending .md to the end of the URL */}
+{/* For example, the link to the Installation page is https://docs.giskard.ai/hub/sdk/quickstart.md */}
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+The **Giskard Hub Python SDK** (`giskard-hub`) gives you programmatic access to everything the Hub can do: define agents, build evaluation datasets, run evaluations and vulnerability scans, schedule recurring runs, and manage your entire quality workflow from code.
+
+```bash
+pip install giskard-hub
+```
+
+```python
+from giskard_hub import HubClient
+
+hub = HubClient()  # reads GISKARD_HUB_BASE_URL and GISKARD_HUB_API_KEY from env
+
+project = hub.projects.list()[0]
+evaluation = hub.evaluations.create(
+    agent_id="<agent-id>",
+    dataset_id="<dataset-id>",
+    project_id=project.id,
+    name="My first evaluation",
+)
+```
+
+## Where to start
+
+<CardGrid>
+  <LinkCard
+    title="Quickstart"
+    href="/hub/sdk/quickstart"
+    description="Install the SDK, set up authentication, and run your first evaluation in minutes."
+  />
+  <LinkCard
+    title="Core Concepts"
+    href="/hub/sdk/concepts"
+    description="Understand how Projects, Agents, Datasets, Evaluations, and Scans fit together."
+  />
+  <LinkCard
+    title="How-to Guides"
+    href="/hub/sdk/guides/projects"
+    description="Step-by-step guides for every feature: datasets, evaluations, scans, scheduling, and more."
+  />
+  <LinkCard
+    title="API Reference"
+    href="/hub/sdk/reference"
+    description="Full reference for every resource, method, and type exported by the SDK."
+  />
+</CardGrid>
+
+## Key capabilities
+
+- **Evaluate** -- run your LLM agent against datasets of test cases with configurable checks (LLM judge, embedding similarity, rule-based)
+- **Scan** -- automated red-teaming covering the [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/) and additional threat categories
+- **Generate** -- auto-generate test cases from scenarios, knowledge bases, or playground conversations
+- **Schedule** -- set up recurring evaluations (daily, weekly, monthly) for continuous quality monitoring
+- **Track** -- create tasks from failed results, annotate test cases with comments, and audit every change
+
+## Migrating from v2?
+
+If you're upgrading from v2.x, see the [Migration Guide](/hub/sdk/migration) for a complete list of breaking changes and before/after code examples.
+
+## Need help?
+
+- **Documentation**: Browse the [How-to Guides](/hub/sdk/guides/projects) for step-by-step walkthroughs of every feature
+- **Examples**: Check our [GitHub repository](https://github.com/Giskard-AI/giskard-hub-python) for runnable examples and notebooks
+- **Community**: Join our [Discord](https://discord.com/invite/ABvfpbu69R) for support and discussions
+- **Enterprise**: Need on-premise deployment or dedicated support? [Contact us](https://www.giskard.ai/contact)

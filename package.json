@@ -1,0 +1,34 @@
+{
+  "name": "giskard-docs",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "node scripts/convert-notebooks.mjs && astro dev",
+    "start": "astro dev",
+    "build": "npm run format && node scripts/convert-notebooks.mjs && astro build",
+    "build:ci": "node scripts/convert-notebooks.mjs && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "format": "prettier --write 'src/**/*.{md,mdx}' && node scripts/format-code-blocks.mjs",
+    "format:prose": "prettier --write 'src/**/*.{md,mdx}'",
+    "format:code": "node scripts/format-code-blocks.mjs"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.6.12",
+    "@astrojs/react": "^4.4.2",
+    "@astrojs/starlight": "^0.37.6",
+    "@astrojs/tailwind": "^6.0.2",
+    "astro": "^5.6.1",
+    "astro-mermaid": "^2.0.1",
+    "mermaid": "^11.13.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "sharp": "^0.34.2",
+    "starlight-auto-sidebar": "^0.1.4",
+    "tailwindcss": "^3.4.19"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "wrangler": "^4.50.0"
+  }
+}

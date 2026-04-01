@@ -8,31 +8,27 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13,<4.0"
 dependencies = [
-    "giskard-core @ git+ssh://git@github.com/Giskard-AI/giskard-oss.git@main#subdirectory=libs/giskard-core",
-    "giskard-agents @ git+ssh://git@github.com/Giskard-AI/giskard-oss.git@main#subdirectory=libs/giskard-agents",
-    "giskard-checks @ git+ssh://git@github.com/Giskard-AI/giskard-oss.git@main#subdirectory=libs/giskard-checks",
+    "giskard-core==1.0.1b2",
+    "giskard-agents==1.0.2b1",
+    "giskard-checks==1.0.1b1",
 ]
 
 [dependency-groups]
 dev = [
-    "sphinxawesome-theme==5.3.2; python_version>='3.12'",
-    "myst-parser==4.0.1; python_version>='3.12'",
-    "sphinx-click==6.1.0; python_version>='3.12'",
-    "sphinx-autobuild==2025.8.25; python_version>='3.12'",
-    "sphinx-autodoc-typehints==2.3.0; python_version>='3.12'",
-    "sphinx-design==0.6.1; python_version>='3.12'",
-    "sphinx-tabs>=3.4.7; python_version>='3.12'",
-    "sphinxext-opengraph[social_cards]>=0.12.0; python_version>='3.12'",
-    "sphinx-notfound-page>=1.1.0; python_version>='3.12'",
-    "sphinxcontrib-mermaid>=0.9.0; python_version>='3.12'",
-    "pyarrow<21.0.1; python_version>='3.12'",
-    "sphinx-autobuild>=2024.10.3",
-    "giskard-hub>=2.1.0",
-    "sphinxext-rediraffe"
-
+    "nbmake>=1.5.5",
+    "pytest>=8.3",
+    "python-dotenv>=1.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [project.urls]
 Homepage = "https://github.com/Giskard-AI/giskard-hub"
 Repository = "https://github.com/Giskard-AI/giskard-hub"
 Documentation = "https://docs.giskard.ai/"
+
+[tool.uv]
+# Block compromised litellm versions — supply chain attack (CVE-2026-PENDING)
+# https://github.com/BerriAI/litellm/issues/24512
+constraint-dependencies = ["litellm!=1.82.7,!=1.82.8"]

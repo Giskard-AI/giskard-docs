@@ -15,28 +15,69 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pre_checks:
+  docs_build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build:ci
+
+  doc_tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: docs_build
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           fetch-depth: 0
 
-      - name: Install uv and set the python version
+      - name: Install uv
         uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24 # v7.1.1
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
-      - name: Install deps & build base images
-        run: make setup
+      - name: Install Python deps
+        run: uv sync --all-extras
 
-      # REQUIRED BY NBSphinx for Jupyter notebook processing
-      - name: Install Pandoc
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Node deps
+        run: npm ci
+
+      - name: Run notebook tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OVERWRITE_NB: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
+        run: uv run pytest tests/test_docs_nb.py -v --tb=short
+
+      - name: Regenerate .mdx from updated notebooks (main only)
+        if: github.ref == 'refs/heads/main'
+        run: node scripts/convert-notebooks.mjs
+
+      - name: Commit updated notebooks and docs (main only)
+        if: github.ref == 'refs/heads/main'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc
-
-      - name: Make sure doc is building
-        run: make doc
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/content/docs/oss/checks/
+          git diff --staged --quiet || git commit -m "chore: update notebook outputs and regenerate mdx [skip ci]"
+          git push

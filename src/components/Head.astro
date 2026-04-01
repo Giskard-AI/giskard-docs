@@ -1,0 +1,100 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+import WhitepaperBanner from './WhitepaperBanner.astro';
+
+const route = Astro.locals.starlightRoute;
+const siteUrl = 'https://docs.giskard.ai';
+const ogImageUrl = `${siteUrl}/default-og-image.png`;
+// Normalize: strip trailing slash to match canonical URL format
+const pageUrl = new URL(Astro.url.pathname, siteUrl).href.replace(/\/$/, '');
+
+// Build breadcrumb from URL path
+const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
+const breadcrumbItems = [
+	{ name: 'Home', url: siteUrl },
+	...pathSegments.map((segment, i) => ({
+		name: segment
+			.split('-')
+			.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+			.join(' '),
+		url: `${siteUrl}/${pathSegments.slice(0, i + 1).join('/')}`,
+	})),
+];
+
+const breadcrumbJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: breadcrumbItems.map((item, i) => ({
+		'@type': 'ListItem',
+		position: i + 1,
+		name: item.name,
+		item: item.url,
+	})),
+};
+
+const organizationJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'Organization',
+	name: 'Giskard',
+	url: 'https://giskard.ai',
+	logo: `${siteUrl}/favicon.ico`,
+	sameAs: [
+		'https://github.com/Giskard-AI/giskard-oss',
+		'https://discord.com/invite/ABvfpbu69R',
+	],
+};
+
+const articleJsonLd: Record<string, unknown> = {
+	'@context': 'https://schema.org',
+	'@type': 'TechArticle',
+	headline: route.entry.data.title,
+	url: pageUrl,
+	publisher: {
+		'@type': 'Organization',
+		name: 'Giskard',
+		url: 'https://giskard.ai',
+	},
+	mainEntityOfPage: {
+		'@type': 'WebPage',
+		'@id': pageUrl,
+	},
+};
+
+if (route.entry.data.description) {
+	articleJsonLd.description = route.entry.data.description;
+}
+
+articleJsonLd.image = ogImageUrl;
+
+if (route.lastUpdated) {
+	articleJsonLd.dateModified = route.lastUpdated.toISOString();
+}
+---
+
+<!-- Google Tag Manager -->
+<script is:inline>{`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PQ9MJ64');`}</script>
+<!-- End Google Tag Manager -->
+
+<Default {...Astro.props}><slot /></Default>
+
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/png" />
+<meta name="twitter:image" content={ogImageUrl} />
+
+<script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
+<script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+	<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PQ9MJ64"
+		height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+
+<WhitepaperBanner />

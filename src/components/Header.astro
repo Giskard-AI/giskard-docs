@@ -1,0 +1,137 @@
+---
+import SiteTitle from './SiteTitle.astro';
+import Search from '@astrojs/starlight/components/Search.astro';
+import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
+import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+---
+
+<div class="header sl-flex">
+	<div class="logo-container sl-flex">
+		<SiteTitle {...Astro.props} />
+	</div>
+    <div class="nav-links sl-flex">
+        <a href="/" class="nav-link" aria-current={Astro.url.pathname === '/' || Astro.url.pathname.startsWith('/start') ? 'page' : undefined}>Overview</a>
+        <a href="/hub/ui" class="nav-link" aria-current={Astro.url.pathname.startsWith('/hub/ui') ? 'page' : undefined}>Hub UI</a>
+        <a href="/hub/sdk" class="nav-link" aria-current={Astro.url.pathname.startsWith('/hub/sdk') ? 'page' : undefined}>Hub SDK</a>
+        <a href="/oss" class="nav-link" aria-current={Astro.url.pathname.startsWith('/oss') ? 'page' : undefined}>Open Source</a>
+    </div>
+	<div class="search-container sl-flex">
+		<Search {...Astro.props} />
+	</div>
+	<div class="sl-hidden md:sl-flex right-group">
+		<SocialIcons {...Astro.props} />
+		<ThemeSelect {...Astro.props} />
+	</div>
+</div>
+
+<style>
+	.header {
+		gap: 2rem;
+		justify-content: flex-start;
+		align-items: center;
+		height: 100%;
+        padding-inline-end: var(--sl-nav-pad-x);
+	}
+
+    .logo-container {
+        flex-shrink: 0;
+        /* Aligns the menu start with the sidebar border */
+        /* Formula: sidebar-width - header-padding - gap */
+        width: calc(var(--sl-sidebar-width) - var(--sl-nav-pad-x) - 2rem);
+    }
+
+    .nav-links {
+        gap: 1.5rem;
+        display: none;
+    }
+
+    @media (min-width: 50rem) {
+        .nav-links {
+            display: flex;
+        }
+    }
+
+    .nav-link {
+        color: rgba(15, 23, 41, 0.6);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: var(--sl-text-sm);
+        transition: color 0.2s ease;
+    }
+
+    :global(:root[data-theme='dark']) .nav-link {
+        color: rgba(225, 231, 239, 0.6);
+    }
+
+    .nav-link:hover {
+        opacity: 1;
+        color: #0f1729;
+    }
+
+    :global(:root[data-theme='dark']) .nav-link:hover {
+        color: rgba(225, 231, 239, 0.8);
+    }
+
+    .nav-link[aria-current="page"] {
+        color: #0f1729;
+        opacity: 1;
+    }
+
+    :global(:root[data-theme='dark']) .nav-link[aria-current="page"] {
+        color: #05d939;
+    }
+
+    .search-container {
+        flex-grow: 1;
+        display: flex;
+        justify-content: flex-end;
+        margin-left: 2rem;
+        margin-right: 2rem;
+    }
+
+    @media (max-width: 50rem) {
+        .search-container {
+            margin-left: 0.5rem;
+            margin-right: 1.5rem;
+        }
+    }
+
+    .search-container :global(button):not(.pagefind-ui__search-clear) {
+        max-width: 320px !important;
+        justify-content: flex-start !important;
+    }
+
+    @media (max-width: 50rem) {
+        .search-container :global(button) {
+            padding: 0 !important;
+            justify-content: center !important;
+        }
+
+        .search-container :global(button span) {
+            display: none !important;
+        }
+
+        .search-container :global(button svg) {
+            margin: 0 !important;
+        }
+    }
+
+	.right-group {
+		gap: 1rem;
+		align-items: center;
+        flex-shrink: 0;
+	}
+
+	@media (min-width: 50rem) {
+		:global(:root[data-has-sidebar]) {
+			--__sidebar-pad: calc(2 * var(--sl-nav-pad-x));
+		}
+		:global(:root:not([data-has-sidebar])) {
+			--__sidebar-pad: var(--sl-nav-pad-x);
+		}
+		.header {
+			--__sidebar-width: max(0rem, var(--sl-content-inline-start, 0rem) - var(--sl-nav-pad-x));
+			padding-inline-start: var(--sl-nav-pad-x) !important;
+		}
+	}
+</style>

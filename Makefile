@@ -1,46 +1,29 @@
-# Minimal makefile for Sphinx documentation
-#
-
-# You can set these variables from the command line, and also
-# from the environment for the first two.
-SPHINXOPTS    ?=
-SPHINXBUILD   ?= uv run sphinx-build
-SOURCEDIR     = source
-BUILDDIR      = build
-LIDAR_RELEASE = main
-
-# Put it first so that "make" without argument is like "make help".
-help:
-	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-
-.PHONY: help Makefile
-
-# Catch-all target: route all unknown targets to Sphinx using the new
-# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
-%: Makefile
-	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-
 setup: install pre-commit-install ## Complete development setup
-
-install: ## Install project dependencies
-	uv sync --all-extras
-.PHONY: setup
 
 pre-commit-install: ## Setup pre-commit hooks
 	uv tool run pre-commit install
 .PHONY: pre-commit-install
 
-generate-probe-docs: ## Generate probe documentation from lidar
-	@if [ ! -d .venv-probe-docs ]; then uv venv .venv-probe-docs; fi
-	uv pip install --python .venv-probe-docs/bin/python "git+https://github.com/Giskard-AI/lidar@$(LIDAR_RELEASE)"
-	.venv-probe-docs/bin/python scripts/generate_probe_docs.py
-.PHONY: generate-probe-docs
+install: ## Install project dependencies
+	uv sync --all-extras && npm install
+.PHONY: setup
+
 
 dev: ## Start development server
-	uv run sphinx-autobuild source build --ignore "source/_templates/sidebars/**"
+	npm run dev
 .PHONY: dev
 
-doc: clean html ## Build the doc
-	rm -rf ./docs && mkdir -p ./docs && touch ./docs/.nojekyll && mv ./build/html/* ./docs
-	echo docs.giskard.ai > ./docs/CNAME
-.PHONY: doc
+test-docs-nb: ## Run notebook E2E tests (overwrites outputs by default; set OVERWRITE_NB=0 to skip)
+	uv run pytest tests/test_docs_nb.py -v
+.PHONY: test-docs-nb
+
+test-docs-nb-readonly: ## Run notebook tests without writing outputs back
+	OVERWRITE_NB=0 uv run pytest tests/test_docs_nb.py -v
+.PHONY: test-docs-nb-readonly
+
+regen-mdx: ## Regenerate .mdx files from .ipynb notebooks
+	node scripts/convert-notebooks.mjs
+.PHONY: regen-mdx
+
+test-docs: test-docs-nb ## Run all doc tests
+.PHONY: test-docs
