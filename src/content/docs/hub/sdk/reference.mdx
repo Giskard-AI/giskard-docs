@@ -213,7 +213,7 @@ from giskard_hub.types import Agent, AgentDetectStatefulness, AgentOutput, ChatM
   <Property name="supported_languages" type="list[str]" required>
     Language codes the agent supports (e.g. `["en", "fr"]`).
   </Property>
-  <Property name="headers" type="Dict[str, str]">
+  <Property name="headers" type="dict[str, str]">
     HTTP headers sent with every request to the agent (e.g. auth tokens). Each header is a `{"name": str, "value": str}` dict.
   </Property>
   <Property name="description" type="str | None">
@@ -253,7 +253,7 @@ agent = hub.agents.create(
   <Property name="name" type="str | None">Updated display name.</Property>
   <Property name="url" type="str | None">Updated endpoint URL.</Property>
   <Property name="description" type="str | None">Updated description.</Property>
-  <Property name="headers" type="Iterable[HeaderParam] | None">Updated HTTP headers.</Property>
+  <Property name="headers" type="dict[str, str] | None">Updated HTTP headers.</Property>
   <Property name="supported_languages" type="list[str] | None">Updated language codes.</Property>
 </MethodCard>
 
@@ -824,6 +824,12 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
   <Property name="updated_at" type="datetime">
     Last update timestamp.
   </Property>
+  <Property name="old_evaluation_id" type="str | None">
+    ID of the previous evaluation that this evaluation is based on.
+  </Property>
+  <Property name="scheduled_evaluation_id" type="str | None">
+    ID of the scheduled evaluation that this evaluation is based on.
+  </Property>
 </TypeTable>
 
 <TypeTable name="Metric">
@@ -855,7 +861,7 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
 Inspect, filter, update, and rerun individual evaluation results.
 
 ```python
-from giskard_hub.types.evaluation import TestCaseEvaluation, FailureCategory
+from giskard_hub.types import TestCaseEvaluation, FailureCategory
 ```
 
 <MethodCard name=".retrieve()" returnType="TestCaseEvaluation">
@@ -1324,8 +1330,8 @@ from giskard_hub.types import Scenario, ScenarioPreview
 
   <Property name="project_id" type="str" required>Project ID (positional).</Property>
   <Property name="description" type="str" required>Scenario description.</Property>
-  <Property name="agent_id" type="str | None">Agent ID for preview.</Property>
   <Property name="rules" type="list[str]">Scenario rules.</Property>
+  <Property name="agent_id" type="str | None">Agent ID for preview.</Property>
 </MethodCard>
 
 <MethodCard name=".retrieve()" returnType="Scenario">
@@ -1367,8 +1373,7 @@ from giskard_hub.types import Scenario, ScenarioPreview
 <ResourceSection description="Launch automated vulnerability scans covering the OWASP LLM Top 10 and additional threat categories. Sub-resources: hub.scans.probes, hub.scans.attempts.">
 
 ```python
-from giskard_hub.types import Scan, ScanCategory, ScanProbe
-from giskard_hub.types.scan import ScanProbeAttempt, ReviewStatus, Severity
+from giskard_hub.types import Scan, ScanCategory, ScanProbe, ScanProbeAttempt, Severity, ReviewStatus
 ```
 
 <MethodCard name=".create()" returnType="Scan">
@@ -1526,10 +1531,10 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
   <Property name="time" type="str" required>
     Time of day in `HH:MM` format (UTC).
   </Property>
-  <Property name="day_of_week" type="int">
+  <Property name="day_of_week" type="int | None">
     Weekly only: 1 (Monday) through 7 (Sunday).
   </Property>
-  <Property name="day_of_month" type="int">
+  <Property name="day_of_month" type="int | None">
     Monthly only: 1 through 28.
   </Property>
   <Property name="tags" type="list[str] | None">
