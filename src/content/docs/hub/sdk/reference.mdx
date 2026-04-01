@@ -213,7 +213,7 @@ from giskard_hub.types import Agent, AgentDetectStatefulness, AgentOutput, ChatM
   <Property name="supported_languages" type="list[str]" required>
     Language codes the agent supports (e.g. `["en", "fr"]`).
   </Property>
-  <Property name="headers" type="Iterable[HeaderParam]" required>
+  <Property name="headers" type="dict[str, str]">
     HTTP headers sent with every request to the agent (e.g. auth tokens). Each header is a `{"name": str, "value": str}` dict.
   </Property>
   <Property name="description" type="str | None">
@@ -253,7 +253,7 @@ agent = hub.agents.create(
   <Property name="name" type="str | None">Updated display name.</Property>
   <Property name="url" type="str | None">Updated endpoint URL.</Property>
   <Property name="description" type="str | None">Updated description.</Property>
-  <Property name="headers" type="Iterable[HeaderParam] | None">Updated HTTP headers.</Property>
+  <Property name="headers" type="dict[str, str] | None">Updated HTTP headers.</Property>
   <Property name="supported_languages" type="list[str] | None">Updated language codes.</Property>
 </MethodCard>
 
@@ -303,8 +303,8 @@ print(output.metadata)
   <Property name="headers" type="dict[str, str]">HTTP headers to include in the test request.</Property>
 </MethodCard>
 
-<MethodCard name=".generate_description()" returnType="Agent">
-  Auto-generate a description for an agent by observing its behaviour. Returns the updated agent.
+<MethodCard name=".generate_description()" returnType="str">
+  Auto-generate a description for an agent by observing its behaviour. Returns the generated description.
 
   <Property name="agent_id" type="str" required>ID of the agent.</Property>
 </MethodCard>
@@ -538,7 +538,7 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
   Import test cases from a file or list of dicts into a dataset.
 
   <Property name="project_id" type="str" required>Project ID.</Property>
-  <Property name="data" type="FileTypes" required>
+  <Property name="data" type="FileTypes | list[dict[str, Any]] | str" required>
     File path (`str` or `Path`), file-like object, or list of dicts. Each record should have a `messages` list and optional `checks` list.
   </Property>
   <Property name="dataset_id" type="str | None">Append to an existing dataset instead of creating a new one.</Property>
@@ -583,6 +583,9 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
   </Property>
   <Property name="description" type="str | None">
     Updated description.
+  </Property>
+  <Property name="status" type="TaskProgress | None">
+    Async operation status.
   </Property>
 </MethodCard>
 
@@ -721,6 +724,7 @@ hub.helpers.print_metrics(evaluation)
   <Property name="dataset_id" type="str | None">Dataset to evaluate against.</Property>
   <Property name="name" type="str | None">Evaluation name.</Property>
   <Property name="tags" type="list[str] | None">Filter test cases by tags.</Property>
+  <Property name="old_evaluation_id" type="str | None">Reuse a previous evaluation's dataset.</Property>
 
 :::tip
 For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handles the full local evaluation lifecycle automatically.
@@ -732,10 +736,10 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
   Evaluate a single (input, output) pair against checks without creating a full evaluation.
 
   <Property name="messages" type="Iterable[ChatMessageParam]" required>Conversation messages.</Property>
-  <Property name="model_output" type="AgentOutputParam" required>Agent's output to evaluate.</Property>
+  <Property name="agent_output" type="AgentOutputParam" required>Agent's output to evaluate.</Property>
   <Property name="checks" type="Iterable[CheckConfigParam]" required>Checks to apply.</Property>
-  <Property name="project_id" type="str" required>Project ID.</Property>
-  <Property name="model_description" type="str">Description of the agent for context.</Property>
+  <Property name="project_id" type="str">Project ID.</Property>
+  <Property name="agent_description" type="str">Description of the agent for context.</Property>
 </MethodCard>
 
 <MethodCard name=".rerun_errored_results()" returnType="Evaluation">
@@ -820,6 +824,12 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
   <Property name="updated_at" type="datetime">
     Last update timestamp.
   </Property>
+  <Property name="old_evaluation_id" type="str | None">
+    ID of the previous evaluation that this evaluation is based on.
+  </Property>
+  <Property name="scheduled_evaluation_id" type="str | None">
+    ID of the scheduled evaluation that this evaluation is based on.
+  </Property>
 </TypeTable>
 
 <TypeTable name="Metric">
@@ -851,7 +861,7 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
 Inspect, filter, update, and rerun individual evaluation results.
 
 ```python
-from giskard_hub.types.evaluation import TestCaseEvaluation, FailureCategory
+from giskard_hub.types import TestCaseEvaluation, FailureCategory
 ```
 
 <MethodCard name=".retrieve()" returnType="TestCaseEvaluation">
@@ -880,12 +890,6 @@ from giskard_hub.types.evaluation import TestCaseEvaluation, FailureCategory
   </Property>
   <Property name="include" type="list[str] | None">
     Embed related resources (`["test_case"]`).
-  </Property>
-  <Property name="limit" type="int | None">
-    Maximum results.
-  </Property>
-  <Property name="offset" type="int | None">
-    Results offset.
   </Property>
 </MethodCard>
 
@@ -1099,7 +1103,7 @@ from giskard_hub.types import (
 <Property name="project_id" type="str" required>
   Project this KB belongs to.
 </Property>
-<Property name="data" type="list[dict] | str | Path" required>
+<Property name="data" type="FileTypes | list[dict[str, Any]] | str" required>
   Documents as a list of dicts, a file path string, or a `pathlib.Path`
   (JSON/JSONL format).
 </Property>
@@ -1127,13 +1131,16 @@ kb = hub.helpers.wait_for_completion(kb)
 
 </MethodCard>
 
-<MethodCard name=".search_documents()" returnType="tuple[list[KnowledgeBaseDocumentRow], APIPaginatedMetadata]">
+<MethodCard name=".search_documents()" returnType="list[KnowledgeBaseDocumentRow] | tuple[list[KnowledgeBaseDocumentRow], APIPaginatedMetadata]">
   Semantic search over documents in a knowledge base.
 
   <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
   <Property name="query" type="str | None">Search query.</Property>
+  <Property name="filters" type="KnowledgeBaseDocumentFiltersParam | None">Filter criteria.</Property>
+  <Property name="order_by" type="list[KnowledgeBaseDocumentOrderByParam] | None">Sorting criteria.</Property>
   <Property name="limit" type="int | None">Maximum results.</Property>
   <Property name="offset" type="int | None">Results offset.</Property>
+  <Property name="include_metadata" type="bool" defaultValue="False">Include pagination metadata. If true, returns a tuple of (results, metadata).</Property>
 </MethodCard>
 
 <MethodCard name=".retrieve_document()" returnType="KnowledgeBaseDocumentDetail">
@@ -1155,6 +1162,8 @@ kb = hub.helpers.wait_for_completion(kb)
   <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
   <Property name="name" type="str | None">Updated name.</Property>
   <Property name="description" type="str | None">Updated description.</Property>
+  <Property name="project_id" type="str | None">Project ID to move the knowledge base to.</Property>
+  <Property name="status" type="TaskProgress | None">Async operation status.</Property>
 </MethodCard>
 
 <MethodCard name=".list()" returnType="list[KnowledgeBase]">
@@ -1321,8 +1330,8 @@ from giskard_hub.types import Scenario, ScenarioPreview
 
   <Property name="project_id" type="str" required>Project ID (positional).</Property>
   <Property name="description" type="str" required>Scenario description.</Property>
-  <Property name="agent_id" type="str | None">Agent ID for preview.</Property>
   <Property name="rules" type="list[str]">Scenario rules.</Property>
+  <Property name="agent_id" type="str | None">Agent ID for preview.</Property>
 </MethodCard>
 
 <MethodCard name=".retrieve()" returnType="Scenario">
@@ -1364,8 +1373,7 @@ from giskard_hub.types import Scenario, ScenarioPreview
 <ResourceSection description="Launch automated vulnerability scans covering the OWASP LLM Top 10 and additional threat categories. Sub-resources: hub.scans.probes, hub.scans.attempts.">
 
 ```python
-from giskard_hub.types import Scan, ScanCategory, ScanProbe
-from giskard_hub.types.scan import ScanProbeAttempt, ReviewStatus, Severity
+from giskard_hub.types import Scan, ScanCategory, ScanProbe, ScanProbeAttempt, Severity, ReviewStatus
 ```
 
 <MethodCard name=".create()" returnType="Scan">
@@ -1517,16 +1525,16 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
   <Property name="frequency" type="FrequencyOption" required>
     `"daily"`, `"weekly"`, or `"monthly"`.
   </Property>
-  <Property name="name" type="str | None">
-    Schedule name.
+  <Property name="name" type="str" required>
+    Name of the scheduled evaluation.
   </Property>
-  <Property name="time" type="str">
+  <Property name="time" type="str" required>
     Time of day in `HH:MM` format (UTC).
   </Property>
-  <Property name="day_of_week" type="int">
+  <Property name="day_of_week" type="int | None">
     Weekly only: 1 (Monday) through 7 (Sunday).
   </Property>
-  <Property name="day_of_month" type="int">
+  <Property name="day_of_month" type="int | None">
     Monthly only: 1 through 28.
   </Property>
   <Property name="tags" type="list[str] | None">
@@ -1541,7 +1549,7 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
   List all past evaluation runs generated by this scheduled evaluation.
 
   <Property name="scheduled_evaluation_id" type="str" required>Scheduled evaluation ID.</Property>
-  <Property name="include" type="list[str] | None">Embed related resources.</Property>
+  <Property name="include" type='list[Literal["agent", "dataset"]] | None'>Embed related resources.</Property>
 </MethodCard>
 
 <MethodCard name=".retrieve()" returnType="ScheduledEvaluation">
@@ -1561,6 +1569,9 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
   <Property name="day_of_week" type="int | None">Updated day of week (1--7).</Property>
   <Property name="day_of_month" type="int | None">Updated day of month (1--28).</Property>
   <Property name="run_count" type="int | None">Updated run count.</Property>
+  <Property name="last_execution_at" type="str | datetime | None">Updated last execution time.</Property>
+  <Property name="last_execution_status" type="LastExecutionStatusParam | None">Updated last execution status.</Property>
+  <Property name="paused" type="bool | None">Updated paused status.</Property>
 </MethodCard>
 
 <MethodCard name=".list()" returnType="list[ScheduledEvaluation]">
@@ -1605,7 +1616,7 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
   <Property name="priority" type="TaskPriority | None">
     `"low"`, `"medium"`, or `"high"`.
   </Property>
-  <Property name="status" type="TaskStatus">
+  <Property name="status" type="TaskStatus | None">
     `"open"`, `"in_progress"`, or `"resolved"`.
   </Property>
   <Property name="assignee_ids" type="list[str]">
@@ -1755,22 +1766,22 @@ from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
   </Property>
 </MethodCard>
 
-<MethodCard name=".bulk_update()" returnType="None">
-  Update multiple test cases at once.
+<MethodCard name=".bulk_update()" returnType="list[TestCase]">
+  Update multiple test cases at once. Returns the updated test cases.
 
-  <Property name="ids" type="list[str]" required>Test case IDs.</Property>
-  <Property name="status" type="str">Updated status.</Property>
-  <Property name="disabled_checks" type="list[str]">Checks to disable.</Property>
-  <Property name="enabled_checks" type="list[str]">Checks to enable.</Property>
-  <Property name="added_tags" type="list[str]">Tags to add.</Property>
-  <Property name="removed_tags" type="list[str]">Tags to remove.</Property>
+  <Property name="test_case_ids" type="list[str]" required>Test case IDs.</Property>
+  <Property name="status" type='Literal["active", "draft"] | None'>Updated status.</Property>
+  <Property name="disabled_checks" type="list[str] | None">Checks to disable.</Property>
+  <Property name="enabled_checks" type="list[str] | None">Checks to enable.</Property>
+  <Property name="added_tags" type="list[str] | None">Tags to add.</Property>
+  <Property name="removed_tags" type="list[str] | None">Tags to remove.</Property>
 </MethodCard>
 
 <MethodCard name=".bulk_move()" returnType="None">
   Move or copy test cases to another dataset.
 
-  <Property name="chat_test_case_ids" type="list[str]" required>Test case IDs to move.</Property>
-  <Property name="dataset_id" type="str" required>Target dataset ID.</Property>
+  <Property name="test_case_ids" type="list[str]" required>Test case IDs to move.</Property>
+  <Property name="target_dataset_id" type="str" required>Target dataset ID.</Property>
   <Property name="duplicate" type="bool">Copy instead of move.</Property>
 </MethodCard>
 
@@ -1855,7 +1866,7 @@ from giskard_hub.types import PlaygroundChat
   <Property name="project_id" type="str" required>
     Project ID.
   </Property>
-  <Property name="include" type="list[str] | None">
+  <Property name="include" type='list[Literal["agent"]] | None'>
     Embed related resources (`["agent"]`).
   </Property>
   <Property name="limit" type="int | None">
@@ -1870,7 +1881,7 @@ from giskard_hub.types import PlaygroundChat
   <Property name="chat_id" type="str" required>
     Chat ID.
   </Property>
-  <Property name="include" type="list[str] | None">
+  <Property name="include" type='list[Literal["agent"]] | None'>
     Embed related resources (`["agent"]`).
   </Property>
 </MethodCard>
@@ -1899,26 +1910,26 @@ from giskard_hub.types import PlaygroundChat
 from giskard_hub.types import Audit, AuditDisplay
 ```
 
-<MethodCard name=".search()" returnType="list[Audit]">
+<MethodCard name=".search()" returnType="list[Audit] | tuple[list[Audit], APIPaginatedMetadata]">
   Search audit events with free-text queries, filters, and pagination. Pass `include_metadata=True` for `tuple[list[Audit], APIPaginatedMetadata]`.
 
 <Property name="query" type="str | None">
   Free-text search query.
 </Property>
-<Property name="filters" type="AuditFiltersParam">
+<Property name="filters" type="AuditFiltersParam | None">
   Filter criteria (see filter keys below).
 </Property>
-<Property name="order_by" type="list[AuditOrderByParam]">
+<Property name="order_by" type="list[AuditOrderByParam] | None">
   Sorting criteria.
 </Property>
-<Property name="limit" type="int">
+<Property name="limit" type="int | None">
   Maximum results.
 </Property>
-<Property name="offset" type="int">
+<Property name="offset" type="int | None">
   Results offset.
 </Property>
 <Property name="include_metadata" type="bool" defaultValue="False">
-  Include pagination metadata.
+  Include pagination metadata. If true, returns a tuple of (results, metadata).
 </Property>
 
 **Filter keys:**
