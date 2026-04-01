@@ -15,12 +15,21 @@
 		document.body.prepend(banner);
 		document.body.classList.add('banner-visible');
 
+		function updateBannerHeight() {
+			const height = banner.offsetHeight;
+			document.documentElement.style.setProperty('--banner-height', height + 'px');
+		}
+		updateBannerHeight();
+		window.addEventListener('resize', updateBannerHeight);
+
 		banner.querySelector('.close-btn')!.addEventListener('click', () => {
 			banner.style.transform = 'translateY(-100%)';
 			banner.style.opacity = '0';
 			setTimeout(() => {
 				banner.remove();
 				document.body.classList.remove('banner-visible');
+				document.documentElement.style.setProperty('--banner-height', '0px');
+				window.removeEventListener('resize', updateBannerHeight);
 				sessionStorage.setItem('whitepaper-banner-closed', 'true');
 			}, 300);
 		});
