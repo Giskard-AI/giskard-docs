@@ -22,4 +22,4 @@ Looking for Giskard v2 features such as **RAGET** and **Scan**? They are not ava
 - **Documentation**: Explore the [Checks documentation](/oss/checks) for detailed guides
 - **Examples**: Check our [GitHub repository ↗](https://github.com/Giskard-AI/giskard-oss) for more examples
 - **Community**: Join our [Discord ↗](https://discord.com/invite/ABvfpbu69R) for support and discussions
-- **Enterprise**: Ready for team collaboration? [Request a trial](https://docs-v3.giskard.ai/start/enterprise-trial) of Giskard Hub
+- **Enterprise**: Ready for team collaboration? [Request a trial](https://docs.giskard.ai/start/enterprise-trial) of Giskard Hub

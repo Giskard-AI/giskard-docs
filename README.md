@@ -1,6 +1,6 @@
 # Giskard Docs (Starlight)
 
-Documentation site built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build), deployed to Cloudflare Pages at `docs-v3.giskard.ai`.
+Documentation site built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build), deployed to Cloudflare Pages at `docs.giskard.ai`.
 
 ## Requirements
 

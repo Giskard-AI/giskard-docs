@@ -16,7 +16,7 @@ The fastest way to set up Giskard Checks. Paste a single URL into your coding ag
 
 :::tip[Get Started — Paste this into your coding agent:]
 ```
-Follow the instructions from https://docs-v3.giskard.ai/oss/checks/installation.md and install giskard-checks in my project.
+Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md and install giskard-checks in my project.
 ```
 :::
 
