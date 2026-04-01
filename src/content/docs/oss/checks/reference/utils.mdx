@@ -1,0 +1,197 @@
+---
+title: Utilities
+description: "Helper functions for string normalization, value providers, and parameter injection utilities."
+sidebar:
+  order: 7
+---
+
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
+
+Helper functions and utilities for normalization, value providers, and parameter injection.
+
+---
+
+## Normalization
+
+**Module:** `giskard.checks.utils.normalization`
+
+Utilities for normalizing strings and data structures using Unicode normalization forms.
+
+<MethodCard name="normalize_string()" returnType="str">
+  Normalize a string using a specified Unicode normalization form.
+
+  <Property name="value" type="str" required>String to normalize.</Property>
+  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue="None">Unicode normalization form.</Property>
+</MethodCard>
+
+<MethodCard name="normalize_data()" returnType="T">
+  Recursively normalize all strings in a dictionary or list.
+
+  <Property name="data" type="T (dict | list)" required>Data structure to normalize.</Property>
+  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue="None">Unicode normalization form.</Property>
+</MethodCard>
+
+```python
+from giskard.checks.utils.normalization import normalize_string, normalize_data
+
+normalized = normalize_string(
+    "cafe\u0301", normalization_form="NFC"
+)  # "cafe" -> "cafe"
+
+data = {"name": "cafe\u0301", "items": ["nai\u0308ve", "re\u0301sume\u0301"]}
+normalized_data = normalize_data(data, normalization_form="NFC")
+```
+
+### Normalization forms
+
+| Form   | Description                 | Use case                                 |
+| ------ | --------------------------- | ---------------------------------------- |
+| `NFC`  | Canonical Composition       | Most common; combines characters         |
+| `NFD`  | Canonical Decomposition     | Separates base + combining characters    |
+| `NFKC` | Compatibility Composition   | Combines + converts compatibility chars  |
+| `NFKD` | Compatibility Decomposition | Separates + converts compatibility chars |
+
+:::tip[When to use]
+Use normalization when comparing text from different sources (APIs, files, user input) that may have different Unicode representations.
+:::
+
+---
+
+## Value Providers
+
+**Module:** `giskard.checks.utils.value_provider`
+
+Abstract value provider patterns for static values and callables.
+
+### `ValueProvider`
+
+Abstract base class for value providers.
+
+<MethodCard name=".provide()" returnType="R">
+  Provide a value. Subclass and implement this method.
+</MethodCard>
+
+### `StaticValueProvider`
+
+Provider for static values.
+
+<Property name="value" type="R" required>
+  The static value to provide.
+</Property>
+
+```python
+from giskard.checks.utils.value_provider import StaticValueProvider
+
+provider = StaticValueProvider(value="hello")
+result = await provider.provide()  # "hello"
+```
+
+### `CallableValueProvider`
+
+Provider that wraps a callable with parameter injection.
+
+<Property name="callable" type="Callable" required>
+  Function to call for value.
+</Property>
+<Property name="injection_mapping" type="CallableInjectionMapping" required>
+  Parameter injection configuration.
+</Property>
+
+### `ValueGeneratorProvider`
+
+Provider for generator-based values.
+
+```python
+from giskard.checks.utils.value_provider import ValueGeneratorProvider
+
+
+async def value_generator():
+    yield "first"
+    yield "second"
+
+
+provider = ValueGeneratorProvider.from_mapping(value_generator)
+```
+
+:::note
+Value providers are primarily used internally by the framework. Most users won't need to interact with them directly.
+:::
+
+---
+
+## Parameter Injection
+
+**Module:** `giskard.checks.utils.parameter_injection`
+
+Dynamic parameter injection for callables.
+
+### `CallableInjectionMapping`
+
+Maps parameters to inject into a callable.
+
+<MethodCard name=".from_callable()" returnType="CallableInjectionMapping">
+  Create an injection mapping from a callable's signature.
+
+  <Property name="callable" type="Callable" required>The function to create mapping for.</Property>
+</MethodCard>
+
+<MethodCard name=".inject_parameters()" returnType="Callable">
+  Inject parameters into a callable, returning a bound callable.
+
+  <Property name="value" type="Callable" required>Callable to inject into.</Property>
+</MethodCard>
+
+### `ParameterInjection`
+
+Configuration for a single parameter injection.
+
+<Property name="name" type="str" required>
+  Parameter name.
+</Property>
+<Property name="source" type="str" required>
+  Source of the injected value.
+</Property>
+
+:::note
+Parameter injection is primarily used internally for dependency injection in checks and interaction specs.
+:::
+
+---
+
+## Generator Utilities
+
+**Module:** `giskard.checks.utils.generator`
+
+<MethodCard name="a_generator()" returnType="AsyncGenerator">
+  Convert a value or generator (sync or async) into an async generator. Useful for normalizing different input types uniformly.
+
+  <Property name="value_or_generator" type="YieldType | SyncOrAsyncGenerator" required>Value or generator to convert.</Property>
+</MethodCard>
+
+```python
+from giskard.checks.utils.generator import a_generator
+
+# Static value -> yields once
+async for value in a_generator("hello"):
+    print(value)
+
+
+# Sync generator -> async
+def sync_gen():
+    yield 1
+    yield 2
+
+
+async for value in a_generator(sync_gen()):
+    print(value)
+```
+
+---
+
+## See also
+
+- [Core API](/oss/checks/reference/core) -- Core types and base classes
+- [Built-in Checks](/oss/checks/reference/checks) -- Checks using normalization
+- [Generators](/oss/checks/reference/generators) -- Input generators

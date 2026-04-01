@@ -1,0 +1,116 @@
+---
+import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+---
+
+<div class="content-wrapper">
+    <Default {...Astro.props}>
+        <slot />
+    </Default>
+</div>
+
+<style>
+    /*
+     * Aside block rules use specificity (0,2,1): .content-wrapper + aside.starlight-aside--*
+     * This beats Starlight's (0,1,1) rules without needing !important on block properties.
+     * Inner element rules (.starlight-aside__title, __icon) retain !important because
+     * Starlight's component-scoped styles for those elements have higher specificity.
+     */
+
+    /* Note */
+    .content-wrapper :global(aside.starlight-aside--note) {
+        border: 1px solid #0284c7;
+        border-radius: 8px;
+        background-color: #f0f9ff;
+        font-size: 14px;
+        color: #0c4a6e;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--note) {
+        background-color: rgba(96, 165, 250, 0.15);
+        color: #e0f2fe;
+        border-color: #0284c7;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--note .starlight-aside__title) {
+        color: inherit !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--note .starlight-aside__icon) {
+        color: #0284c7 !important;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--note .starlight-aside__icon) {
+        color: #60a5fa !important;
+    }
+
+    /* Tip */
+    .content-wrapper :global(aside.starlight-aside--tip) {
+        border: 1px solid #05d939;
+        border-radius: 8px;
+        background-color: rgba(5, 217, 57, 0.06);
+        font-size: 14px;
+        color: #022c22;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--tip) {
+        background-color: rgba(5, 217, 57, 0.12);
+        color: #c6ffff;
+        border-color: #05d939;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--tip .starlight-aside__title) {
+        color: inherit !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--tip .starlight-aside__icon) {
+        color: #05d939 !important;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--tip .starlight-aside__icon) {
+        color: #05d939 !important;
+    }
+
+    /* Warning / Caution */
+    .content-wrapper :global(aside.starlight-aside--warning),
+    .content-wrapper :global(aside.starlight-aside--caution) {
+        border: 1px solid #f97316;
+        border-radius: 8px;
+        background-color: #fff7ed;
+        font-size: 14px;
+        color: #7c2d12;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--warning),
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--caution) {
+        background-color: rgba(248, 148, 64, 0.12);
+        color: #ffedd5;
+        border-color: #f97316;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--warning .starlight-aside__title),
+    .content-wrapper :global(aside.starlight-aside--caution .starlight-aside__title) {
+        color: inherit !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+
+    .content-wrapper :global(aside.starlight-aside--warning .starlight-aside__icon),
+    .content-wrapper :global(aside.starlight-aside--caution .starlight-aside__icon) {
+        color: #f97316 !important;
+    }
+
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--warning .starlight-aside__icon),
+    :global(:root[data-theme='dark']) .content-wrapper :global(aside.starlight-aside--caution .starlight-aside__icon) {
+        color: #fdba74 !important;
+    }
+</style>

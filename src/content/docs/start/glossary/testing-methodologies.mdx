@@ -1,0 +1,61 @@
+---
+title: "Testing Methodologies"
+description: "Comprehensive guide to testing methodologies for AI systems including adversarial testing, red teaming, and continuous monitoring."
+sidebar:
+  order: 2
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+Effective testing of AI systems requires a comprehensive approach that combines multiple methodologies to ensure safety, security, and reliability. Giskard provides tools and frameworks for implementing robust testing strategies.
+
+## Key testing approaches
+
+<CardGrid>
+  <LinkCard title="Business Failures" href="/start/glossary/business" description="AI system failures that affect the business logic of the model." />
+  <LinkCard title="Security Vulnerabilities" href="/start/glossary/security" description="AI system failures that affect the security of the model." />
+  <LinkCard title="LLM Scan" href="/hub/ui/scan" description="Giskard's automated vulnerability detection system that identifies security issues and business logic failures." />
+  <LinkCard title="RAG Evaluation" href="/hub/ui/datasets/knowledge-base" description="A comprehensive testing framework for Retrieval-Augmented Generation systems." />
+  <LinkCard title="Adversarial Testing" href="/hub/ui/datasets" description="Testing methodology that intentionally tries to break or exploit models using carefully crafted inputs." />
+  <LinkCard title="Human-in-the-Loop" href="/hub/ui/annotate" description="Combining automated testing with human expertise and judgment." />
+  <LinkCard title="Regression Testing" href="/hub/ui/evaluations/compare" description="Ensuring that new changes don't break existing functionality." />
+  <LinkCard title="Continuous Red Teaming" href="/hub/ui/continuous-red-teaming" description="Automated, ongoing security testing that continuously monitors for new threats and vulnerabilities." />
+</CardGrid>
+
+## Testing lifecycle
+
+### 1. Planning phase
+
+- Define testing objectives and scope
+- Identify critical vulnerabilities and risks
+- Design test strategies and methodologies
+- Establish success criteria and metrics
+
+### 2. Execution phase
+
+- Implement automated testing frameworks
+- Conduct manual testing and validation
+- Perform adversarial and red team testing
+- Monitor and record results
+
+### 3. Analysis phase
+
+- Evaluate test results and findings
+- Prioritize vulnerabilities and issues
+- Generate comprehensive reports
+- Plan remediation strategies
+
+### 4. Remediation phase
+
+- Address identified vulnerabilities
+- Implement fixes and improvements
+- Re-test to verify resolution
+- Update testing procedures
+
+## Best practices
+
+- **Comprehensive Coverage**: Test all critical functionality and edge cases
+- **Regular Updates**: Keep testing frameworks and methodologies current
+- **Documentation**: Maintain detailed testing procedures and results
+- **Automation**: Automate repetitive testing tasks for efficiency
+- **Human Oversight**: Combine automated testing with human expertise

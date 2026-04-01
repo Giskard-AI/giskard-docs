@@ -1,0 +1,282 @@
+---
+title: Testing Utilities
+description: "Testing utilities: TestCase for bundling traces with checks, assert_passed(), and debugging helpers."
+sidebar:
+  order: 5
+---
+
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
+
+Testing utilities, test runners, and debugging helpers.
+
+---
+
+## `TestCase`
+
+**Module:** `giskard.checks.core.testcase`
+
+Bundle a trace with a set of checks to execute. Useful for testing against fixed interaction sequences or replaying recorded conversations.
+
+:::note
+For most use cases, use the `Scenario()` fluent API instead. `TestCase` is for advanced use cases where you need direct control over trace construction.
+:::
+
+<TypeTable name="TestCase">
+  <Property name="name" type="str | None">
+    Optional label for the test case.
+  </Property>
+  <Property name="trace" type="Trace" required>
+    The trace containing interactions to test against.
+  </Property>
+  <Property name="checks" type="Sequence[Check]" required>
+    Sequence of checks to run against the trace.
+  </Property>
+</TypeTable>
+
+<MethodCard name=".run()" returnType="TestCaseResult">
+  Execute all checks against the trace.
+
+  <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
+</MethodCard>
+
+<MethodCard name=".assert_passed()" returnType="None">
+  Run the test case and assert that all checks passed. Raises `AssertionError`
+  with formatted failure messages if any check fails.
+</MethodCard>
+
+```python
+from giskard.checks import TestCase, Trace, Interaction, Equals
+
+trace = Trace(
+    interactions=[
+        Interaction(inputs="Hello", outputs="Hi there!"),
+        Interaction(inputs="How are you?", outputs="I'm doing well!"),
+    ]
+)
+
+test_case = TestCase(
+    name="greeting_test",
+    trace=trace,
+    checks=[
+        Equals(expected_value="Hi there!", key="trace.interactions[0].outputs"),
+        Equals(
+            expected_value="I'm doing well!",
+            key="trace.interactions[1].outputs",
+        ),
+    ],
+)
+
+result = await test_case.run()
+```
+
+### Integration with pytest
+
+```python
+import pytest
+
+
+@pytest.mark.asyncio
+async def test_greeting_response():
+    trace = Trace(
+        interactions=[
+            Interaction(inputs="Hello", outputs="Hi there! How can I help?")
+        ]
+    )
+    test_case = TestCase(
+        name="greeting_politeness",
+        trace=trace,
+        checks=[
+            FnCheck(
+                fn=lambda t: "help" in t.last.outputs.lower(),
+                name="offers_help",
+            ),
+        ],
+    )
+    await test_case.assert_passed()
+```
+
+---
+
+## `TestCaseResult`
+
+**Module:** `giskard.checks.core.result`
+
+Result of test case execution with check outcomes.
+
+<TypeTable name="TestCaseResult">
+  <Property name="status" type="TestCaseStatus">
+    Overall test case status (PASS/FAIL/ERROR).
+  </Property>
+  <Property name="results" type="list[CheckResult]">
+    Results from all checks.
+  </Property>
+  <Property name="passed" type="bool">
+    True if all checks passed.
+  </Property>
+  <Property name="failed" type="bool">
+    True if any check failed.
+  </Property>
+  <Property name="duration_ms" type="int">
+    Execution time in milliseconds.
+  </Property>
+</TypeTable>
+
+```python
+result = await test_case.run()
+
+if result.passed:
+    print("All checks passed!")
+else:
+    for check_result in result.results:
+        if check_result.failed:
+            print(f"Failed: {check_result.message}")
+
+# Assert (raises if failed)
+result.assert_passed()
+```
+
+---
+
+## `TestCaseRunner`
+
+**Module:** `giskard.checks.testing.runner`
+
+Low-level runner for executing test cases. Most users should use `test_case.run()` instead.
+
+<MethodCard name=".run()" returnType="TestCaseResult">
+  Execute a test case's checks against its trace.
+
+  <Property name="test_case" type="TestCase" required>The test case to execute.</Property>
+  <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
+</MethodCard>
+
+<MethodCard name="get_runner()" returnType="TestCaseRunner">
+  Get the default process-wide singleton runner instance.
+</MethodCard>
+
+---
+
+## `WithSpy`
+
+**Module:** `giskard.checks.testing.spy`
+
+Spy on function calls during interaction generation for debugging. Wraps an interaction spec and records all function calls made during generation.
+
+<TypeTable name="WithSpy">
+  <Property name="interaction_generator" type="InteractionSpec" required>
+    The interaction spec to spy on.
+  </Property>
+  <Property name="target" type="str" required>
+    JSONPath to the value to spy on.
+  </Property>
+</TypeTable>
+
+```python
+from giskard.checks import Scenario, Interact, WithSpy
+
+interaction_spec = Interact(
+    inputs=lambda trace: f"Context: {trace.last.outputs if trace.last else 'None'}",
+    outputs=lambda inputs: my_model(inputs),
+)
+
+spied_spec = WithSpy(
+    interaction_generator=interaction_spec, target="trace.last.outputs"
+)
+
+result = await Scenario("debug_test").add_interaction(spied_spec).run()
+
+# Access spy data from metadata
+spy_data = result.final_trace.last.metadata.get("trace.last.outputs")
+print(spy_data)
+```
+
+:::tip
+Use `WithSpy` when debugging complex interaction generation logic, understanding multi-turn interaction flow, or investigating unexpected behavior in scenarios.
+:::
+
+---
+
+## Usage patterns
+
+### Replaying recorded conversations
+
+```python
+from giskard.checks import TestCase, Trace, Interaction, FnCheck
+
+recorded = [
+    Interaction(inputs="What's the weather?", outputs="It's sunny and 75F."),
+    Interaction(
+        inputs="Should I bring an umbrella?", outputs="No, you won't need one."
+    ),
+]
+
+trace = Trace(interactions=recorded)
+
+test_case = TestCase(
+    name="weather_replay",
+    trace=trace,
+    checks=[
+        FnCheck(
+            fn=lambda t: "sunny" in t.interactions[0].outputs.lower(),
+            name="weather",
+        ),
+        FnCheck(
+            fn=lambda t: "no" in t.interactions[1].outputs.lower(),
+            name="umbrella",
+        ),
+    ],
+)
+
+await test_case.assert_passed()
+```
+
+### Batch testing
+
+```python
+test_cases = [
+    TestCase(name="test1", trace=trace1, checks=checks1),
+    TestCase(name="test2", trace=trace2, checks=checks2),
+    TestCase(name="test3", trace=trace3, checks=checks3),
+]
+
+results = await asyncio.gather(*[tc.run() for tc in test_cases])
+
+passed = sum(1 for r in results if r.passed)
+print(f"Passed: {passed}/{len(results)}")
+```
+
+### Parameterized tests
+
+```python
+import pytest
+
+test_data = [("Hello", "Hi there!"), ("Good morning", "Good morning!")]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("greeting_input,expected_output", test_data)
+async def test_greeting_variations(greeting_input, expected_output):
+    trace = Trace(
+        interactions=[
+            Interaction(inputs=greeting_input, outputs=expected_output)
+        ]
+    )
+    test_case = TestCase(
+        name=f"greeting_{greeting_input}",
+        trace=trace,
+        checks=[
+            Equals(expected_value=expected_output, key="trace.last.outputs")
+        ],
+    )
+    await test_case.assert_passed()
+```
+
+---
+
+## See also
+
+- [Core API](/oss/checks/reference/core) -- Trace, Interaction, and Check details
+- [Scenarios](/oss/checks/reference/scenarios) -- Building multi-step test workflows
+- [Built-in Checks](/oss/checks/reference/checks) -- Ready-to-use validation checks

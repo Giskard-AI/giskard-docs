@@ -1,0 +1,34 @@
+---
+title: Overview
+description: "End-to-end worked examples applying Giskard Checks to RAG systems, agents, chatbots, and content moderation."
+sidebar:
+  order: 1
+  label: Overview
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+These are worked examples — not tutorials or how-to guides. They show a complete system being built and tested end-to-end, applying Giskard Checks to real AI application domains. Best read after [Tutorials](/oss/checks/tutorials) or [How-to Guides](/oss/checks/how-to).
+
+<CardGrid>
+  <LinkCard
+    title="RAG Evaluation"
+    description="Test retrieval quality, groundedness, and answer relevance in a Retrieval-Augmented Generation system"
+    href="/oss/checks/use-cases/rag-evaluation"
+  />
+  <LinkCard
+    title="Testing Agents"
+    description="Validate multi-step agent workflows with tool usage, reasoning, and state management"
+    href="/oss/checks/use-cases/testing-agents"
+  />
+  <LinkCard
+    title="Chatbot Testing"
+    description="Test conversational flows, context handling, and response quality in a chatbot"
+    href="/oss/checks/use-cases/chatbot-testing"
+  />
+  <LinkCard
+    title="Content Moderation"
+    description="Implement and test safety checks and content filtering for AI applications"
+    href="/oss/checks/use-cases/content-moderation"
+  />
+</CardGrid>

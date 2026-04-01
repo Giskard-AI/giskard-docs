@@ -1,0 +1,180 @@
+# Giskard Documentation
+
+> Giskard is an AI testing and evaluation platform. This is the official documentation site for Giskard products.
+
+## For LLMs
+
+Every documentation page is available as raw Markdown by appending `.md` to any URL. All links below point directly to the Markdown version.
+
+## About Giskard
+
+Giskard provides tools for testing, evaluating, and red-teaming LLM-based applications. The company offers an enterprise platform (Giskard Hub) and an open-source Python library (Giskard Checks) for AI quality assurance.
+
+- Website: https://giskard.ai
+- Documentation: https://docs.giskard.ai
+- GitHub: https://github.com/Giskard-AI/giskard-oss
+- Discord: https://discord.com/invite/ABvfpbu69R
+
+## Products
+
+### Giskard Hub
+Enterprise platform for LLM agent testing with team collaboration and continuous red teaming. Available as a UI for business users and an SDK for developers.
+
+### Giskard Checks (Open Source)
+Lightweight Python library for testing non-deterministic AI applications. Supports single-turn and multi-turn scenario testing, LLM-as-a-judge evaluations, and CI/CD integration.
+
+### Giskard Research
+Open research on AI safety and security, including the Phare multilingual benchmark, RealHarm incident dataset, and RealPerformance functional issues dataset.
+
+## Documentation Structure
+
+### Overview
+- Welcome to Giskard: https://docs.giskard.ai/.md
+- Open Source vs Hub: https://docs.giskard.ai/start/comparison.md
+- Request your Enterprise Trial: https://docs.giskard.ai/start/enterprise-trial.md
+
+### Knowledge Glossary
+- Introduction: https://docs.giskard.ai/start/glossary.md
+- Testing Methodologies: https://docs.giskard.ai/start/glossary/testing-methodologies.md
+
+### Glossary — Business Failures
+- Overview: https://docs.giskard.ai/start/glossary/business.md
+- Addition of Information: https://docs.giskard.ai/start/glossary/business/addition-of-information.md
+- Business Out of Scope: https://docs.giskard.ai/start/glossary/business/business-out-of-scope.md
+- Denial of Answers: https://docs.giskard.ai/start/glossary/business/denial-of-answers.md
+- Hallucination: https://docs.giskard.ai/start/glossary/business/hallucination.md
+- Moderation Issues: https://docs.giskard.ai/start/glossary/business/moderation-issues.md
+- Omission: https://docs.giskard.ai/start/glossary/business/omission.md
+
+### Glossary — Security Vulnerabilities
+- Overview: https://docs.giskard.ai/start/glossary/security.md
+- Prompt Injection: https://docs.giskard.ai/start/glossary/security/injection.md
+- Harmful Content: https://docs.giskard.ai/start/glossary/security/harmful-content.md
+- Information Disclosure: https://docs.giskard.ai/start/glossary/security/information-disclosure.md
+- Output Formatting: https://docs.giskard.ai/start/glossary/security/formatting.md
+- Robustness: https://docs.giskard.ai/start/glossary/security/robustness.md
+- Stereotypes & Discrimination: https://docs.giskard.ai/start/glossary/security/stereotypes.md
+
+### Glossary — LLM Benchmarks
+- Overview: https://docs.giskard.ai/start/glossary/llm-benchmarks.md
+- Reasoning and Language: https://docs.giskard.ai/start/glossary/llm-benchmarks/reasoning-and-language.md
+- Math Problems: https://docs.giskard.ai/start/glossary/llm-benchmarks/math-problems.md
+- Coding: https://docs.giskard.ai/start/glossary/llm-benchmarks/coding.md
+- Conversation and Chatbot: https://docs.giskard.ai/start/glossary/llm-benchmarks/conversation-and-chatbot.md
+- Safety: https://docs.giskard.ai/start/glossary/llm-benchmarks/safety.md
+- Domain-Specific: https://docs.giskard.ai/start/glossary/llm-benchmarks/domain-specific.md
+
+### Hub UI
+- Introduction: https://docs.giskard.ai/hub/ui.md
+- Access Rights: https://docs.giskard.ai/hub/ui/access-rights.md
+- Continuous Red Teaming: https://docs.giskard.ai/hub/ui/continuous-red-teaming.md
+- Event Logs: https://docs.giskard.ai/hub/ui/event-logs.md
+
+### Hub UI — Setup
+- Setup Overview: https://docs.giskard.ai/hub/ui/setup.md
+- Projects: https://docs.giskard.ai/hub/ui/setup/projects.md
+- Agents: https://docs.giskard.ai/hub/ui/setup/agents.md
+- Knowledge Bases: https://docs.giskard.ai/hub/ui/setup/knowledge-bases.md
+
+### Hub UI — Datasets
+- Datasets Overview: https://docs.giskard.ai/hub/ui/datasets.md
+- Import Tests: https://docs.giskard.ai/hub/ui/datasets/import.md
+- Create Manual Tests: https://docs.giskard.ai/hub/ui/datasets/manual.md
+- Scenario-Based Tests: https://docs.giskard.ai/hub/ui/datasets/scenario.md
+- Knowledge Base Tests: https://docs.giskard.ai/hub/ui/datasets/knowledge-base.md
+
+### Hub UI — Evaluations
+- Evaluations Overview: https://docs.giskard.ai/hub/ui/evaluations.md
+- Run and Review: https://docs.giskard.ai/hub/ui/evaluations/create.md
+- Compare Evaluations: https://docs.giskard.ai/hub/ui/evaluations/compare.md
+- Schedule Evaluations: https://docs.giskard.ai/hub/ui/evaluations/schedule.md
+
+### Hub UI — Scan
+- Scan Overview: https://docs.giskard.ai/hub/ui/scan.md
+- Launch a Scan: https://docs.giskard.ai/hub/ui/scan/launch-scan.md
+- Review Scan Results: https://docs.giskard.ai/hub/ui/scan/review-scan-results.md
+
+### Hub UI — Vulnerability Categories
+- Attack Categories Overview: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories.md
+- Harmful Content Generation: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/harmful-content-generation.md
+- Internal Information Exposure: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/internal-information-exposure.md
+- Prompt Injection: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/prompt-injection.md
+- Data Privacy Exfiltration: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/data-privacy-exfiltration.md
+- Training Data Extraction: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/training-data-extraction.md
+- Excessive Agency: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/excessive-agency.md
+- Hallucination: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/hallucination.md
+- Denial Of Service: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/denial-of-service.md
+- Brand Damaging And Reputation: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/brand-damaging-and-reputation.md
+- Legal And Financial Risk: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/legal-and-financial-risk.md
+- Misguidance And Unauthorized Advice: https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/misguidance-and-unauthorized-advice.md
+
+### Hub UI — Annotate
+- Annotate Overview: https://docs.giskard.ai/hub/ui/annotate.md
+- Metrics, Failure Categories & Tags: https://docs.giskard.ai/hub/ui/annotate/overview.md
+- Task Management: https://docs.giskard.ai/hub/ui/annotate/task-management.md
+- Review Test Results: https://docs.giskard.ai/hub/ui/annotate/review-test-results.md
+- Modify Test Cases: https://docs.giskard.ai/hub/ui/annotate/modify-test-cases.md
+
+### Hub UI — Release Notes
+- Release Notes: https://docs.giskard.ai/hub/ui/release-notes.md
+
+### Hub SDK
+- Introduction: https://docs.giskard.ai/hub/sdk.md
+- Quickstart: https://docs.giskard.ai/hub/sdk/quickstart.md
+- Core Concepts: https://docs.giskard.ai/hub/sdk/concepts.md
+- API Reference: https://docs.giskard.ai/hub/sdk/reference.md
+- Migration Guide: https://docs.giskard.ai/hub/sdk/migration.md
+- Release Notes: https://docs.giskard.ai/hub/sdk/release-notes.md
+
+### Hub SDK Guides
+- Projects: https://docs.giskard.ai/hub/sdk/guides/projects.md
+- Evaluations: https://docs.giskard.ai/hub/sdk/guides/evaluations.md
+- Datasets & Checks: https://docs.giskard.ai/hub/sdk/guides/datasets-and-checks.md
+- Vulnerability Scanning: https://docs.giskard.ai/hub/sdk/guides/scans.md
+- Agents & Knowledge Bases: https://docs.giskard.ai/hub/sdk/guides/agents-and-knowledge-bases.md
+- Playground Chats: https://docs.giskard.ai/hub/sdk/guides/playground-chats.md
+- Tasks: https://docs.giskard.ai/hub/sdk/guides/tasks.md
+- Audit Logs: https://docs.giskard.ai/hub/sdk/guides/audit.md
+
+### Giskard Checks (Open Source)
+- Giskard Library: https://docs.giskard.ai/oss.md
+- What are Giskard Checks?: https://docs.giskard.ai/oss/checks.md
+- Install & Configure: https://docs.giskard.ai/oss/checks/installation.md
+- Quickstart: https://docs.giskard.ai/oss/checks/quickstart.md
+
+### Checks Tutorials
+- Your First Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md
+- Your First LLM Call: https://docs.giskard.ai/oss/checks/tutorials/single-turn.md
+- Multi-Turn Scenarios: https://docs.giskard.ai/oss/checks/tutorials/multi-turn.md
+- Dynamic Scenarios: https://docs.giskard.ai/oss/checks/tutorials/dynamic-scenarios.md
+- Test Suites: https://docs.giskard.ai/oss/checks/tutorials/test-suites.md
+
+### Checks How-to Guides
+- Run Tests with pytest: https://docs.giskard.ai/oss/checks/how-to/run-in-pytest.md
+- Simulate Users: https://docs.giskard.ai/oss/checks/how-to/simulate-users.md
+- Spy on Internal Calls: https://docs.giskard.ai/oss/checks/how-to/spy-on-calls.md
+- Testing Structured Outputs: https://docs.giskard.ai/oss/checks/how-to/structured-output.md
+- Batch Evaluation: https://docs.giskard.ai/oss/checks/how-to/batch-evaluation.md
+- Stateful Checks: https://docs.giskard.ai/oss/checks/how-to/stateful-checks.md
+- Custom Checks: https://docs.giskard.ai/oss/checks/how-to/custom-checks.md
+- CI/CD Integration: https://docs.giskard.ai/oss/checks/how-to/ci-cd.md
+
+### Checks API Reference
+- Core API: https://docs.giskard.ai/oss/checks/reference/core.md
+- Checks: https://docs.giskard.ai/oss/checks/reference/checks.md
+- Scenarios: https://docs.giskard.ai/oss/checks/reference/scenarios.md
+- Testing Utilities: https://docs.giskard.ai/oss/checks/reference/testing-utils.md
+- Generators: https://docs.giskard.ai/oss/checks/reference/generators.md
+- Utilities: https://docs.giskard.ai/oss/checks/reference/utils.md
+
+### Checks Explanation
+- Core Concepts: https://docs.giskard.ai/oss/checks/explanation/core-concepts.md
+- When to Use Which Check: https://docs.giskard.ai/oss/checks/explanation/when-to-use-which-check.md
+- Async Design & pytest: https://docs.giskard.ai/oss/checks/explanation/async-and-pytest.md
+- JSONPath in Checks: https://docs.giskard.ai/oss/checks/explanation/jsonpath-in-checks.md
+
+### Checks Use Cases
+- RAG Evaluation: https://docs.giskard.ai/oss/checks/use-cases/rag-evaluation.md
+- Testing Agents: https://docs.giskard.ai/oss/checks/use-cases/testing-agents.md
+- Chatbot Testing: https://docs.giskard.ai/oss/checks/use-cases/chatbot-testing.md
+- Content Moderation: https://docs.giskard.ai/oss/checks/use-cases/content-moderation.md

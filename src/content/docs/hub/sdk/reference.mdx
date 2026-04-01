@@ -1,0 +1,2044 @@
+---
+title: Reference
+description: Complete reference for every resource, method, parameter, and type in the Giskard Hub Python SDK.
+sidebar:
+  order: 6
+---
+
+import {
+  Tabs,
+  TabItem,
+  Badge,
+  CardGrid,
+  LinkCard,
+} from "@astrojs/starlight/components";
+import Property from "../../../../components/api/Property.astro";
+import MethodCard from "../../../../components/api/MethodCard.astro";
+import ResourceSection from "../../../../components/api/ResourceSection.astro";
+import TypeTable from "../../../../components/api/TypeTable.astro";
+
+<CardGrid>
+  <LinkCard
+    title="hub.agents"
+    href="#hubagents"
+    description="Register, test, and manage LLM agents"
+  />
+  <LinkCard
+    title="hub.datasets"
+    href="#hubdatasets"
+    description="Create datasets and generate test cases"
+  />
+  <LinkCard
+    title="hub.evaluations"
+    href="#hubevaluations"
+    description="Run evaluations and inspect results"
+  />
+  <LinkCard
+    title="hub.scans"
+    href="#hubscans"
+    description="Launch vulnerability scans and review probes"
+  />
+  <LinkCard
+    title="hub.checks"
+    href="#hubchecks"
+    description="Define custom check criteria"
+  />
+  <LinkCard
+    title="hub.knowledge_bases"
+    href="#hubknowledge_bases"
+    description="Manage document collections"
+  />
+  <LinkCard
+    title="hub.projects"
+    href="#hubprojects"
+    description="Organize resources into projects"
+  />
+  <LinkCard
+    title="hub.helpers"
+    href="#hubhelpers"
+    description="Convenience methods for common workflows"
+  />
+  <LinkCard
+    title="hub.test_cases"
+    href="#hubtest_cases"
+    description="Create and manage individual test cases"
+  />
+  <LinkCard
+    title="hub.scheduled_evaluations"
+    href="#hubscheduled_evaluations"
+    description="Set up recurring evaluation runs"
+  />
+  <LinkCard
+    title="hub.tasks"
+    href="#hubtasks"
+    description="Track issues from evaluations and scans"
+  />
+  <LinkCard
+    title="hub.playground_chats"
+    href="#hubplayground_chats"
+    description="Access playground conversations"
+  />
+  <LinkCard
+    title="hub.audit_logs"
+    href="#hubaudit_logs"
+    description="Query the audit trail"
+  />
+  <LinkCard
+    title="Error Types"
+    href="#error-types"
+    description="Exception hierarchy and error handling"
+  />
+</CardGrid>
+
+---
+
+## Client
+
+### `HubClient`
+
+Synchronous client. All resource operations are available as attributes.
+
+```python title="Constructor"
+from giskard_hub import HubClient
+
+hub = HubClient(
+    api_key="gsk_...",                  # or set GISKARD_HUB_API_KEY env var
+    base_url="https://hub.example.com", # or set GISKARD_HUB_BASE_URL env var
+)
+```
+
+<Property
+  name="api_key"
+  type="str | None"
+  defaultValue="env GISKARD_HUB_API_KEY"
+>
+  Your Hub API key.
+</Property>
+<Property
+  name="base_url"
+  type="str | httpx.URL | None"
+  defaultValue="env GISKARD_HUB_BASE_URL"
+>
+  Base URL of your Hub instance.
+</Property>
+<Property name="auto_add_api_suffix" type="bool" defaultValue="True">
+  Automatically append `/_api` to `base_url`.
+</Property>
+<Property
+  name="timeout"
+  type="float | httpx.Timeout | None"
+  defaultValue="60.0"
+>
+  Default request timeout in seconds. Pass an `httpx.Timeout` for fine-grained
+  control over connect, read, and write timeouts.
+</Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Number of automatic retries on transient errors (connection errors, 5xx
+  responses).
+</Property>
+<Property
+  name="default_headers"
+  type="dict[str, str] | None"
+  defaultValue="None"
+>
+  Headers added to every request.
+</Property>
+<Property
+  name="default_query"
+  type="dict[str, object] | None"
+  defaultValue="None"
+>
+  Query parameters added to every request.
+</Property>
+<Property name="http_client" type="httpx.Client | None" defaultValue="None">
+  Custom `httpx.Client` instance for proxies, custom transports, or mutual TLS.
+</Property>
+
+### `AsyncHubClient`
+
+Async counterpart with an identical API surface -- every method is a coroutine.
+
+<Tabs>
+  <TabItem label="Sync">
+```python
+from giskard_hub import HubClient
+
+hub = HubClient()
+projects = hub.projects.list()
+````
+  </TabItem>
+  <TabItem label="Async">
+```python
+from giskard_hub import AsyncHubClient
+import asyncio
+
+
+async def main():
+    async with AsyncHubClient() as hub:
+        projects = await hub.projects.list()
+
+
+asyncio.run(main())
+````
+
+  </TabItem>
+</Tabs>
+
+:::tip
+All methods documented below are shown in their synchronous form. The async variants are identical -- just `await` them.
+:::
+
+---
+
+## `hub.agents`
+
+<ResourceSection description="Register, test, and invoke LLM agents. An agent represents your LLM application -- either a remote HTTP endpoint or a local Python callable.">
+
+```python
+from giskard_hub.types import Agent, AgentDetectStatefulness, AgentOutput, ChatMessage
+```
+
+<MethodCard name=".create()" returnType="Agent">
+  Create a new agent with configuration for external API communication.
+
+  <Property name="name" type="str" required>
+    Display name of the agent.
+  </Property>
+  <Property name="url" type="str" required>
+    HTTP endpoint the Hub calls during evaluations and scans.
+  </Property>
+  <Property name="project_id" type="str" required>
+    Project this agent belongs to.
+  </Property>
+  <Property name="supported_languages" type="list[str]" required>
+    Language codes the agent supports (e.g. `["en", "fr"]`).
+  </Property>
+  <Property name="headers" type="Iterable[HeaderParam]" required>
+    HTTP headers sent with every request to the agent (e.g. auth tokens). Each header is a `{"name": str, "value": str}` dict.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="stateful" type="bool | None">
+    Whether the agent is stateful.
+  </Property>
+
+```python title="Example"
+agent = hub.agents.create(
+    project_id=project.id,
+    name="Support Bot v2",
+    url="https://my-app.example.com/api/chat",
+    supported_languages=["en"],
+    headers={"Authorization": "Bearer <token>"},
+    description="GPT-4o chatbot with RAG",
+)
+```
+
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="Agent">
+  Retrieve an agent by its ID.
+
+  <Property name="agent_id" type="str" required>
+    ID of the agent to retrieve.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Agent">
+  Update an existing agent's configuration. Only the provided fields are modified.
+
+  <Property name="agent_id" type="str" required>
+    ID of the agent to update.
+  </Property>
+  <Property name="name" type="str | None">Updated display name.</Property>
+  <Property name="url" type="str | None">Updated endpoint URL.</Property>
+  <Property name="description" type="str | None">Updated description.</Property>
+  <Property name="headers" type="Iterable[HeaderParam] | None">Updated HTTP headers.</Property>
+  <Property name="supported_languages" type="list[str] | None">Updated language codes.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Agent]">
+  List all agents, optionally filtered by project.
+
+  <Property name="project_id" type="str | None">Project ID to filter by.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete an agent by its ID.
+
+  <Property name="agent_id" type="str" required>ID of the agent to delete.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple agents at once.
+
+  <Property name="agent_ids" type="list[str]" required>IDs of agents to delete.</Property>
+</MethodCard>
+
+<MethodCard name=".generate_completion()" returnType="AgentOutput">
+  Call a registered agent with a list of messages and get the response.
+
+  <Property name="agent_id" type="str" required>
+    ID of the agent to call.
+  </Property>
+  <Property name="messages" type="Iterable[ChatMessageParam]" required>
+    Conversation messages as `[{"role": "user", "content": "..."}]`.
+  </Property>
+
+```python title="Example"
+output = hub.agents.generate_completion(
+    agent.id,
+    messages=[{"role": "user", "content": "What is your return policy?"}],
+)
+print(output.response.content)
+print(output.metadata)
+```
+
+</MethodCard>
+
+<MethodCard name=".test_connection()" returnType="AgentOutput">
+  Test connectivity to an agent endpoint without persisting the agent.
+
+  <Property name="url" type="str" required>HTTP endpoint URL to test.</Property>
+  <Property name="headers" type="dict[str, str]">HTTP headers to include in the test request.</Property>
+</MethodCard>
+
+<MethodCard name=".generate_description()" returnType="Agent">
+  Auto-generate a description for an agent by observing its behaviour. Returns the updated agent.
+
+  <Property name="agent_id" type="str" required>ID of the agent.</Property>
+</MethodCard>
+
+<MethodCard name=".detect_statefulness()" returnType="AgentDetectStatefulness">
+  Detect whether the agent is stateful by analyzing its behavior.
+
+  <Property name="agent_id" type="str" required>ID of the agent to detect statefulness for.</Property>
+</MethodCard>
+
+<TypeTable name="Agent">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="url" type="str">
+    HTTP endpoint URL.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="supported_languages" type="list[str]">
+    Language codes.
+  </Property>
+  <Property name="headers" type="list[Header]">
+    HTTP headers.
+  </Property>
+  <Property name="stateful" type="bool">
+    Whether the agent is stateful.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AgentDetectStatefulness">
+  <Property name="stateful" type="bool">
+    Whether the agent is stateful.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AgentOutput">
+  <Property name="response" type="ChatMessage">
+    The agent's response message.
+  </Property>
+  <Property name="error" type="ExecutionError | None">
+    Error details if the agent call failed.
+  </Property>
+  <Property name="metadata" type="dict | None">
+    Arbitrary metadata returned by the agent.
+  </Property>
+</TypeTable>
+
+</ResourceSection>
+
+---
+
+## `hub.checks`
+
+<ResourceSection description="Define and manage reusable check criteria for evaluating agent responses. Checks are project-scoped and can be referenced by identifier in any test case.">
+
+```python
+from giskard_hub.types import Check, CheckResult
+```
+
+<MethodCard name=".create()" returnType="Check">
+  Create a custom check in the specified project.
+
+<Property name="identifier" type="str" required>
+  Unique identifier to reference this check in test cases.
+</Property>
+<Property name="name" type="str" required>
+  Display name.
+</Property>
+<Property name="project_id" type="str" required>
+  Project this check belongs to.
+</Property>
+<Property name="params" type="CheckTypeParam" required>
+  Check configuration (see check type params below).
+</Property>
+<Property name="description" type="str | None">
+  Human-readable description.
+</Property>
+
+```python title="Example"
+check = hub.checks.create(
+    project_id=project.id,
+    identifier="tone_professional",
+    name="Professional tone",
+    params={"type": "conformity", "rules": ["Use formal language."]},
+)
+```
+
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="Check">
+  <Property name="check_id" type="str" required>
+    ID of the check to retrieve.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Check">
+  Update an existing check. Only the provided fields are modified.
+
+  <Property name="check_id" type="str" required>ID of the check to update.</Property>
+  <Property name="identifier" type="str | None">Updated identifier.</Property>
+  <Property name="name" type="str | None">Updated name.</Property>
+  <Property name="params" type="CheckTypeParam | None">Updated check params.</Property>
+  <Property name="description" type="str | None">Updated description.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Check]">
+  <Property name="project_id" type="str" required>
+    Project ID to list checks for.
+  </Property>
+  <Property name="filter_builtin" type="bool">
+    When `True`, include built-in checks in the results.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  <Property name="check_id" type="str" required>
+    ID of the check to delete.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  <Property name="check_ids" type="list[str]" required>
+    IDs of checks to delete.
+  </Property>
+</MethodCard>
+
+### Check type params
+
+The `params` field accepts one of these shapes:
+
+| Type                    | `params` shape                                                          | Evaluation method |
+| ----------------------- | ----------------------------------------------------------------------- | ----------------- |
+| **Correctness**         | `{"type": "correctness", "reference": str}`                             | LLM judge         |
+| **Conformity**          | `{"type": "conformity", "rules": list[str]}`                            | LLM judge         |
+| **Groundedness**        | `{"type": "groundedness", "context": str}`                              | LLM judge         |
+| **Semantic similarity** | `{"type": "semantic_similarity", "reference": str, "threshold": float}` | Embedding         |
+| **String match**        | `{"type": "string_match", "keyword": str}`                              | Rule-based        |
+| **Metadata**            | `{"type": "metadata", "json_path_rules": list[JsonPathRule]}`           | Rule-based        |
+
+Each `JsonPathRule`: `{"json_path": str, "expected_value": str, "expected_value_type": "string" | "number" | "boolean"}`
+
+<TypeTable name="Check">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="built_in" type="bool">
+    Whether this is a built-in check.
+  </Property>
+  <Property name="identifier" type="str">
+    Reusable identifier string.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="params" type="dict">
+    Check-specific configuration.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="CheckResult">
+  <Property name="name" type="str">
+    Check identifier.
+  </Property>
+  <Property name="display_name" type="str">
+    Human-readable name.
+  </Property>
+  <Property name="status" type="str">
+    Execution status.
+  </Property>
+  <Property name="passed" type="bool">
+    Whether the check passed.
+  </Property>
+  <Property name="error" type="str | None">
+    Error message if execution failed.
+  </Property>
+  <Property name="reason" type="str | None">
+    LLM judge's reasoning (for LLM-based checks).
+  </Property>
+  <Property name="annotations" type="list[OutputAnnotation]">
+    Annotated spans in the agent's response.
+  </Property>
+</TypeTable>
+
+</ResourceSection>
+
+---
+
+## `hub.datasets`
+
+<ResourceSection description="Create datasets, import test cases, and auto-generate test suites from scenarios or knowledge bases.">
+
+```python
+from giskard_hub.types import Dataset, TestCase, TaskProgress
+```
+
+<MethodCard name=".create()" returnType="Dataset">
+  Create a new empty dataset in the specified project.
+
+  <Property name="name" type="str" required>Display name.</Property>
+  <Property name="project_id" type="str" required>Project this dataset belongs to.</Property>
+  <Property name="description" type="str | None">Human-readable description.</Property>
+</MethodCard>
+
+<MethodCard name=".upload()" returnType="Dataset">
+  Import test cases from a file or list of dicts into a dataset.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="data" type="FileTypes" required>
+    File path (`str` or `Path`), file-like object, or list of dicts. Each record should have a `messages` list and optional `checks` list.
+  </Property>
+  <Property name="dataset_id" type="str | None">Append to an existing dataset instead of creating a new one.</Property>
+  <Property name="name" type="str | None">Name for the new dataset.</Property>
+</MethodCard>
+
+<MethodCard name=".generate_scenario_based()" returnType="Dataset">
+  Generate a dataset of test cases from scenario definitions. The dataset's `status` will be `"running"` until generation completes -- use `hub.helpers.wait_for_completion()` to wait.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="agent_id" type="str" required>Agent to generate test cases for.</Property>
+  <Property name="scenario_id" type="str" required>Scenario template to use.</Property>
+  <Property name="n_examples" type="int">Number of test cases to generate.</Property>
+  <Property name="dataset_id" type="str | None">Append to an existing dataset.</Property>
+  <Property name="dataset_name" type="str | None">Name for the new dataset.</Property>
+</MethodCard>
+
+<MethodCard name=".generate_document_based()" returnType="Dataset">
+  Generate test cases grounded in knowledge base documents. Async -- use `hub.helpers.wait_for_completion()`.
+
+  <Property name="agent_id" type="str" required>Agent to generate test cases for.</Property>
+  <Property name="knowledge_base_id" type="str" required>Knowledge base to source documents from.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="dataset_name" type="str | None">Name for the new dataset.</Property>
+  <Property name="description" type="str | None">Dataset description.</Property>
+  <Property name="n_examples" type="int">Number of test cases to generate.</Property>
+  <Property name="topic_ids" type="list[str]">Filter to specific KB topics.</Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="Dataset">
+  <Property name="dataset_id" type="str" required>
+    ID of the dataset to retrieve.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Dataset">
+  <Property name="dataset_id" type="str" required>
+    ID of the dataset to update.
+  </Property>
+  <Property name="name" type="str | None">
+    Updated name.
+  </Property>
+  <Property name="description" type="str | None">
+    Updated description.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Dataset]">
+  <Property name="project_id" type="str | None">
+    Project ID to filter by.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a dataset by its ID.
+
+  <Property name="dataset_id" type="str" required>Dataset ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple datasets at once.
+
+  <Property name="dataset_ids" type="list[str]" required>IDs of datasets to delete.</Property>
+</MethodCard>
+
+<MethodCard name=".list_tags()" returnType="list[str]">
+  List all tags used across test cases in a dataset.
+
+  <Property name="dataset_id" type="str" required>Dataset ID.</Property>
+</MethodCard>
+
+<MethodCard name=".list_test_cases()" returnType="list[TestCase]">
+  List all test cases in a dataset.
+
+  <Property name="dataset_id" type="str" required>Dataset ID.</Property>
+</MethodCard>
+
+<MethodCard name=".search_test_cases()" returnType="list[TestCase]">
+  Search test cases with filters, sorting, and pagination. Pass `include_metadata=True` to receive `tuple[list[TestCase], APIPaginatedMetadata]`.
+
+  <Property name="dataset_id" type="str" required>Dataset ID.</Property>
+  <Property name="query" type="str | None">Free-text search query.</Property>
+  <Property name="order_by" type="list[TestCaseOrderByParam] | None">Sorting criteria.</Property>
+  <Property name="filters" type="TestCaseFiltersParam | None">Filter criteria.</Property>
+  <Property name="limit" type="int | None">Maximum results per page.</Property>
+  <Property name="offset" type="int | None">Results offset for pagination.</Property>
+  <Property name="include_metadata" type="bool" defaultValue="False">Include pagination metadata in the return value.</Property>
+</MethodCard>
+
+<TypeTable name="Dataset">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async operation status (for generated datasets).
+  </Property>
+  <Property name="tags" type="list[str]">
+    All tags used across test cases.
+  </Property>
+  <Property name="state" type="str">
+    Computed from `status.state` -- e.g. `"finished"`, `"running"`.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+</ResourceSection>
+
+---
+
+## `hub.evaluations`
+
+<ResourceSection description="Run agents against datasets, inspect per-test-case results, and manage the evaluation lifecycle. Sub-resource: hub.evaluations.results.">
+
+```python
+from giskard_hub.types import Evaluation, Metric, CheckResult
+```
+
+<MethodCard name=".create()" returnType="Evaluation">
+  Create and launch a new evaluation of an agent on a dataset.
+
+<Property name="project_id" type="str" required>
+  Project ID.
+</Property>
+<Property name="agent_id" type="str" required>
+  Agent to evaluate.
+</Property>
+<Property name="dataset_id" type="str | None">
+  Dataset to evaluate against. Provide this **or** `old_evaluation_id`, not
+  both.
+</Property>
+<Property name="old_evaluation_id" type="str | None">
+  Reuse a previous evaluation's dataset.
+</Property>
+<Property name="name" type="str">
+  Evaluation run name.
+</Property>
+<Property name="tags" type="list[str] | None">
+  Filter test cases by tags.
+</Property>
+<Property name="run_count" type="int">
+  Run each test case N times (for consistency testing).
+</Property>
+<Property name="scheduled_evaluation_id" type="str | None">
+  Link to a scheduled evaluation.
+</Property>
+
+```python title="Example"
+evaluation = hub.evaluations.create(
+    project_id=project.id,
+    agent_id=agent.id,
+    dataset_id=dataset.id,
+    name="v2.1 regression run",
+)
+evaluation = hub.helpers.wait_for_completion(evaluation)
+hub.helpers.print_metrics(evaluation)
+```
+
+</MethodCard>
+
+<MethodCard name=".create_local()" returnType="Evaluation">
+  Create a local evaluation for running agent inference in your own process.
+
+  <Property name="agent_info" type="MinimalAgentParam" required>
+    Agent info as `{"name": str, "description": str}`.
+  </Property>
+  <Property name="dataset_id" type="str | None">Dataset to evaluate against.</Property>
+  <Property name="name" type="str | None">Evaluation name.</Property>
+  <Property name="tags" type="list[str] | None">Filter test cases by tags.</Property>
+
+:::tip
+For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handles the full local evaluation lifecycle automatically.
+:::
+
+</MethodCard>
+
+<MethodCard name=".run_single()" returnType="list[CheckResult]">
+  Evaluate a single (input, output) pair against checks without creating a full evaluation.
+
+  <Property name="messages" type="Iterable[ChatMessageParam]" required>Conversation messages.</Property>
+  <Property name="model_output" type="AgentOutputParam" required>Agent's output to evaluate.</Property>
+  <Property name="checks" type="Iterable[CheckConfigParam]" required>Checks to apply.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="model_description" type="str">Description of the agent for context.</Property>
+</MethodCard>
+
+<MethodCard name=".rerun_errored_results()" returnType="Evaluation">
+  Rerun all errored results without triggering a full re-evaluation.
+
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="Evaluation">
+  Retrieve an evaluation by its ID, with optional related resource inclusion.
+
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+  <Property name="include" type='list[Literal["agent", "dataset"]] | None'>Embed the full agent and/or dataset objects instead of references.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Evaluation">
+  Update an evaluation's name.
+
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+  <Property name="name" type="str" required>New name for the evaluation.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Evaluation]">
+  List all evaluations for a project.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="include" type='list[Literal["agent", "dataset"]] | None'>Embed related objects.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete an evaluation by its ID.
+
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple evaluations at once.
+
+  <Property name="evaluation_ids" type="list[str]" required>IDs of evaluations to delete.</Property>
+</MethodCard>
+
+<TypeTable name="Evaluation">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str | None">
+    Display name.
+  </Property>
+  <Property name="agent" type="AgentReference | Agent">
+    The evaluated agent.
+  </Property>
+  <Property name="dataset" type="DatasetReference | Dataset">
+    The dataset used.
+  </Property>
+  <Property name="criteria" type="list">
+    Check criteria applied.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="local" type="bool">
+    Whether this is a local evaluation.
+  </Property>
+  <Property name="metrics" type="list[Metric]">
+    Aggregated pass/fail metrics per check.
+  </Property>
+  <Property name="tags" type="list[str]">
+    Tags used to filter test cases.
+  </Property>
+  <Property name="failure_categories" type="list[FailureCategory]">
+    Available failure classifications.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async operation status.
+  </Property>
+  <Property name="state" type="str">
+    Computed: `"finished"`, `"running"`, `"error"`.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="Metric">
+  <Property name="name" type="str">
+    Check identifier (e.g. `"correctness"`, `"global"`).
+  </Property>
+  <Property name="display_name" type="str">
+    Human-readable name.
+  </Property>
+  <Property name="passed" type="int">
+    Number of test cases that passed.
+  </Property>
+  <Property name="failed" type="int">
+    Number of test cases that failed.
+  </Property>
+  <Property name="errored" type="int">
+    Number of test cases that errored.
+  </Property>
+  <Property name="total" type="int">
+    Total test cases.
+  </Property>
+  <Property name="success_rate" type="float">
+    Pass rate as a float between `0.0` and `1.0`.
+  </Property>
+</TypeTable>
+
+### `hub.evaluations.results`
+
+Inspect, filter, update, and rerun individual evaluation results.
+
+```python
+from giskard_hub.types.evaluation import TestCaseEvaluation, FailureCategory
+```
+
+<MethodCard name=".retrieve()" returnType="TestCaseEvaluation">
+  <Property name="result_id" type="str" required>
+    Result ID.
+  </Property>
+  <Property name="evaluation_id" type="str" required>
+    Evaluation ID.
+  </Property>
+  <Property name="include" type="list[str] | None">
+    Embed related resources (`["test_case"]`).
+  </Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="TestCaseEvaluation">
+  Update the failure category of an evaluation result.
+
+  <Property name="result_id" type="str" required>Result ID.</Property>
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+  <Property name="failure_category" type="FailureCategoryParam | None">Failure classification to assign.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[TestCaseEvaluation]">
+  <Property name="evaluation_id" type="str" required>
+    Evaluation ID.
+  </Property>
+  <Property name="include" type="list[str] | None">
+    Embed related resources (`["test_case"]`).
+  </Property>
+  <Property name="limit" type="int | None">
+    Maximum results.
+  </Property>
+  <Property name="offset" type="int | None">
+    Results offset.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".search()" returnType="list[TestCaseEvaluation]">
+  Search and filter results. Pass `include_metadata=True` for pagination metadata.
+
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+  <Property name="query" type="str | None">Free-text search query.</Property>
+  <Property name="filters" type="ResultFiltersParam | None">Filter criteria.</Property>
+  <Property name="order_by" type="list[ResultOrderByParam] | None">Sorting criteria.</Property>
+  <Property name="limit" type="int | None">Maximum results.</Property>
+  <Property name="offset" type="int | None">Results offset.</Property>
+  <Property name="include" type="list[str] | None">Embed related resources.</Property>
+  <Property name="include_metadata" type="bool" defaultValue="False">Include pagination metadata.</Property>
+</MethodCard>
+
+<MethodCard name=".rerun_test_case()" returnType="TestCaseEvaluation">
+  <Property name="result_id" type="str" required>
+    Result ID.
+  </Property>
+  <Property name="evaluation_id" type="str" required>
+    Evaluation ID.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".submit_local_output()" returnType="TestCaseEvaluation">
+  Submit locally-generated agent output for evaluation and scoring.
+
+  <Property name="result_id" type="str" required>Result ID.</Property>
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+  <Property name="agent_output" type="AgentOutputParam | None">Agent output to submit.</Property>
+  <Property name="error" type="str | None">Error message if the agent call failed.</Property>
+</MethodCard>
+
+<MethodCard name=".update_visibility()" returnType="TestCaseEvaluation">
+  Show or hide a result from the default view.
+
+  <Property name="result_id" type="str" required>Result ID.</Property>
+  <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
+  <Property name="hidden" type="bool" required>Whether the result should be hidden.</Property>
+  <Property name="set_test_case_draft" type="bool | None">Also set the linked test case to draft status.</Property>
+</MethodCard>
+
+<TypeTable name="TestCaseEvaluation">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="evaluation_id" type="str">
+    Parent evaluation ID.
+  </Property>
+  <Property name="test_case" type="TestCase | TestCaseReference">
+    The test case.
+  </Property>
+  <Property name="test_case_exists" type="bool">
+    Whether the test case still exists.
+  </Property>
+  <Property name="state" type="str">
+    Result state: `"finished"`, `"running"`, `"error"`.
+  </Property>
+  <Property name="results" type="list[CheckResult]">
+    Per-check outcomes.
+  </Property>
+  <Property name="output" type="AgentOutput | None">
+    The agent's actual response.
+  </Property>
+  <Property name="error" type="ExecutionError | None">
+    Error details if the agent call failed.
+  </Property>
+  <Property name="failure_category" type="FailureCategory | None">
+    Assigned failure classification.
+  </Property>
+  <Property name="hidden" type="bool">
+    Whether this result is hidden.
+  </Property>
+  <Property name="divergence_warnings" type="list[DivergenceWarning] | None">
+    List of divergence warnings detected during multi-turn evaluation.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="DivergenceWarning">
+  <Property name="turn" type="int">
+    The conversation turn where divergence was detected.
+  </Property>
+  <Property name="expected" type="str">
+    The expected message content.
+  </Property>
+  <Property name="actual" type="str">
+    The actual message content received.
+  </Property>
+</TypeTable>
+
+</ResourceSection>
+
+---
+
+## `hub.helpers`
+
+<ResourceSection description="High-level convenience methods for the most common SDK workflows: waiting for async operations, running evaluations, and printing metrics.">
+
+```python
+from giskard_hub.types import Evaluation, Scan, ChatMessage, AgentOutput
+```
+
+<MethodCard name=".wait_for_completion()" returnType="TStateful">
+  Poll an entity until it leaves its running state. Returns the refreshed entity.
+
+<Property name="entity" type="TStateful" required>
+  Any stateful entity: `Evaluation`, `Scan`, `Dataset`, `KnowledgeBase`,
+  `ScanProbe`, `TestCaseEvaluation`.
+</Property>
+<Property name="poll_interval" type="float" defaultValue="5.0">
+  Seconds between polling requests.
+</Property>
+<Property name="max_retries" type="int" defaultValue="360">
+  Maximum polling attempts. Default: 30 minutes at 5-second intervals.
+</Property>
+<Property
+  name="running_states"
+  type="Collection[str]"
+  defaultValue='{"running"}'
+>
+  States considered as "still processing".
+</Property>
+<Property name="error_states" type="Collection[str]" defaultValue='{"error"}'>
+  Terminal error states.
+</Property>
+<Property name="raise_on_error" type="bool" defaultValue="True">
+  Raise `ValueError` if entity enters an error state.
+</Property>
+
+:::note
+Always reassign the return value: `entity = hub.helpers.wait_for_completion(entity)`.
+:::
+
+</MethodCard>
+
+<MethodCard name=".evaluate()" returnType="Evaluation">
+  Run an evaluation for a given agent over a dataset. Handles both remote and local agents.
+
+  <Property name="agent" type="str | Agent | Callable" required>
+    Agent ID, `Agent` object, or a Python callable for local evaluation. Callable signature: `(messages: list[ChatMessage]) -> str | ChatMessage | AgentOutput`.
+  </Property>
+  <Property name="dataset" type="str | Dataset" required>
+    Dataset ID or `Dataset` object.
+  </Property>
+  <Property name="project" type="str | Project | None">
+    Required when `agent` is remote (str or Agent). Not required for local callables.
+  </Property>
+  <Property name="name" type="str | None">Evaluation run name.</Property>
+  <Property name="tags" type="list[str] | None">Filter test cases by tags.</Property>
+
+  <Tabs>
+    <TabItem label="Remote agent">
+  ```python
+  evaluation = hub.helpers.evaluate(
+      agent=my_agent, dataset=my_dataset,
+      project=my_project, name="Remote eval",
+  )
+  ```
+    </TabItem>
+    <TabItem label="Local agent">
+  ```python
+  def my_fn(messages: list[ChatMessage]) -> str:
+      return "Hello from my local agent"
+
+evaluation = hub.helpers.evaluate(
+agent=my_fn, dataset="dataset-id", name="Local eval",
+)
+
+````
+  </TabItem>
+</Tabs>
+</MethodCard>
+
+<MethodCard name=".print_metrics()" returnType="None">
+Print a formatted metrics table to the console for an evaluation or scan.
+
+<Property name="entity" type="Evaluation | Scan" required>
+  The evaluation or scan to print metrics for.
+</Property>
+</MethodCard>
+
+</ResourceSection>
+
+---
+
+## `hub.knowledge_bases`
+
+<ResourceSection description="Create, search, and manage indexed document collections for grounded evaluations, document-based test generation, and knowledge-grounded vulnerability scans.">
+
+```python
+from giskard_hub.types import (
+    KnowledgeBase,
+    KnowledgeBaseDocumentRow,
+    KnowledgeBaseDocumentDetail,
+)
+````
+
+<MethodCard name=".create()" returnType="KnowledgeBase">
+  Create a knowledge base and upload documents. Indexing happens asynchronously after creation -- use `hub.helpers.wait_for_completion()`.
+
+<Property name="name" type="str" required>
+  Display name.
+</Property>
+<Property name="project_id" type="str" required>
+  Project this KB belongs to.
+</Property>
+<Property name="data" type="list[dict] | str | Path" required>
+  Documents as a list of dicts, a file path string, or a `pathlib.Path`
+  (JSON/JSONL format).
+</Property>
+<Property name="description" type="str | None">
+  Human-readable description.
+</Property>
+<Property name="document_column" type="str" defaultValue='"text"'>
+  Column name for document text.
+</Property>
+<Property name="topic_column" type="str" defaultValue='"topic"'>
+  Column name for topic label.
+</Property>
+
+```python title="Example"
+kb = hub.knowledge_bases.create(
+    project_id=project.id,
+    name="Product Docs",
+    data=[
+        {"text": "30-day return policy.", "topic": "Returns"},
+        {"text": "Free shipping over $50.", "topic": "Shipping"},
+    ],
+)
+kb = hub.helpers.wait_for_completion(kb)
+```
+
+</MethodCard>
+
+<MethodCard name=".search_documents()" returnType="tuple[list[KnowledgeBaseDocumentRow], APIPaginatedMetadata]">
+  Semantic search over documents in a knowledge base.
+
+  <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
+  <Property name="query" type="str | None">Search query.</Property>
+  <Property name="limit" type="int | None">Maximum results.</Property>
+  <Property name="offset" type="int | None">Results offset.</Property>
+</MethodCard>
+
+<MethodCard name=".retrieve_document()" returnType="KnowledgeBaseDocumentDetail">
+  Retrieve a specific document with its full content.
+
+  <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
+  <Property name="document_id" type="str" required>Document ID.</Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="KnowledgeBase">
+  Retrieve a knowledge base by its ID, including its topics.
+
+  <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="KnowledgeBase">
+  Update a knowledge base's metadata.
+
+  <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
+  <Property name="name" type="str | None">Updated name.</Property>
+  <Property name="description" type="str | None">Updated description.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[KnowledgeBase]">
+  List all knowledge bases, optionally filtered by project.
+
+  <Property name="project_id" type="str | None">Project ID to filter by.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a knowledge base by its ID.
+
+  <Property name="knowledge_base_id" type="str" required>Knowledge base ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple knowledge bases at once.
+
+  <Property name="knowledge_base_ids" type="list[str]" required>IDs of knowledge bases to delete.</Property>
+</MethodCard>
+
+<TypeTable name="KnowledgeBase">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="filename" type="str | None">
+    Original upload filename.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="n_documents" type="int">
+    Number of indexed documents.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async indexing status.
+  </Property>
+  <Property name="topics" type="list">
+    Discovered topics.
+  </Property>
+  <Property name="state" type="str">
+    Computed from `status.state`.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+</ResourceSection>
+
+---
+
+## `hub.projects`
+
+<ResourceSection description="Top-level workspace that groups all related resources: agents, datasets, evaluations, scans, and more. Sub-resource: hub.projects.scenarios.">
+
+```python
+from giskard_hub.types import Project
+```
+
+<MethodCard name=".create()" returnType="Project">
+  <Property name="name" type="str" required>
+    Project name.
+  </Property>
+  <Property name="description" type="str | None">
+    Project description.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Project">
+  <Property name="project_id" type="str" required>
+    Project ID.
+  </Property>
+  <Property name="name" type="str | None">
+    Updated name.
+  </Property>
+  <Property name="description" type="str | None">
+    Updated description.
+  </Property>
+  <Property
+    name="failure_categories"
+    type="Iterable[FailureCategoryParam] | None"
+  >
+    Project-level failure classifications.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="Project">
+  Retrieve a project by its ID.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Project]">
+  List all projects accessible to the current user.
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a project by its ID.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple projects at once.
+
+  <Property name="project_ids" type="list[str]" required>IDs of projects to delete.</Property>
+</MethodCard>
+
+<TypeTable name="Project">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="failure_categories" type="list[FailureCategory]">
+    Project-level failure classifications.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+### `hub.projects.scenarios`
+
+Reusable persona and behaviour templates for scenario-based dataset generation.
+
+```python
+from giskard_hub.types import Scenario, ScenarioPreview
+```
+
+<MethodCard name=".create()" returnType="Scenario">
+  <Property name="project_id" type="str" required>
+    Project ID (positional).
+  </Property>
+  <Property name="name" type="str" required>
+    Scenario name.
+  </Property>
+  <Property name="description" type="str" required>
+    Scenario description.
+  </Property>
+  <Property name="rules" type="list[str]">
+    Rules the generated conversations should follow.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".preview()" returnType="ScenarioPreview">
+  Generate a preview conversation for a scenario without persisting it.
+
+  <Property name="project_id" type="str" required>Project ID (positional).</Property>
+  <Property name="description" type="str" required>Scenario description.</Property>
+  <Property name="agent_id" type="str | None">Agent ID for preview.</Property>
+  <Property name="rules" type="list[str]">Scenario rules.</Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="Scenario">
+  Retrieve a scenario by its ID within a project.
+
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Scenario">
+  Update an existing scenario's definition.
+
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="name" type="str | None">Updated name.</Property>
+  <Property name="description" type="str | None">Updated description.</Property>
+  <Property name="rules" type="list[str] | None">Updated rules.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Scenario]">
+  List all scenarios for a project.
+
+  <Property name="project_id" type="str" required>Project ID (positional).</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a scenario from a project.
+
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
+</MethodCard>
+
+</ResourceSection>
+
+---
+
+## `hub.scans`
+
+<ResourceSection description="Launch automated vulnerability scans covering the OWASP LLM Top 10 and additional threat categories. Sub-resources: hub.scans.probes, hub.scans.attempts.">
+
+```python
+from giskard_hub.types import Scan, ScanCategory, ScanProbe
+from giskard_hub.types.scan import ScanProbeAttempt, ReviewStatus, Severity
+```
+
+<MethodCard name=".create()" returnType="Scan">
+  Launch a new vulnerability scan of an agent.
+
+<Property name="project_id" type="str" required>
+  Project ID.
+</Property>
+<Property name="agent_id" type="str" required>
+  Agent to scan.
+</Property>
+<Property name="knowledge_base_id" type="str | None">
+  Anchor probes to KB documents for domain-specific attacks.
+</Property>
+<Property name="probe_ids" type="list[str] | None">
+  List of specific LIDAR probe IDs to run in the scan.
+</Property>
+<Property name="tags" type="list[str] | None">
+  Limit scan to specific threat categories (e.g.
+  `["gsk:threat-type='prompt-injection'"]`).
+</Property>
+
+```python title="Example"
+scan = hub.scans.create(
+    project_id=project.id,
+    agent_id=agent.id,
+    tags=["gsk:threat-type='prompt-injection'"],
+)
+scan = hub.helpers.wait_for_completion(scan)
+print(f"Grade: {scan.grade}")
+hub.helpers.print_metrics(scan)
+```
+
+</MethodCard>
+
+<MethodCard name=".list_categories()" returnType="list[ScanCategory]">
+  List all available scan categories and their OWASP mappings.
+</MethodCard>
+
+<MethodCard name=".list_probes()" returnType="list[ScanProbe]">
+  List all probe results for a completed scan.
+
+  <Property name="scan_id" type="str" required>Scan ID.</Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="Scan">
+  Retrieve a scan result by its ID, with optional related resource inclusion.
+
+  <Property name="scan_id" type="str" required>Scan ID.</Property>
+  <Property name="include" type='list[Literal["agent", "knowledge_base"]] | None'>Embed related objects.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Scan]">
+  List all scan results, optionally filtered by project.
+
+  <Property name="project_id" type="str | None">Project ID to filter by.</Property>
+  <Property name="include" type='list[Literal["agent", "knowledge_base"]] | None'>Embed related objects.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a scan result by its ID.
+
+  <Property name="scan_id" type="str" required>Scan ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple scan results at once.
+
+  <Property name="scan_ids" type="list[str]" required>IDs of scans to delete.</Property>
+</MethodCard>
+
+<TypeTable name="Scan">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="agent" type="AgentReference | Agent">
+    The scanned agent.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="knowledge_base" type="KnowledgeBase | None">
+    Linked knowledge base.
+  </Property>
+  <Property name="grade" type="str | None">
+    Overall grade: `"A"`, `"B"`, `"C"`, `"D"`, or `None`.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async operation status.
+  </Property>
+  <Property name="state" type="str">
+    Computed from `status.state`.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+### `hub.scans.probes`
+
+<MethodCard name=".retrieve()" returnType="ScanProbe">
+  <Property name="probe_id" type="str" required>
+    Probe ID.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".list_attempts()" returnType="list[ScanProbeAttempt]">
+  List all adversarial attempts for a specific probe.
+
+  <Property name="probe_id" type="str" required>Probe ID.</Property>
+</MethodCard>
+
+### `hub.scans.attempts`
+
+<MethodCard name=".update()" returnType="ScanProbeAttempt">
+  Update a probe attempt's review status, severity, or success flag.
+
+  <Property name="probe_attempt_id" type="str" required>Probe attempt ID.</Property>
+  <Property name="review_status" type="ReviewStatus | None">Review status: `"pending"`, `"ignored"`, `"acknowledged"`, `"corrected"`.</Property>
+  <Property name="severity" type="Severity | None">Severity: `SAFE` (0), `MINOR` (10), `MAJOR` (20), `CRITICAL` (30).</Property>
+  <Property name="successful" type="bool | None">Whether the attack was successful.</Property>
+</MethodCard>
+
+</ResourceSection>
+
+---
+
+## `hub.scheduled_evaluations`
+
+<ResourceSection description="Set up recurring evaluation runs on a daily, weekly, or monthly cadence for continuous quality monitoring.">
+
+```python
+from giskard_hub.types import ScheduledEvaluation, FrequencyOption
+```
+
+<MethodCard name=".create()" returnType="ScheduledEvaluation">
+  <Property name="project_id" type="str" required>
+    Project ID.
+  </Property>
+  <Property name="agent_id" type="str" required>
+    Agent to evaluate.
+  </Property>
+  <Property name="dataset_id" type="str" required>
+    Dataset to evaluate against.
+  </Property>
+  <Property name="frequency" type="FrequencyOption" required>
+    `"daily"`, `"weekly"`, or `"monthly"`.
+  </Property>
+  <Property name="name" type="str | None">
+    Schedule name.
+  </Property>
+  <Property name="time" type="str">
+    Time of day in `HH:MM` format (UTC).
+  </Property>
+  <Property name="day_of_week" type="int">
+    Weekly only: 1 (Monday) through 7 (Sunday).
+  </Property>
+  <Property name="day_of_month" type="int">
+    Monthly only: 1 through 28.
+  </Property>
+  <Property name="tags" type="list[str] | None">
+    Filter test cases by tags.
+  </Property>
+  <Property name="run_count" type="int">
+    Run each test case N times.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".list_evaluations()" returnType="list[Evaluation]">
+  List all past evaluation runs generated by this scheduled evaluation.
+
+  <Property name="scheduled_evaluation_id" type="str" required>Scheduled evaluation ID.</Property>
+  <Property name="include" type="list[str] | None">Embed related resources.</Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="ScheduledEvaluation">
+  Retrieve a scheduled evaluation by its ID.
+
+  <Property name="scheduled_evaluation_id" type="str" required>Scheduled evaluation ID.</Property>
+  <Property name="include" type='list[Literal["evaluations"]] | None'>Embed recent evaluation runs.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="ScheduledEvaluation">
+  Update a scheduled evaluation's configuration.
+
+  <Property name="scheduled_evaluation_id" type="str" required>Scheduled evaluation ID.</Property>
+  <Property name="name" type="str | None">Updated name.</Property>
+  <Property name="frequency" type="FrequencyOption | None">Updated frequency.</Property>
+  <Property name="time" type="str | None">Updated time (HH:MM, UTC).</Property>
+  <Property name="day_of_week" type="int | None">Updated day of week (1--7).</Property>
+  <Property name="day_of_month" type="int | None">Updated day of month (1--28).</Property>
+  <Property name="run_count" type="int | None">Updated run count.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[ScheduledEvaluation]">
+  List all scheduled evaluations for a project.
+
+  <Property name="project_id" type="str" required>Project ID.</Property>
+  <Property name="include" type='list[Literal["evaluations"]] | None'>Embed recent runs.</Property>
+  <Property name="last_days" type="int | None">Filter to schedules active within the last N days.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a scheduled evaluation by its ID.
+
+  <Property name="scheduled_evaluation_id" type="str" required>Scheduled evaluation ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple scheduled evaluations at once.
+
+  <Property name="scheduled_evaluation_ids" type="list[str]" required>IDs to delete.</Property>
+</MethodCard>
+
+</ResourceSection>
+
+---
+
+## `hub.tasks`
+
+<ResourceSection description="Lightweight issue tracker for managing findings from evaluations and scans. Link tasks to specific evaluation results, test cases, or probe attempts.">
+
+```python
+from giskard_hub.types import Task, TaskStatus, TaskPriority
+```
+
+<MethodCard name=".create()" returnType="Task">
+  <Property name="project_id" type="str" required>
+    Project ID.
+  </Property>
+  <Property name="description" type="str" required>
+    What needs to be done.
+  </Property>
+  <Property name="priority" type="TaskPriority | None">
+    `"low"`, `"medium"`, or `"high"`.
+  </Property>
+  <Property name="status" type="TaskStatus">
+    `"open"`, `"in_progress"`, or `"resolved"`.
+  </Property>
+  <Property name="assignee_ids" type="list[str]">
+    User IDs to assign.
+  </Property>
+  <Property name="evaluation_result_id" type="str | None">
+    Link to a specific evaluation result.
+  </Property>
+  <Property name="dataset_test_case_id" type="str | None">
+    Link to a specific test case.
+  </Property>
+  <Property name="probe_attempt_id" type="str | None">
+    Link to a specific scan probe attempt.
+  </Property>
+  <Property name="disable_test" type="bool">
+    Disable the linked test case.
+  </Property>
+  <Property name="hide_result" type="bool">
+    Hide the linked evaluation result.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="Task">
+  Retrieve a task by its ID.
+
+  <Property name="task_id" type="str" required>Task ID.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="Task">
+  Update an existing task's metadata and assignees.
+
+  <Property name="task_id" type="str" required>Task ID.</Property>
+  <Property name="status" type="TaskStatus | None">Updated status: `"open"`, `"in_progress"`, or `"resolved"`.</Property>
+  <Property name="priority" type="TaskPriority | None">Updated priority: `"low"`, `"medium"`, or `"high"`.</Property>
+  <Property name="description" type="str | None">Updated description.</Property>
+  <Property name="assignee_ids" type="list[str] | None">Updated user IDs to assign.</Property>
+  <Property name="set_test_case_status" type="str | None">Also set the linked test case's status.</Property>
+</MethodCard>
+
+<MethodCard name=".list()" returnType="list[Task]">
+  List all tasks for a project, ordered by creation date descending.
+
+  <Property name="project_id" type="str | None">Project ID to filter by.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a task by its ID.
+
+  <Property name="task_id" type="str" required>Task ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple tasks at once.
+
+  <Property name="task_ids" type="list[str]" required>IDs of tasks to delete.</Property>
+</MethodCard>
+
+<TypeTable name="Task">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="description" type="str">
+    Task description.
+  </Property>
+  <Property name="status" type="TaskStatus">
+    `"open"`, `"in_progress"`, or `"resolved"`.
+  </Property>
+  <Property name="priority" type="TaskPriority">
+    `"low"`, `"medium"`, or `"high"`.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="created_by" type="UserReference">
+    User who created the task.
+  </Property>
+  <Property name="assignees" type="list[UserReference]">
+    Assigned users.
+  </Property>
+  <Property name="references" type="dict">
+    Linked resources.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+</ResourceSection>
+
+---
+
+## `hub.test_cases`
+
+<ResourceSection description="Create, update, and manage individual test cases within datasets. Sub-resource: hub.test_cases.comments.">
+
+```python
+from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
+```
+
+<MethodCard name=".create()" returnType="TestCase">
+  Create a new test case with conversation messages and optional checks.
+
+  <Property name="dataset_id" type="str" required>Dataset this test case belongs to.</Property>
+  <Property name="messages" type="Iterable[ChatMessageParam]" required>
+    Conversation messages as `[{"role": "user", "content": "..."}]`. Should **not** include the final assistant response.
+  </Property>
+  <Property name="checks" type="Iterable[CheckConfigParam]">
+    Checks to apply: `[{"identifier": "correctness", "params": {"reference": "..."}}]`.
+  </Property>
+  <Property name="demo_output" type="str | ChatMessageWithMetadataParam | None">
+    Expected output for display only -- not used during evaluation.
+  </Property>
+  <Property name="status" type='"active" | "draft" | None'>Test case status.</Property>
+  <Property name="tags" type="list[str]">Tags for filtering.</Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="TestCase">
+  Retrieve a test case by its ID.
+
+  <Property name="test_case_id" type="str" required>Test case ID.</Property>
+</MethodCard>
+
+<MethodCard name=".update()" returnType="TestCase">
+  Update an existing test case's messages, checks, tags, or status.
+
+  <Property name="test_case_id" type="str" required>Test case ID.</Property>
+  <Property name="messages" type="Iterable[ChatMessageParam] | None">Updated conversation messages.</Property>
+  <Property name="checks" type="Iterable[CheckConfigParam] | None">Updated checks.</Property>
+  <Property name="demo_output" type="str | ChatMessageWithMetadataParam | None">Updated expected output.</Property>
+  <Property name="status" type='"active" | "draft" | None'>Updated status.</Property>
+  <Property name="tags" type="list[str] | None">Updated tags.</Property>
+  <Property name="dataset_id" type="str | None">Move the test case to a different dataset.</Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a test case by its ID.
+
+  <Property name="test_case_id" type="str" required>Test case ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  <Property name="test_case_ids" type="list[str]" required>
+    IDs of test cases to delete.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".bulk_update()" returnType="None">
+  Update multiple test cases at once.
+
+  <Property name="ids" type="list[str]" required>Test case IDs.</Property>
+  <Property name="status" type="str">Updated status.</Property>
+  <Property name="disabled_checks" type="list[str]">Checks to disable.</Property>
+  <Property name="enabled_checks" type="list[str]">Checks to enable.</Property>
+  <Property name="added_tags" type="list[str]">Tags to add.</Property>
+  <Property name="removed_tags" type="list[str]">Tags to remove.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_move()" returnType="None">
+  Move or copy test cases to another dataset.
+
+  <Property name="chat_test_case_ids" type="list[str]" required>Test case IDs to move.</Property>
+  <Property name="dataset_id" type="str" required>Target dataset ID.</Property>
+  <Property name="duplicate" type="bool">Copy instead of move.</Property>
+</MethodCard>
+
+### `hub.test_cases.comments`
+
+<MethodCard name=".add()" returnType="TestCaseComment">
+  <Property name="test_case_id" type="str" required>
+    Test case ID.
+  </Property>
+  <Property name="content" type="str" required>
+    Comment text.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".edit()" returnType="TestCaseComment">
+  <Property name="comment_id" type="str" required>
+    Comment ID.
+  </Property>
+  <Property name="test_case_id" type="str" required>
+    Test case ID.
+  </Property>
+  <Property name="content" type="str" required>
+    Updated text.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  <Property name="comment_id" type="str" required>
+    Comment ID.
+  </Property>
+  <Property name="test_case_id" type="str" required>
+    Test case ID.
+  </Property>
+</MethodCard>
+
+<TypeTable name="TestCase">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="dataset_id" type="str">
+    Parent dataset ID.
+  </Property>
+  <Property name="messages" type="list[ChatMessage]">
+    Conversation messages.
+  </Property>
+  <Property name="demo_output" type="ChatMessageWithMetadata | None">
+    Expected output (display only).
+  </Property>
+  <Property name="checks" type="list[CheckConfig]">
+    Configured checks.
+  </Property>
+  <Property name="comments" type="list[TestCaseComment]">
+    Annotations.
+  </Property>
+  <Property name="tags" type="list[str]">
+    Tags for filtering.
+  </Property>
+  <Property name="status" type='"active" | "draft"'>
+    Test case status.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+</ResourceSection>
+
+---
+
+## `hub.playground_chats`
+
+<ResourceSection description="Access conversations captured from the Hub's interactive playground UI.">
+
+```python
+from giskard_hub.types import PlaygroundChat
+```
+
+<MethodCard name=".list()" returnType="list[PlaygroundChat]">
+  <Property name="project_id" type="str" required>
+    Project ID.
+  </Property>
+  <Property name="include" type="list[str] | None">
+    Embed related resources (`["agent"]`).
+  </Property>
+  <Property name="limit" type="int | None">
+    Maximum results.
+  </Property>
+  <Property name="offset" type="int | None">
+    Results offset.
+  </Property>
+</MethodCard>
+
+<MethodCard name=".retrieve()" returnType="PlaygroundChat">
+  <Property name="chat_id" type="str" required>
+    Chat ID.
+  </Property>
+  <Property name="include" type="list[str] | None">
+    Embed related resources (`["agent"]`).
+  </Property>
+</MethodCard>
+
+<MethodCard name=".delete()" returnType="None">
+  Delete a playground chat by its ID.
+
+  <Property name="chat_id" type="str" required>Chat ID.</Property>
+</MethodCard>
+
+<MethodCard name=".bulk_delete()" returnType="None">
+  Delete multiple playground chats at once.
+
+  <Property name="chat_ids" type="list[str]" required>IDs of chats to delete.</Property>
+</MethodCard>
+
+</ResourceSection>
+
+---
+
+## `hub.audit_logs`
+
+<ResourceSection description="Query the audit trail for compliance reporting, change history, and debugging. Every create, update, and delete action is recorded.">
+
+```python
+from giskard_hub.types import Audit, AuditDisplay
+```
+
+<MethodCard name=".search()" returnType="list[Audit]">
+  Search audit events with free-text queries, filters, and pagination. Pass `include_metadata=True` for `tuple[list[Audit], APIPaginatedMetadata]`.
+
+<Property name="query" type="str | None">
+  Free-text search query.
+</Property>
+<Property name="filters" type="AuditFiltersParam">
+  Filter criteria (see filter keys below).
+</Property>
+<Property name="order_by" type="list[AuditOrderByParam]">
+  Sorting criteria.
+</Property>
+<Property name="limit" type="int">
+  Maximum results.
+</Property>
+<Property name="offset" type="int">
+  Results offset.
+</Property>
+<Property name="include_metadata" type="bool" defaultValue="False">
+  Include pagination metadata.
+</Property>
+
+**Filter keys:**
+
+| Key           | Type        | Example                                                            |
+| ------------- | ----------- | ------------------------------------------------------------------ |
+| `project_id`  | list filter | `{"selected_options": ["project-id"]}`                             |
+| `entity_type` | list filter | `{"selected_options": ["agent", "evaluation"]}`                    |
+| `action`      | list filter | `{"selected_options": ["create", "delete"]}`                       |
+| `user_id`     | list filter | `{"selected_options": ["user-id"]}`                                |
+| `created_at`  | date range  | `{"from_": "2025-01-01T00:00:00Z", "to_": "2025-12-31T23:59:59Z"}` |
+
+</MethodCard>
+
+<MethodCard name=".list_entities()" returnType="list[AuditDisplay]">
+  List audit history for a specific resource, including diffs of each change. Pass `include_metadata=True` for pagination metadata.
+
+  <Property name="entity_id" type="str" required>UUID of the entity.</Property>
+  <Property name="entity_type" type="str" required>Type of entity (e.g. `"project"`, `"agent"`, `"evaluation"`).</Property>
+  <Property name="limit" type="int">Maximum results.</Property>
+  <Property name="offset" type="int">Results offset.</Property>
+  <Property name="include_metadata" type="bool" defaultValue="False">Include pagination metadata.</Property>
+</MethodCard>
+
+</ResourceSection>
+
+---
+
+## Error types
+
+All exceptions inherit from `HubClientError` and are importable from the root package.
+
+```python
+from giskard_hub import (
+    HubClientError,  # Base exception for all SDK errors
+    APIStatusError,  # Base for HTTP status errors (has .status_code, .response)
+    APITimeoutError,  # Request timed out
+    APIConnectionError,  # Could not connect to the Hub
+    BadRequestError,  # 400
+    AuthenticationError,  # 401 — invalid or missing API key
+    PermissionDeniedError,  # 403 — insufficient permissions
+    NotFoundError,  # 404 — resource does not exist
+    ConflictError,  # 409 — resource conflict
+    UnprocessableEntityError,  # 422 — validation error
+    RateLimitError,  # 429 — too many requests
+    InternalServerError,  # 500+ — server error
+)
+```
+
+```python title="Error handling example"
+from giskard_hub import HubClient, NotFoundError, AuthenticationError
+
+hub = HubClient()
+
+try:
+    agent = hub.agents.retrieve("nonexistent-id")
+except NotFoundError as e:
+    print(f"Agent not found: {e}")
+except AuthenticationError:
+    print("Check your API key")
+```
+
+---
+
+## Advanced patterns
+
+### Pagination
+
+Methods that support pagination accept `limit` and `offset`. Pass `include_metadata=True` to get an `APIPaginatedMetadata` object:
+
+```python title="Pagination example"
+results, metadata = hub.evaluations.results.search(
+    "evaluation-id", limit=50, offset=0, include_metadata=True,
+)
+print(f"Page: {metadata.count} of {metadata.total} (offset {metadata.offset})")
+```
+
+### Raw response access
+
+```python title="Access HTTP headers and status"
+response = hub.with_raw_response.agents.retrieve("agent-id")
+print(response.status_code)
+agent = response.parse()
+```
+
+### Retries and timeouts
+
+```python title="Per-request override"
+hub.with_options(max_retries=5, timeout=300.0).evaluations.create(...)
+```
+
+### Custom HTTP client
+
+```python title="Proxy configuration"
+from giskard_hub import HubClient, DefaultHttpxClient
+
+hub = HubClient(
+    http_client=DefaultHttpxClient(proxy="http://proxy.example.com:8080"),
+)
+```
+
+### Debug logging
+
+```bash title="Enable debug logging"
+export GISKARD_HUB_LOG=debug
+```
+
+### Common extra parameters
+
+Every method accepts these optional keyword arguments for per-request customization:
+
+<Property name="extra_headers" type="dict[str, str] | None">
+  Additional HTTP headers for this request.
+</Property>
+<Property name="extra_query" type="dict[str, object] | None">
+  Additional query parameters.
+</Property>
+<Property name="extra_body" type="object | None">
+  Additional JSON body fields.
+</Property>
+<Property name="timeout" type="float | httpx.Timeout | None">
+  Override the default timeout for this request.
+</Property>

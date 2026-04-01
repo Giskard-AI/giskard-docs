@@ -1,0 +1,50 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Sidebar.astro';
+
+const navLinks = [
+  { label: 'Overview', href: '/', active: Astro.url.pathname === '/' || Astro.url.pathname.startsWith('/start') },
+  { label: 'Hub UI', href: '/hub/ui', active: Astro.url.pathname.startsWith('/hub/ui') },
+  { label: 'Hub SDK', href: '/hub/sdk', active: Astro.url.pathname.startsWith('/hub/sdk') },
+  { label: 'Open Source', href: '/oss', active: Astro.url.pathname.startsWith('/oss') },
+];
+---
+
+<div class="mobile-nav-links sl-flex md:sl-hidden">
+    {navLinks.map((link) => (
+        <a href={link.href} class="mobile-nav-link" aria-current={link.active ? 'page' : undefined}>
+            {link.label}
+        </a>
+    ))}
+</div>
+
+<Default {...Astro.props}><slot /></Default>
+
+<style>
+    .mobile-nav-links {
+        flex-direction: column;
+        gap: 0.25rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--sl-color-hairline);
+        margin-bottom: 1rem;
+    }
+
+    .mobile-nav-link {
+        color: var(--sl-color-text);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: var(--sl-text-sm);
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.2s ease;
+    }
+
+    .mobile-nav-link:hover {
+        background-color: var(--sl-color-gray-6);
+    }
+
+    .mobile-nav-link[aria-current="page"] {
+        background-color: var(--sl-color-accent-low);
+        color: var(--sl-color-accent-high);
+    }
+</style>

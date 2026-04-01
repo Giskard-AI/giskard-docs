@@ -1,0 +1,25 @@
+---
+interface Props {
+  description: string;
+}
+
+const { description } = Astro.props;
+---
+
+<p class="resource-section-description">{description}</p>
+<div class="resource-section-body">
+  <slot />
+</div>
+
+<style>
+  .resource-section-description {
+    font-size: 0.9rem;
+    margin: 0.5rem 0 1.5rem 0;
+    color: var(--sl-color-gray-2, #6b7280);
+    line-height: 1.6;
+  }
+
+  :root[data-theme='dark'] .resource-section-description {
+    color: rgba(198, 255, 255, 0.7);
+  }
+</style>
