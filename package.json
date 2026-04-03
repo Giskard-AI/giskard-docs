@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "node scripts/convert-notebooks.mjs && astro dev",
     "start": "astro dev",
-    "build": "npm run format && node scripts/convert-notebooks.mjs && astro build",
-    "build:ci": "node scripts/convert-notebooks.mjs && astro build",
+    "build": "npm run format && node scripts/convert-notebooks.mjs && astro build && node scripts/generate-redirects.mjs",
+    "build:ci": "node scripts/convert-notebooks.mjs && astro build && node scripts/generate-redirects.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write 'src/**/*.{md,mdx}' && node scripts/format-code-blocks.mjs",

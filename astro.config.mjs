@@ -12,7 +12,6 @@ import mermaid from 'astro-mermaid';
 
 // https://astro.build/config
 export default defineConfig({
-    output: 'server',
     site: 'https://docs.giskard.ai',
     trailingSlash: 'never',
 
