@@ -1,7 +1,6 @@
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, readdirSync, statSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { globSync } from "fs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -30,7 +29,6 @@ for (const [from, to] of Object.entries(redirects)) {
 
 // 2. Generic .html and /index.html stripping for all built pages
 //    Scan dist/ for all index.html files to discover page paths
-import { readdirSync, statSync } from "fs";
 
 function walkDir(dir, results = []) {
   for (const entry of readdirSync(dir)) {
