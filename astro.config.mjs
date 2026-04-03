@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import react from '@astrojs/react';
 import tailwind from '@astrojs/tailwind';
 
 import starlightAutoSidebar from 'starlight-auto-sidebar'
@@ -89,7 +88,6 @@ export default defineConfig({
                 starlightAutoSidebar()
             ]
         }),
-        react(),
         tailwind({
             // Disable base styles to avoid conflict with Starlight if needed,
             // but Starlight's tailwind plugin handles this.
