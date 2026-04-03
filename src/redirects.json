@@ -27,6 +27,7 @@
   "/hub/sdk/setup/keys": "/hub/sdk/quickstart",
   "/hub/sdk/setup/knowledge_bases": "/hub/sdk/guides/agents-and-knowledge-bases",
   "/hub/sdk/setup/projects": "/hub/sdk/guides/projects",
+  "/hub/ui/annotate/checks": "/hub/ui/annotate/overview",
   "/hub/ui/annotate/modify_test_cases": "/hub/ui/annotate/modify-test-cases",
   "/hub/ui/annotate/review_test_results": "/hub/ui/annotate/review-test-results",
   "/hub/ui/annotate/task_management": "/hub/ui/annotate/task-management",
