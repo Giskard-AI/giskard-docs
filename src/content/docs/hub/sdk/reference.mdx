@@ -19,80 +19,37 @@ import TypeTable from "../../../../components/api/TypeTable.astro";
 
 <CardGrid>
   <LinkCard
-    title="hub.agents"
-    href="#hubagents"
-    description="Register, test, and manage LLM agents"
+    title="Client"
+    href="#client"
+    description="Client classes for interacting with the Giskard Hub API"
   />
   <LinkCard
-    title="hub.datasets"
-    href="#hubdatasets"
-    description="Create datasets and generate test cases"
+    title="Resources"
+    href="#resources"
+    description="Resource groups exposed by the client for managing Hub entities"
   />
   <LinkCard
-    title="hub.evaluations"
-    href="#hubevaluations"
-    description="Run evaluations and inspect results"
+    title="Types"
+    href="#types"
+    description="Reference for every data type returned or accepted by the SDK"
   />
   <LinkCard
-    title="hub.scans"
-    href="#hubscans"
-    description="Launch vulnerability scans and review probes"
-  />
-  <LinkCard
-    title="hub.checks"
-    href="#hubchecks"
-    description="Define custom check criteria"
-  />
-  <LinkCard
-    title="hub.knowledge_bases"
-    href="#hubknowledge_bases"
-    description="Manage document collections"
-  />
-  <LinkCard
-    title="hub.projects"
-    href="#hubprojects"
-    description="Organize resources into projects"
-  />
-  <LinkCard
-    title="hub.helpers"
-    href="#hubhelpers"
-    description="Convenience methods for common workflows"
-  />
-  <LinkCard
-    title="hub.test_cases"
-    href="#hubtest_cases"
-    description="Create and manage individual test cases"
-  />
-  <LinkCard
-    title="hub.scheduled_evaluations"
-    href="#hubscheduled_evaluations"
-    description="Set up recurring evaluation runs"
-  />
-  <LinkCard
-    title="hub.tasks"
-    href="#hubtasks"
-    description="Track issues from evaluations and scans"
-  />
-  <LinkCard
-    title="hub.playground_chats"
-    href="#hubplayground_chats"
-    description="Access playground conversations"
-  />
-  <LinkCard
-    title="hub.audit_logs"
-    href="#hubaudit_logs"
-    description="Query the audit trail"
-  />
-  <LinkCard
-    title="Error Types"
+    title="Error types"
     href="#error-types"
     description="Exception hierarchy and error handling"
+  />
+  <LinkCard
+    title="Advanced patterns"
+    href="#advanced-patterns"
+    description="Reusable patterns for pagination, retries, and asynchronous workflows"
   />
 </CardGrid>
 
 ---
 
 ## Client
+
+Client classes for interacting with the Giskard Hub API.
 
 ### `HubClient`
 
@@ -190,7 +147,11 @@ All methods documented below are shown in their synchronous form. The async vari
 
 ---
 
-## `hub.agents`
+## Resources
+
+Resource groups exposed by the client for managing Hub entities.
+
+### `hub.agents`
 
 <ResourceSection description="Register, test, and invoke LLM agents. An agent represents your LLM application -- either a remote HTTP endpoint or a local Python callable.">
 
@@ -315,62 +276,11 @@ print(output.metadata)
   <Property name="agent_id" type="str" required>ID of the agent to detect statefulness for.</Property>
 </MethodCard>
 
-<TypeTable name="Agent">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="name" type="str">
-    Display name.
-  </Property>
-  <Property name="description" type="str | None">
-    Human-readable description.
-  </Property>
-  <Property name="url" type="str">
-    HTTP endpoint URL.
-  </Property>
-  <Property name="project_id" type="str">
-    Parent project ID.
-  </Property>
-  <Property name="supported_languages" type="list[str]">
-    Language codes.
-  </Property>
-  <Property name="headers" type="list[Header]">
-    HTTP headers.
-  </Property>
-  <Property name="stateful" type="bool">
-    Whether the agent is stateful.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
-<TypeTable name="AgentDetectStatefulness">
-  <Property name="stateful" type="bool">
-    Whether the agent is stateful.
-  </Property>
-</TypeTable>
-
-<TypeTable name="AgentOutput">
-  <Property name="response" type="ChatMessage">
-    The agent's response message.
-  </Property>
-  <Property name="error" type="ExecutionError | None">
-    Error details if the agent call failed.
-  </Property>
-  <Property name="metadata" type="dict | None">
-    Arbitrary metadata returned by the agent.
-  </Property>
-</TypeTable>
-
 </ResourceSection>
 
 ---
 
-## `hub.checks`
+### `hub.checks`
 
 <ResourceSection description="Define and manage reusable check criteria for evaluating agent responses. Checks are project-scoped and can be referenced by identifier in any test case.">
 
@@ -460,65 +370,11 @@ The `params` field accepts one of these shapes:
 
 Each `JsonPathRule`: `{"json_path": str, "expected_value": str, "expected_value_type": "string" | "number" | "boolean"}`
 
-<TypeTable name="Check">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="built_in" type="bool">
-    Whether this is a built-in check.
-  </Property>
-  <Property name="identifier" type="str">
-    Reusable identifier string.
-  </Property>
-  <Property name="name" type="str">
-    Display name.
-  </Property>
-  <Property name="description" type="str | None">
-    Human-readable description.
-  </Property>
-  <Property name="project_id" type="str">
-    Parent project ID.
-  </Property>
-  <Property name="params" type="dict">
-    Check-specific configuration.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
-<TypeTable name="CheckResult">
-  <Property name="name" type="str">
-    Check identifier.
-  </Property>
-  <Property name="display_name" type="str">
-    Human-readable name.
-  </Property>
-  <Property name="status" type="str">
-    Execution status.
-  </Property>
-  <Property name="passed" type="bool">
-    Whether the check passed.
-  </Property>
-  <Property name="error" type="str | None">
-    Error message if execution failed.
-  </Property>
-  <Property name="reason" type="str | None">
-    LLM judge's reasoning (for LLM-based checks).
-  </Property>
-  <Property name="annotations" type="list[OutputAnnotation]">
-    Annotated spans in the agent's response.
-  </Property>
-</TypeTable>
-
 </ResourceSection>
 
 ---
 
-## `hub.datasets`
+### `hub.datasets`
 
 <ResourceSection description="Create datasets, import test cases, and auto-generate test suites from scenarios or knowledge bases.">
 
@@ -631,41 +487,11 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
   <Property name="include_metadata" type="bool" defaultValue="False">Include pagination metadata in the return value.</Property>
 </MethodCard>
 
-<TypeTable name="Dataset">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="name" type="str">
-    Display name.
-  </Property>
-  <Property name="description" type="str | None">
-    Human-readable description.
-  </Property>
-  <Property name="project_id" type="str">
-    Parent project ID.
-  </Property>
-  <Property name="status" type="TaskProgress">
-    Async operation status (for generated datasets).
-  </Property>
-  <Property name="tags" type="list[str]">
-    All tags used across test cases.
-  </Property>
-  <Property name="state" type="str">
-    Computed from `status.state` -- e.g. `"finished"`, `"running"`.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
 </ResourceSection>
 
 ---
 
-## `hub.evaluations`
+### `hub.evaluations`
 
 <ResourceSection description="Run agents against datasets, inspect per-test-case results, and manage the evaluation lifecycle. Sub-resource: hub.evaluations.results.">
 
@@ -781,81 +607,6 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
   <Property name="evaluation_ids" type="list[str]" required>IDs of evaluations to delete.</Property>
 </MethodCard>
 
-<TypeTable name="Evaluation">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="name" type="str | None">
-    Display name.
-  </Property>
-  <Property name="agent" type="AgentReference | Agent">
-    The evaluated agent.
-  </Property>
-  <Property name="dataset" type="DatasetReference | Dataset">
-    The dataset used.
-  </Property>
-  <Property name="criteria" type="list">
-    Check criteria applied.
-  </Property>
-  <Property name="project_id" type="str">
-    Parent project ID.
-  </Property>
-  <Property name="local" type="bool">
-    Whether this is a local evaluation.
-  </Property>
-  <Property name="metrics" type="list[Metric]">
-    Aggregated pass/fail metrics per check.
-  </Property>
-  <Property name="tags" type="list[str]">
-    Tags used to filter test cases.
-  </Property>
-  <Property name="failure_categories" type="list[FailureCategory]">
-    Available failure classifications.
-  </Property>
-  <Property name="status" type="TaskProgress">
-    Async operation status.
-  </Property>
-  <Property name="state" type="str">
-    Computed: `"finished"`, `"running"`, `"error"`.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-  <Property name="old_evaluation_id" type="str | None">
-    ID of the previous evaluation that this evaluation is based on.
-  </Property>
-  <Property name="scheduled_evaluation_id" type="str | None">
-    ID of the scheduled evaluation that this evaluation is based on.
-  </Property>
-</TypeTable>
-
-<TypeTable name="Metric">
-  <Property name="name" type="str">
-    Check identifier (e.g. `"correctness"`, `"global"`).
-  </Property>
-  <Property name="display_name" type="str">
-    Human-readable name.
-  </Property>
-  <Property name="passed" type="int">
-    Number of test cases that passed.
-  </Property>
-  <Property name="failed" type="int">
-    Number of test cases that failed.
-  </Property>
-  <Property name="errored" type="int">
-    Number of test cases that errored.
-  </Property>
-  <Property name="total" type="int">
-    Total test cases.
-  </Property>
-  <Property name="success_rate" type="float">
-    Pass rate as a float between `0.0` and `1.0`.
-  </Property>
-</TypeTable>
-
 ### `hub.evaluations.results`
 
 Inspect, filter, update, and rerun individual evaluation results.
@@ -893,7 +644,7 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   </Property>
 </MethodCard>
 
-<MethodCard name=".search()" returnType="list[TestCaseEvaluation]">
+<MethodCard name=".search()" returnType="list[TestCaseEvaluation] | tuple[list[TestCaseEvaluation], APIPaginatedMetadata]">
   Search and filter results. Pass `include_metadata=True` for pagination metadata.
 
   <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
@@ -933,65 +684,11 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   <Property name="set_test_case_draft" type="bool | None">Also set the linked test case to draft status.</Property>
 </MethodCard>
 
-<TypeTable name="TestCaseEvaluation">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="evaluation_id" type="str">
-    Parent evaluation ID.
-  </Property>
-  <Property name="test_case" type="TestCase | TestCaseReference">
-    The test case.
-  </Property>
-  <Property name="test_case_exists" type="bool">
-    Whether the test case still exists.
-  </Property>
-  <Property name="state" type="str">
-    Result state: `"finished"`, `"running"`, `"error"`.
-  </Property>
-  <Property name="results" type="list[CheckResult]">
-    Per-check outcomes.
-  </Property>
-  <Property name="output" type="AgentOutput | None">
-    The agent's actual response.
-  </Property>
-  <Property name="error" type="ExecutionError | None">
-    Error details if the agent call failed.
-  </Property>
-  <Property name="failure_category" type="FailureCategory | None">
-    Assigned failure classification.
-  </Property>
-  <Property name="hidden" type="bool">
-    Whether this result is hidden.
-  </Property>
-  <Property name="divergence_warnings" type="list[DivergenceWarning] | None">
-    List of divergence warnings detected during multi-turn evaluation.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
-<TypeTable name="DivergenceWarning">
-  <Property name="turn" type="int">
-    The conversation turn where divergence was detected.
-  </Property>
-  <Property name="expected" type="str">
-    The expected message content.
-  </Property>
-  <Property name="actual" type="str">
-    The actual message content received.
-  </Property>
-</TypeTable>
-
 </ResourceSection>
 
 ---
 
-## `hub.helpers`
+### `hub.helpers`
 
 <ResourceSection description="High-level convenience methods for the most common SDK workflows: waiting for async operations, running evaluations, and printing metrics.">
 
@@ -1082,7 +779,7 @@ Print a formatted metrics table to the console for an evaluation or scan.
 
 ---
 
-## `hub.knowledge_bases`
+### `hub.knowledge_bases`
 
 <ResourceSection description="Create, search, and manage indexed document collections for grounded evaluations, document-based test generation, and knowledge-grounded vulnerability scans.">
 
@@ -1092,7 +789,7 @@ from giskard_hub.types import (
     KnowledgeBaseDocumentRow,
     KnowledgeBaseDocumentDetail,
 )
-````
+```
 
 <MethodCard name=".create()" returnType="KnowledgeBase">
   Create a knowledge base and upload documents. Indexing happens asynchronously after creation -- use `hub.helpers.wait_for_completion()`.
@@ -1184,47 +881,11 @@ kb = hub.helpers.wait_for_completion(kb)
   <Property name="knowledge_base_ids" type="list[str]" required>IDs of knowledge bases to delete.</Property>
 </MethodCard>
 
-<TypeTable name="KnowledgeBase">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="name" type="str">
-    Display name.
-  </Property>
-  <Property name="description" type="str | None">
-    Human-readable description.
-  </Property>
-  <Property name="filename" type="str | None">
-    Original upload filename.
-  </Property>
-  <Property name="project_id" type="str">
-    Parent project ID.
-  </Property>
-  <Property name="n_documents" type="int">
-    Number of indexed documents.
-  </Property>
-  <Property name="status" type="TaskProgress">
-    Async indexing status.
-  </Property>
-  <Property name="topics" type="list">
-    Discovered topics.
-  </Property>
-  <Property name="state" type="str">
-    Computed from `status.state`.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
 </ResourceSection>
 
 ---
 
-## `hub.projects`
+### `hub.projects`
 
 <ResourceSection description="Top-level workspace that groups all related resources: agents, datasets, evaluations, scans, and more. Sub-resource: hub.projects.scenarios.">
 
@@ -1281,27 +942,6 @@ from giskard_hub.types import Project
   <Property name="project_ids" type="list[str]" required>IDs of projects to delete.</Property>
 </MethodCard>
 
-<TypeTable name="Project">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="name" type="str">
-    Display name.
-  </Property>
-  <Property name="description" type="str | None">
-    Human-readable description.
-  </Property>
-  <Property name="failure_categories" type="list[FailureCategory]">
-    Project-level failure classifications.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
 ### `hub.projects.scenarios`
 
 Reusable persona and behaviour templates for scenario-based dataset generation.
@@ -1312,7 +952,7 @@ from giskard_hub.types import Scenario, ScenarioPreview
 
 <MethodCard name=".create()" returnType="Scenario">
   <Property name="project_id" type="str" required>
-    Project ID (positional).
+    Project ID.
   </Property>
   <Property name="name" type="str" required>
     Scenario name.
@@ -1328,7 +968,7 @@ from giskard_hub.types import Scenario, ScenarioPreview
 <MethodCard name=".preview()" returnType="ScenarioPreview">
   Generate a preview conversation for a scenario without persisting it.
 
-  <Property name="project_id" type="str" required>Project ID (positional).</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
   <Property name="description" type="str" required>Scenario description.</Property>
   <Property name="rules" type="list[str]">Scenario rules.</Property>
   <Property name="agent_id" type="str | None">Agent ID for preview.</Property>
@@ -1354,7 +994,7 @@ from giskard_hub.types import Scenario, ScenarioPreview
 <MethodCard name=".list()" returnType="list[Scenario]">
   List all scenarios for a project.
 
-  <Property name="project_id" type="str" required>Project ID (positional).</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
 </MethodCard>
 
 <MethodCard name=".delete()" returnType="None">
@@ -1368,7 +1008,7 @@ from giskard_hub.types import Scenario, ScenarioPreview
 
 ---
 
-## `hub.scans`
+### `hub.scans`
 
 <ResourceSection description="Launch automated vulnerability scans covering the OWASP LLM Top 10 and additional threat categories. Sub-resources: hub.scans.probes, hub.scans.attempts.">
 
@@ -1445,36 +1085,6 @@ hub.helpers.print_metrics(scan)
   <Property name="scan_ids" type="list[str]" required>IDs of scans to delete.</Property>
 </MethodCard>
 
-<TypeTable name="Scan">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="agent" type="AgentReference | Agent">
-    The scanned agent.
-  </Property>
-  <Property name="project_id" type="str">
-    Parent project ID.
-  </Property>
-  <Property name="knowledge_base" type="KnowledgeBase | None">
-    Linked knowledge base.
-  </Property>
-  <Property name="grade" type="str | None">
-    Overall grade: `"A"`, `"B"`, `"C"`, `"D"`, or `None`.
-  </Property>
-  <Property name="status" type="TaskProgress">
-    Async operation status.
-  </Property>
-  <Property name="state" type="str">
-    Computed from `status.state`.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
 ### `hub.scans.probes`
 
 <MethodCard name=".retrieve()" returnType="ScanProbe">
@@ -1504,7 +1114,7 @@ hub.helpers.print_metrics(scan)
 
 ---
 
-## `hub.scheduled_evaluations`
+### `hub.scheduled_evaluations`
 
 <ResourceSection description="Set up recurring evaluation runs on a daily, weekly, or monthly cadence for continuous quality monitoring.">
 
@@ -1540,7 +1150,7 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
   <Property name="tags" type="list[str] | None">
     Filter test cases by tags.
   </Property>
-  <Property name="run_count" type="int">
+  <Property name="run_count" type="int | None">
     Run each test case N times.
   </Property>
 </MethodCard>
@@ -1598,7 +1208,7 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
 
 ---
 
-## `hub.tasks`
+### `hub.tasks`
 
 <ResourceSection description="Lightweight issue tracker for managing findings from evaluations and scans. Link tasks to specific evaluation results, test cases, or probe attempts.">
 
@@ -1674,44 +1284,11 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
   <Property name="task_ids" type="list[str]" required>IDs of tasks to delete.</Property>
 </MethodCard>
 
-<TypeTable name="Task">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="description" type="str">
-    Task description.
-  </Property>
-  <Property name="status" type="TaskStatus">
-    `"open"`, `"in_progress"`, or `"resolved"`.
-  </Property>
-  <Property name="priority" type="TaskPriority">
-    `"low"`, `"medium"`, or `"high"`.
-  </Property>
-  <Property name="project_id" type="str">
-    Parent project ID.
-  </Property>
-  <Property name="created_by" type="UserReference">
-    User who created the task.
-  </Property>
-  <Property name="assignees" type="list[UserReference]">
-    Assigned users.
-  </Property>
-  <Property name="references" type="dict">
-    Linked resources.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
 </ResourceSection>
 
 ---
 
-## `hub.test_cases`
+### `hub.test_cases`
 
 <ResourceSection description="Create, update, and manage individual test cases within datasets. Sub-resource: hub.test_cases.comments.">
 
@@ -1817,44 +1394,11 @@ from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
   </Property>
 </MethodCard>
 
-<TypeTable name="TestCase">
-  <Property name="id" type="str">
-    Unique identifier.
-  </Property>
-  <Property name="dataset_id" type="str">
-    Parent dataset ID.
-  </Property>
-  <Property name="messages" type="list[ChatMessage]">
-    Conversation messages.
-  </Property>
-  <Property name="demo_output" type="ChatMessageWithMetadata | None">
-    Expected output (display only).
-  </Property>
-  <Property name="checks" type="list[CheckConfig]">
-    Configured checks.
-  </Property>
-  <Property name="comments" type="list[TestCaseComment]">
-    Annotations.
-  </Property>
-  <Property name="tags" type="list[str]">
-    Tags for filtering.
-  </Property>
-  <Property name="status" type='"active" | "draft"'>
-    Test case status.
-  </Property>
-  <Property name="created_at" type="datetime">
-    Creation timestamp.
-  </Property>
-  <Property name="updated_at" type="datetime">
-    Last update timestamp.
-  </Property>
-</TypeTable>
-
 </ResourceSection>
 
 ---
 
-## `hub.playground_chats`
+### `hub.playground_chats`
 
 <ResourceSection description="Access conversations captured from the Hub's interactive playground UI.">
 
@@ -1902,7 +1446,7 @@ from giskard_hub.types import PlaygroundChat
 
 ---
 
-## `hub.audit_logs`
+### `hub.audit_logs`
 
 <ResourceSection description="Query the audit trail for compliance reporting, change history, and debugging. Every create, update, and delete action is recorded.">
 
@@ -1944,7 +1488,7 @@ from giskard_hub.types import Audit, AuditDisplay
 
 </MethodCard>
 
-<MethodCard name=".list_entities()" returnType="list[AuditDisplay]">
+<MethodCard name=".list_entities()" returnType="list[AuditDisplay] | tuple[list[AuditDisplay], APIPaginatedMetadata]">
   List audit history for a specific resource, including diffs of each change. Pass `include_metadata=True` for pagination metadata.
 
   <Property name="entity_id" type="str" required>UUID of the entity.</Property>
@@ -1955,6 +1499,1307 @@ from giskard_hub.types import Audit, AuditDisplay
 </MethodCard>
 
 </ResourceSection>
+
+---
+
+## Types
+
+All Python types referenced by the methods above. Click any type name in a method's return value or parameter to jump straight to its definition. Each card is collapsed by default — expand it to see the fields.
+
+<CardGrid>
+  <LinkCard
+    title="Core types"
+    href="#core-types"
+    description="Chat messages, headers, errors, pagination, task progress"
+  />
+  <LinkCard
+    title="Agent types"
+    href="#agent-types"
+    description="Agent, AgentOutput, AgentReference, MinimalAgent"
+  />
+  <LinkCard
+    title="Check types"
+    href="#check-types"
+    description="Check, CheckResult, CheckConfig, OutputAnnotation"
+  />
+  <LinkCard
+    title="Dataset and test case types"
+    href="#dataset-and-test-case-types"
+    description="Dataset, TestCase, TestCaseComment, references"
+  />
+  <LinkCard
+    title="Evaluation types"
+    href="#evaluation-types"
+    description="Evaluation, Metric, TestCaseEvaluation, FailureCategory"
+  />
+  <LinkCard
+    title="Scan types"
+    href="#scan-types"
+    description="Scan, ScanProbe, ScanProbeAttempt, Severity, ReviewStatus"
+  />
+  <LinkCard
+    title="Knowledge base types"
+    href="#knowledge-base-types"
+    description="KnowledgeBase, Topic, document rows"
+  />
+  <LinkCard
+    title="Project and scenario types"
+    href="#project-and-scenario-types"
+    description="Project, Scenario, ScenarioPreview"
+  />
+  <LinkCard
+    title="Scheduled evaluation types"
+    href="#scheduled-evaluation-types"
+    description="ScheduledEvaluation, FrequencyOption"
+  />
+  <LinkCard
+    title="Task types"
+    href="#task-types"
+    description="Task, TaskStatus, TaskPriority"
+  />
+  <LinkCard
+    title="Playground chat types"
+    href="#playground-chat-types"
+    description="PlaygroundChat"
+  />
+  <LinkCard
+    title="Audit types"
+    href="#audit-types"
+    description="Audit, AuditDisplay, AuditDiffItem"
+  />
+</CardGrid>
+
+### Core types
+
+Shared building blocks used by every resource. The `*Param` variants are `TypedDict`s used in request bodies.
+
+<TypeTable name="ChatMessage">
+  <Property name="role" type="str">
+    Sender role: typically `"user"`, `"assistant"`, or `"system"`.
+  </Property>
+  <Property name="content" type="str">
+    Message text.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ChatMessageParam">
+  <Property name="role" type="str" required>
+    Sender role: typically `"user"`, `"assistant"`, or `"system"`.
+  </Property>
+  <Property name="content" type="str" required>
+    Message text.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ChatMessageWithMetadata">
+  <Property name="role" type="str">
+    Sender role.
+  </Property>
+  <Property name="content" type="str">
+    Message text.
+  </Property>
+  <Property name="metadata" type="dict[str, object] | None">
+    Arbitrary metadata attached to the message.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ChatMessageWithMetadataParam">
+  <Property name="role" type="str" required>
+    Sender role.
+  </Property>
+  <Property name="content" type="str" required>
+    Message text.
+  </Property>
+  <Property name="metadata" type="dict[str, object] | None">
+    Arbitrary metadata attached to the message.
+  </Property>
+</TypeTable>
+
+<TypeTable name="Header">
+  <Property name="name" type="str">
+    Header name.
+  </Property>
+  <Property name="value" type="str">
+    Header value.
+  </Property>
+</TypeTable>
+
+<TypeTable name="HeaderParam">
+  <Property name="name" type="str" required>
+    Header name.
+  </Property>
+  <Property name="value" type="str" required>
+    Header value.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ExecutionError">
+  <Property name="message" type="str">
+    Error message returned by the agent or runtime.
+  </Property>
+  <Property name="details" type="dict[str, object] | None">
+    Optional structured error context.
+  </Property>
+</TypeTable>
+
+<TypeTable name="User">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="email" type="str">
+    User email address.
+  </Property>
+  <Property name="name" type="str | None">
+    Display name, if set.
+  </Property>
+</TypeTable>
+
+<TypeTable name="UserReference">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TaskProgress">
+  <Property name="state" type="TaskState">
+    Current state.
+  </Property>
+  <Property name="current" type="int">
+    Items processed so far.
+  </Property>
+  <Property name="total" type="int">
+    Total items to process.
+  </Property>
+  <Property name="error" type="str | None">
+    Error message if the task failed.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TaskState">
+  <Property name="running" type="literal">
+    Task is in progress.
+  </Property>
+  <Property name="finished" type="literal">
+    Task completed successfully.
+  </Property>
+  <Property name="error" type="literal">
+    Task failed.
+  </Property>
+  <Property name="canceled" type="literal">
+    Task was canceled.
+  </Property>
+  <Property name="skipped" type="literal">
+    Task was skipped.
+  </Property>
+</TypeTable>
+
+<TypeTable name="APIPaginatedMetadata">
+  <Property name="count" type="int">
+    Number of items returned in this page.
+  </Property>
+  <Property name="offset" type="int">
+    Offset of the first item in this page.
+  </Property>
+  <Property name="limit" type="int">
+    Maximum page size requested.
+  </Property>
+  <Property name="total" type="int">
+    Total number of items across all pages.
+  </Property>
+</TypeTable>
+
+### Agent types
+
+<TypeTable name="Agent">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="url" type="str">
+    HTTP endpoint URL.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="supported_languages" type="list[str]">
+    Language codes the agent supports.
+  </Property>
+  <Property name="headers" type="dict[str, str]">
+    HTTP headers sent with every request.
+  </Property>
+  <Property name="stateful" type="bool">
+    Whether the agent is stateful.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AgentReference">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AgentOutput">
+  <Property name="response" type="ChatMessage | None">
+    The agent's response message.
+  </Property>
+  <Property name="error" type="ExecutionError | None">
+    Error details if the agent call failed.
+  </Property>
+  <Property name="metadata" type="dict[str, object] | None">
+    Arbitrary metadata returned by the agent.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AgentOutputParam">
+  <Property name="response" type="ChatMessageParam | None" required>
+    The agent's response message.
+  </Property>
+  <Property name="error" type="ExecutionError | None">
+    Error details if the agent call failed.
+  </Property>
+  <Property name="metadata" type="dict[str, object]">
+    Arbitrary metadata returned by the agent.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AgentDetectStatefulness">
+  <Property name="stateful" type="bool">
+    Whether the agent was detected as stateful.
+  </Property>
+</TypeTable>
+
+<TypeTable name="MinimalAgent">
+  <Property name="name" type="str">
+    Agent name (used for local evaluations).
+  </Property>
+  <Property name="description" type="str | None">
+    Optional description.
+  </Property>
+</TypeTable>
+
+<TypeTable name="MinimalAgentParam">
+  <Property name="name" type="str" required>
+    Agent name.
+  </Property>
+  <Property name="description" type="str | None">
+    Optional description.
+  </Property>
+</TypeTable>
+
+### Check types
+
+<TypeTable name="Check">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="built_in" type="bool">
+    Whether this is a built-in check.
+  </Property>
+  <Property name="identifier" type="str">
+    Reusable identifier string.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="params" type="dict[str, Any]">
+    Check-specific configuration. Shape depends on the check type — see [Check type params](#check-type-params).
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="CheckResult">
+  <Property name="name" type="str">
+    Check identifier.
+  </Property>
+  <Property name="display_name" type="str | None">
+    Human-readable name.
+  </Property>
+  <Property name="status" type="TaskState">
+    Execution status.
+  </Property>
+  <Property name="passed" type="bool | None">
+    Whether the check passed.
+  </Property>
+  <Property name="error" type="str | None">
+    Error message if execution failed.
+  </Property>
+  <Property name="reason" type="str | None">
+    LLM judge's reasoning (for LLM-based checks).
+  </Property>
+  <Property name="annotations" type="list[OutputAnnotation] | None">
+    Annotated spans in the agent's response.
+  </Property>
+</TypeTable>
+
+<TypeTable name="CheckConfig">
+  <Property name="identifier" type="str">
+    Check identifier.
+  </Property>
+  <Property name="enabled" type="bool | None">
+    Whether the check is enabled.
+  </Property>
+  <Property name="params" type="dict[str, Any]">
+    Check-specific parameters (without the `type` discriminator).
+  </Property>
+</TypeTable>
+
+<TypeTable name="CheckConfigParam">
+  <Property name="identifier" type="str" required>
+    Check identifier to apply.
+  </Property>
+  <Property name="enabled" type="bool">
+    Whether the check is enabled.
+  </Property>
+  <Property name="params" type="dict[str, Any]">
+    Check-specific parameters.
+  </Property>
+</TypeTable>
+
+<TypeTable name="OutputAnnotation">
+  <Property name="text" type="str">
+    The annotated substring.
+  </Property>
+  <Property name="label" type="str">
+    Label assigned to the span.
+  </Property>
+  <Property name="start_char_index" type="int">
+    Start position in the response (character offset).
+  </Property>
+  <Property name="end_char_index" type="int">
+    End position in the response (character offset).
+  </Property>
+  <Property name="type" type='"output" | "context"'>
+    Whether the annotation references the agent's output or its retrieved context.
+  </Property>
+</TypeTable>
+
+<TypeTable name="JsonPathRule">
+  <Property name="json_path" type="str">
+    JSONPath expression to evaluate against the agent's output metadata.
+  </Property>
+  <Property name="expected_value" type="bool | float | str">
+    The value the JSONPath should resolve to.
+  </Property>
+  <Property name="expected_value_type" type='"string" | "number" | "boolean"'>
+    Expected primitive type of the resolved value.
+  </Property>
+</TypeTable>
+
+<TypeTable name="CheckTypeParam">
+  <Property name="alias" type="union">
+    `TypeAlias` for the union of `CorrectnessParamsParam`, `ConformityParamsParam`, `GroundednessParamsParam`, `StringMatchParamsParam`, `MetadataParamsParam`, and `SemanticSimilarityParamsParam`. See [Check type params](#check-type-params) for the concrete shapes.
+  </Property>
+</TypeTable>
+
+### Dataset and test case types
+
+<TypeTable name="Dataset">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async operation status (for generated datasets).
+  </Property>
+  <Property name="tags" type="list[str]">
+    All tags used across test cases.
+  </Property>
+  <Property name="state" type="TaskState">
+    Computed from `status.state` — e.g. `"finished"`, `"running"`.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="DatasetReference">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+</TypeTable>
+
+<TypeTable name="DatasetSubset">
+  <Property name="dataset_id" type="str">
+    Dataset to subset.
+  </Property>
+  <Property name="tags" type="list[str] | None">
+    Restrict to test cases matching these tags.
+  </Property>
+  <Property name="target_type" type='"dataset" | None'>
+    Discriminator for criterion unions.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TestCase">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="dataset_id" type="str">
+    Parent dataset ID.
+  </Property>
+  <Property name="messages" type="list[ChatMessage]">
+    Conversation messages.
+  </Property>
+  <Property name="demo_output" type="AgentOutput | None">
+    Expected output (display only — not used during evaluation).
+  </Property>
+  <Property name="checks" type="list[CheckConfig]">
+    Configured checks.
+  </Property>
+  <Property name="comments" type="list[TestCaseComment]">
+    Annotations attached to this test case.
+  </Property>
+  <Property name="tags" type="list[str]">
+    Tags for filtering.
+  </Property>
+  <Property name="status" type='"active" | "draft"'>
+    Test case status.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TestCaseReference">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TestCaseComment">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="content" type="str">
+    Comment text.
+  </Property>
+  <Property name="user" type="UserReference">
+    Author of the comment.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+### Evaluation types
+
+<TypeTable name="Evaluation">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="agent" type="AgentReference | MinimalAgent | Agent">
+    The evaluated agent.
+  </Property>
+  <Property name="dataset" type="Dataset | DatasetReference">
+    The dataset used.
+  </Property>
+  <Property name="criteria" type="DatasetSubset | None">
+    Subset of the dataset used as evaluation criteria.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="local" type="bool">
+    Whether this is a local evaluation.
+  </Property>
+  <Property name="metrics" type="list[Metric]">
+    Aggregated pass/fail metrics per check.
+  </Property>
+  <Property name="failure_categories" type="dict[str, int]">
+    Counts of results per failure category identifier.
+  </Property>
+  <Property name="tags" type="list[Metric]">
+    Per-tag aggregated metrics.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async operation status.
+  </Property>
+  <Property name="state" type="TaskState">
+    Computed from `status.state` — `"finished"`, `"running"`, `"error"`.
+  </Property>
+  <Property name="old_evaluation_id" type="str | None">
+    ID of the previous evaluation this one is based on.
+  </Property>
+  <Property name="scheduled_evaluation_id" type="str | None">
+    ID of the scheduled evaluation that produced this run.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="EvaluationReference">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+</TypeTable>
+
+<TypeTable name="Metric">
+  <Property name="name" type="str">
+    Check identifier (e.g. `"correctness"`, `"global"`).
+  </Property>
+  <Property name="display_name" type="str | None">
+    Human-readable name.
+  </Property>
+  <Property name="passed" type="int | None">
+    Number of test cases that passed.
+  </Property>
+  <Property name="failed" type="int | None">
+    Number of test cases that failed.
+  </Property>
+  <Property name="errored" type="int | None">
+    Number of test cases that errored.
+  </Property>
+  <Property name="total" type="int | None">
+    Total test cases evaluated.
+  </Property>
+  <Property name="success_rate" type="float | None">
+    Pass rate as a float between `0.0` and `1.0`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TestCaseEvaluation">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="evaluation_id" type="str">
+    Parent evaluation ID.
+  </Property>
+  <Property name="test_case" type="TestCase | TestCaseReference">
+    The test case.
+  </Property>
+  <Property name="test_case_exists" type="bool | None">
+    Whether the test case still exists.
+  </Property>
+  <Property name="state" type="TaskState">
+    Result state: `"finished"`, `"running"`, `"error"`.
+  </Property>
+  <Property name="results" type="list[CheckResult]">
+    Per-check outcomes.
+  </Property>
+  <Property name="output" type="AgentOutput | None">
+    The agent's actual response.
+  </Property>
+  <Property name="error" type="str | None">
+    Error message if the agent call failed.
+  </Property>
+  <Property name="failure_category" type="FailureCategoryResult | None">
+    Assigned failure classification.
+  </Property>
+  <Property name="hidden" type="bool">
+    Whether this result is hidden from the default view.
+  </Property>
+  <Property name="divergence_warnings" type="list[DivergenceWarning] | None">
+    Divergence warnings detected during multi-turn evaluation.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="DivergenceWarning">
+  <Property name="turn" type="int">
+    The conversation turn where divergence was detected.
+  </Property>
+  <Property name="expected" type="str">
+    The expected message content.
+  </Property>
+  <Property name="actual" type="str">
+    The actual message content received.
+  </Property>
+</TypeTable>
+
+<TypeTable name="FailureCategory">
+  <Property name="identifier" type="str">
+    Stable identifier (e.g. `"hallucination"`).
+  </Property>
+  <Property name="title" type="str">
+    Display title.
+  </Property>
+  <Property name="description" type="str">
+    Human-readable description.
+  </Property>
+</TypeTable>
+
+<TypeTable name="FailureCategoryParam">
+  <Property name="identifier" type="str" required>
+    Stable identifier.
+  </Property>
+  <Property name="title" type="str" required>
+    Display title.
+  </Property>
+  <Property name="description" type="str" required>
+    Human-readable description.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TestCaseEvaluationReference">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+</TypeTable>
+
+<TypeTable name="FailureCategoryResult">
+  <Property name="category" type="FailureCategory | None">
+    The assigned failure category.
+  </Property>
+  <Property name="status" type="TaskState | None">
+    Classification status.
+  </Property>
+  <Property name="error" type="str | None">
+    Error message if classification failed.
+  </Property>
+</TypeTable>
+
+### Scan types
+
+<TypeTable name="Scan">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="agent" type="AgentReference | Agent">
+    The scanned agent.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="knowledge_base" type="KnowledgeBaseReference | KnowledgeBase | None">
+    Linked knowledge base, if the scan was grounded.
+  </Property>
+  <Property name="grade" type='"A" | "B" | "C" | "D" | None'>
+    Overall grade.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async operation status.
+  </Property>
+  <Property name="state" type="TaskState">
+    Computed from `status.state`.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScanCategory">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="title" type="str">
+    Display title.
+  </Property>
+  <Property name="description" type="str">
+    Human-readable description.
+  </Property>
+  <Property name="owasp_id" type="str | None">
+    Mapping to the OWASP LLM Top 10, if applicable.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScanProbe">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Probe display name.
+  </Property>
+  <Property name="category" type="str">
+    Probe category.
+  </Property>
+  <Property name="description" type="str">
+    Human-readable description.
+  </Property>
+  <Property name="probe_lidar_id" type="str">
+    LIDAR probe identifier.
+  </Property>
+  <Property name="tags" type="list[str]">
+    Tags applied to this probe.
+  </Property>
+  <Property name="scan_id" type="str">
+    Parent scan ID.
+  </Property>
+  <Property name="metrics" type="list[ScanProbeMetric] | None">
+    Aggregated severity counts.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async operation status.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScanProbeMetric">
+  <Property name="severity" type="Severity">
+    Severity level.
+  </Property>
+  <Property name="count" type="int">
+    Number of attempts at this severity.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScanProbeAttempt">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="probe_id" type="str">
+    Parent probe ID.
+  </Property>
+  <Property name="messages" type="list[ChatMessageWithMetadata]">
+    Conversation messages exchanged with the agent.
+  </Property>
+  <Property name="metadata" type="dict[str, object]">
+    Arbitrary metadata about the attempt.
+  </Property>
+  <Property name="reason" type="str">
+    Why this attempt was generated.
+  </Property>
+  <Property name="severity" type="Severity">
+    Severity assigned to the attempt outcome.
+  </Property>
+  <Property name="review_status" type="ReviewStatus">
+    Reviewer-assigned status.
+  </Property>
+  <Property name="error" type="ScanProbeAttemptError | None">
+    Error details if the attempt failed to execute.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScanProbeAttemptError">
+  <Property name="message" type="str">
+    Error message.
+  </Property>
+</TypeTable>
+
+<TypeTable name="Severity">
+  <Property name="SAFE" type="0">
+    No vulnerability found.
+  </Property>
+  <Property name="MINOR" type="10">
+    Minor issue.
+  </Property>
+  <Property name="MAJOR" type="20">
+    Significant issue.
+  </Property>
+  <Property name="CRITICAL" type="30">
+    Critical vulnerability.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ReviewStatus">
+  <Property name="pending" type="literal">
+    Awaiting review.
+  </Property>
+  <Property name="ignored" type="literal">
+    Reviewer dismissed the finding.
+  </Property>
+  <Property name="acknowledged" type="literal">
+    Reviewer acknowledged the finding.
+  </Property>
+  <Property name="corrected" type="literal">
+    The underlying issue has been fixed.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScanProbeAttemptReference">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+</TypeTable>
+
+### Knowledge base types
+
+<TypeTable name="KnowledgeBase">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str | None">
+    Human-readable description.
+  </Property>
+  <Property name="filename" type="str | None">
+    Original upload filename.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="n_documents" type="int">
+    Number of indexed documents.
+  </Property>
+  <Property name="topics" type="list[Topic]">
+    Discovered topics.
+  </Property>
+  <Property name="status" type="TaskProgress">
+    Async indexing status.
+  </Property>
+  <Property name="state" type="TaskState">
+    Computed from `status.state`.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="KnowledgeBaseReference">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+</TypeTable>
+
+<TypeTable name="Topic">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Topic name.
+  </Property>
+  <Property name="knowledge_base_id" type="str">
+    Parent knowledge base ID.
+  </Property>
+  <Property name="document_count" type="int | None">
+    Number of documents in this topic.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="KnowledgeBaseDocumentRow">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="knowledge_base_id" type="str">
+    Parent knowledge base ID.
+  </Property>
+  <Property name="snippet" type="str">
+    Truncated content snippet.
+  </Property>
+  <Property name="content" type="str">
+    Full document content (computed alias of `snippet`).
+  </Property>
+  <Property name="topic_id" type="str | None">
+    Topic ID, if classified.
+  </Property>
+  <Property name="topic_name" type="str | None">
+    Topic display name.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="KnowledgeBaseDocumentDetail">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="knowledge_base_id" type="str">
+    Parent knowledge base ID.
+  </Property>
+  <Property name="content" type="str">
+    Full document content.
+  </Property>
+  <Property name="topic_id" type="str | None">
+    Topic ID, if classified.
+  </Property>
+  <Property name="topic_name" type="str | None">
+    Topic display name.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+### Project and scenario types
+
+<TypeTable name="Project">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="description" type="str">
+    Human-readable description.
+  </Property>
+  <Property name="failure_categories" type="list[FailureCategory]">
+    Project-level failure classifications.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="Scenario">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Scenario name.
+  </Property>
+  <Property name="description" type="str | None">
+    Scenario description.
+  </Property>
+  <Property name="rules" type="list[str]">
+    Rules the generated conversations should follow.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScenarioPreview">
+  <Property name="conversation" type="list[dict[str, Any]]">
+    Generated preview conversation.
+  </Property>
+  <Property name="generated_rules" type="list[str] | None">
+    Rules inferred from the scenario description.
+  </Property>
+</TypeTable>
+
+### Scheduled evaluation types
+
+<TypeTable name="FrequencyOption">
+  <Property name="daily" type="literal">
+    Run every day.
+  </Property>
+  <Property name="weekly" type="literal">
+    Run on a specific day each week.
+  </Property>
+  <Property name="monthly" type="literal">
+    Run on a specific day each month.
+  </Property>
+</TypeTable>
+
+<TypeTable name="LastExecutionStatus">
+  <Property name="alias" type="union">
+    `TypeAlias` for `SuccessExecutionStatus | ErrorExecutionStatus | None`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="LastExecutionStatusParam">
+  <Property name="alias" type="union">
+    `TypeAlias` for `SuccessExecutionStatusParam | ErrorExecutionStatusParam`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScheduledEvaluation">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="name" type="str">
+    Display name.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="agent_id" type="str">
+    Agent to evaluate.
+  </Property>
+  <Property name="dataset_id" type="str">
+    Dataset to evaluate against.
+  </Property>
+  <Property name="frequency" type="FrequencyOption">
+    `"daily"`, `"weekly"`, or `"monthly"`.
+  </Property>
+  <Property name="time" type="str">
+    Time of day in `HH:MM` format (UTC).
+  </Property>
+  <Property name="day_of_week" type="int | None">
+    Weekly only: 1 (Monday) through 7 (Sunday).
+  </Property>
+  <Property name="day_of_month" type="int | None">
+    Monthly only: 1 through 28.
+  </Property>
+  <Property name="tags" type="list[str]">
+    Tags used to filter test cases.
+  </Property>
+  <Property name="run_count" type="int">
+    Number of times each test case is run per execution.
+  </Property>
+  <Property name="paused" type="bool">
+    Whether the schedule is currently paused.
+  </Property>
+  <Property name="last_execution_at" type="datetime | None">
+    Timestamp of the most recent execution.
+  </Property>
+  <Property name="last_execution_status" type="LastExecutionStatus">
+    Status of the most recent execution.
+  </Property>
+  <Property name="evaluations" type="list[EvaluationReference]">
+    Evaluation runs produced by this schedule.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+### Task types
+
+<TypeTable name="Task">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="description" type="str">
+    Task description.
+  </Property>
+  <Property name="status" type="TaskStatus">
+    Current status.
+  </Property>
+  <Property name="priority" type="TaskPriority | None">
+    Priority level.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="created_by" type="User">
+    User who created the task.
+  </Property>
+  <Property name="assignees" type="list[User]">
+    Assigned users.
+  </Property>
+  <Property name="references" type="list[TestCaseEvaluationReference | ScanProbeAttemptReference | TestCaseReference]">
+    Linked resources (evaluation results, test cases, or probe attempts).
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TaskStatus">
+  <Property name="open" type="literal">
+    Newly created, not yet picked up.
+  </Property>
+  <Property name="in_progress" type="literal">
+    Being worked on.
+  </Property>
+  <Property name="resolved" type="literal">
+    Closed.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TaskPriority">
+  <Property name="low" type="literal">
+    Low priority.
+  </Property>
+  <Property name="medium" type="literal">
+    Medium priority.
+  </Property>
+  <Property name="high" type="literal">
+    High priority.
+  </Property>
+</TypeTable>
+
+### Playground chat types
+
+<TypeTable name="PlaygroundChat">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="project_id" type="str">
+    Parent project ID.
+  </Property>
+  <Property name="user" type="UserReference | None">
+    The user who started the chat.
+  </Property>
+  <Property name="agent" type="AgentReference | Agent | None">
+    The agent that responded.
+  </Property>
+  <Property name="messages" type="list[ChatMessageWithMetadata]">
+    Conversation messages.
+  </Property>
+  <Property name="created_at" type="datetime">
+    Creation timestamp.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
+  </Property>
+</TypeTable>
+
+### Audit types
+
+<TypeTable name="Audit">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="action" type='"insert" | "update" | "delete"'>
+    Action performed on the entity.
+  </Property>
+  <Property name="entity_id" type="str">
+    UUID of the affected entity.
+  </Property>
+  <Property name="entity_type" type="str">
+    Type of the affected entity (e.g. `"agent"`, `"evaluation"`).
+  </Property>
+  <Property name="user_id" type="str | None">
+    User who performed the action, if recorded.
+  </Property>
+  <Property name="project_id" type="str | None">
+    Project the entity belongs to, if applicable.
+  </Property>
+  <Property name="diff" type="list[AuditDiffItem] | None">
+    Field-level changes for `update` actions.
+  </Property>
+  <Property name="metadata" type="dict[str, object] | None">
+    Arbitrary metadata captured with the event.
+  </Property>
+  <Property name="created_at" type="datetime">
+    When the action occurred.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AuditDisplay">
+  <Property name="id" type="str">
+    Unique identifier.
+  </Property>
+  <Property name="action" type='"insert" | "update" | "delete"'>
+    Action performed.
+  </Property>
+  <Property name="user_id" type="str">
+    User who performed the action.
+  </Property>
+  <Property name="user_name" type="str | None">
+    User display name.
+  </Property>
+  <Property name="diffs" type="list[AuditDisplayDiffItem]">
+    Pre-formatted diff items for display.
+  </Property>
+  <Property name="real_change_count" type="int">
+    Number of fields that actually changed.
+  </Property>
+  <Property name="summary_fields" type="list[str]">
+    Field names highlighted in the summary.
+  </Property>
+  <Property name="created_at" type="datetime">
+    When the action occurred.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AuditDiffItem">
+  <Property name="kind" type='"added" | "removed" | "changed"'>
+    Kind of change.
+  </Property>
+  <Property name="field" type="str">
+    Field path.
+  </Property>
+  <Property name="old_value" type="Any | None">
+    Previous value (for `removed`/`changed`).
+  </Property>
+  <Property name="new_value" type="Any | None">
+    New value (for `added`/`changed`).
+  </Property>
+</TypeTable>
+
+<TypeTable name="AuditDisplayDiffItem">
+  <Property name="kind" type='"added" | "removed" | "changed" | "skip"'>
+    Kind of change for display.
+  </Property>
+  <Property name="scope" type="str">
+    The scope of the change.
+  </Property>
+  <Property name="root" type="str">
+    Root field name.
+  </Property>
+  <Property name="label" type="str | None">
+    Display label for the changed field.
+  </Property>
+  <Property name="before_str" type="str | None">
+    Pre-formatted previous value.
+  </Property>
+  <Property name="after_str" type="str | None">
+    Pre-formatted new value.
+  </Property>
+  <Property name="skip_count" type="int | None">
+    Number of skipped items if `kind="skip"`.
+  </Property>
+</TypeTable>
 
 ---
 
