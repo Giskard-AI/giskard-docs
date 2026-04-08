@@ -49,7 +49,36 @@ import TypeTable from "../../../../components/api/TypeTable.astro";
 
 ## Client
 
-Client classes for interacting with the Giskard Hub API.
+Client classes for interacting with the Giskard Hub API. Two flavours are available with an identical API surface — pick the one that matches your runtime.
+
+<Tabs>
+  <TabItem label="Sync">
+```python
+from giskard_hub import HubClient
+
+hub = HubClient()
+projects = hub.projects.list()
+```
+  </TabItem>
+  <TabItem label="Async">
+```python
+from giskard_hub import AsyncHubClient
+import asyncio
+
+
+async def main():
+    async with AsyncHubClient() as hub:
+        projects = await hub.projects.list()
+
+
+asyncio.run(main())
+```
+  </TabItem>
+</Tabs>
+
+:::tip
+All methods documented below are shown in their synchronous form. The async variants are identical -- just `await` them.
+:::
 
 ### `HubClient`
 
@@ -113,37 +142,68 @@ hub = HubClient(
 
 ### `AsyncHubClient`
 
-Async counterpart with an identical API surface -- every method is a coroutine.
+Async counterpart with an identical API surface -- every method is a coroutine. Accepts the same constructor arguments as `HubClient`, except `http_client` takes an `httpx.AsyncClient` instead of an `httpx.Client`.
 
-<Tabs>
-  <TabItem label="Sync">
-```python
-from giskard_hub import HubClient
-
-hub = HubClient()
-projects = hub.projects.list()
-````
-  </TabItem>
-  <TabItem label="Async">
-```python
+```python title="Constructor"
 from giskard_hub import AsyncHubClient
-import asyncio
 
+hub = AsyncHubClient(
+    api_key="gsk_...",                  # or set GISKARD_HUB_API_KEY env var
+    base_url="https://hub.example.com", # or set GISKARD_HUB_BASE_URL env var
+)
+```
 
-async def main():
-    async with AsyncHubClient() as hub:
-        projects = await hub.projects.list()
-
-
-asyncio.run(main())
-````
-
-  </TabItem>
-</Tabs>
-
-:::tip
-All methods documented below are shown in their synchronous form. The async variants are identical -- just `await` them.
-:::
+<Property
+  name="api_key"
+  type="str | None"
+  defaultValue="env GISKARD_HUB_API_KEY"
+>
+  Your Hub API key.
+</Property>
+<Property
+  name="base_url"
+  type="str | httpx.URL | None"
+  defaultValue="env GISKARD_HUB_BASE_URL"
+>
+  Base URL of your Hub instance.
+</Property>
+<Property name="auto_add_api_suffix" type="bool" defaultValue="True">
+  Automatically append `/_api` to `base_url`.
+</Property>
+<Property
+  name="timeout"
+  type="float | httpx.Timeout | None"
+  defaultValue="60.0"
+>
+  Default request timeout in seconds. Pass an `httpx.Timeout` for fine-grained
+  control over connect, read, and write timeouts.
+</Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Number of automatic retries on transient errors (connection errors, 5xx
+  responses).
+</Property>
+<Property
+  name="default_headers"
+  type="dict[str, str] | None"
+  defaultValue="None"
+>
+  Headers added to every request.
+</Property>
+<Property
+  name="default_query"
+  type="dict[str, object] | None"
+  defaultValue="None"
+>
+  Query parameters added to every request.
+</Property>
+<Property
+  name="http_client"
+  type="httpx.AsyncClient | None"
+  defaultValue="None"
+>
+  Custom `httpx.AsyncClient` instance for proxies, custom transports, or mutual
+  TLS.
+</Property>
 
 ---
 
@@ -339,7 +399,7 @@ check = hub.checks.create(
     Project ID to list checks for.
   </Property>
   <Property name="filter_builtin" type="bool">
-    When `True`, include built-in checks in the results.
+    Whether to filter out built-in checks from the results. Default `True`.
   </Property>
 </MethodCard>
 
@@ -355,7 +415,7 @@ check = hub.checks.create(
   </Property>
 </MethodCard>
 
-### Check type params
+#### Check type params
 
 The `params` field accepts one of these shapes:
 
@@ -1771,7 +1831,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="response" type="ChatMessageParam | None" required>
     The agent's response message.
   </Property>
-  <Property name="error" type="ExecutionError | None">
+  <Property name="error" type="ExecutionErrorParam | None">
     Error details if the agent call failed.
   </Property>
   <Property name="metadata" type="dict[str, object]">
@@ -2445,7 +2505,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     Truncated content snippet.
   </Property>
   <Property name="content" type="str">
-    Full document content (computed alias of `snippet`).
+    Computed alias of `snippet` (the truncated content shown in search results).
   </Property>
   <Property name="topic_id" type="str | None">
     Topic ID, if classified.

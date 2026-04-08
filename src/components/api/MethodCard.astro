@@ -1,27 +1,57 @@
 ---
-import { linkifyType } from "./linkifyType";
+import {
+  getTypeLinkConfig,
+  isCollapsibleByDefault,
+  linkifyType,
+} from "./linkifyType";
 
 interface Props {
   name: string;
   returnType?: string;
   /**
-   * Whether the method body is expanded by default. Methods are collapsed
-   * by default to keep resource sections scannable; click the header to expand.
+   * Whether the method body is rendered as a collapsible accordion.
+   * If omitted, defaults to true on the Hub SDK reference (long page,
+   * many methods) and false on the OSS Checks reference (short pages
+   * where users want everything visible).
+   */
+  collapsible?: boolean;
+  /**
+   * Whether a collapsible card starts expanded. Ignored when
+   * `collapsible` is false (the body is always visible).
    */
   defaultOpen?: boolean;
 }
 
-const { name, returnType, defaultOpen = false } = Astro.props;
-const returnTypeHtml = returnType ? linkifyType(returnType) : null;
+const { name, returnType, collapsible, defaultOpen } = Astro.props;
+const pathname = Astro.url?.pathname ?? "";
+const { knownTypes, typePages } = getTypeLinkConfig(pathname);
+const returnTypeHtml = returnType
+  ? linkifyType(returnType, knownTypes, pathname, typePages)
+  : null;
+
+const isCollapsible = collapsible ?? isCollapsibleByDefault(pathname);
+// When the card is non-collapsible, force it open. When collapsible, honour
+// `defaultOpen` (default closed) so the page renders compact.
+const isOpen = isCollapsible ? (defaultOpen ?? false) : true;
+// Stable id for the body so the header can reference it via aria-controls.
+// crypto.randomUUID() is evaluated once per render, so the id remains
+// consistent within a single page render.
+const bodyId = `method-body-${crypto.randomUUID()}`;
 ---
 
-<div class="method-card" data-open={String(defaultOpen)}>
+<div
+  class="method-card"
+  data-open={String(isOpen)}
+  data-collapsible={String(isCollapsible)}
+>
   <div
     class="method-card-header"
-    role="button"
-    tabindex="0"
-    aria-expanded={String(defaultOpen)}
-    onclick="
+    role={isCollapsible ? "button" : undefined}
+    tabindex={isCollapsible ? "0" : undefined}
+    aria-expanded={isCollapsible ? String(isOpen) : undefined}
+    aria-controls={isCollapsible ? bodyId : undefined}
+    onclick={isCollapsible
+      ? `
     // Skip toggle when the click originated on a link inside the header
     // (e.g. the linkified return type pointing at #type-Agent).
     if (event.target.closest('a')) return;
@@ -29,16 +59,19 @@ const returnTypeHtml = returnType ? linkifyType(returnType) : null;
     const isOpen = card.getAttribute('data-open') === 'true';
     card.setAttribute('data-open', String(!isOpen));
     this.setAttribute('aria-expanded', String(!isOpen));
-  "
-    onkeydown="
+  `
+      : undefined}
+    onkeydown={isCollapsible
+      ? `
     if (event.key !== 'Enter' && event.key !== ' ') return;
-    if (event.target.tagName === 'A') return;
+    if (event.target.closest('a')) return;
     event.preventDefault();
     const card = this.closest('.method-card');
     const isOpen = card.getAttribute('data-open') === 'true';
     card.setAttribute('data-open', String(!isOpen));
     this.setAttribute('aria-expanded', String(!isOpen));
-  "
+  `
+      : undefined}
   >
     <code class="method-card-name">{name}</code>
     {returnTypeHtml && (
@@ -47,24 +80,26 @@ const returnTypeHtml = returnType ? linkifyType(returnType) : null;
         <code set:html={returnTypeHtml} />
       </span>
     )}
-    <svg
-      class="method-card-chevron"
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M4 6l4 4 4-4"
-        stroke="currentColor"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      ></path>
-    </svg>
+    {isCollapsible && (
+      <svg
+        class="method-card-chevron"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M4 6l4 4 4-4"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    )}
   </div>
-  <div class="method-card-body">
+  <div class="method-card-body" id={bodyId}>
     <slot />
   </div>
 </div>
@@ -85,26 +120,31 @@ const returnTypeHtml = returnType ? linkifyType(returnType) : null;
     flex-wrap: wrap;
     padding: 0.75rem 1rem;
     background: var(--api-method-header-bg);
-    cursor: pointer;
     user-select: none;
     /* Bottom border only when expanded — collapsed cards have no body
        below the header, so the divider would float in space. */
+  }
+
+  .method-card[data-collapsible="true"] .method-card-header {
+    cursor: pointer;
   }
 
   .method-card[data-open="true"] .method-card-header {
     border-bottom: 1px solid var(--sl-color-hairline);
   }
 
-  .method-card-header:hover {
+  .method-card[data-collapsible="true"] .method-card-header:hover {
     filter: brightness(0.97);
   }
 
-  :root[data-theme="dark"] .method-card-header:hover {
+  :root[data-theme="dark"]
+    .method-card[data-collapsible="true"]
+    .method-card-header:hover {
     filter: brightness(1.15);
   }
 
   .method-card-header:focus-visible {
-    outline: 2px solid var(--api-return-color);
+    outline: 2px solid var(--api-type-color, #6366f1);
     outline-offset: -2px;
   }
 
