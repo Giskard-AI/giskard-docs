@@ -37,7 +37,7 @@ Ready-to-use validation checks for common testing scenarios, including function-
 <Property name="failure_message" type="str | None" defaultValue="None">
   Message when check fails.
 </Property>
-<Property name="details" type="dict | None" defaultValue="None">
+<Property name="details" type="dict[str, Any]" defaultValue="{}">
   Additional details to include in result.
 </Property>
 
@@ -74,15 +74,17 @@ check = FnCheck(fn=validate_response, name="async_validation")
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="keyword" type="str">
+<Property name="keyword" type="str | None">
   Substring to search for (or use `keyword_key` to extract from trace).
 </Property>
-<Property name="keyword_key" type="str">
+<Property name="keyword_key" type="str | None">
   JSONPath to extract keyword from trace.
 </Property>
+<Property name="text" type="str | None">JSONPath-resolved text to search in. If unset, falls back to `text_key`.</Property>
 <Property name="text_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to search in.
 </Property>
+<Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>Unicode normalization applied before matching.</Property>
 <Property name="case_sensitive" type="bool" defaultValue="True">
   Whether matching is case-sensitive.
 </Property>
@@ -106,9 +108,11 @@ check = StringMatching(
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="pattern" type="str" required>
+<Property name="pattern" type="str | None">
   Regular expression pattern.
 </Property>
+<Property name="pattern_key" type="str | None">JSONPath to extract the regex pattern from the trace. Provide exactly one of `pattern` or `pattern_key`.</Property>
+<Property name="text" type="str | None">JSONPath-resolved text to match against (alternative to `text_key`).</Property>
 <Property name="text_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to match against.
 </Property>
@@ -137,13 +141,13 @@ All comparison checks share these parameters:
 <Property name="expected_value" type="Any | None">
   Static expected value.
 </Property>
-<Property name="expected_value_key" type="str | None">
+<Property name="expected_value_key" type="JSONPathStr | NotProvided">
   JSONPath to extract expected value from trace.
 </Property>
 <Property name="key" type="str" required>
   JSONPath to extract the actual value from the trace.
 </Property>
-<Property name="normalization_form" type="str | None">
+<Property name="normalization_form" type="str | None" defaultValue='"NFKC"'>
   Unicode normalization: `"NFC"`, `"NFD"`, `"NFKC"`, `"NFKD"`.
 </Property>
 
@@ -211,7 +215,7 @@ Validation checks powered by Large Language Models for semantic understanding.
 **Module:** `giskard.checks.judges.base`
 
 <TypeTable name="BaseLLMCheck">
-  <Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
     LLM generator for evaluation. Falls back to the global default if not
     provided.
   </Property>
@@ -307,7 +311,7 @@ Default result model for LLM-based checks. This is the structured output format 
 >
   JSONPath to extract context from trace.
 </Property>
-<Property name="generator" type="BaseGenerator | None">
+<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation.
 </Property>
 
@@ -344,7 +348,7 @@ check = Groundedness(
   The conformity rule to evaluate. Supports Jinja2 templating with access to the
   `trace` object.
 </Property>
-<Property name="generator" type="BaseGenerator | None">
+<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation (falls back to default).
 </Property>
 
@@ -381,7 +385,7 @@ check = Conformity(
 <Property name="prompt_path" type="str | None">
   Path to a template file (e.g. `"checks::my_template.j2"`).
 </Property>
-<Property name="generator" type="BaseGenerator | None">
+<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation.
 </Property>
 
@@ -464,12 +468,10 @@ check = LLMJudge(
 >
   JSONPath to extract actual value from trace.
 </Property>
-<Property name="threshold" type="float" defaultValue="0.8">
+<Property name="threshold" type="float" defaultValue="0.95">
   Similarity threshold (0.0 to 1.0).
 </Property>
-<Property name="generator" type="BaseGenerator | None">
-  LLM generator for evaluation.
-</Property>
+<Property name="embedding_model" type="BaseEmbeddingModel" defaultValue="get_default_embedding_model()">Embedding model used to compute similarity scores.</Property>
 
 ```python
 from giskard.checks import SemanticSimilarity
