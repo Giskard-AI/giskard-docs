@@ -1,10 +1,12 @@
-import cloudflare from '@astrojs/cloudflare';
 // @ts-check
-import { defineConfig } from 'astro/config';
-import mermaid from 'astro-mermaid';
-import starlight from '@astrojs/starlight';
-import starlightAutoSidebar from 'starlight-auto-sidebar'
-import tailwind from '@astrojs/tailwind';
+import { defineConfig } from "astro/config";
+
+import cloudflare from "@astrojs/cloudflare";
+import starlight from "@astrojs/starlight";
+import tailwind from "@astrojs/tailwind";
+
+import mermaid from "astro-mermaid";
+import starlightAutoSidebar from "starlight-auto-sidebar";
 
 // https://astro.build/config
 export default defineConfig({
