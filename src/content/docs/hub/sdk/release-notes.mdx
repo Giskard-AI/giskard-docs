@@ -88,7 +88,9 @@ scan_result.print_metrics()
 
 # Check if the grade is worse than A or B (C, D or N/A)
 if scan_result.grade not in ["A", "B"]:
-    print(f"❌ Security check failed: Scan with Grade {scan_result.grade.value}")
+    print(
+        f"❌ Security check failed: Scan with Grade {scan_result.grade.value}"
+    )
     sys.exit(1)
 
 print(f"✅ Security check passed: Scan with Grade {scan_result.grade.value}")

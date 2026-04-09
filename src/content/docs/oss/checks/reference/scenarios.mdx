@@ -41,9 +41,9 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 </MethodCard>
 
 <MethodCard name=".add_interaction()" returnType="self">
-  Add a pre-constructed `Interaction` or `InteractionSpec` object.
+  Add a pre-constructed `InteractionSpec` object.
 
-  <Property name="interaction" type="Interaction | InteractionSpec" required>The interaction or spec to add.</Property>
+  <Property name="interaction" type="InteractionSpec" required>The interaction spec to add.</Property>
 </MethodCard>
 
 <MethodCard name=".extend()" returnType="self">
@@ -133,6 +133,15 @@ Result of scenario execution with trace and check results.
   </Property>
   <Property name="passed" type="bool">
     True when all steps passed.
+  </Property>
+  <Property name="failed" type="bool">
+    True when any step failed.
+  </Property>
+  <Property name="errored" type="bool">
+    True when any step errored.
+  </Property>
+  <Property name="skipped" type="bool">
+    True when all steps were skipped.
   </Property>
   <Property name="duration_ms" type="int">
     Total execution time in milliseconds.
@@ -225,6 +234,12 @@ Aggregate result from suite execution.
   </Property>
 </TypeTable>
 
+<MethodCard name=".to_junit_xml()" returnType="str">
+  Export the suite result as a JUnit XML string. Optionally write to a file.
+
+  <Property name="path" type="str | Path | None" defaultValue="None">File path to write the XML to. Returns the XML string regardless.</Property>
+</MethodCard>
+
 ---
 
 ## `ScenarioRunner`
@@ -237,7 +252,9 @@ Low-level runner for executing scenarios. Most users should use `Scenario(...).r
   <Property name="scenario" type="Scenario" required>
     The scenario to execute.
   </Property>
-  <Property name="target" type="Callable | None" defaultValue="None">Override the scenario's target SUT.</Property>
+  <Property name="target" type="Callable | None" defaultValue="None">
+    Override the scenario's target SUT.
+  </Property>
   <Property name="return_exception" type="bool" defaultValue="False">
     Return results on exceptions.
   </Property>
