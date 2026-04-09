@@ -11,24 +11,24 @@ Everyone is welcome to contribute — whether you fix bugs, improve docs, propos
 
 Before contributing, make sure you have:
 
-- **[Git](https://git-scm.com/)** installed
+- **<a href="https://git-scm.com/" target="_blank">Git</a>** installed
 - **Python 3.12+**
-- **[uv](https://docs.astral.sh/uv/)** — the project's package manager and workspace tool
+- **<a href="https://docs.astral.sh/uv/" target="_blank">uv</a>** — the project's package manager and workspace tool
 - **make** — used for all dev commands (on Windows, use WSL or an equivalent)
 
 ## Official contributing guide
 
-Read **[How to contribute to Giskard ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/CONTRIBUTING.md)** in the `giskard-oss` repository. It covers:
+Read **<a href="https://github.com/Giskard-AI/giskard-oss/blob/main/CONTRIBUTING.md" target="_blank">How to contribute to Giskard ↗</a>** in the `giskard-oss` repository. It covers:
 
 - Reporting bugs and requesting features (search existing issues first)
 - Code style and quality: **uv** workspace, Python 3.12+, **Ruff**, **basedpyright**, **pre-commit**
 - Contributing checks and scenarios, and where to look in the repo
 
-Also please review and follow the **[Code of Conduct ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/CODE_OF_CONDUCT.md)**.
+Also please review and follow the **<a href="https://github.com/Giskard-AI/giskard-oss/blob/main/CODE_OF_CONDUCT.md" target="_blank">Code of Conduct ↗</a>**.
 
 ### Make targets (formatting, lint, and checks)
 
-From the **root of `giskard-oss`**, these are the usual commands (details and any updates live in [CONTRIBUTING.md ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/CONTRIBUTING.md)):
+From the **root of `giskard-oss`**, these are the usual commands (details and any updates live in <a href="https://github.com/Giskard-AI/giskard-oss/blob/main/CONTRIBUTING.md" target="_blank">CONTRIBUTING.md ↗</a>):
 
 | Command | What it does |
 | :--- | :--- |
@@ -42,7 +42,7 @@ Run `make help` in the repo for other targets (for example scoped tests with `PA
 
 ### Fork-to-PR workflow
 
-1. **Fork** [giskard-oss ↗](https://github.com/Giskard-AI/giskard-oss) on GitHub
+1. **Fork** <a href="https://github.com/Giskard-AI/giskard-oss" target="_blank">giskard-oss ↗</a> on GitHub
 2. **Clone your fork** and enter the directory:
    ```bash
    git clone https://github.com/<your-username>/giskard-oss.git
@@ -62,7 +62,7 @@ CI will run the same checks. A maintainer will review your PR — most PRs recei
 
 ### Contributing to the documentation
 
-This docs site ([giskard-docs ↗](https://github.com/Giskard-AI/giskard-docs)) is a separate Astro / Starlight project. To contribute:
+This docs site (<a href="https://github.com/Giskard-AI/giskard-docs" target="_blank">giskard-docs ↗</a>) is a separate Astro / Starlight project. To contribute:
 
 1. Fork and clone `giskard-docs`
 2. Install dependencies: `npm install`
@@ -73,15 +73,15 @@ This docs site ([giskard-docs ↗](https://github.com/Giskard-AI/giskard-docs)) 
 
 If you find Giskard useful, please consider starring these projects to improve their discoverability:
 
-- **[Giskard-AI/giskard-oss ↗](https://github.com/Giskard-AI/giskard-oss)** — main open-source monorepo (library, checks, contribution entry)
-- **[Giskard-AI/giskard-agents ↗](https://github.com/Giskard-AI/giskard-agents)** — Giskard Agents
-- **[Giskard-AI/giskard-hub-python ↗](https://github.com/Giskard-AI/giskard-hub-python)** — Giskard Hub Python client
-- **[Giskard-AI/giskard-docs ↗](https://github.com/Giskard-AI/giskard-docs)** — this documentation site
-- **[Giskard-AI/flare ↗](https://github.com/Giskard-AI/flare)** — Flare evaluation runner (e.g. Phare benchmark workflows)
-- **[Giskard-AI/realharm ↗](https://github.com/Giskard-AI/realharm)** — collection of real failure cases of LLM-based applications
-- **[Giskard-AI/phare ↗](https://github.com/Giskard-AI/phare)** — Phare benchmark (LLM safety & security evaluation)
+- **<a href="https://github.com/Giskard-AI/giskard-oss" target="_blank">Giskard-AI/giskard-oss ↗</a>** — main open-source monorepo (library, checks, contribution entry)
+- **<a href="https://github.com/Giskard-AI/giskard-agents" target="_blank">Giskard-AI/giskard-agents ↗</a>** — Giskard Agents
+- **<a href="https://github.com/Giskard-AI/giskard-hub-python" target="_blank">Giskard-AI/giskard-hub-python ↗</a>** — Giskard Hub Python client
+- **<a href="https://github.com/Giskard-AI/giskard-docs" target="_blank">Giskard-AI/giskard-docs ↗</a>** — this documentation site
+- **<a href="https://github.com/Giskard-AI/flare" target="_blank">Giskard-AI/flare ↗</a>** — Flare evaluation runner (e.g. Phare benchmark workflows)
+- **<a href="https://github.com/Giskard-AI/realharm" target="_blank">Giskard-AI/realharm ↗</a>** — collection of real failure cases of LLM-based applications
+- **<a href="https://github.com/Giskard-AI/phare" target="_blank">Giskard-AI/phare ↗</a>** — Phare benchmark (LLM safety & security evaluation)
 
-With the [GitHub CLI ↗](https://cli.github.com/) installed, you can star them all from the terminal:
+With the <a href="https://cli.github.com/" target="_blank">GitHub CLI ↗</a> installed, you can star them all from the terminal:
 
 ```bash
 for repo in giskard-oss giskard-agents giskard-hub-python giskard-docs flare realharm phare; do
@@ -91,4 +91,4 @@ done
 
 ## Community
 
-Questions, discussion, or just want to say hi? Join us on **[Discord ↗](https://discord.com/invite/ABvfpbu69R)**.
+Questions, discussion, or just want to say hi? Join us on **<a href="https://discord.com/invite/ABvfpbu69R" target="_blank">Discord ↗</a>**.
