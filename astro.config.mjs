@@ -59,7 +59,7 @@ export default defineConfig({
                     label: 'Get Started',
                     items: [
                         { label: 'Giskard Library', slug: 'oss' },
-                        { slug: 'oss/contributing', label: 'Contribute & star our repos' },
+                        { slug: 'oss/contributing', label: 'Contributing' },
                     ]
                 },
                 {

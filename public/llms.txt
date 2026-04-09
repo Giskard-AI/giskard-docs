@@ -138,6 +138,7 @@ Open research on AI safety and security, including the Phare multilingual benchm
 
 ### Giskard Checks (Open Source)
 - Giskard Library: https://docs.giskard.ai/oss.md
+- Contribute to Giskard: https://docs.giskard.ai/oss/contributing.md
 - What are Giskard Checks?: https://docs.giskard.ai/oss/checks.md
 - Install & Configure: https://docs.giskard.ai/oss/checks/installation.md
 - Quickstart: https://docs.giskard.ai/oss/checks/quickstart.md
