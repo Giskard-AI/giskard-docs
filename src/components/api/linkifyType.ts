@@ -69,6 +69,7 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "ResultFiltersParam",
   // Scan
   "Scan",
+  "ScanAvailableProbe",
   "ScanCategory",
   "ScanProbe",
   "ScanProbeMetric",

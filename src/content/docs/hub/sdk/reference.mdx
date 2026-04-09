@@ -486,7 +486,7 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
   <Property name="agent_id" type="str" required>Agent to generate test cases for.</Property>
   <Property name="knowledge_base_id" type="str" required>Knowledge base to source documents from.</Property>
   <Property name="project_id" type="str" required>Project ID.</Property>
-  <Property name="dataset_name" type="str | None">Name for the new dataset.</Property>
+  <Property name="dataset_name" type="str">Name for the new dataset.</Property>
   <Property name="description" type="str | None">Dataset description.</Property>
   <Property name="n_examples" type="int">Number of test cases to generate.</Property>
   <Property name="topic_ids" type="list[str]">Filter to specific KB topics.</Property>
@@ -632,7 +632,7 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
   <Property name="messages" type="Iterable[ChatMessageParam]" required>Conversation messages.</Property>
   <Property name="agent_output" type="AgentOutputParam" required>Agent's output to evaluate.</Property>
   <Property name="checks" type="Iterable[CheckConfigParam]" required>Checks to apply.</Property>
-  <Property name="project_id" type="str">Project ID.</Property>
+  <Property name="project_id" type="str | None">Project ID.</Property>
   <Property name="agent_description" type="str">Description of the agent for context.</Property>
 </MethodCard>
 
@@ -690,8 +690,8 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   <Property name="evaluation_id" type="str" required>
     Evaluation ID.
   </Property>
-  <Property name="include" type="list[str] | None">
-    Embed related resources (`["test_case"]`).
+  <Property name="include" type='list[Literal["test_case"]] | None'>
+    Embed related resources.
   </Property>
 </MethodCard>
 
@@ -707,8 +707,8 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   <Property name="evaluation_id" type="str" required>
     Evaluation ID.
   </Property>
-  <Property name="include" type="list[str] | None">
-    Embed related resources (`["test_case"]`).
+  <Property name="include" type='list[Literal["test_case"]] | None'>
+    Embed related resources.
   </Property>
 </MethodCard>
 
@@ -721,7 +721,7 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   <Property name="order_by" type="list[ResultOrderByParam] | None">Sorting criteria.</Property>
   <Property name="limit" type="int | None">Maximum results.</Property>
   <Property name="offset" type="int | None">Results offset.</Property>
-  <Property name="include" type="list[str] | None">Embed related resources.</Property>
+  <Property name="include" type='list[Literal["test_case"]] | None'>Embed related resources.</Property>
   <Property name="include_metadata" type="bool" defaultValue="False">Include pagination metadata.</Property>
 </MethodCard>
 
@@ -875,11 +875,11 @@ from giskard_hub.types import (
 <Property name="description" type="str | None">
   Human-readable description.
 </Property>
-<Property name="document_column" type="str" defaultValue='"text"'>
-  Column name for document text.
+<Property name="document_column" type="str">
+  Column name for document text. Server defaults to `"text"` if omitted.
 </Property>
-<Property name="topic_column" type="str" defaultValue='"topic"'>
-  Column name for topic label.
+<Property name="topic_column" type="str">
+  Column name for topic label. Server defaults to `"topic"` if omitted.
 </Property>
 
 ```python title="Example"
@@ -1158,6 +1158,10 @@ hub.helpers.print_metrics(scan)
   Delete multiple scan results at once.
 
   <Property name="scan_ids" type="list[str]" required>IDs of scans to delete.</Property>
+</MethodCard>
+
+<MethodCard name=".list_available_probes()" returnType="list[ScanAvailableProbe]">
+  List all probe definitions available for scanning.
 </MethodCard>
 
 ### `hub.scans.probes`
@@ -1541,10 +1545,10 @@ from giskard_hub.types import Audit, AuditDisplay
 <Property name="order_by" type="list[AuditOrderByParam] | None">
   Sorting criteria.
 </Property>
-<Property name="limit" type="int | None">
+<Property name="limit" type="int">
   Maximum results.
 </Property>
-<Property name="offset" type="int | None">
+<Property name="offset" type="int">
   Results offset.
 </Property>
 <Property name="include_metadata" type="bool" defaultValue="False">
@@ -2344,6 +2348,21 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
   <Property name="updated_at" type="datetime">
     Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScanAvailableProbe">
+  <Property name="id" type="str">
+    Unique probe identifier.
+  </Property>
+  <Property name="name" type="str">
+    Probe display name.
+  </Property>
+  <Property name="desc" type="str">
+    Human-readable description.
+  </Property>
+  <Property name="tags" type="list[str]">
+    Tags applied to this probe.
   </Property>
 </TypeTable>
 
