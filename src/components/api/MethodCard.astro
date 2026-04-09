@@ -50,28 +50,6 @@ const bodyId = `method-body-${crypto.randomUUID()}`;
     tabindex={isCollapsible ? "0" : undefined}
     aria-expanded={isCollapsible ? String(isOpen) : undefined}
     aria-controls={isCollapsible ? bodyId : undefined}
-    onclick={isCollapsible
-      ? `
-    // Skip toggle when the click originated on a link inside the header
-    // (e.g. the linkified return type pointing at #type-Agent).
-    if (event.target.closest('a')) return;
-    const card = this.closest('.method-card');
-    const isOpen = card.getAttribute('data-open') === 'true';
-    card.setAttribute('data-open', String(!isOpen));
-    this.setAttribute('aria-expanded', String(!isOpen));
-  `
-      : undefined}
-    onkeydown={isCollapsible
-      ? `
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    if (event.target.closest('a')) return;
-    event.preventDefault();
-    const card = this.closest('.method-card');
-    const isOpen = card.getAttribute('data-open') === 'true';
-    card.setAttribute('data-open', String(!isOpen));
-    this.setAttribute('aria-expanded', String(!isOpen));
-  `
-      : undefined}
   >
     <code class="method-card-name">{name}</code>
     {returnTypeHtml && (
@@ -222,3 +200,34 @@ const bodyId = `method-body-${crypto.randomUUID()}`;
     --api-return-bg: rgba(5, 217, 57, 0.1);
   }
 </style>
+
+<script>
+  function toggleCard(header: Element) {
+    const card = header.closest(".method-card")!;
+    const isOpen = card.getAttribute("data-open") === "true";
+    card.setAttribute("data-open", String(!isOpen));
+    header.setAttribute("aria-expanded", String(!isOpen));
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target as Element;
+    if (target.closest("a")) return;
+    const header = target.closest(".method-card-header");
+    if (!header) return;
+    const card = header.closest(".method-card");
+    if (!card || card.getAttribute("data-collapsible") !== "true") return;
+    toggleCard(header);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    const target = event.target as Element;
+    if (target.closest("a")) return;
+    const header = target.closest(".method-card-header");
+    if (!header) return;
+    const card = header.closest(".method-card");
+    if (!card || card.getAttribute("data-collapsible") !== "true") return;
+    event.preventDefault();
+    toggleCard(header);
+  });
+</script>
