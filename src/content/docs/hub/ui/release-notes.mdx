@@ -9,6 +9,16 @@ Below you will find the release notes for each version of Giskard Hub UI. Each e
 
 ---
 
+## 2.5.1 (2026-03-31)
+
+We're releasing a fix for an issue where checks were not executed on local evaluation results.
+
+### What's fixed?
+
+- **Local evaluation checks** - Fixed an issue where checks were skipped on local evaluations when model output was already present. All local evaluation results are now correctly evaluated instead of being marked as skipped.
+
+---
+
 ## 2.5.0 (2026-03-31)
 
 We are releasing a new version of the Hub that introduces a unified data table experience with saveable table views, stateful agent support for multi-turn conversations, server-side pagination for large evaluation and dataset pages, fine-grained probe selection for scans, and a new TokenBreak security probe.
@@ -45,6 +55,32 @@ We are releasing a new version of the Hub that introduces a unified data table e
 - **XLSX export reliability** - Free-text fields in XLSX evaluation exports are now sanitized to remove illegal XML control characters, and exports are processed in the background to keep the app responsive.
 
 - **Parallel page loading** - Data fetches on several pages now run in parallel, resulting in noticeably faster page loads across the Hub.
+
+---
+
+## 2.4.2 (2026-03-04)
+
+We're releasing a patch with fixes for test case management, groundedness evaluation, and UI reliability.
+
+### What's fixed?
+
+- **Test case status persistence** - Fixed an issue where the draft/published status was not saved when creating or updating a single test case via the API.
+
+- **Groundedness evaluation accuracy** - Corrected minor contradictions in groundedness scoring that could produce inconsistent results in edge cases.
+
+- **Scan page navigation** - Fixed scroll-to-section failures on slow-loading scan pages by retrying until the target section is available.
+
+---
+
+## 2.4.1 (2026-02-25)
+
+We're releasing a patch that refines groundedness confidence scoring and changes how custom groundedness instructions are configured.
+
+### What's changed?
+
+- **Groundedness confidence scoring** - Improved confidence score calculation by removing the auto-pass shortcut for grounded answers and using clearer per-claim scoring. This may produce slightly different confidence scores compared to previous versions.
+
+- **Groundedness extra instructions** - The `extra_instructions` parameter has been moved from assertion params to the `GISKARD_HUB_GROUNDEDNESS_EXTRA_INSTRUCTIONS` environment variable. If you were using custom groundedness instructions, update your environment configuration accordingly.
 
 ---
 
