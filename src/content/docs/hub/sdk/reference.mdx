@@ -16,6 +16,8 @@ import Property from "../../../../components/api/Property.astro";
 import MethodCard from "../../../../components/api/MethodCard.astro";
 import ResourceSection from "../../../../components/api/ResourceSection.astro";
 import TypeTable from "../../../../components/api/TypeTable.astro";
+import LiteralType from "../../../../components/api/LiteralType.astro";
+import LiteralValue from "../../../../components/api/LiteralValue.astro";
 
 <CardGrid>
   <LinkCard
@@ -58,7 +60,7 @@ from giskard_hub import HubClient
 
 hub = HubClient()
 projects = hub.projects.list()
-```
+````
   </TabItem>
   <TabItem label="Async">
 ```python
@@ -72,7 +74,8 @@ async def main():
 
 
 asyncio.run(main())
-```
+````
+
   </TabItem>
 </Tabs>
 
@@ -216,7 +219,12 @@ Resource groups exposed by the client for managing Hub entities.
 <ResourceSection description="Register, test, and invoke LLM agents. An agent represents your LLM application -- either a remote HTTP endpoint or a local Python callable.">
 
 ```python
-from giskard_hub.types import Agent, AgentDetectStatefulness, AgentOutput, ChatMessage
+from giskard_hub.types import (
+    Agent,
+    AgentDetectStatefulness,
+    AgentOutput,
+    ChatMessage,
+)
 ```
 
 <MethodCard name=".create()" returnType="Agent">
@@ -1073,7 +1081,14 @@ from giskard_hub.types import Scenario, ScenarioPreview
 <ResourceSection description="Launch automated vulnerability scans covering the OWASP LLM Top 10 and additional threat categories. Sub-resources: hub.scans.probes, hub.scans.attempts.">
 
 ```python
-from giskard_hub.types import Scan, ScanCategory, ScanProbe, ScanProbeAttempt, Severity, ReviewStatus
+from giskard_hub.types import (
+    Scan,
+    ScanCategory,
+    ScanProbe,
+    ScanProbeAttempt,
+    Severity,
+    ReviewStatus,
+)
 ```
 
 <MethodCard name=".create()" returnType="Scan">
@@ -1702,6 +1717,15 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
+<TypeTable name="ExecutionErrorParam">
+  <Property name="message" type="str" required>
+    Error message returned by the agent or runtime.
+  </Property>
+  <Property name="details" type="dict[str, object]">
+    Optional structured error context.
+  </Property>
+</TypeTable>
+
 <TypeTable name="User">
   <Property name="id" type="str">
     Unique identifier.
@@ -1738,23 +1762,13 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="TaskState">
-  <Property name="running" type="literal">
-    Task is in progress.
-  </Property>
-  <Property name="finished" type="literal">
-    Task completed successfully.
-  </Property>
-  <Property name="error" type="literal">
-    Task failed.
-  </Property>
-  <Property name="canceled" type="literal">
-    Task was canceled.
-  </Property>
-  <Property name="skipped" type="literal">
-    Task was skipped.
-  </Property>
-</TypeTable>
+<LiteralType name="TaskState">
+  <LiteralValue name="running">Task is in progress.</LiteralValue>
+  <LiteralValue name="finished">Task completed successfully.</LiteralValue>
+  <LiteralValue name="error">Task failed.</LiteralValue>
+  <LiteralValue name="canceled">Task was canceled.</LiteralValue>
+  <LiteralValue name="skipped">Task was skipped.</LiteralValue>
+</LiteralType>
 
 <TypeTable name="APIPaginatedMetadata">
   <Property name="count" type="int">
@@ -2089,6 +2103,21 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
+<TypeTable name="TestCaseOrderByParam">
+  <Property name="id" type='"created_at" | "id" | "status" | "updated_at"' required>
+    Column to sort by.
+  </Property>
+  <Property name="desc" type="bool">
+    Sort descending when `true`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="TestCaseFiltersParam">
+  <Property name="alias" type="dict">
+    `Dict` mapping a column name to a filter value. Valid columns: `"metrics"`, `"status"`, `"tags"`.
+  </Property>
+</TypeTable>
+
 ### Evaluation types
 
 <TypeTable name="Evaluation">
@@ -2271,6 +2300,21 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
+<TypeTable name="ResultOrderByParam">
+  <Property name="id" type='"failure_category_name" | "id" | "sample_success" | "status" | "visibility"' required>
+    Column to sort by.
+  </Property>
+  <Property name="desc" type="bool">
+    Sort descending when `true`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ResultFiltersParam">
+  <Property name="alias" type="dict">
+    `Dict` mapping a column name to a filter value. Valid columns: `"failure_category_name"`, `"metrics"`, `"sample_success"`, `"status"`, `"tags"`, `"visibility"`.
+  </Property>
+</TypeTable>
+
 ### Scan types
 
 <TypeTable name="Scan">
@@ -2346,6 +2390,9 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="status" type="TaskProgress">
     Async operation status.
   </Property>
+  <Property name="state" type="TaskState">
+    Convenience accessor for `status.state`.
+  </Property>
 </TypeTable>
 
 <TypeTable name="ScanProbeMetric">
@@ -2405,20 +2452,12 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="ReviewStatus">
-  <Property name="pending" type="literal">
-    Awaiting review.
-  </Property>
-  <Property name="ignored" type="literal">
-    Reviewer dismissed the finding.
-  </Property>
-  <Property name="acknowledged" type="literal">
-    Reviewer acknowledged the finding.
-  </Property>
-  <Property name="corrected" type="literal">
-    The underlying issue has been fixed.
-  </Property>
-</TypeTable>
+<LiteralType name="ReviewStatus">
+  <LiteralValue name="pending">Awaiting review.</LiteralValue>
+  <LiteralValue name="ignored">Reviewer dismissed the finding.</LiteralValue>
+  <LiteralValue name="acknowledged">Reviewer acknowledged the finding.</LiteralValue>
+  <LiteralValue name="corrected">The underlying issue has been fixed.</LiteralValue>
+</LiteralType>
 
 <TypeTable name="ScanProbeAttemptReference">
   <Property name="id" type="str">
@@ -2545,6 +2584,21 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
+<TypeTable name="KnowledgeBaseDocumentOrderByParam">
+  <Property name="id" type='"created_at" | "updated_at" | "topic_id"' required>
+    Column to sort by.
+  </Property>
+  <Property name="desc" type="bool">
+    Sort descending when `true`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="KnowledgeBaseDocumentFiltersParam">
+  <Property name="alias" type="dict">
+    `Dict` mapping a column name to a filter value. Valid columns: `"topic_id"`.
+  </Property>
+</TypeTable>
+
 ### Project and scenario types
 
 <TypeTable name="Project">
@@ -2600,17 +2654,11 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 ### Scheduled evaluation types
 
-<TypeTable name="FrequencyOption">
-  <Property name="daily" type="literal">
-    Run every day.
-  </Property>
-  <Property name="weekly" type="literal">
-    Run on a specific day each week.
-  </Property>
-  <Property name="monthly" type="literal">
-    Run on a specific day each month.
-  </Property>
-</TypeTable>
+<LiteralType name="FrequencyOption">
+  <LiteralValue name="daily">Run every day.</LiteralValue>
+  <LiteralValue name="weekly">Run on a specific day each week.</LiteralValue>
+  <LiteralValue name="monthly">Run on a specific day each month.</LiteralValue>
+</LiteralType>
 
 <TypeTable name="LastExecutionStatus">
   <Property name="alias" type="union">
@@ -2621,6 +2669,42 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 <TypeTable name="LastExecutionStatusParam">
   <Property name="alias" type="union">
     `TypeAlias` for `SuccessExecutionStatusParam | ErrorExecutionStatusParam`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="SuccessExecutionStatus">
+  <Property name="evaluation_id" type="str">
+    ID of the evaluation produced by the execution.
+  </Property>
+  <Property name="status" type='"success"'>
+    Always `"success"`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="SuccessExecutionStatusParam">
+  <Property name="evaluation_id" type="str" required>
+    ID of the evaluation produced by the execution.
+  </Property>
+  <Property name="status" type='"success"'>
+    Always `"success"`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ErrorExecutionStatus">
+  <Property name="error_message" type="str">
+    Description of what went wrong.
+  </Property>
+  <Property name="status" type='"error"'>
+    Always `"error"`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ErrorExecutionStatusParam">
+  <Property name="error_message" type="str" required>
+    Description of what went wrong.
+  </Property>
+  <Property name="status" type='"error"'>
+    Always `"error"`.
   </Property>
 </TypeTable>
 
@@ -2713,29 +2797,17 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="TaskStatus">
-  <Property name="open" type="literal">
-    Newly created, not yet picked up.
-  </Property>
-  <Property name="in_progress" type="literal">
-    Being worked on.
-  </Property>
-  <Property name="resolved" type="literal">
-    Closed.
-  </Property>
-</TypeTable>
+<LiteralType name="TaskStatus">
+  <LiteralValue name="open">Newly created, not yet picked up.</LiteralValue>
+  <LiteralValue name="in_progress">Being worked on.</LiteralValue>
+  <LiteralValue name="resolved">Closed.</LiteralValue>
+</LiteralType>
 
-<TypeTable name="TaskPriority">
-  <Property name="low" type="literal">
-    Low priority.
-  </Property>
-  <Property name="medium" type="literal">
-    Medium priority.
-  </Property>
-  <Property name="high" type="literal">
-    High priority.
-  </Property>
-</TypeTable>
+<LiteralType name="TaskPriority">
+  <LiteralValue name="low">Low priority.</LiteralValue>
+  <LiteralValue name="medium">Medium priority.</LiteralValue>
+  <LiteralValue name="high">High priority.</LiteralValue>
+</LiteralType>
 
 ### Playground chat types
 
@@ -2861,6 +2933,21 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
+<TypeTable name="AuditOrderByParam">
+  <Property name="id" type='"action" | "created_at" | "entity_type" | "project_id" | "user_id"' required>
+    Column to sort by.
+  </Property>
+  <Property name="desc" type="bool">
+    Sort descending when `true`.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AuditFiltersParam">
+  <Property name="alias" type="dict">
+    `Dict` mapping a column name to a filter value. Valid columns: `"action"`, `"created_at"`, `"entity_type"`, `"project_id"`, `"user_id"`.
+  </Property>
+</TypeTable>
+
 ---
 
 ## Error types
@@ -2958,3 +3045,4 @@ Every method accepts these optional keyword arguments for per-request customizat
 <Property name="timeout" type="float | httpx.Timeout | None">
   Override the default timeout for this request.
 </Property>
+````

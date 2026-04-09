@@ -24,6 +24,7 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "Header",
   "HeaderParam",
   "ExecutionError",
+  "ExecutionErrorParam",
   "User",
   "UserReference",
   "TaskProgress",
@@ -52,6 +53,8 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "TestCase",
   "TestCaseReference",
   "TestCaseComment",
+  "TestCaseOrderByParam",
+  "TestCaseFiltersParam",
   // Evaluation
   "Evaluation",
   "EvaluationReference",
@@ -62,6 +65,8 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "FailureCategory",
   "FailureCategoryParam",
   "FailureCategoryResult",
+  "ResultOrderByParam",
+  "ResultFiltersParam",
   // Scan
   "Scan",
   "ScanCategory",
@@ -77,6 +82,8 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "KnowledgeBaseReference",
   "KnowledgeBaseDocumentRow",
   "KnowledgeBaseDocumentDetail",
+  "KnowledgeBaseDocumentOrderByParam",
+  "KnowledgeBaseDocumentFiltersParam",
   "Topic",
   // Project & scenario
   "Project",
@@ -87,6 +94,10 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "FrequencyOption",
   "LastExecutionStatus",
   "LastExecutionStatusParam",
+  "SuccessExecutionStatus",
+  "SuccessExecutionStatusParam",
+  "ErrorExecutionStatus",
+  "ErrorExecutionStatusParam",
   // Task
   "Task",
   "TaskStatus",
@@ -98,6 +109,8 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "AuditDisplay",
   "AuditDiffItem",
   "AuditDisplayDiffItem",
+  "AuditOrderByParam",
+  "AuditFiltersParam",
 ]);
 
 /**
