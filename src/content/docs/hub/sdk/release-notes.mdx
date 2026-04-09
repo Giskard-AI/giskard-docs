@@ -9,6 +9,16 @@ Below you will find the release notes for each version of Giskard Hub SDK. Each 
 
 ---
 
+## 3.1.0 (2026-04-09)
+
+This minor release adds the ability to discover available scan probes programmatically.
+
+### New features
+
+- **`hub.scans.list_available_probes()`** — returns the full catalogue of probe definitions available for scanning, including their names, descriptions, and tags. Useful for filtering or selecting specific probes when creating a scan with `hub.scans.create(probe_ids=[...])`.
+
+---
+
 ## 3.0.1 (2026-04-01)
 
 This patch release builds on the first v3 SDK release introduced in [`3.0.0`](#300-2026-04-01), with API consistency fixes, helper compatibility improvements, and documentation updates.
