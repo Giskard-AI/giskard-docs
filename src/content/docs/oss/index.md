@@ -19,6 +19,7 @@ Looking for Giskard v2 features such as **RAGET** and **Scan**? They are not ava
 
 ## Need Help?
 
+- **Contributing**: See [Contribute to Giskard](/oss/contributing) for the official guide, AI-agent notes, and repos to star
 - **Documentation**: Explore the [Checks documentation](/oss/checks) for detailed guides
 - **Examples**: Check our [GitHub repository ↗](https://github.com/Giskard-AI/giskard-oss) for more examples
 - **Community**: Join our [Discord ↗](https://discord.com/invite/ABvfpbu69R) for support and discussions

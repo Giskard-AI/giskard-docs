@@ -1,13 +1,12 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
-import starlight from '@astrojs/starlight';
-import tailwind from '@astrojs/tailwind';
+import { defineConfig } from "astro/config";
 
-import starlightAutoSidebar from 'starlight-auto-sidebar'
+import cloudflare from "@astrojs/cloudflare";
+import starlight from "@astrojs/starlight";
+import tailwind from "@astrojs/tailwind";
 
-import cloudflare from '@astrojs/cloudflare';
-
-import mermaid from 'astro-mermaid';
+import mermaid from "astro-mermaid";
+import starlightAutoSidebar from "starlight-auto-sidebar";
 
 // https://astro.build/config
 export default defineConfig({
@@ -62,6 +61,7 @@ export default defineConfig({
                     label: 'Get Started',
                     items: [
                         { label: 'Giskard Library', slug: 'oss' },
+                        { slug: 'oss/contributing', label: 'Contributing' },
                     ]
                 },
                 {
