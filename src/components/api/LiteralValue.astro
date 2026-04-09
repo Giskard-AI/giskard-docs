@@ -1,0 +1,52 @@
+---
+interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+---
+
+<div class="literal-value">
+  <code class="literal-value-code">"{name}"</code>
+  <span class="literal-value-desc"><slot /></span>
+</div>
+
+<style>
+  .literal-value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+  }
+
+  .literal-value-code {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    color: var(--api-literal-code-color);
+    background: var(--api-literal-code-bg);
+  }
+
+  .literal-value-desc {
+    font-size: 0.825rem;
+    color: var(--sl-color-gray-2, #6b7280);
+    line-height: 1.4;
+  }
+
+  :root:not([data-theme="dark"]) {
+    --api-literal-code-color: #7c3aed;
+    --api-literal-code-bg: #f5f3ff;
+  }
+
+  :root[data-theme="dark"] {
+    --api-literal-code-color: #c4b5fd;
+    --api-literal-code-bg: rgba(196, 181, 253, 0.1);
+  }
+
+  :root[data-theme="dark"] .literal-value-desc {
+    color: rgba(198, 255, 255, 0.65);
+  }
+</style>

@@ -1,28 +1,120 @@
 ---
+import { isCollapsibleByDefault, typeAnchorId } from "./linkifyType";
+
 interface Props {
   name: string;
+  /**
+   * Whether the type's fields are rendered as a collapsible accordion.
+   * If omitted, defaults to true on the Hub SDK reference (long page,
+   * many TypeTables) and false on the OSS Checks reference (short pages
+   * where users want every field visible at a glance).
+   */
+  collapsible?: boolean;
+  /**
+   * Whether a collapsible TypeTable starts expanded. Ignored when
+   * `collapsible` is false (the body is always visible). The auto-expand
+   * script in the client-side block will additionally expand any table
+   * whose anchor matches `window.location.hash`.
+   */
+  defaultOpen?: boolean;
 }
 
-const { name } = Astro.props;
+const { name, collapsible, defaultOpen } = Astro.props;
+const pathname = Astro.url?.pathname ?? "";
+const isCollapsible = collapsible ?? isCollapsibleByDefault(pathname);
+const isOpen = isCollapsible ? (defaultOpen ?? false) : true;
+const anchorId = typeAnchorId(name);
 ---
 
-<div class="type-table" data-open="true">
-  <button class="type-table-header" aria-expanded="true" onclick="
-    const parent = this.parentElement;
-    const isOpen = parent.getAttribute('data-open') === 'true';
-    parent.setAttribute('data-open', String(!isOpen));
-    this.setAttribute('aria-expanded', String(!isOpen));
-  ">
-    <code class="type-table-name">{name}</code>
-    <span class="type-table-label">fields</span>
-    <svg class="type-table-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
-  <div class="type-table-body">
+<div
+  class="type-table"
+  data-open={String(isOpen)}
+  data-collapsible={String(isCollapsible)}
+  id={anchorId}
+>
+  {
+    isCollapsible ? (
+      <button
+        class="type-table-header"
+        aria-expanded={String(isOpen)}
+        aria-controls={`${anchorId}-body`}
+        onclick="
+      const parent = this.closest('.type-table');
+      const isOpen = parent.getAttribute('data-open') === 'true';
+      parent.setAttribute('data-open', String(!isOpen));
+      this.setAttribute('aria-expanded', String(!isOpen));
+    "
+      >
+        <code class="type-table-name">{name}</code>
+        <svg
+          class="type-table-chevron"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M4 6l4 4 4-4"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    ) : (
+      <div class="type-table-header">
+        <code class="type-table-name">{name}</code>
+      </div>
+    )
+  }
+  <div class="type-table-body" id={`${anchorId}-body`}>
     <slot />
   </div>
 </div>
+
+<script>
+  // Auto-expand and scroll the TypeTable matching the current URL hash so
+  // links from method cards / property types land on an opened section.
+  // Only collapsible tables have something to expand; non-collapsible ones
+  // are already visible and just need scrolling into view.
+  // Single-init guard: this <script> is emitted once per TypeTable instance,
+  // so without the guard the listeners would be attached N times on a page
+  // with N TypeTables (the Hub SDK page has ~70).
+  if (!(window as any).__apiTypeTableInit) {
+    (window as any).__apiTypeTableInit = true;
+
+    function openMatchingType() {
+      const hash = window.location.hash.slice(1);
+      if (!hash.startsWith("type-")) return;
+      const el = document.getElementById(hash);
+      if (!el || !el.classList.contains("type-table")) return;
+
+      if (el.getAttribute("data-collapsible") === "true") {
+        el.setAttribute("data-open", "true");
+        const button = el.querySelector(".type-table-header");
+        if (button) button.setAttribute("aria-expanded", "true");
+      }
+
+      // Wait a tick so the layout settles before scrolling.
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
+    window.addEventListener("hashchange", openMatchingType);
+    // Run after Astro page transitions and on first paint.
+    document.addEventListener("astro:page-load", openMatchingType);
+    // Also run immediately if the script loads after the initial page-load event
+    // (e.g. on a hard navigation that lands on a hash).
+    if (document.readyState !== "loading") {
+      openMatchingType();
+    } else {
+      document.addEventListener("DOMContentLoaded", openMatchingType);
+    }
+  }
+</script>
 
 <style>
   .type-table {
@@ -30,6 +122,12 @@ const { name } = Astro.props;
     border-radius: 8px;
     margin: 1rem 0;
     overflow: hidden;
+    scroll-margin-top: 5rem;
+  }
+
+  .type-table:target {
+    border-color: var(--api-type-color, #6366f1);
+    box-shadow: 0 0 0 1px var(--api-type-color, #6366f1);
   }
 
   .type-table-header {
@@ -38,16 +136,31 @@ const { name } = Astro.props;
     gap: 0.5rem;
     padding: 0.625rem 1rem;
     width: 100%;
-    cursor: pointer;
     background: var(--api-type-table-header-bg);
     user-select: none;
     border: none;
     text-align: left;
     font-family: inherit;
+    color: inherit;
   }
 
-  .type-table-header:hover {
-    opacity: 0.85;
+  .type-table[data-collapsible="true"] .type-table-header {
+    cursor: pointer;
+  }
+
+  .type-table[data-collapsible="true"] .type-table-header:hover {
+    filter: brightness(0.97);
+  }
+
+  :root[data-theme="dark"]
+    .type-table[data-collapsible="true"]
+    .type-table-header:hover {
+    filter: brightness(1.15);
+  }
+
+  .type-table-header:focus-visible {
+    outline: 2px solid var(--api-type-color, #6366f1);
+    outline-offset: -2px;
   }
 
   .type-table-name {
@@ -56,16 +169,7 @@ const { name } = Astro.props;
     color: var(--sl-color-text);
     background: none;
     padding: 0;
-  }
-
-  .type-table-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--sl-color-gray-3, #9ca3af);
-    padding: 0.1rem 0.4rem;
-    border-radius: 3px;
-    background: var(--api-type-table-label-bg);
+    margin-right: auto;
   }
 
   .type-table-chevron {
@@ -75,7 +179,7 @@ const { name } = Astro.props;
     flex-shrink: 0;
   }
 
-  .type-table[data-open='true'] .type-table-chevron {
+  .type-table[data-open="true"] .type-table-chevron {
     transform: rotate(180deg);
   }
 
@@ -83,19 +187,17 @@ const { name } = Astro.props;
     padding: 0 1rem 0.5rem;
   }
 
-  .type-table[data-open='false'] .type-table-body {
+  .type-table[data-open="false"] .type-table-body {
     display: none;
   }
 
   /* Light mode */
-  :root:not([data-theme='dark']) {
+  :root:not([data-theme="dark"]) {
     --api-type-table-header-bg: #fafafa;
-    --api-type-table-label-bg: #f1f5f9;
   }
 
   /* Dark mode */
-  :root[data-theme='dark'] {
-    --api-type-table-header-bg: #0D3636;
-    --api-type-table-label-bg: rgba(64, 222, 223, 0.08);
+  :root[data-theme="dark"] {
+    --api-type-table-header-bg: #0d3636;
   }
 </style>

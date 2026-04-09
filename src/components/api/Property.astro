@@ -1,4 +1,6 @@
 ---
+import { getTypeLinkConfig, linkifyType } from "./linkifyType";
+
 interface Props {
   name: string;
   type: string;
@@ -7,12 +9,15 @@ interface Props {
 }
 
 const { name, type, required = false, defaultValue } = Astro.props;
+const pathname = Astro.url?.pathname ?? "";
+const { knownTypes, typePages } = getTypeLinkConfig(pathname);
+const typeHtml = linkifyType(type, knownTypes, pathname, typePages);
 ---
 
 <div class="api-property">
   <div class="api-property-header">
     <code class="api-property-name">{name}</code>
-    <span class="api-property-type">{type}</span>
+    <span class="api-property-type" set:html={typeHtml} />
     {required && <span class="api-property-required">Required</span>}
     {!required && defaultValue && <span class="api-property-default">Default: <code>{defaultValue}</code></span>}
   </div>
@@ -55,6 +60,18 @@ const { name, type, required = false, defaultValue } = Astro.props;
     border-radius: 4px;
     color: var(--api-type-color);
     background: var(--api-type-bg);
+  }
+
+  .api-property-type :global(.api-type-link) {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dashed currentColor;
+    transition: border-bottom-color 0.15s ease, opacity 0.15s ease;
+  }
+
+  .api-property-type :global(.api-type-link:hover) {
+    border-bottom-style: solid;
+    opacity: 0.85;
   }
 
   .api-property-required {

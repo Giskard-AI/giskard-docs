@@ -400,6 +400,25 @@ body.banner-visible .main-frame {
 
 }
 
+/* Probe "NEW" badge */
+.probe-badge-new {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+  margin-bottom: 4px;
+  background-color: #05d939;
+  color: #002929;
+}
+
+:root:not([data-theme='dark']) .probe-badge-new {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+
 /* Responsive video embeds */
 iframe[src*="youtube.com"],
 iframe[src*="vimeo.com"] {
