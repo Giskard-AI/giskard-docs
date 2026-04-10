@@ -517,9 +517,9 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "nbmake", specifier = ">=1.5.5" },
-    { name = "pytest", specifier = ">=8.3" },
-    { name = "python-dotenv", specifier = ">=1.0" },
+    { name = "nbmake", specifier = "==1.5.5" },
+    { name = "pytest", specifier = "==9.0.2" },
+    { name = "python-dotenv", specifier = "==1.2.1" },
 ]
 
 [[package]]
