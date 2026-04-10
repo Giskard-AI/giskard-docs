@@ -123,6 +123,16 @@ We are releasing a new version of the Hub that introduces a server-backed datase
 
 ---
 
+## 2.3.1 (2026-02-20)
+
+We're releasing a fix for a container permission issue affecting OpenShift deployments.
+
+### What's fixed?
+
+- **OpenShift compatibility** - Fixed a permission error that prevented the frontend from starting correctly on OpenShift deployments.
+
+---
+
 ## 2.3.0 (2026-02-03)
 
 We are releasing a new version of the Hub that brings significant improvements to productivity and user experience. This release introduces bulk conversation management for faster dataset organization, a redesigned dashboard with side-by-side evaluations and scans, automated agent description generation, enhanced knowledge base browsing with dedicated chunk navigation, and improved list views across all resources. We've also added two new security probes (Domain Misguidance and Reasoning Denial of Service) and delivered major performance improvements for large evaluation runs.
@@ -175,6 +185,16 @@ We are releasing a new version of the Hub that brings significant improvements t
 - **Task permissions** - Fixed permission issues on tasks to ensure proper access control.
 
 - **Chart tooltips** - Improved tooltip rendering in evaluation charts.
+
+---
+
+## 2.2.2 (2026-01-05)
+
+We're releasing a fix for an issue where API keys were not generated for newly created users.
+
+### What's fixed?
+
+- **User creation API key generation** - Fixed an issue where new users did not receive an API key on creation. The Keycloak extension now correctly generates API keys for all new users, including those created via the admin API.
 
 ---
 
