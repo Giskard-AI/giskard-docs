@@ -197,7 +197,9 @@ Immutable history of all interactions in a scenario. Passed to checks for valida
     Ordered list of all interactions. Most recent at `[-1]`.
   </Property>
   <Property name="annotations" type="dict[str, Any]">
-    Optional scenario-level metadata (for example tenant id or experiment name). Populated from `Scenario(..., annotations=...)` when the runner creates the initial trace.
+    Optional scenario-level metadata (for example tenant id or experiment name).
+    Populated from `Scenario(..., annotations=...)` when the runner creates the
+    initial trace.
   </Property>
   <Property name="last" type="Interaction | None">
     Computed property returning the last interaction, or None if empty.

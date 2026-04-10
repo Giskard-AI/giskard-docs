@@ -8,15 +8,29 @@ const ogImageUrl = `${siteUrl}/default-og-image.png`;
 // Normalize: strip trailing slash to match canonical URL format
 const pageUrl = new URL(Astro.url.pathname, siteUrl).href.replace(/\/$/, '');
 
+// Known acronyms and special labels for breadcrumb segments
+const segmentLabels: Record<string, string> = {
+	ui: 'UI',
+	sdk: 'SDK',
+	oss: 'Open Source',
+	rag: 'RAG',
+	llm: 'LLM',
+	api: 'API',
+	ci: 'CI',
+	cd: 'CD',
+};
+
 // Build breadcrumb from URL path
 const pathSegments = Astro.url.pathname.split('/').filter(Boolean);
 const breadcrumbItems = [
 	{ name: 'Home', url: siteUrl },
 	...pathSegments.map((segment, i) => ({
-		name: segment
-			.split('-')
-			.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-			.join(' '),
+		name:
+			segmentLabels[segment] ??
+			segment
+				.split('-')
+				.map((w) => segmentLabels[w] ?? w.charAt(0).toUpperCase() + w.slice(1))
+				.join(' '),
 		url: `${siteUrl}/${pathSegments.slice(0, i + 1).join('/')}`,
 	})),
 ];
@@ -71,6 +85,9 @@ if (route.lastUpdated) {
 }
 ---
 
+<link rel="preload" href="/fonts/osmose-regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/osmose-bold.woff2" as="font" type="font/woff2" crossorigin />
+
 <!-- Google Tag Manager -->
 <script is:inline>
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -83,10 +100,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <Default {...Astro.props}><slot /></Default>
 
+<meta property="og:type" content="article" />
+<meta property="og:site_name" content="Giskard Documentation" />
+<meta property="og:url" content={pageUrl} />
+<meta property="og:title" content={route.entry.data.title} />
+{route.entry.data.description && <meta property="og:description" content={route.entry.data.description} />}
+<meta property="og:locale" content="en_US" />
 <meta property="og:image" content={ogImageUrl} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:type" content="image/png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={route.entry.data.title} />
+{route.entry.data.description && <meta name="twitter:description" content={route.entry.data.description} />}
 <meta name="twitter:image" content={ogImageUrl} />
 
 <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />

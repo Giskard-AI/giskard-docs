@@ -403,7 +403,7 @@ body.banner-visible .main-frame {
 /* Probe "NEW" badge */
 .probe-badge-new {
   display: block;
-  font-size: 0.7em;
+  font-size: 0.75rem;
   font-weight: 700;
   line-height: 1;
   padding: 2px 6px;

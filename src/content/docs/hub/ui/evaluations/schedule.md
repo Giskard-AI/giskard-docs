@@ -43,4 +43,4 @@ After filling the form, click on the "Schedule evaluation" button, which will cr
 
 Now that you have scheduled an evaluation, you can take action on the results.
 
-* **Compare evaluations** - [Compare evaluations](/hub/ui/evaluations/compare)
+- **Compare evaluations** - [Compare evaluations](/hub/ui/evaluations/compare)

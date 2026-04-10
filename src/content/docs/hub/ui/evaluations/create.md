@@ -51,7 +51,7 @@ During the development phase, it is essential to diagnose issues and implement c
 - **Failure rate per check:** Identifying the checks with the highest failure rate makes it easier to apply targeted corrections. For example, if you created a custom check to verify whether the agent starts with "I'm sorry," it is useful to know how many conversations fail this requirement. If the failure rate is high, you can develop mitigation strategies such as prompt engineering, implementing guardrails, or using routers to address the issue.
 - **Failure rate per category:** Measuring failure rates across different vulnerability categories (e.g., hallucination, prompt injection) helps prioritize mitigation strategies for the AI agent.
 - **Failure rate per tag:** Measuring failure rates across different tags (e.g., customer-support, technical-support) helps prioritize mitigation strategies for the AI agent.
-:::
+  :::
 
 ### Metrics view
 
@@ -63,9 +63,9 @@ The pie chart below displays the number of evaluations that passed, failed, or w
 
 The metrics view helps you:
 
-* Identify which checks have the highest failure rates
-* Understand which custom checks are most effective
-* Prioritize which checks need refinement or adjustment
+- Identify which checks have the highest failure rates
+- Understand which custom checks are most effective
+- Prioritize which checks need refinement or adjustment
 
 :::tip
 You can read about metric definitions in [Annotate overview](/hub/ui/annotate/overview).
@@ -81,10 +81,10 @@ The pie chart below displays the number of evaluations that passed, failed, or w
 
 Using failure categories helps you:
 
-* **Identify patterns** - See which types of failures are most common
-* **Prioritize fixes** - Focus on the most critical failure types first
-* **Assign tasks** - Route issues to the right team members based on category
-* **Track improvements** - Monitor how failure rates change over time
+- **Identify patterns** - See which types of failures are most common
+- **Prioritize fixes** - Focus on the most critical failure types first
+- **Assign tasks** - Route issues to the right team members based on category
+- **Track improvements** - Monitor how failure rates change over time
 
 :::tip
 You can read about failure category changes in [Modify test cases](/hub/ui/annotate/modify-test-cases).
@@ -98,10 +98,10 @@ The tags view helps you filter and analyze results by custom tags.
 
 Using tags helps you:
 
-* **Filter results** - Focus on specific test types or scenarios
-* **Compare performance** - See how your agent performs across different test categories
-* **Identify weak areas** - Discover which types of tests have higher failure rates
-* **Organize reviews** - Review test results by category or domain
+- **Filter results** - Focus on specific test types or scenarios
+- **Compare performance** - See how your agent performs across different test categories
+- **Identify weak areas** - Discover which types of tests have higher failure rates
+- **Organize reviews** - Review test results by category or domain
 
 :::tip
 You can read about tag definitions in [Annotate overview](/hub/ui/annotate/overview).
@@ -115,36 +115,34 @@ The evaluation run table displays test cases with several columns that provide i
 
 These columns help you:
 
-* Quickly identify which test cases need review
-* Filter and sort results to focus on specific issues
-* Navigate efficiently through large evaluation runs
-* Make informed decisions about which test cases require action
+- Quickly identify which test cases need review
+- Filter and sort results to focus on specific issues
+- Navigate efficiently through large evaluation runs
+- Make informed decisions about which test cases require action
 
 Underneath, you can see the types of columns that are displayed for each test case:
 
-* **Sample success** - The overall result of the test case:
+- **Sample success** - The overall result of the test case:
+  - **Pass** - The test case met all evaluation criteria
+  - **Fail** - The test case did not meet one or more evaluation criteria
+  - **Error** - An error occurred during evaluation
+  - **Skipped** - The test case was not evaluated (typically because required checks or annotations are missing)
 
-  * **Pass** - The test case met all evaluation criteria
-  * **Fail** - The test case did not meet one or more evaluation criteria
-  * **Error** - An error occurred during evaluation
-  * **Skipped** - The test case was not evaluated (typically because required checks or annotations are missing)
+- **Metrics** - The metrics that were calculated for the test case
 
-* **Metrics** - The metrics that were calculated for the test case
+- **Status** - The status of the test case:
+  - **Running** - The test case is being evaluated
+  - **Finished** - The test case has been evaluated
+  - **Error** - An error occurred during evaluation
+  - **Skipped** - The test case was not evaluated (typically because the test case is in draft status as part of a task)
 
-* **Status** - The status of the test case:
+- **Failure category** - The category assigned to failed test cases (if applicable)
 
-  * **Running** - The test case is being evaluated
-  * **Finished** - The test case has been evaluated
-  * **Error** - An error occurred during evaluation
-  * **Skipped** - The test case was not evaluated (typically because the test case is in draft status as part of a task)
-
-* **Failure category** - The category assigned to failed test cases (if applicable)
-
-* **Tags** - Tags associated with the test case for filtering and organization
+- **Tags** - Tags associated with the test case for filtering and organization
 
 ## Next steps
 
 Now that you have created an evaluation, you can take action on the results.
 
-* **Compare evaluations** - [Compare evaluations](/hub/ui/evaluations/compare)
-* **Schedule evaluations** - [Schedule evaluations](/hub/ui/evaluations/schedule)
+- **Compare evaluations** - [Compare evaluations](/hub/ui/evaluations/compare)
+- **Schedule evaluations** - [Schedule evaluations](/hub/ui/evaluations/schedule)

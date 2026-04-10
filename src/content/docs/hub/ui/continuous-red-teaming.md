@@ -9,8 +9,8 @@ Continuous red teaming is a proactive approach to AI security that involves cont
 
 Unlike traditional security testing that focuses on known vulnerabilities, continuous red teaming:
 
-* **Adapts to new threats**: Automatically detects and responds to emerging attack patterns
-* **Enables proactive defense**: Identifies vulnerabilities before they can be exploited
+- **Adapts to new threats**: Automatically detects and responds to emerging attack patterns
+- **Enables proactive defense**: Identifies vulnerabilities before they can be exploited
 
 ## Dataset generation
 

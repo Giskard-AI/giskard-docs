@@ -71,18 +71,18 @@ You can find examples of business vulnerabilities in our [RealPerformance datase
 
 **Example 1: Invented Facts**
 
-*User Query*: "What was the population of Paris in 2020?"
-*Model Response*: "The population of Paris in 2020 was approximately 2.2 million people."
-*Reality*: The actual population was closer to 2.1 million.
+_User Query_: "What was the population of Paris in 2020?"
+_Model Response_: "The population of Paris in 2020 was approximately 2.2 million people."
+_Reality_: The actual population was closer to 2.1 million.
 
 **Example 2: Fake Sources**
 
-*User Query*: "What does the latest IPCC report say about renewable energy costs?"
-*Model Response*: "According to the IPCC's 2024 Special Report on Renewable Energy, solar costs have decreased by 89% since 2010."
-*Reality*: No such IPCC report exists.
+_User Query_: "What does the latest IPCC report say about renewable energy costs?"
+_Model Response_: "According to the IPCC's 2024 Special Report on Renewable Energy, solar costs have decreased by 89% since 2010."
+_Reality_: No such IPCC report exists.
 
 **Example 3: Logical Errors**
 
-*User Query*: "If a company's revenue increased by 20% and costs decreased by 10%, what happened to profit?"
-*Model Response*: "Profit increased by 30% because 20% + 10% = 30%."
-*Reality*: This calculation is mathematically incorrect.
+_User Query_: "If a company's revenue increased by 20% and costs decreased by 10%, what happened to profit?"
+_Model Response_: "Profit increased by 30% because 20% + 10% = 30%."
+_Reality_: This calculation is mathematically incorrect.

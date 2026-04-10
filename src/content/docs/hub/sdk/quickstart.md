@@ -12,9 +12,11 @@ This tutorial walks you through installing the SDK, connecting to the Hub, and r
 The fastest way to set up the Giskard Hub SDK. Paste a single URL into your coding agent and it handles everything — dependency installation, authentication, and environment setup.
 
 :::tip[Get Started — Paste this into your coding agent:]
+
 ```
 Follow the instructions from https://docs.giskard.ai/hub/sdk/quickstart.md and install giskard-hub in my project.
 ```
+
 :::
 
 ### How it works

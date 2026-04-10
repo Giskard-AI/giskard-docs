@@ -13,10 +13,10 @@ Event logs provide full traceability for all changes made to entities within Gis
 
 Event logs are essential for maintaining accountability and understanding the evolution of your evaluation setup. They help you:
 
-* **Track changes** - See what has been modified on any entity
-* **Identify authors** - Know who made each change
-* **Understand impact** - Recognize how changes affect your evaluations
-* **Maintain compliance** - Keep complete audit trails for regulatory requirements
+- **Track changes** - See what has been modified on any entity
+- **Identify authors** - Know who made each change
+- **Understand impact** - Recognize how changes affect your evaluations
+- **Maintain compliance** - Keep complete audit trails for regulatory requirements
 
 ## Event logs overview
 
@@ -26,17 +26,17 @@ To begin, click on the "Settings" icon on the left panel, then select "Event log
 
 Every entity in Giskard Hub maintains a complete history of all modifications. This includes:
 
-* **Checks** - Custom validation rules and their configurations
-* **Datasets** - Test case collections and their metadata
-* **Evaluation test cases** - Individual test cases within evaluations
-* **Other entities** - All project-related entities track their changes
+- **Checks** - Custom validation rules and their configurations
+- **Datasets** - Test case collections and their metadata
+- **Evaluation test cases** - Individual test cases within evaluations
+- **Other entities** - All project-related entities track their changes
 
 Each change is recorded with:
 
-* **What changed** - The specific field or property that was modified
-* **Who made the change** - The user who performed the action
-* **When it changed** - Timestamp of the modification
-* **Change details** - Description of the modification
+- **What changed** - The specific field or property that was modified
+- **Who made the change** - The user who performed the action
+- **When it changed** - Timestamp of the modification
+- **Change details** - Description of the modification
 
 #### Viewing event history
 
@@ -50,20 +50,20 @@ To view the event history for a specific entity in the Event logs overview:
 
 ## Best practices
 
-* **Review history regularly** - Check event logs when investigating evaluation results
-* **Monitor critical entities** - Pay special attention to changes in checks and datasets that affect production evaluations
-* **Coordinate with team** - Review event logs before making major changes to understand recent modifications
+- **Review history regularly** - Check event logs when investigating evaluation results
+- **Monitor critical entities** - Pay special attention to changes in checks and datasets that affect production evaluations
+- **Coordinate with team** - Review event logs before making major changes to understand recent modifications
 
 ## Next steps
 
 Now that you understand event logs, you can:
 
-* **Review entity histories** - Check the history of your checks, datasets, and test cases
-* **Investigate changes** - Use event logs to debug evaluation issues
-* **Maintain traceability** - Keep complete audit trails of all modifications
+- **Review entity histories** - Check the history of your checks, datasets, and test cases
+- **Investigate changes** - Use event logs to debug evaluation issues
+- **Maintain traceability** - Keep complete audit trails of all modifications
 
 For more information about working with specific entity types, see:
 
-* [Annotate overview](/hub/ui/annotate/overview) - Learn about checks and validation rules
-* [Datasets](/hub/ui/datasets) - Understand dataset management
-* [Evaluations](/hub/ui/evaluations) - Explore evaluation workflows
+- [Annotate overview](/hub/ui/annotate/overview) - Learn about checks and validation rules
+- [Datasets](/hub/ui/datasets) - Understand dataset management
+- [Evaluations](/hub/ui/evaluations) - Explore evaluation workflows

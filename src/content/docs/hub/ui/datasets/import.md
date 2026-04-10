@@ -49,11 +49,34 @@ Here's an example of the structure and content in a dataset:
         "demo_output": {"role": "assistant", "content": "How can I help you ?"},
         "tags": ["greetings"],
         "checks": [
-            {"identifier": "correctness", "params": {"reference": "How can I help you?"}},
-            {"identifier": "conformity", "params": {"rules": ["The agent should not do X"]}},
-            {"identifier": "metadata", "params": {"json_path_rules": [{"json_path": "$.tool", "expected_value": "calculator", "expected_value_type": "string"}]}},
-            {"identifier": "semantic_similarity", "params": {"reference": "How can I help you?", "threshold": 0.8}},
-        ]
+            {
+                "identifier": "correctness",
+                "params": {"reference": "How can I help you?"},
+            },
+            {
+                "identifier": "conformity",
+                "params": {"rules": ["The agent should not do X"]},
+            },
+            {
+                "identifier": "metadata",
+                "params": {
+                    "json_path_rules": [
+                        {
+                            "json_path": "$.tool",
+                            "expected_value": "calculator",
+                            "expected_value_type": "string",
+                        }
+                    ]
+                },
+            },
+            {
+                "identifier": "semantic_similarity",
+                "params": {
+                    "reference": "How can I help you?",
+                    "threshold": 0.8,
+                },
+            },
+        ],
     }
 ]
 ```
@@ -82,7 +105,7 @@ Hi agent!,How can I help you?,greetings,assistance,How can I help you?,The agent
 
 ## Next steps
 
-* **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
-* **Generate knowledge base tests** - Try [Knowledge base tests](/hub/ui/datasets/knowledge-base)
-* **Generate scenario tests** - Try [Scenario tests](/hub/ui/datasets/scenario)
-* **Review test case** - Make sure to [Annotate](/hub/ui/annotate)
+- **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
+- **Generate knowledge base tests** - Try [Knowledge base tests](/hub/ui/datasets/knowledge-base)
+- **Generate scenario tests** - Try [Scenario tests](/hub/ui/datasets/scenario)
+- **Review test case** - Make sure to [Annotate](/hub/ui/annotate)

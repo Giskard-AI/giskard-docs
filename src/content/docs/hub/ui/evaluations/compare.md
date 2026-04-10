@@ -7,10 +7,10 @@ sidebar:
 
 Comparing evaluations is a crucial part of maintaining and improving your LLM agents over time. By comparing results across different versions, datasets, or time periods, you can:
 
-* **Detect regressions**: Identify when agent performance has degraded
-* **Track improvements**: Measure the impact of changes and optimizations
-* **Maintain quality standards**: Ensure consistent performance across deployments
-* **Make data-driven decisions**: Use metrics to guide development priorities
+- **Detect regressions**: Identify when agent performance has degraded
+- **Track improvements**: Measure the impact of changes and optimizations
+- **Maintain quality standards**: Ensure consistent performance across deployments
+- **Make data-driven decisions**: Use metrics to guide development priorities
 
 In this section, we will walk you through how to compare evaluations in Giskard Hub.
 
@@ -45,4 +45,4 @@ If you need more information on setting up efficient evaluations for your agent,
 
 Now that you have compared evaluations, you can take action on the results.
 
-* **Schedule evaluations** - [Schedule evaluations](/hub/ui/evaluations/schedule)
+- **Schedule evaluations** - [Schedule evaluations](/hub/ui/evaluations/schedule)

@@ -11,8 +11,8 @@ This section guides you through the business workflow for reviewing test results
 
 There are two main ways to review test results:
 
-* From an evaluation run
-* From an assigned task
+- From an evaluation run
+- From an assigned task
 
 ### From an evaluation run
 
@@ -68,10 +68,9 @@ If you can answer at least one of these questions:
 
 - **Go to the linked test case** in the dataset
 - **Rewrite the test requirement:**
-
-  * If question 1 is true: Enable correctness check by putting the minimum info as reference
-  * If question 2 is true: Enable groundedness check and put the block of info as context
-  * If question 3 is true: Write a negative rule ("the agent should not...") in a conformity check
+  - If question 1 is true: Enable correctness check by putting the minimum info as reference
+  - If question 2 is true: Enable groundedness check and put the block of info as context
+  - If question 3 is true: Write a negative rule ("the agent should not...") in a conformity check
 
 - **Retest various times** until the result is always PASS (regenerate a agent answer, and retest)
 - **Save** the changes
@@ -127,15 +126,13 @@ If the agent answers correctly in reality and the test was too strict:
 
 - **Provide the reason** why the agent answer is ok, in the description of the task
 - **Answer at least one of these questions** to help guide the test rewrite:
-
-  * Is there any minimum information the agent must not omit (e.g., a number, a fact)?
-  * Is there any block of information the agent must not go beyond (a page of a website, a section of a document)?
-  * Is there any information you do not want to appear in the agent's answer?
+  - Is there any minimum information the agent must not omit (e.g., a number, a fact)?
+  - Is there any block of information the agent must not go beyond (a page of a website, a section of a document)?
+  - Is there any information you do not want to appear in the agent's answer?
 
 - **Assign the product owner** so that he or she can rewrite the test based on your input
-
-   * Navigate to the "Distribute tasks" workflow [Task management](/hub/ui/annotate/task-management)
-   * Update the task description with your answer and reassign it to the product owner
+  - Navigate to the "Distribute tasks" workflow [Task management](/hub/ui/annotate/task-management)
+  - Update the task description with your answer and reassign it to the product owner
 
 #### If you don't know if the agent answers correctly or not. There needs to be a discussion
 
@@ -179,10 +176,10 @@ To understand why a test passed or failed, you need to review the explanation fo
 
 Each check provides an explanation of why it passed or failed. This explanation helps you understand:
 
-* What the check was evaluating
-* What criteria were applied
-* Why the test case passed or failed
-* What specific aspects of the agent's response caused the result
+- What the check was evaluating
+- What criteria were applied
+- Why the test case passed or failed
+- What specific aspects of the agent's response caused the result
 
 :::tip
 For more information about checks and how to enable/disable them, see the "Enable/Disable checks" section in [Modify test cases](/hub/ui/annotate/modify-test-cases). For comprehensive information about all check types, see [Overview](/hub/ui/annotate/overview).
@@ -192,18 +189,18 @@ For more information about checks and how to enable/disable them, see the "Enabl
 
 When a test fails, it is categorized based on the type of failure. Understanding these categories helps you:
 
-* Identify patterns in failures
-* Prioritize which issues to address first
-* Assign tasks to the right team members
+- Identify patterns in failures
+- Prioritize which issues to address first
+- Assign tasks to the right team members
 
 **Common failure categories:**
 
-* **Hallucination** - The agent generated information not present in the context
-* **Omission** - The agent failed to include required information
-* **Conformity violation** - The agent did not follow business rules or constraints
-* **Groundedness issue** - The agent's answer contains information not grounded in the provided context
-* **Metadata mismatch** - The agent's metadata does not match expected values
-* **String matching failure** - Required keywords or phrases are missing
+- **Hallucination** - The agent generated information not present in the context
+- **Omission** - The agent failed to include required information
+- **Conformity violation** - The agent did not follow business rules or constraints
+- **Groundedness issue** - The agent's answer contains information not grounded in the provided context
+- **Metadata mismatch** - The agent's metadata does not match expected values
+- **String matching failure** - Required keywords or phrases are missing
 
 :::tip
 You can change the categories used for classification but before doing so, we recommend you to read about the best practices for modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
@@ -215,10 +212,10 @@ Understanding the conversation flow helps you assess whether the test case struc
 
 When reviewing the conversation flow, consider:
 
-* Whether the conversation structure makes sense
-* Whether the user messages are clear and unambiguous
-* Whether the conversation history provides necessary context
-* Whether the test case accurately represents the scenario you want to test
+- Whether the conversation structure makes sense
+- Whether the user messages are clear and unambiguous
+- Whether the conversation history provides necessary context
+- Whether the test case accurately represents the scenario you want to test
 
 ### Conversation structure
 
@@ -228,17 +225,17 @@ A conversation, or test case, is composed of a sequence of messages between the 
 
 In the simplest scenario, a conversation consists of a single message from the user. For example:
 
-   **User:** Hello, which language is your open-source library written in?
+**User:** Hello, which language is your open-source library written in?
 
 ### Multi-turn conversation
 
 To test multi-turn capabilities or provide more context, you can add several alternating messages. For instance:
 
-   **User:** Hello, I wanted to have more information about your open-source library.
+**User:** Hello, I wanted to have more information about your open-source library.
 
-   **Assistant:** Hello! I'm happy to help you learn more about our library. What would you like to know?
+**Assistant:** Hello! I'm happy to help you learn more about our library. What would you like to know?
 
-   **User:** Which language is it written in?
+**User:** Which language is it written in?
 
 You can add as many turns as needed, but always ensure the conversation ends with a user message, since the assistant's reply will be evaluated at runtime.
 
@@ -260,31 +257,31 @@ For more detailed information about creating and managing conversations, see [Ma
 
 The conversation metadata provides additional information about the agent's response, which a developer decided to pass along with the answer, such as:
 
-* Tool calls that were made
-* System flags or status indicators
-* Additional context or structured data
-* Any other information the agent includes in its response
+- Tool calls that were made
+- System flags or status indicators
+- Additional context or structured data
+- Any other information the agent includes in its response
 
 Reviewing metadata helps you understand:
 
-* What actions the agent took during the conversation
-* Whether the agent followed expected workflows
-* Whether system-level requirements were met
-* Whether the response structure matches expectations
+- What actions the agent took during the conversation
+- Whether the agent followed expected workflows
+- Whether system-level requirements were met
+- Whether the response structure matches expectations
 
 For more information about metadata checks and other check types, see [Overview](/hub/ui/annotate/overview).
 
 ## Best practices
 
-* **Review thoroughly** - Take time to understand all aspects of the test result before making a decision
-* **Document your findings** - Add comments to tasks to help others understand your review
-* **Use appropriate actions** - Close tasks when results are correct, assign modification work when changes are needed
-* **Collaborate effectively** - Work with product owners and other team members to ensure test cases are accurate
-* **Maintain quality** - Only close tasks when you're confident the test results are correct
+- **Review thoroughly** - Take time to understand all aspects of the test result before making a decision
+- **Document your findings** - Add comments to tasks to help others understand your review
+- **Use appropriate actions** - Close tasks when results are correct, assign modification work when changes are needed
+- **Collaborate effectively** - Work with product owners and other team members to ensure test cases are accurate
+- **Maintain quality** - Only close tasks when you're confident the test results are correct
 
 ## Next steps
 
 Now that you understand how to review test results, you can:
 
-* **Modify test cases** - Learn how to refine test cases and checks [Modify test cases](/hub/ui/annotate/modify-test-cases)
-* **Distribute tasks** - Create and manage tasks to organize review work [Task management](/hub/ui/annotate/task-management)
+- **Modify test cases** - Learn how to refine test cases and checks [Modify test cases](/hub/ui/annotate/modify-test-cases)
+- **Distribute tasks** - Create and manage tasks to organize review work [Task management](/hub/ui/annotate/task-management)

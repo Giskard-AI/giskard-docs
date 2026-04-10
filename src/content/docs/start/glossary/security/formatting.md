@@ -85,19 +85,19 @@ You can find examples of security vulnerabilities in our [RealHarm dataset ↗](
 
 **Example 1: JSON Format Violation**
 
-*Expected*: `{"name": "John", "age": 30, "city": "New York"}`
-*Actual*: "The person's name is John, they are 30 years old, and live in New York."
-*Issue*: Ignored JSON format instruction
+_Expected_: `{"name": "John", "age": 30, "city": "New York"}`
+_Actual_: "The person's name is John, they are 30 years old, and live in New York."
+_Issue_: Ignored JSON format instruction
 
 **Example 2: Structural Inconsistency**
 
-*Request*: "List the top 3 benefits of exercise"
-*Response 1*: "1. Weight management\n2. Improved mood\n3. Better sleep"
-*Response 2*: "Exercise provides weight management benefits. It also improves mood and helps with sleep."
-*Issue*: Inconsistent response structure
+_Request_: "List the top 3 benefits of exercise"
+_Response 1_: "1. Weight management\n2. Improved mood\n3. Better sleep"
+_Response 2_: "Exercise provides weight management benefits. It also improves mood and helps with sleep."
+_Issue_: Inconsistent response structure
 
 **Example 3: Instruction Ignorance**
 
-*Prompt*: "Answer in exactly 3 bullet points"
-*Response*: "Exercise is beneficial for health. It helps maintain weight and improves cardiovascular function. Regular physical activity also boosts mood and energy levels. Additionally, it strengthens muscles and bones."
-*Issue*: Ignored bullet point requirement
+_Prompt_: "Answer in exactly 3 bullet points"
+_Response_: "Exercise is beneficial for health. It helps maintain weight and improves cardiovascular function. Regular physical activity also boosts mood and energy levels. Additionally, it strengthens muscles and bones."
+_Issue_: Ignored bullet point requirement

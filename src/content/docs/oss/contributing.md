@@ -30,13 +30,13 @@ Also please review and follow the **<a href="https://github.com/Giskard-AI/giska
 
 From the **root of `giskard-oss`**, these are the usual commands (details and any updates live in <a href="https://github.com/Giskard-AI/giskard-oss/blob/main/CONTRIBUTING.md" target="_blank">CONTRIBUTING.md ↗</a>):
 
-| Command | What it does |
-| :--- | :--- |
-| `make setup` | Runs `uv sync`, installs dev CLI tools, and enables **pre-commit** hooks so formatting and checks run before you push |
-| `make format` | **Ruff** format plus safe auto-fixes (`ruff check --fix`) — use this to normalize code you touched |
-| `make lint` | **Ruff** check only (no file writes) — quick feedback without changing files |
-| `make check` | Full local gate: lint, format check, Python 3.12 compatibility (**vermin**), **basedpyright** types, security, and license checks — run before opening a PR |
-| `make test` | **pytest** for packages under `libs/` |
+| Command       | What it does                                                                                                                                                |
+| :------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `make setup`  | Runs `uv sync`, installs dev CLI tools, and enables **pre-commit** hooks so formatting and checks run before you push                                       |
+| `make format` | **Ruff** format plus safe auto-fixes (`ruff check --fix`) — use this to normalize code you touched                                                          |
+| `make lint`   | **Ruff** check only (no file writes) — quick feedback without changing files                                                                                |
+| `make check`  | Full local gate: lint, format check, Python 3.12 compatibility (**vermin**), **basedpyright** types, security, and license checks — run before opening a PR |
+| `make test`   | **pytest** for packages under `libs/`                                                                                                                       |
 
 Run `make help` in the repo for other targets (for example scoped tests with `PACKAGE=giskard-checks`).
 

@@ -25,8 +25,8 @@ The interface below displays the knowledge base details that need to be filled o
 
 - `Name`: The name of the knowledge base.
 - `File`: The document to upload, containing the knowledge base content. Supported formats are:
-    - **JSON**: A JSON file containing an array of objects
-    - **JSONL**: A JSON Lines file with one object per line
+  - **JSON**: A JSON file containing an array of objects
+  - **JSONL**: A JSON Lines file with one object per line
 
 ## File formats
 
@@ -36,8 +36,8 @@ Each object in your JSON or JSONL file should have the following structure:
 
 ```json
 {
-    "text": "Your document content here",
-    "topic": "Optional topic classification"
+  "text": "Your document content here",
+  "topic": "Optional topic classification"
 }
 ```
 
@@ -47,6 +47,7 @@ Each object in your JSON or JSONL file should have the following structure:
 ## Validation rules
 
 **General rules for all formats:**
+
 - If the `text` has a value but the `topic` is blank, the `topic` will be set to 'Others'. However, if all topics are blank, the `topic` will be automatically generated.
 - If both the `text` and `topic` are blank, or if the `text` is blank but the `topic` has a value, the entry will not be imported.
 

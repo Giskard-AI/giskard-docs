@@ -14,10 +14,10 @@ Test cases (conversations) are part of datasets. For information on creating and
 :::tip
 **When to modify test cases**
 
-* Review feedback indicates that test cases need adjustment (see [Review test results](/hub/ui/annotate/review-test-results))
-* Test cases are not accurately representing the intended scenarios
-* Checks need to be adjusted to better match evaluation criteria
-* Test cases need to be organized with tags and descriptions
+- Review feedback indicates that test cases need adjustment (see [Review test results](/hub/ui/annotate/review-test-results))
+- Test cases are not accurately representing the intended scenarios
+- Checks need to be adjusted to better match evaluation criteria
+- Test cases need to be organized with tags and descriptions
 
 This workflow is typically triggered after a business user reviews test results and identifies issues that need modification.
 :::
@@ -30,9 +30,9 @@ Drafting and undrafting test cases allows you to control which test cases are in
 
 Setting a test case to draft status:
 
-* **Excludes it from evaluation runs** - Draft test cases are not used in evaluations until they are undrafted
-* **Indicates work in progress** - Shows that the test case is being reviewed or modified
-* **Prevents biased metrics** - Ensures that incomplete or problematic test cases don't affect your evaluation results
+- **Excludes it from evaluation runs** - Draft test cases are not used in evaluations until they are undrafted
+- **Indicates work in progress** - Shows that the test case is being reviewed or modified
+- **Prevents biased metrics** - Ensures that incomplete or problematic test cases don't affect your evaluation results
 
 To draft a test case:
 
@@ -50,8 +50,8 @@ For more information about creating tasks and setting test cases to draft, see [
 
 In addition to drafting, you can hide false positive results to organize your evaluation overview:
 
-* **Hide** - Makes the false positive result less visible in the evaluation overview and for the metrics computations in the dashboard
-* **Unhide** - Makes the false positive result visible again in the evaluation overview
+- **Hide** - Makes the false positive result less visible in the evaluation overview and for the metrics computations in the dashboard
+- **Unhide** - Makes the false positive result visible again in the evaluation overview
 
 :::tip
 You can look at understanding the overview of evaluations in [Create evaluations](/hub/ui/evaluations/create).
@@ -63,11 +63,11 @@ After modifying a test case or its checks, you should rerun the test to validate
 
 **When to rerun:**
 
-* After modifying the conversation structure
-* After updating the answer example
-* After enabling or disabling checks
-* After modifying check requirements
-* After making any changes that could affect the test result
+- After modifying the conversation structure
+- After updating the answer example
+- After enabling or disabling checks
+- After modifying check requirements
+- After making any changes that could affect the test result
 
 **How to rerun:**
 
@@ -78,10 +78,10 @@ After modifying a test case or its checks, you should rerun the test to validate
 
 Rerunning helps you:
 
-* Validate that your modifications work as expected
-* Catch issues before including the test case in a full evaluation run
-* Iterate quickly on test case improvements
-* Ensure that your changes don't introduce new problems
+- Validate that your modifications work as expected
+- Catch issues before including the test case in a full evaluation run
+- Iterate quickly on test case improvements
+- Ensure that your changes don't introduce new problems
 
 :::tip
 **Rerun before full evaluation**
@@ -95,10 +95,10 @@ If a test case is not relevant to your use case or doesn't test meaningful behav
 
 **When to remove a test case:**
 
-* The test case is not relevant to your use case
-* The scenario is too ambiguous or difficult to evaluate consistently
-* You have duplicate or redundant test cases
-* The test case concept is fundamentally flawed and cannot be fixed
+- The test case is not relevant to your use case
+- The scenario is too ambiguous or difficult to evaluate consistently
+- You have duplicate or redundant test cases
+- The test case concept is fundamentally flawed and cannot be fixed
 
 **How to remove:**
 
@@ -155,9 +155,9 @@ To validate that your check modifications work correctly:
 
 Rerunning the agent answer helps you:
 
-* Verify that the check correctly evaluates the agent's response in different scenarios
-* Ensure that your modifications don't break the check
-* Catch issues before using the check in full evaluation runs
+- Verify that the check correctly evaluates the agent's response in different scenarios
+- Ensure that your modifications don't break the check
+- Catch issues before using the check in full evaluation runs
 
 ### Rerunning the check evaluation
 
@@ -174,10 +174,10 @@ For more information about iterating on checks, see [Overview](/hub/ui/annotate/
 
 Tags are optional but highly recommended labels that help you organize and filter your test cases. Tags help you analyze evaluation results by allowing you to:
 
-* **Filter results** - Focus on specific test cases or scenarios
-* **Compare performance** - See how your agent performs across different test categories
-* **Identify weak areas** - Discover which types of tests have higher failure rates
-* **Organize reviews** - Review test cases by category or domain
+- **Filter results** - Focus on specific test cases or scenarios
+- **Compare performance** - See how your agent performs across different test categories
+- **Identify weak areas** - Discover which types of tests have higher failure rates
+- **Organize reviews** - Review test cases by category or domain
 
 :::tip
 For more information about tags, see [Overview](/hub/ui/annotate/overview).
@@ -187,7 +187,7 @@ For more information about tags, see [Overview](/hub/ui/annotate/overview).
 
 Now that you understand how to modify test cases, you can:
 
-* **Review test results** - Understand how test results are reviewed [Review test results](/hub/ui/annotate/review-test-results)
-* **Distribute tasks** - Learn how tasks are created and managed [Task management](/hub/ui/annotate/task-management)
-* **Learn about checks** - Get detailed information about check types [Overview](/hub/ui/annotate/overview)
-* **Learn about tags** - Understand how to organize with tags [Overview](/hub/ui/annotate/overview)
+- **Review test results** - Understand how test results are reviewed [Review test results](/hub/ui/annotate/review-test-results)
+- **Distribute tasks** - Learn how tasks are created and managed [Task management](/hub/ui/annotate/task-management)
+- **Learn about checks** - Get detailed information about check types [Overview](/hub/ui/annotate/overview)
+- **Learn about tags** - Understand how to organize with tags [Overview](/hub/ui/annotate/overview)

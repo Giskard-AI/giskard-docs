@@ -9,15 +9,16 @@ sidebar:
 Giskard v3 is currently in Pre-release (Beta). We are actively refining the APIs and welcome early adopters to provide feedback and report issues as we move toward a stable 3.0.0 release.
 :::
 
-
 ## Install with a coding agent
 
 The fastest way to set up Giskard Checks. Paste a single URL into your coding agent and it handles everything — dependency installation, LLM provider configuration, and environment setup.
 
 :::tip[Get Started — Paste this into your coding agent:]
+
 ```
 Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md and install giskard-checks in my project.
 ```
+
 :::
 
 ### How it works
@@ -26,7 +27,6 @@ Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md 
 2. **The agent reads** the installation instructions from this page
 3. **The agent installs** `giskard-checks` and configures your LLM provider
 4. **You review** the changes and start writing checks
-
 
 ## Install the Python package
 

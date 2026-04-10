@@ -27,8 +27,8 @@ The interface below displays the agent details that need to be filled out.
 - `Description`: Used to refine automatic evaluation and generation for better accuracy in your specific use case.
 - `Supported Languages`: Add the languages your agent can handle. Note that this affects data generation.
 - `Connection Settings`:
-    - `Agent API Endpoint`: The URL of your agent's API endpoint. This is where requests are sent to interact with your agent.
-    - `Headers`: These are useful for authentication and other custom headers
+  - `Agent API Endpoint`: The URL of your agent's API endpoint. This is where requests are sent to interact with your agent.
+  - `Headers`: These are useful for authentication and other custom headers
 
 ## Request payload
 
@@ -37,18 +37,9 @@ The endpoint should expect an object with the following structure:
 ```python
 {
     "messages": [
-        {
-        "role": "user",
-        "content": "Hello!"
-        },
-        {
-        "role": "assistant",
-        "content": "Hello! How can I help you?"
-        },
-        {
-        "role": "user",
-        "content": "What color is an orange?"
-        }
+        {"role": "user", "content": "Hello!"},
+        {"role": "assistant", "content": "Hello! How can I help you?"},
+        {"role": "user", "content": "What color is an orange?"},
     ]
 }
 ```
@@ -59,13 +50,8 @@ The endpoint's response should have the following structure:
 
 ```python
 {
-    "response": {
-        "role": "assistant",
-        "content": "An orange is green"
-    },
-    "metadata": {
-        "some_key": "whatever value"
-    }
+    "response": {"role": "assistant", "content": "An orange is green"},
+    "metadata": {"some_key": "whatever value"},
 }
 ```
 
