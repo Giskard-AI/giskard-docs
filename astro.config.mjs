@@ -20,6 +20,7 @@ export default defineConfig({
             logo: {
                 light: './src/assets/logo.png',
                 dark: './src/assets/logo_dark.png',
+                alt: 'Giskard',
             },
             customCss: [
                 // Load custom styles
