@@ -85,21 +85,21 @@ You can find examples of business vulnerabilities in our [RealPerformance datase
 
 **Example 1: Selective Omission**
 
-*Context*: "Our product supports Windows, macOS, and Linux with both cloud and on-premise deployment options."
-*User Query*: "What platforms do you support?"
-*Model Response*: "Our product supports Windows and macOS."
-*Issue*: Omitted Linux support and deployment options
+_Context_: "Our product supports Windows, macOS, and Linux with both cloud and on-premise deployment options."
+_User Query_: "What platforms do you support?"
+_Model Response_: "Our product supports Windows and macOS."
+_Issue_: Omitted Linux support and deployment options
 
 **Example 2: Incomplete Response**
 
-*Context*: "We offer 24/7 support via phone, email, live chat, and ticket system."
-*User Query*: "How can I get support?"
-*Model Response*: "You can contact us via phone or email."
-*Issue*: Omitted live chat and ticket system options
+_Context_: "We offer 24/7 support via phone, email, live chat, and ticket system."
+_User Query_: "How can I get support?"
+_Model Response_: "You can contact us via phone or email."
+_Issue_: Omitted live chat and ticket system options
 
 **Example 3: Feature Oversight**
 
-*Context*: "The dashboard includes real-time analytics, customizable widgets, export functionality, and mobile access."
-*User Query*: "What features does the dashboard have?"
-*Model Response*: "The dashboard includes real-time analytics and customizable widgets."
-*Issue*: Omitted export functionality and mobile access
+_Context_: "The dashboard includes real-time analytics, customizable widgets, export functionality, and mobile access."
+_User Query_: "What features does the dashboard have?"
+_Model Response_: "The dashboard includes real-time analytics and customizable widgets."
+_Issue_: Omitted export functionality and mobile access

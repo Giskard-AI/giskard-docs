@@ -111,26 +111,17 @@ The interface below displays the agent details that need to be filled out.
 - `Description`: Used to refine automatic evaluation and generation for better accuracy in your specific use case.
 - `Supported Languages`: Add the languages your agent can handle. Note that this affects data generation.
 - `Connection Settings`:
-    - `Agent API Endpoint`: The URL of your agent's API endpoint. This is where requests are sent to interact with your agent.
-    - `Headers`: These are useful for authentication and other custom headers
+  - `Agent API Endpoint`: The URL of your agent's API endpoint. This is where requests are sent to interact with your agent.
+  - `Headers`: These are useful for authentication and other custom headers
 
 The endpoint should expect an object with the following structure:
 
 ```python
 {
     "messages": [
-        {
-        "role": "user",
-        "content": "Hello!"
-        },
-        {
-        "role": "assistant",
-        "content": "Hello! How can I help you?"
-        },
-        {
-        "role": "user",
-        "content": "What color is an orange?"
-        }
+        {"role": "user", "content": "Hello!"},
+        {"role": "assistant", "content": "Hello! How can I help you?"},
+        {"role": "user", "content": "What color is an orange?"},
     ]
 }
 ```
@@ -139,13 +130,8 @@ The endpoint's response should have the following structure:
 
 ```python
 {
-    "response": {
-        "role": "assistant",
-        "content": "An orange is green"
-    },
-    "metadata": {
-        "some_key": "whatever value"
-    }
+    "response": {"role": "assistant", "content": "An orange is green"},
+    "metadata": {"some_key": "whatever value"},
 }
 ```
 
@@ -167,8 +153,8 @@ The interface below displays the knowledge base details that need to be filled o
 
 - `Name`: The name of the knowledge base.
 - `File`: The document to upload, containing the knowledge base content. Supported formats are:
-    - **JSON**: A JSON file containing an array of objects
-    - **JSONL**: A JSON Lines file with one object per line
+  - **JSON**: A JSON file containing an array of objects
+  - **JSONL**: A JSON Lines file with one object per line
 
 **JSON/JSONL format requirements:**
 
@@ -176,8 +162,8 @@ Each object in your JSON or JSONL file should have the following structure:
 
 ```json
 {
-    "text": "Your document content here",
-    "topic": "Optional topic classification"
+  "text": "Your document content here",
+  "topic": "Optional topic classification"
 }
 ```
 
@@ -185,6 +171,7 @@ Each object in your JSON or JSONL file should have the following structure:
 - `topic` (optional): The topic classification for the document
 
 **General rules for all formats:**
+
 - If the `text` has a value but the `topic` is blank, the `topic` will be set to 'Others'. However, if all topics are blank, the `topic` will be automatically generated.
 - If both the `text` and `topic` are blank, or if the `text` is blank but the `topic` has a value, the entry will not be imported.
 

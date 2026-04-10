@@ -4,7 +4,8 @@
 
 ## For LLMs
 
-Every documentation page is available as raw Markdown by appending `.md` to any URL. All links below point directly to the Markdown version.
+- **Full content in a single file:** https://docs.giskard.ai/llms-full.txt
+- Every documentation page is also available as raw Markdown by appending `.md` to any URL. All links below point directly to the Markdown version.
 
 ## About Giskard
 

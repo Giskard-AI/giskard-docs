@@ -90,8 +90,10 @@ For a **custom trace type**, subclass `Trace` and pass `trace_type=YourTrace` on
 ```python
 from giskard.checks import Scenario, Trace
 
+
 class MyTrace(Trace[str, str]):
     pass
+
 
 scenario = Scenario(
     "with_custom_trace",

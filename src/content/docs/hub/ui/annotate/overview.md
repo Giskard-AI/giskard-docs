@@ -13,10 +13,10 @@ This page provides an overview of the key concepts for organizing and analyzing 
 
 By combining these three concepts, you can:
 
-* Understand which checks (metrics) are failing most often
-* Determine the root causes (failure categories) of those failures
-* Identify which types of test cases (tags) have the highest failure rates
-* Prioritize fixes for each failure category
+- Understand which checks (metrics) are failing most often
+- Determine the root causes (failure categories) of those failures
+- Identify which types of test cases (tags) have the highest failure rates
+- Prioritize fixes for each failure category
 
 You can then focus on improving your agent's compliance with business rules specifically for customer support scenarios.
 
@@ -56,16 +56,15 @@ Check whether all information from the reference answer is present in the agent 
 **Failure examples**:
 
 - The capital of France is Paris.
+  - _Reason: The answer does not specify when the city of Paris was founded_
 
-  - *Reason: The answer does not specify when the city of Paris was founded*
 - The capital of France is Paris, it was founded in 200 AD.
-
-  - *Reason: The answer contradicts the reference which states that Paris was founded around 200 BC, and not 200 AD*
+  - _Reason: The answer contradicts the reference which states that Paris was founded around 200 BC, and not 200 AD_
 
 **Success example**:
 
 - The capital of France is Paris, the first settlement dates from 200 BC.
-:::
+  :::
 
 #### Conformity
 
@@ -83,34 +82,30 @@ Given a rule or criterion, check whether the agent answer complies with this rul
 **Failure example**:
 
 - You should definitely invest into bitcoin in addition to your saving plan, since you want to buy a flat quickly, the yield is much higher with bitcoin.
-
-  - *Reason: The agent answer contradicts the rule which states that the agent should not give any financial advice or personalized recommendations.*
+  - _Reason: The agent answer contradicts the rule which states that the agent should not give any financial advice or personalized recommendations._
 
 **Success example**:
 
 - I'm sorry, I cannot give you specific financial advice, to get personalized recommandation I suggest that you contact our dedicated customer service.
-:::
+  :::
 
 :::tip
 To write effective rules, remember the following best practices:
 
 - **Avoid General Rules Unrelated to the Conversation**
-
-  - *Example of wrong usage:* "The agent should not discriminate based on gender, sexual orientation, religion, or profession" when responding to a user question that has no connection to biases and discrimination.
-  - *Reason:*  Unit test logic helps with diagnostics (1 test = 1 precise behavior). Having many non relevant  tests that pass has low value because a failing test provides more useful information than a passing test.
-  - *Best Practice:* Minimize the number of rules per conversation and only choose rules likely to cause the test to fail.
+  - _Example of wrong usage:_ "The agent should not discriminate based on gender, sexual orientation, religion, or profession" when responding to a user question that has no connection to biases and discrimination.
+  - _Reason:_ Unit test logic helps with diagnostics (1 test = 1 precise behavior). Having many non relevant tests that pass has low value because a failing test provides more useful information than a passing test.
+  - _Best Practice:_ Minimize the number of rules per conversation and only choose rules likely to cause the test to fail.
 
 - **Break Down Policies into Multiple Ones**
-
-  - *Example of wrong usage:* "The agent should not respond to requests about illegal topics and should focus on banking and insurance-related questions."
-  - *Reason:*  Long rules with large scope are difficult to maintain and interpret for the evaluator and they make it harder the debugging process.
-  - *Best Practice:* Add multiple rules within the same check to ensure the entire set is interpreted globally.
+  - _Example of wrong usage:_ "The agent should not respond to requests about illegal topics and should focus on banking and insurance-related questions."
+  - _Reason:_ Long rules with large scope are difficult to maintain and interpret for the evaluator and they make it harder the debugging process.
+  - _Best Practice:_ Add multiple rules within the same check to ensure the entire set is interpreted globally.
 
 - **Write Custom Checks when your rules apply to multiple conversations**
-
   - Creating and enabling a custom check for multiple conversations is useful when you want to display the evaluation results for all conversations where the custom check is enabled.
-  - *Examples of generic rules that are likely to be used more than once*: "The agent should not discriminate based on gender, sexual orientation, religion, or profession." "The agent should answer in English."
-:::
+  - _Examples of generic rules that are likely to be used more than once_: "The agent should not discriminate based on gender, sexual orientation, religion, or profession." "The agent should answer in English."
+    :::
 
 #### Groundedness
 
@@ -124,17 +119,16 @@ Check whether all information from the agent's answer is present in the given co
 **Failure examples**:
 
 - Edmund Hillary, born in 1919, was a great mountaineer who climb Mount Everest first.
+  - _Reason: The reference context does not specify that Hillary was born in 1919_
 
-  - *Reason: The reference context does not specify that Hillary was born in 1919*
 - Edmund Hillary reached the summit of Mount Everest in 1952.
-
-  - *Reason: The reference context states that Hillary reached the summit of Mount Everest in 1953, and not in 1952*
+  - _Reason: The reference context states that Hillary reached the summit of Mount Everest in 1953, and not in 1952_
 
 **Success examples**:
 
 - Edmund Hillary was the first person to reach the summit of Mount Everest in 1953.
 - Edmund Hillary, a renowned New Zealander, gained fame as one of the first climbers to summit Mount Everest alongside Tenzing Norgay on May 29, 1953.
-:::
+  :::
 
 #### String Matching
 
@@ -146,13 +140,12 @@ Check whether the given keyword or sentence is present in the agent answer.
 **Failure example**:
 
 - Hi, can I help you?
-
-  - *Reason: The agent answer does not contain the keyword 'Hello'*
+  - _Reason: The agent answer does not contain the keyword 'Hello'_
 
 **Success example**:
 
 - Hello, how may I help you today?
-:::
+  :::
 
 #### Metadata
 
@@ -168,14 +161,13 @@ We recommend using a tool like [json-path-evaluator](https://mockoon.com/tools/j
 **Failure examples**:
 
 - Metadata: `{"user": {"name": "Doe"}}`
-
-  - *Reason: Expected* `John` *at* `$.user.name` *but got* `Doe`
+  - _Reason: Expected_ `John` _at_ `$.user.name` _but got_ `Doe`
 
 **Success examples**:
 
 - Metadata: `{"user": {"name": "John"}}`
 - Metadata: `{"user": {"name": "John Doe"}}`
-:::
+  :::
 
 :::note[Example - boolean value]
 **JSON Path rule**: Expecting `true` (boolean) at `$.output.success`
@@ -183,17 +175,15 @@ We recommend using a tool like [json-path-evaluator](https://mockoon.com/tools/j
 **Failure examples**:
 
 - Metadata: `{"output": {"success": false}}`
-
-  - *Reason: Expected* `true` *at* `$.output.success` *but got* `false`
+  - _Reason: Expected_ `true` _at_ `$.output.success` _but got_ `false`
 
 - Metadata: `{"output": {}}`
-
-  - *Reason: JSON path* `$.output.success` *does not exist in metadata*
+  - _Reason: JSON path_ `$.output.success` _does not exist in metadata_
 
 **Success example**:
 
 - Metadata: `{"output": {"success": true}}`
-:::
+  :::
 
 #### Semantic Similarity
 
@@ -209,7 +199,7 @@ Check whether the agent's response is semantically similar to the reference. Thi
 **Failure example**:
 
 - The capital of France is Paris, which is located in the southern part of the country.
-:::
+  :::
 
 #### Custom Checks
 
@@ -227,7 +217,7 @@ Next, set the parameters for the check:
 - `Identifier`: A unique identifier for the check. It should be a string without spaces.
 - `Description`: A brief description of the check.
 - `Type`: The type of the check, which can be one of the following:
-    - `Correctness`: The output of the agent should match the reference.
+  - `Correctness`: The output of the agent should match the reference.
 - `Conformity`: The conversation should follow a set of rules.
 - `Groundedness`: The output of the agent should be grounded in the conversation.
 - `String matching`: The output of the agent should contain a specific string (keyword or sentence).
@@ -262,6 +252,7 @@ You can read about modifying test cases in [Modify test cases](/hub/ui/annotate/
 Failure categories help you understand the root cause of test failures and identify patterns in how your agent is failing. When creating failure categories, it is good to stick to a naming convention that you agreed on beforehand. Ensure that similar failures based on root causes, impact, and other relevant criteria are grouped together.
 
 :::note[Types of Failure Categories]
+
 - **Accuracy-Related Failures**: These categories capture failures related to the correctness and completeness of information in the agent's response.
 
   Examples: "Contradiction", "Omission", "Addition", "Incorrect Information"
@@ -285,9 +276,10 @@ Failure categories help you understand the root cause of test failures and ident
 - **Context-Awareness Failures**: These categories relate to failures where the agent fails to properly understand or use the provided context.
 
   Examples: "Context Misunderstanding", "Missing Context Reference", "Context Contradiction"
-:::
+  :::
 
 :::tip
+
 - **Create Categories Based on Root Causes**: Focus on categorizing failures by their underlying root cause rather than surface-level symptoms to enable more effective fixes.
 
   Example: Instead of creating separate categories for "Wrong Date" and "Wrong Name", consider a broader "Factual Error" category that captures the root cause.
@@ -299,16 +291,16 @@ Failure categories help you understand the root cause of test failures and ident
 - **Analyze Patterns Across Categories**: Look for patterns in failure categories across different tags or test types to identify systemic issues.
 
   Example: If "Security-Related Failures" are concentrated in conversations tagged with "Adversarial Testing", you may need to strengthen your agent's security defenses.
-:::
+  :::
 
 ## Tags
 
 Tags are optional but highly recommended labels that help you organize and filter your test cases. Tags help you analyze evaluation results by allowing you to:
 
-* **Filter results** - Focus on specific test types or scenarios
-* **Compare performance** - See how your agent performs across different test categories
-* **Identify weak areas** - Discover which types of tests have higher failure rates
-* **Organize reviews** - Review test results by category or domain
+- **Filter results** - Focus on specific test types or scenarios
+- **Compare performance** - See how your agent performs across different test categories
+- **Identify weak areas** - Discover which types of tests have higher failure rates
+- **Organize reviews** - Review test results by category or domain
 
 ### Create a tag
 
@@ -325,6 +317,7 @@ Before creating a tag, we recommend you to read about the best practices for mod
 To choose a tag, it is good to stick to a naming convention that you agreed on beforehand. Ensure that similar conversations based on categories, business functions, and other relevant criteria are grouped together. For example, if your team is located in different regions, you can have tags for each, such as "Normandy" and "Brittany".
 
 :::note[Categories of Tags]
+
 - **Issue-Related Tags**: These tags categorize the types of problems that might occur during a conversation.
 
   Examples: "Hallucination", "Misunderstanding", "Incorrect Information"
@@ -348,9 +341,10 @@ To choose a tag, it is good to stick to a naming convention that you agreed on b
 - **Temporal Tags**: Depending on the life cycle of the testing process of the agent.
 
   Examples: "red teaming phase 1", "red teaming phase 2"
-:::
+  :::
 
 :::tip
+
 - **Use Multiple Tags if Necessary**: Apply multiple tags to a single conversation to cover all relevant aspects.
 
   Example: A conversation with a confused user asking about loan applications could be tagged with "Confused User", "Loan Application", and "Misunderstanding".
@@ -362,12 +356,12 @@ To choose a tag, it is good to stick to a naming convention that you agreed on b
 - **Stick to Agreed Naming Conventions**: Ensure that your team agrees on and follows a consistent naming convention for tags to maintain organization and clarity.
 
   Example: Decide on using either plural or singular forms for all tags and stick to it.
-:::
+  :::
 
 ## Next Steps
 
 Now that you understand the fundamentals of test organization, you can:
 
-* **Review test results** - [Review test results](/hub/ui/annotate/review-test-results)
-* **Modify test cases** - [Modify test cases](/hub/ui/annotate/modify-test-cases)
-* **Run evaluations** - [Create evaluations](/hub/ui/evaluations/create)
+- **Review test results** - [Review test results](/hub/ui/annotate/review-test-results)
+- **Modify test cases** - [Modify test cases](/hub/ui/annotate/modify-test-cases)
+- **Run evaluations** - [Create evaluations](/hub/ui/evaluations/create)

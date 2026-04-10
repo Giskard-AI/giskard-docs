@@ -29,7 +29,7 @@ These clusters and topics are then used to generate dedicated tests that challen
 - **Designed to trigger failures**: Synthetic test cases should not be trivial queries, otherwise the chance that your tests fail becomes very low. The Giskard hub applies perturbation techniques (e.g., paraphrasing, adding out-of-scope contexts) to increase the likelihood of incorrect responses from the agent.
 - **Automatable**: A good synthetic test case generator should not only generate queries but also generate the expected outputs so that the evaluation judge can automatically compare them with the agent's responses. This is essential for the LLM-as-a-judge setup.
 - **Domain-specific**: Synthetic test cases should not be generic queries; otherwise, they won't truly represent real user queries. While these test cases should be reviewed by humans, it's important to add metadata to the synthetic data generator to make it more specific. The Giskard Hub includes the agent's description in the generation process to ensure that the queries are realistic.
-:::
+  :::
 
 ## Getting started
 
@@ -67,6 +67,6 @@ For detailed information about checks like groundedness, correctness, conformity
 
 ## Next steps
 
-* **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
-* **Generate scenario tests** - Try [Scenario tests](/hub/ui/datasets/scenario)
-* **Review test cases** - Make sure to [Annotate](/hub/ui/annotate)
+- **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
+- **Generate scenario tests** - Try [Scenario tests](/hub/ui/datasets/scenario)
+- **Review test cases** - Make sure to [Annotate](/hub/ui/annotate)

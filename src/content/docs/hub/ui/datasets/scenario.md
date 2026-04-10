@@ -31,6 +31,7 @@ You'll see a subset of all the personas that you've defined---the user personas 
 ![Select or create a persona](/_static/images/hub/scenario-persona-choose.png)
 
 When creating a new persona scenario, it's always nice to have:
+
 - **A descriptive name**: This helps identify the persona quickly
 - **A description**: This helps with the generation understanding and ensures the generated test cases align with your intended persona
 
@@ -41,6 +42,7 @@ You can then add specific rules that define behaviors your agent should respect 
 ![Configure persona with rules](/_static/images/hub/scenario-persona-create.png)
 
 For example:
+
 - **Persona**: Customer using slang/emojis asking about loans
 - **Rules**: Enforce professional tone and refusal to do interest calculations
 
@@ -52,6 +54,7 @@ After defining a set of rules, you can add them to the scenario.
 ## Generate test cases
 
 Once you've configured your persona and rules, you can:
+
 - **Select your agent**: Choose the agent you want to test (e.g., Zephyr Bank multilingual agent)
 - **Set the number of test cases**: Specify how many test cases you want to generate
 
@@ -67,6 +70,6 @@ After generating an example response, you can also test the evaluation. If the e
 
 ## Next steps
 
-* **Review test cases** - Make sure to [Annotate](/hub/ui/annotate)
-* **Generate knowledge base tests** - Try [Knowledge base tests](/hub/ui/datasets/knowledge-base)
-* **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
+- **Review test cases** - Make sure to [Annotate](/hub/ui/annotate)
+- **Generate knowledge base tests** - Try [Knowledge base tests](/hub/ui/datasets/knowledge-base)
+- **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)

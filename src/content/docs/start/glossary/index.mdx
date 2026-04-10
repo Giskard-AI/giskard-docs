@@ -14,60 +14,176 @@ The glossary is organized into several key areas: core concepts that form the fo
 ## Core concepts
 
 <CardGrid>
-  <LinkCard title="Project" href="/hub/ui/setup/projects" description="A container for organizing related models, datasets, checks, and evaluations within Giskard Hub." />
-  <LinkCard title="Model" href="/hub/ui" description="A trained machine learning model, particularly Large Language Models (LLMs) that process and generate text." />
-  <LinkCard title="Agent" href="/hub/ui/setup/agents" description="An AI system or agent that can perform tasks autonomously, often using tools and following specific instructions." />
-  <LinkCard title="Tool" href="/hub/ui/setup/agents" description="A function or capability that an agent can use to perform tasks, often provided by external services or APIs." />
-  <LinkCard title="Dataset" href="/hub/ui/datasets" description="A collection of test cases, examples, or data points used to evaluate model performance and behavior." />
-  <LinkCard title="Test Case" href="/hub/ui/datasets/manual" description="A specific input-output pair or scenario used to evaluate model behavior and performance." />
-  <LinkCard title="Check" href="/hub/ui/annotate/overview" description="A specific test or validation rule that evaluates a particular aspect of model behavior (e.g., correctness, security, fairness)." />
-  <LinkCard title="Evaluation" href="/hub/ui/evaluations" description="The process of testing a model against a dataset to assess its performance, safety, and compliance." />
+  <LinkCard
+    title="Project"
+    href="/hub/ui/setup/projects"
+    description="A container for organizing related models, datasets, checks, and evaluations within Giskard Hub."
+  />
+  <LinkCard
+    title="Model"
+    href="/hub/ui"
+    description="A trained machine learning model, particularly Large Language Models (LLMs) that process and generate text."
+  />
+  <LinkCard
+    title="Agent"
+    href="/hub/ui/setup/agents"
+    description="An AI system or agent that can perform tasks autonomously, often using tools and following specific instructions."
+  />
+  <LinkCard
+    title="Tool"
+    href="/hub/ui/setup/agents"
+    description="A function or capability that an agent can use to perform tasks, often provided by external services or APIs."
+  />
+  <LinkCard
+    title="Dataset"
+    href="/hub/ui/datasets"
+    description="A collection of test cases, examples, or data points used to evaluate model performance and behavior."
+  />
+  <LinkCard
+    title="Test Case"
+    href="/hub/ui/datasets/manual"
+    description="A specific input-output pair or scenario used to evaluate model behavior and performance."
+  />
+  <LinkCard
+    title="Check"
+    href="/hub/ui/annotate/overview"
+    description="A specific test or validation rule that evaluates a particular aspect of model behavior (e.g., correctness, security, fairness)."
+  />
+  <LinkCard
+    title="Evaluation"
+    href="/hub/ui/evaluations"
+    description="The process of testing a model against a dataset to assess its performance, safety, and compliance."
+  />
 </CardGrid>
 
 ## Testing and evaluation
 
 <CardGrid>
-  <LinkCard title="AI Business Failures" href="/start/glossary/business" description="AI system failures that affect business logic, including hallucinations, omission, contradiction, and moderation issues." />
-  <LinkCard title="AI Security Vulnerabilities" href="/start/glossary/security" description="AI system failures that affect security, including prompt injection, harmful content generation, and information disclosure." />
-  <LinkCard title="Adversarial Testing" href="/hub/ui/datasets" description="Testing methodology that intentionally tries to break or exploit models using carefully crafted inputs designed to trigger failures." />
-  <LinkCard title="Human-in-the-Loop" href="/hub/ui/annotate/overview" description="Combining automated testing with human expertise and judgment." />
-  <LinkCard title="Regression Testing" href="/hub/ui/evaluations/compare" description="Ensuring that new changes don't break existing functionality." />
-  <LinkCard title="Continuous Red Teaming" href="/hub/ui/continuous-red-teaming" description="Automated, ongoing security testing that continuously monitors for new threats and vulnerabilities." />
+  <LinkCard
+    title="AI Business Failures"
+    href="/start/glossary/business"
+    description="AI system failures that affect business logic, including hallucinations, omission, contradiction, and moderation issues."
+  />
+  <LinkCard
+    title="AI Security Vulnerabilities"
+    href="/start/glossary/security"
+    description="AI system failures that affect security, including prompt injection, harmful content generation, and information disclosure."
+  />
+  <LinkCard
+    title="Adversarial Testing"
+    href="/hub/ui/datasets"
+    description="Testing methodology that intentionally tries to break or exploit models using carefully crafted inputs designed to trigger failures."
+  />
+  <LinkCard
+    title="Human-in-the-Loop"
+    href="/hub/ui/annotate/overview"
+    description="Combining automated testing with human expertise and judgment."
+  />
+  <LinkCard
+    title="Regression Testing"
+    href="/hub/ui/evaluations/compare"
+    description="Ensuring that new changes don't break existing functionality."
+  />
+  <LinkCard
+    title="Continuous Red Teaming"
+    href="/hub/ui/continuous-red-teaming"
+    description="Automated, ongoing security testing that continuously monitors for new threats and vulnerabilities."
+  />
 </CardGrid>
 
 ## Security vulnerabilities
 
 <CardGrid>
-  <LinkCard title="Prompt Injection" href="/start/glossary/security/injection" description="A security vulnerability where malicious input manipulates the model's behavior or extracts sensitive information." />
-  <LinkCard title="Harmful Content Generation" href="/start/glossary/security/harmful-content" description="Production of violent, illegal, or inappropriate material by AI models." />
-  <LinkCard title="Information Disclosure" href="/start/glossary/security/information-disclosure" description="Leaking sensitive data or private information from training data or user interactions." />
-  <LinkCard title="Output Formatting Issues" href="/start/glossary/security/formatting" description="Manipulation of response structure for malicious purposes or poor output formatting." />
-  <LinkCard title="Robustness Issues" href="/start/glossary/security/robustness" description="Vulnerability to adversarial inputs or edge cases causing inconsistent behavior." />
+  <LinkCard
+    title="Prompt Injection"
+    href="/start/glossary/security/injection"
+    description="A security vulnerability where malicious input manipulates the model's behavior or extracts sensitive information."
+  />
+  <LinkCard
+    title="Harmful Content Generation"
+    href="/start/glossary/security/harmful-content"
+    description="Production of violent, illegal, or inappropriate material by AI models."
+  />
+  <LinkCard
+    title="Information Disclosure"
+    href="/start/glossary/security/information-disclosure"
+    description="Leaking sensitive data or private information from training data or user interactions."
+  />
+  <LinkCard
+    title="Output Formatting Issues"
+    href="/start/glossary/security/formatting"
+    description="Manipulation of response structure for malicious purposes or poor output formatting."
+  />
+  <LinkCard
+    title="Robustness Issues"
+    href="/start/glossary/security/robustness"
+    description="Vulnerability to adversarial inputs or edge cases causing inconsistent behavior."
+  />
 </CardGrid>
 
 ## Access and permissions
 
 <CardGrid>
-  <LinkCard title="Access Rights" href="/hub/ui/access-rights" description="Permissions that control what users can see and do within the Giskard Hub platform." />
-  <LinkCard title="Role-Based Access Control (RBAC)" href="/hub/ui/access-rights" description="A security model that assigns permissions based on user roles rather than individual user accounts." />
-  <LinkCard title="Scope" href="/hub/ui/access-rights" description="The level of access a user has, which can be global (platform-wide) or limited to specific projects or resources." />
-  <LinkCard title="Permission" href="/hub/ui/access-rights" description="A specific action or operation that a user is allowed to perform, such as creating projects or running evaluations." />
+  <LinkCard
+    title="Access Rights"
+    href="/hub/ui/access-rights"
+    description="Permissions that control what users can see and do within the Giskard Hub platform."
+  />
+  <LinkCard
+    title="Role-Based Access Control (RBAC)"
+    href="/hub/ui/access-rights"
+    description="A security model that assigns permissions based on user roles rather than individual user accounts."
+  />
+  <LinkCard
+    title="Scope"
+    href="/hub/ui/access-rights"
+    description="The level of access a user has, which can be global (platform-wide) or limited to specific projects or resources."
+  />
+  <LinkCard
+    title="Permission"
+    href="/hub/ui/access-rights"
+    description="A specific action or operation that a user is allowed to perform, such as creating projects or running evaluations."
+  />
 </CardGrid>
 
 ## Integration and workflows
 
 <CardGrid>
-  <LinkCard title="SDK (Software Development Kit)" href="/hub/sdk" description="A collection of tools and libraries that allow developers to integrate Giskard functionality into their applications and workflows." />
-  <LinkCard title="API (Application Programming Interface)" href="/hub/sdk/reference" description="A set of rules and protocols that allows different software applications to communicate and exchange data." />
+  <LinkCard
+    title="SDK (Software Development Kit)"
+    href="/hub/sdk"
+    description="A collection of tools and libraries that allow developers to integrate Giskard functionality into their applications and workflows."
+  />
+  <LinkCard
+    title="API (Application Programming Interface)"
+    href="/hub/sdk/reference"
+    description="A set of rules and protocols that allows different software applications to communicate and exchange data."
+  />
 </CardGrid>
 
 ## Business and compliance
 
 <CardGrid>
-  <LinkCard title="Compliance" href="/start/comparison" description="Adherence to laws, regulations, and industry standards that govern data privacy, security, and ethical AI use." />
-  <LinkCard title="Audit Trail" href="/hub/ui/event-logs" description="A chronological record of all actions, changes, and access attempts within a system for compliance and security purposes." />
-  <LinkCard title="Governance" href="/start/comparison" description="The framework of policies, procedures, and controls that ensure responsible and ethical use of AI systems." />
-  <LinkCard title="Stakeholder" href="/start/comparison" description="Individuals or groups with an interest in the performance, safety, and compliance of AI systems." />
+  <LinkCard
+    title="Compliance"
+    href="/start/comparison"
+    description="Adherence to laws, regulations, and industry standards that govern data privacy, security, and ethical AI use."
+  />
+  <LinkCard
+    title="Audit Trail"
+    href="/hub/ui/event-logs"
+    description="A chronological record of all actions, changes, and access attempts within a system for compliance and security purposes."
+  />
+  <LinkCard
+    title="Governance"
+    href="/start/comparison"
+    description="The framework of policies, procedures, and controls that ensure responsible and ethical use of AI systems."
+  />
+  <LinkCard
+    title="Stakeholder"
+    href="/start/comparison"
+    description="Individuals or groups with an interest in the performance, safety, and compliance of AI systems."
+  />
 </CardGrid>
 
 ## Getting help

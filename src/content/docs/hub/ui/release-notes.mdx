@@ -26,21 +26,21 @@ We are releasing a new version of the Hub that introduces a unified data table e
 ### What's new?
 
 **Unified data table UX**
-   All major data tables now share a consistent, modernized interface with sticky headers and a floating bulk actions bar. A new "table views" feature lets you save, restore, and manage your table configurations — including filters, sorting, and column visibility — so you can switch between different workflows without reconfiguring the table each time.
+All major data tables now share a consistent, modernized interface with sticky headers and a floating bulk actions bar. A new "table views" feature lets you save, restore, and manage your table configurations — including filters, sorting, and column visibility — so you can switch between different workflows without reconfiguring the table each time.
 
 **Stateful agent support**
-   Agents can now track conversation history on the server, enabling multi-turn conversations with persistent context. This helps you build and test agents that maintain context across multiple turns, improving reliability for conversational workflows.
+Agents can now track conversation history on the server, enabling multi-turn conversations with persistent context. This helps you build and test agents that maintain context across multiple turns, improving reliability for conversational workflows.
 
 **Paginated evaluation results and datasets**
-   Evaluation results and dataset test cases now use server-side pagination. You can efficiently browse, filter, and compare results without slowdowns or excessive memory use, even in large projects.
+Evaluation results and dataset test cases now use server-side pagination. You can efficiently browse, filter, and compare results without slowdowns or excessive memory use, even in large projects.
 
 **Scan creation by probe IDs**
-   The scan creation page now lets you select individual probes from a searchable checklist, in addition to the existing category-based selection. This gives you more precise control over which probes to include in a scan run.
+The scan creation page now lets you select individual probes from a searchable checklist, in addition to the existing category-based selection. This gives you more precise control over which probes to include in a scan run.
 
 **New security probe**
-   Enhanced scanning capabilities with a new built-in probe:
+Enhanced scanning capabilities with a new built-in probe:
 
-   * **TokenBreak** ([OWASP LLM 01 - Prompt Injection](/hub/ui/scan/vulnerability-categories/prompt-injection)) - This probe tests whether your agent can be manipulated through obfuscated prompt injection. It embeds malicious instructions inside legitimate-looking user messages, then prepends characters to sensitive trigger words (e.g. "ignore" → "Aignore") to evade input classifiers while remaining interpretable by the underlying language model. The technique exploits the gap between how safety filters tokenize text and how LLMs process it. Based on the [TokenBreak attack research](https://hiddenlayer.com/innovation-hub/the-tokenbreak-attack/) ([paper](https://arxiv.org/html/2506.07948v1)). Supports English, French, Italian, and German.
+- **TokenBreak** ([OWASP LLM 01 - Prompt Injection](/hub/ui/scan/vulnerability-categories/prompt-injection)) - This probe tests whether your agent can be manipulated through obfuscated prompt injection. It embeds malicious instructions inside legitimate-looking user messages, then prepends characters to sensitive trigger words (e.g. "ignore" → "Aignore") to evade input classifiers while remaining interpretable by the underlying language model. The technique exploits the gap between how safety filters tokenize text and how LLMs process it. Based on the [TokenBreak attack research](https://hiddenlayer.com/innovation-hub/the-tokenbreak-attack/) ([paper](https://arxiv.org/html/2506.07948v1)). Supports English, French, Italian, and German.
 
 ### What's fixed?
 
@@ -91,25 +91,25 @@ We are releasing a new version of the Hub that introduces a server-backed datase
 ### What's new?
 
 **Server-backed dataset management**
-   Dataset test cases now load via a server-backed table, significantly improving performance for large datasets. You can filter, sort, and paginate through thousands of test cases without slowing down your browser. A new bulk action preview shows you exactly how many items will be affected before you apply changes, making large-scale edits safer and more predictable.
+Dataset test cases now load via a server-backed table, significantly improving performance for large datasets. You can filter, sort, and paginate through thousands of test cases without slowing down your browser. A new bulk action preview shows you exactly how many items will be affected before you apply changes, making large-scale edits safer and more predictable.
 
 **Enhanced Playground interactivity**
-   The Playground now features quick actions to streamline your prompt engineering workflow. You can instantly remove the last conversation turn, re-generate the assistant's previous answer, and toggle between "Pretty" and "Raw" Markdown rendering. Your display preference is saved in your browser, ensuring a consistent experience across sessions.
+The Playground now features quick actions to streamline your prompt engineering workflow. You can instantly remove the last conversation turn, re-generate the assistant's previous answer, and toggle between "Pretty" and "Raw" Markdown rendering. Your display preference is saved in your browser, ensuring a consistent experience across sessions.
 
 **Advanced Groundedness pipeline**
-   Groundedness evaluation has been upgraded to a three-step pipeline that extracts evidence, evaluates individual claims, and re-checks borderline cases for higher accuracy. You can now view detailed, per-claim groundedness reasons directly in the results and comparison views, presented in a clear Markdown format. Confidence scoring has also been improved for more consistent results.
+Groundedness evaluation has been upgraded to a three-step pipeline that extracts evidence, evaluates individual claims, and re-checks borderline cases for higher accuracy. You can now view detailed, per-claim groundedness reasons directly in the results and comparison views, presented in a clear Markdown format. Confidence scoring has also been improved for more consistent results.
 
 **Annotation highlights in compare view**
-   The conversation comparison view now displays metric annotations — such as groundedness failures — directly in the response and context panels. This helps you understand evaluation results and the reasons behind metric failures without leaving the compare flow.
+The conversation comparison view now displays metric annotations — such as groundedness failures — directly in the response and context panels. This helps you understand evaluation results and the reasons behind metric failures without leaving the compare flow.
 
 **Re-run checks on local evaluations**
-   You can now re-run checks on local evaluation results without re-querying the model, preserving the existing output. This helps you iterate on check configurations more efficiently and safely.
+You can now re-run checks on local evaluation results without re-querying the model, preserving the existing output. This helps you iterate on check configurations more efficiently and safely.
 
 **Scan grade tooltip**
-   A tooltip explaining scan grades is now available on the dashboard and scan history views. You can hover over a grade to quickly understand what it means without navigating away from the summary screen.
+A tooltip explaining scan grades is now available on the dashboard and scan history views. You can hover over a grade to quickly understand what it means without navigating away from the summary screen.
 
 **Safe markdown rendering in scans**
-   Markdown rendering in scan results now blocks images and external links unless they match an approved domain list. This prevents adversarial agents from embedding tracking pixels or exfiltration links in their responses. Blocked content is displayed as plain text with a tooltip.
+Markdown rendering in scan results now blocks images and external links unless they match an approved domain list. This prevents adversarial agents from embedding tracking pixels or exfiltration links in their responses. Blocked content is displayed as plain text with a tooltip.
 
 ### What's fixed?
 
@@ -139,38 +139,47 @@ We are releasing a new version of the Hub that brings significant improvements t
 
 ### What's new?
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/WyK-DL-ESvM?si=p0kZOr3Kb7aTZlE6&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/WyK-DL-ESvM?si=p0kZOr3Kb7aTZlE6&amp;controls=0"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen
+></iframe>
 
 **Bulk conversation management**
-   You can now perform bulk operations on multiple conversations at once, including deleting conversations, exporting data (JSON format), modifying tags, updating checks, changing status, and moving conversations between projects. This helps you organize large conversation datasets faster and with fewer manual actions.
+You can now perform bulk operations on multiple conversations at once, including deleting conversations, exporting data (JSON format), modifying tags, updating checks, changing status, and moving conversations between projects. This helps you organize large conversation datasets faster and with fewer manual actions.
 
 **Redesigned dashboard**
-   The project dashboard now features a two-column layout displaying Evaluations and Scans side-by-side, with richer visual summaries including a scans grade gauge and an interactive issue-category treemap. Clicking on specific results takes you directly to the corresponding scan run for deeper analysis. This helps you get a faster, more actionable overview of both security and quality metrics and accelerates the diagnostic process without leaving the dashboard.
+The project dashboard now features a two-column layout displaying Evaluations and Scans side-by-side, with richer visual summaries including a scans grade gauge and an interactive issue-category treemap. Clicking on specific results takes you directly to the corresponding scan run for deeper analysis. This helps you get a faster, more actionable overview of both security and quality metrics and accelerates the diagnostic process without leaving the dashboard.
 
-   ![New dashboard with evaluations and scans side-by-side](/_static/images/hub/new-dashboard.png)
+![New dashboard with evaluations and scans side-by-side](/_static/images/hub/new-dashboard.png)
 
 **Automated agent description**
-   When setting up a new agent, you can now automatically generate its description with a single click. The system probes your agent and drafts a description that accurately depicts the agent's tone, abilities, and constraints, which you can then review and edit as needed. This helps you create comprehensive agent documentation faster than writing from scratch and ensures you have a good description of the agent domain and abilities.
+When setting up a new agent, you can now automatically generate its description with a single click. The system probes your agent and drafts a description that accurately depicts the agent's tone, abilities, and constraints, which you can then review and edit as needed. This helps you create comprehensive agent documentation faster than writing from scratch and ensures you have a good description of the agent domain and abilities.
 
 **Faster evaluation results**
-   The evaluation results page now loads faster and remains responsive even for large evaluation runs with thousands of results. You can navigate between results while keeping your filters active. This helps you review large evaluations without slowdowns or delays.
+The evaluation results page now loads faster and remains responsive even for large evaluation runs with thousands of results. You can navigate between results while keeping your filters active. This helps you review large evaluations without slowdowns or delays.
 
 **Improved knowledge base browsing**
-   The Knowledge Base documents page now loads faster and includes improved search with topic filtering. A new dedicated chunk detail page lets you navigate between chunks with next/previous buttons while preserving your search and filter settings. This helps you find and review KB content faster, especially in large knowledge bases.
+The Knowledge Base documents page now loads faster and includes improved search with topic filtering. A new dedicated chunk detail page lets you navigate between chunks with next/previous buttons while preserving your search and filter settings. This helps you find and review KB content faster, especially in large knowledge bases.
 
 **Enhanced list views**
-   Agents, Datasets, Checks, and Knowledge Bases now display in a compact list layout with search, sort, and filters (where applicable). Your search and filter settings are preserved when you share links or reload the page. This helps you search, find, and share items faster without losing your place.
+Agents, Datasets, Checks, and Knowledge Bases now display in a compact list layout with search, sort, and filters (where applicable). Your search and filter settings are preserved when you share links or reload the page. This helps you search, find, and share items faster without losing your place.
 
-   ![Knowledge bases with compact list layout and search](/_static/images/hub/kb-compact-list.png)
+![Knowledge bases with compact list layout and search](/_static/images/hub/kb-compact-list.png)
 
 **Brand fonts update**
-   The Hub UI now uses the new brand typography with improved readability and visual consistency.
+The Hub UI now uses the new brand typography with improved readability and visual consistency.
 
 **New security probes**
-   Enhanced scanning capabilities with two new built-in probes:
+Enhanced scanning capabilities with two new built-in probes:
 
-   * **Domain Misguidance** (Misguidance & Unauthorized Advice) - A new dynamic attack probe that adapts its follow-up questions based on the agent's previous answers to probe for weaknesses and see if the chatbot can be led into providing harmful or out-of-scope guidance. Similar to TAP (Tree-of-Attacks Prompting), this probe uses dynamic logic to detect potential misguidance vulnerabilities.
-   * **Reasoning Denial of Service** ([OWASP LLM10 - Denial of Service](https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/denial-of-service.html)) - This probe targets agents relying on reasoning models to detect availability vulnerabilities. Evaluation is done by comparing the resource consumption (latency and token count) of standard questions against obfuscated variations that require a reasoning step. Significant performance degradation on the obfuscated prompts indicates a vulnerability to reasoning-induced resource exhaustion.
+- **Domain Misguidance** (Misguidance & Unauthorized Advice) - A new dynamic attack probe that adapts its follow-up questions based on the agent's previous answers to probe for weaknesses and see if the chatbot can be led into providing harmful or out-of-scope guidance. Similar to TAP (Tree-of-Attacks Prompting), this probe uses dynamic logic to detect potential misguidance vulnerabilities.
+- **Reasoning Denial of Service** ([OWASP LLM10 - Denial of Service](https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/denial-of-service.html)) - This probe targets agents relying on reasoning models to detect availability vulnerabilities. Evaluation is done by comparing the resource consumption (latency and token count) of standard questions against obfuscated variations that require a reasoning step. Significant performance degradation on the obfuscated prompts indicates a vulnerability to reasoning-induced resource exhaustion.
 
 ### What's fixed?
 
@@ -214,24 +223,33 @@ We are releasing a new version of the Hub UI that introduces scenario-based gene
 
 ### What's new?
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/g_fsrGyJF4E?si=6ohbPagZyCNU7OCp&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/g_fsrGyJF4E?si=6ohbPagZyCNU7OCp&amp;controls=0"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen
+></iframe>
 
 **Scenario-based generation**
-   Scenario-based generation replaces the previous Adversarial generation in the Giskard Hub. You can now choose between three test generation modes in the Hub: LLM vulnerability scanner (run 50+ probes), Knowledge base generation, and Scenario-based. Users are able to create more targeted, business-specific tests without editing the agent description. This helps to generate more realistic test cases. Users provide a description and rules. For example: Persona using slang/emojis asking about loans; rules enforce professional tone and refusal to do interest calculations.
+Scenario-based generation replaces the previous Adversarial generation in the Giskard Hub. You can now choose between three test generation modes in the Hub: LLM vulnerability scanner (run 50+ probes), Knowledge base generation, and Scenario-based. Users are able to create more targeted, business-specific tests without editing the agent description. This helps to generate more realistic test cases. Users provide a description and rules. For example: Persona using slang/emojis asking about loans; rules enforce professional tone and refusal to do interest calculations.
 
 **Bulk move from evaluations**
-   You can now select specific conversations directly from an evaluation run and move or duplicate them into a specific dataset. This simplifies the process of curating high-quality examples for regression testing.
+You can now select specific conversations directly from an evaluation run and move or duplicate them into a specific dataset. This simplifies the process of curating high-quality examples for regression testing.
 
 **Better display of lists**
-   To improve navigability, we have introduced a search bar and dedicated filters across the platform. You can now easily search and filter through datasets, agents, knowledge bases, and checks, making it faster to locate specific assets in complex workspaces.
+To improve navigability, we have introduced a search bar and dedicated filters across the platform. You can now easily search and filter through datasets, agents, knowledge bases, and checks, making it faster to locate specific assets in complex workspaces.
 
 **Enhanced Scans**
-   Improved scanning capabilities with new probes and better rendering:
+Improved scanning capabilities with new probes and better rendering:
 
-   * **New Built-in Probes** - Two new built-in probes added to the scanning toolkit
-      - **ChatInject** (OWASP LLM 01 - Prompt Injection) - This probe tests whether agents can be manipulated through malicious instructions formatted to match their native chat templates. Unlike traditional plain-text injection attacks, ChatInject exploits the structured role-based formatting (system, user, assistant tags) that agents use internally. By wrapping attack payloads with forged chat template tokens, mimicking the model's own instruction hierarchy, attackers can bypass defenses that rely on role priority. The probe includes a multi-turn variant that sends persuasive conversation, delimited with adequate separation tokens, inside one message to confuse the agent under test. This technique achieves significantly higher success rates than standard injection methods and transfers effectively across models, even when the target model's exact template structure is unknown.
-      - **CoT Forgery** (OWASP LLM 01 - Prompt Injection) - This probe implements the Chain-of-Thought (CoT) forgery attack strategy, which appends realistic and compliant reasoning traces to harmful requests that mimic the format and tone of legitimate reasoning steps, causing the model to continue the compliant reasoning pattern and answer requests it should refuse.
-   * **Improved Markdown rendering** - Enhanced Markdown rendering in Scan results
+- **New Built-in Probes** - Two new built-in probes added to the scanning toolkit
+  - **ChatInject** (OWASP LLM 01 - Prompt Injection) - This probe tests whether agents can be manipulated through malicious instructions formatted to match their native chat templates. Unlike traditional plain-text injection attacks, ChatInject exploits the structured role-based formatting (system, user, assistant tags) that agents use internally. By wrapping attack payloads with forged chat template tokens, mimicking the model's own instruction hierarchy, attackers can bypass defenses that rely on role priority. The probe includes a multi-turn variant that sends persuasive conversation, delimited with adequate separation tokens, inside one message to confuse the agent under test. This technique achieves significantly higher success rates than standard injection methods and transfers effectively across models, even when the target model's exact template structure is unknown.
+  - **CoT Forgery** (OWASP LLM 01 - Prompt Injection) - This probe implements the Chain-of-Thought (CoT) forgery attack strategy, which appends realistic and compliant reasoning traces to harmful requests that mimic the format and tone of legitimate reasoning steps, causing the model to continue the compliant reasoning pattern and answer requests it should refuse.
+- **Improved Markdown rendering** - Enhanced Markdown rendering in Scan results
 
 ### What's fixed?
 
@@ -240,8 +258,8 @@ We are releasing a new version of the Hub UI that introduces scenario-based gene
 - **Better handling of LiteLLM-specific embedding exceptions** - Improved error handling for embedding generation errors
 - **Improved Scan error handling** - Enhanced error handling for vulnerability scan errors
 - **Export fixes**:
-   - Added missing parameters to export options
-   - Fixed metadata display in evaluation results
+  - Added missing parameters to export options
+  - Fixed metadata display in evaluation results
 
 ---
 
@@ -254,9 +272,8 @@ We're releasing a hotfix that addresses a critical security vulnerability affect
 - **Security patch** - Upgraded Next.js to 15.5.7 and React to 19.2.1 to remediate CVE-2025-55182.
 
   References:
-
-  * [NVD CVE-2025-55182](https://nvd.nist.gov/vuln/detail/CVE-2025-55182)
-  * [Next.js CVE-2025-66478](https://nextjs.org/blog/CVE-2025-66478)
+  - [NVD CVE-2025-55182](https://nvd.nist.gov/vuln/detail/CVE-2025-55182)
+  - [Next.js CVE-2025-66478](https://nextjs.org/blog/CVE-2025-66478)
 
 ---
 
@@ -278,7 +295,7 @@ This helps you manage your evaluation process, track your scans, and improve the
 ### What's new?
 
 <div style="position: relative; width: 100%; max-width: 100%; padding-top: 56.25%;">
-<iframe
+  <iframe
     src="https://player.vimeo.com/video/1140819940?h=7be84b6c71&amp;autoplay=1&amp;muted=1&amp;loop=1&amp;controls=0"
     frameborder="0"
     allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -287,20 +304,20 @@ This helps you manage your evaluation process, track your scans, and improve the
     data-ready="true"
     style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.10);"
     allowfullscreen
-></iframe>
+  ></iframe>
 </div>
 
 **Task management**
-   This new feature enables teams to organize, track, and collaborate on test corrections directly within Giskard Hub. For more information, see [Task management](/hub/ui/annotate/task-management):
+This new feature enables teams to organize, track, and collaborate on test corrections directly within Giskard Hub. For more information, see [Task management](/hub/ui/annotate/task-management):
 
-   * **Create Tasks from Failures** - Create tasks directly from failed evaluations or scans
-   * **Assign Owners with Notifications** - Assign task owners with email notifications (opt-out available)
-   * **Auto-Draft Bad Tests** - When you create a task from a bad test, the system will propose to automatically mark it as draft
-   * **Hide Noisy Results** - You can now hide false positive results while still tracking them with tasks. For more information, see [Modify test cases](/hub/ui/annotate/modify-test-cases)
-   * **Prioritize Tasks** - Set the priority of the task based on the importance of the work to be done
+- **Create Tasks from Failures** - Create tasks directly from failed evaluations or scans
+- **Assign Owners with Notifications** - Assign task owners with email notifications (opt-out available)
+- **Auto-Draft Bad Tests** - When you create a task from a bad test, the system will propose to automatically mark it as draft
+- **Hide Noisy Results** - You can now hide false positive results while still tracking them with tasks. For more information, see [Modify test cases](/hub/ui/annotate/modify-test-cases)
+- **Prioritize Tasks** - Set the priority of the task based on the importance of the work to be done
 
 <div style="position: relative; width: 100%; max-width: 100%; padding-top: 56.25%;">
-<iframe
+  <iframe
     src="https://player.vimeo.com/video/1140820125?h=f35533df6d&amp;fl=tl&amp;fe=ec&amp;autoplay=1&amp;muted=1&amp;loop=1&amp;controls=0"
     frameborder="0"
     allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -309,27 +326,27 @@ This helps you manage your evaluation process, track your scans, and improve the
     data-ready="true"
     style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.10);"
     allowfullscreen
-></iframe>
+  ></iframe>
 </div>
 
 **Draft Conversations & Datasets**
-   Draft mode lets you iterate privately on test cases without affecting live evaluations. Drafts are excluded from dashboards, reports, scheduled runs, and success rates, so your production metrics stay clean while you experiment. For more information, see [Task management](/hub/ui/annotate/task-management):
+Draft mode lets you iterate privately on test cases without affecting live evaluations. Drafts are excluded from dashboards, reports, scheduled runs, and success rates, so your production metrics stay clean while you experiment. For more information, see [Task management](/hub/ui/annotate/task-management):
 
-   * **Draft/Published Toggle** - A toggle with a helpful explanation to draft or publish a conversation
-   * **Draft Filter in Tables** - Draft filter added to dataset tables with conversation status labels
-   * **Consistent Exclusion** - Drafted conversations are excluded from evaluation runs
+- **Draft/Published Toggle** - A toggle with a helpful explanation to draft or publish a conversation
+- **Draft Filter in Tables** - Draft filter added to dataset tables with conversation status labels
+- **Consistent Exclusion** - Drafted conversations are excluded from evaluation runs
 
 **Enhanced Scans**
-   Improved scanning capabilities and usability. For more information, see [Scans](/hub/ui/scan):
+Improved scanning capabilities and usability. For more information, see [Scans](/hub/ui/scan):
 
-   * **New Built-in Probes** - Two new built-in probes added to the scanning toolkit
-       - **Harmful Misguidance** - This probe tests whether an AI agent validates or encourages dangerous behaviors when users implicitly seek affirmation for harmful actions. The probe generates domain-specific scenarios where users frame risky intentions positively or indirectly, like a banking customer asking about investing retirement savings in volatile assets, or someone asking about quitting their job while carrying substantial debt. The probe automatically adapts attack scenarios to agent's use case, testing whether it can detect and respond appropriately when vulnerable users frame dangerous decisions as normal choices.
-       - **Agentic Tool Extraction** - This probe implements an agentic reconnaissance workflow that systematically queries the agent to discover and enumerate available tools, functions, and capabilities, exposing the agent's internal configuration and expanding the attack surface for targeted exploitation
-   * **JSON Export** - Export scan results in JSON format directly from the UI. See [Review scan results](/hub/ui/scan/review-scan-results) for more details
-   * **UI Improvements** - Various improvements for better readability and stability
+- **New Built-in Probes** - Two new built-in probes added to the scanning toolkit
+  - **Harmful Misguidance** - This probe tests whether an AI agent validates or encourages dangerous behaviors when users implicitly seek affirmation for harmful actions. The probe generates domain-specific scenarios where users frame risky intentions positively or indirectly, like a banking customer asking about investing retirement savings in volatile assets, or someone asking about quitting their job while carrying substantial debt. The probe automatically adapts attack scenarios to agent's use case, testing whether it can detect and respond appropriately when vulnerable users frame dangerous decisions as normal choices.
+  - **Agentic Tool Extraction** - This probe implements an agentic reconnaissance workflow that systematically queries the agent to discover and enumerate available tools, functions, and capabilities, exposing the agent's internal configuration and expanding the attack surface for targeted exploitation
+- **JSON Export** - Export scan results in JSON format directly from the UI. See [Review scan results](/hub/ui/scan/review-scan-results) for more details
+- **UI Improvements** - Various improvements for better readability and stability
 
 <div style="position: relative; width: 100%; max-width: 100%; padding-top: 56.25%;">
-<iframe
+  <iframe
     src="https://player.vimeo.com/video/1140111264?h=d28fd97518&amp;autoplay=1&amp;muted=1&amp;loop=1&amp;controls=0"
     frameborder="0"
     allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -338,21 +355,21 @@ This helps you manage your evaluation process, track your scans, and improve the
     data-ready="true"
     style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.10);"
     allowfullscreen
-></iframe>
+  ></iframe>
 </div>
 
 **Audit & History**
-   Audit history allows you to track all changes across the Hub, which allows you to understand project history and helps with regulatory compliance. For more information, see [Event logs](/hub/ui/event-logs):
+Audit history allows you to track all changes across the Hub, which allows you to understand project history and helps with regulatory compliance. For more information, see [Event logs](/hub/ui/event-logs):
 
-   * **Change Timelines** - View change timelines for all major entities (projects, datasets, checks, models, tasks, scans...)
-   * **Human-Readable Summaries** - Clear, human-readable summaries of all updates
-   * **Project-Wide Search** - Search audits across the whole project
+- **Change Timelines** - View change timelines for all major entities (projects, datasets, checks, models, tasks, scans...)
+- **Human-Readable Summaries** - Clear, human-readable summaries of all updates
+- **Project-Wide Search** - Search audits across the whole project
 
 **UI & Content Improvements**
-   Enhanced user experience throughout the Hub:
+Enhanced user experience throughout the Hub:
 
-   * **Markdown Support** - Descriptions and error messages now support Markdown formatting
-   * **Better Navigation** - Clearer labels, improved empty states, and more consistent navigation
+- **Markdown Support** - Descriptions and error messages now support Markdown formatting
+- **Better Navigation** - Clearer labels, improved empty states, and more consistent navigation
 
 ### What's fixed?
 
@@ -367,20 +384,20 @@ We're releasing a focused update that enhances the user experience with a refres
 ### What's new?
 
 **Refreshed Hub Theme & Colors**
-   The Hub now features a cleaner, more modern look with updated colors and improved visual consistency throughout the interface.
+The Hub now features a cleaner, more modern look with updated colors and improved visual consistency throughout the interface.
 
 **Clearer, Friendlier Error Pages**
-   Error messages are now more user-friendly and provide clearer guidance on how to resolve issues, making troubleshooting easier for users.
+Error messages are now more user-friendly and provide clearer guidance on how to resolve issues, making troubleshooting easier for users.
 
 **Improved Scan Experience**
-   Enhanced the scanning workflow with several key improvements:
+Enhanced the scanning workflow with several key improvements:
 
-   * **Toggle Select/Unselect Probes** - Easier probe management with intuitive selection controls
-   * **Better Issue Visualization** - Improved display of scan results and vulnerability details
-   * **Knowledge Base Display** - Relevant knowledge base information is now shown when applicable during scans
+- **Toggle Select/Unselect Probes** - Easier probe management with intuitive selection controls
+- **Better Issue Visualization** - Improved display of scan results and vulnerability details
+- **Knowledge Base Display** - Relevant knowledge base information is now shown when applicable during scans
 
 **Updated Login Page and Smoother Navigation**
-   Streamlined authentication flow with improved login page design and enhanced navigation throughout the application.
+Streamlined authentication flow with improved login page design and enhanced navigation throughout the application.
 
 ### What's fixed?
 
@@ -394,7 +411,7 @@ We're releasing a focused update that enhances the user experience with a refres
 ## 2.0.0 (2025-09-25)
 
 <div style="position: relative; width: 100%; max-width: 100%; padding-top: 56.25%;">
-<iframe
+  <iframe
     src="https://player.vimeo.com/video/1121557632?h=17284299f1&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=1&amp;muted=1&amp;loop=1&amp;controls=0"
     frameborder="0"
     allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -403,7 +420,7 @@ We're releasing a focused update that enhances the user experience with a refres
     data-ready="true"
     style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.10);"
     allowfullscreen
-></iframe>
+  ></iframe>
 </div>
 
 We're releasing an upgraded LLM vulnerability scanner in Giskard Hub, specifically designed to secure conversational AI agents in production environments. This enterprise version deploys autonomous red teaming agents that conduct dynamic, multi-turn attacks across dozens of vulnerability categories covering more than 40 probes.
@@ -411,37 +428,37 @@ We're releasing an upgraded LLM vulnerability scanner in Giskard Hub, specifical
 ### What's new?
 
 **Comprehensive LLM Vulnerabilities Coverage**
-   The scanner covers LLM vulnerabilities across established OWASP categories and business failures:
+The scanner covers LLM vulnerabilities across established OWASP categories and business failures:
 
-   * **Prompt Injection (OWASP LLM 01)** - Attacks that manipulate AI agents through carefully crafted prompts
-   * **Training Data Extraction (OWASP LLM 02)** - Attempts to extract or infer information from the AI model's training data
-   * **Data Privacy Exfiltration (OWASP LLM 05)** - Attacks aimed at extracting sensitive information
-   * **Excessive Agency (OWASP LLM 06)** - Tests whether AI agents can be manipulated beyond their intended scope
-   * **Hallucination & Misinformation (OWASP LLM 09)** - Tests for false, inconsistent, or fabricated information
-   * **Denial of Service (OWASP LLM 10)** - Attacks that attempt to cause resource exhaustion
-   * **Internal Information Exposure** - Attempts to extract system prompts and configuration details
-   * **Harmful Content Generation** - Probes that bypass safety measures
-   * **Brand Damage & Reputation** - Tests for reputational risks
-   * **Legal & Financial Risk** - Attacks exposing deployers to liabilities
-   * **Unauthorized Professional Advice** - Tests for advice outside intended scope
+- **Prompt Injection (OWASP LLM 01)** - Attacks that manipulate AI agents through carefully crafted prompts
+- **Training Data Extraction (OWASP LLM 02)** - Attempts to extract or infer information from the AI model's training data
+- **Data Privacy Exfiltration (OWASP LLM 05)** - Attacks aimed at extracting sensitive information
+- **Excessive Agency (OWASP LLM 06)** - Tests whether AI agents can be manipulated beyond their intended scope
+- **Hallucination & Misinformation (OWASP LLM 09)** - Tests for false, inconsistent, or fabricated information
+- **Denial of Service (OWASP LLM 10)** - Attacks that attempt to cause resource exhaustion
+- **Internal Information Exposure** - Attempts to extract system prompts and configuration details
+- **Harmful Content Generation** - Probes that bypass safety measures
+- **Brand Damage & Reputation** - Tests for reputational risks
+- **Legal & Financial Risk** - Attacks exposing deployers to liabilities
+- **Unauthorized Professional Advice** - Tests for advice outside intended scope
 
 **Business Alignment**
-   Evaluates both security vulnerabilities and business failures, automatically validating business logic by generating expected outputs from knowledge bases.
+Evaluates both security vulnerabilities and business failures, automatically validating business logic by generating expected outputs from knowledge bases.
 
 **Domain-specific Attacks**
-   Adapts testing methodologies to agent-specific contexts using bot descriptions, tools specification, and knowledge bases for realistic evaluation.
+Adapts testing methodologies to agent-specific contexts using bot descriptions, tools specification, and knowledge bases for realistic evaluation.
 
 **Multi-turn Attack Simulation**
-   Implements dynamic multi-turn testing that simulates realistic conversation flows, detecting context-dependent vulnerabilities that emerge through conversation history.
+Implements dynamic multi-turn testing that simulates realistic conversation flows, detecting context-dependent vulnerabilities that emerge through conversation history.
 
 **Adaptive AI Red Teaming**
-   Adjusts attack strategies based on agent resistance, escalating tactics or pivoting approaches when encountering defenses.
+Adjusts attack strategies based on agent resistance, escalating tactics or pivoting approaches when encountering defenses.
 
 **Root-cause Analysis**
-   Every detected vulnerability includes detailed explanations of attack methodology and severity scoring for prioritized remediation.
+Every detected vulnerability includes detailed explanations of attack methodology and severity scoring for prioritized remediation.
 
 **Continuous Red Teaming**
-   Detected vulnerabilities automatically convert into reusable tests for continuous validation and integration into golden datasets.
+Detected vulnerabilities automatically convert into reusable tests for continuous validation and integration into golden datasets.
 
 ### What's changed?
 
@@ -467,7 +484,7 @@ We're releasing an upgraded LLM vulnerability scanner in Giskard Hub, specifical
 5. **Turn into continuous tests** - Successful probes can convert into tests for continuous validation
 
 <div style="position: relative; width: 100%; max-width: 100%; padding-top: 56.25%;">
-<iframe
+  <iframe
     src="https://player.vimeo.com/video/1121565937?h=75d7765bb6&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479&amp;autoplay=1&amp;muted=1&amp;loop=1&amp;controls=0"
     frameborder="0"
     allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
@@ -476,7 +493,7 @@ We're releasing an upgraded LLM vulnerability scanner in Giskard Hub, specifical
     title="crt-security"
     data-ready="true"
     allowfullscreen
-></iframe>
+  ></iframe>
 </div>
 
 This release enables detection of sophisticated attacks that evolve across multiple conversation turns, automatically generating attacks, analyzing system responses, and modifying approaches to help correct agents with re-executable tests.

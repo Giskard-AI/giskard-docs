@@ -27,6 +27,7 @@ These benchmarks assess how well LLMs can:
 **Description**: SafetyBench incorporates over 11,000 multiple-choice questions across seven categories of safety concerns: offensive content, bias, illegal activities, mental health, and more. The benchmark offers data in both Chinese and English.
 
 **Key Features**:
+
 - Multiple safety categories
 - Bilingual evaluation (Chinese/English)
 - Large dataset (11,000+ questions)
@@ -44,6 +45,7 @@ These benchmarks assess how well LLMs can:
 **Description**: AgentHarm tests how well LLM agents can maintain safety while executing complex, multi-step tasks. The benchmark assesses whether agents can fulfill user requests without causing harm or violating safety principles.
 
 **Key Features**:
+
 - Multi-step task evaluation
 - Agent safety assessment
 - Task completion testing
@@ -61,6 +63,7 @@ These benchmarks assess how well LLMs can:
 **Description**: TruthfulQA evaluates whether language models can distinguish between true and false information, particularly when dealing with common misconceptions or false beliefs that are frequently repeated online.
 
 **Key Features**:
+
 - Truthfulness testing
 - Misinformation resistance
 - Factual accuracy assessment
@@ -80,6 +83,7 @@ Safety evaluation is also included in other benchmarks such as BigBench, which c
 **Description**: Phare is a multilingual benchmark to evaluate LLMs across key safety and security dimensions, including hallucination, factual accuracy, bias, and potential harm.
 
 **Key Features**:
+
 - Multilingual evaluation
 - Comprehensive safety coverage
 - Hallucination testing

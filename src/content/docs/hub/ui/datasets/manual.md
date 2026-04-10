@@ -7,8 +7,8 @@ sidebar:
 
 You can create test datasets manually for fine-grained control. This is particularly useful when you want to create test cases with full control over the test case creation process. There are two ways to manually create test cases:
 
-* **Manual in a dataset:** You create both the user questions and the expected responses yourself.
-* **Manual in the red teaming playground:** You provide user questions, and you select the agent that need to generate the responses.
+- **Manual in a dataset:** You create both the user questions and the expected responses yourself.
+- **Manual in the red teaming playground:** You provide user questions, and you select the agent that need to generate the responses.
 
 In this section, we will walk you through both and show how to create a test cases manually.
 
@@ -36,16 +36,16 @@ A conversation consists of the following components:
 
 - `Messages`: Contains the user's input and the agent's responses in a multi-message exchange.
 - `Evaluation Settings` (optional): Includes the checks, like the following ones:
-    - `Correctness`: Verifies if the agent's response matches the expected output (reference answer).
-    - `Conformity`: Ensures the agent's response adheres to the rules, such as "The agent must be polite."
-    - `Groundedness`: Ensures the agent's response is grounded in the conversation.
-    - `String matching`: Checks if the agent's response contains a specific string, keyword, or sentence.
-    - `Metadata`: Verifies the presence of specific (tool calls, user information, etc.) metadata in the agent's response.
-    - `Semantic Similarity`: Verifies that the agent's response is semantically similar to the expected output.
-    - And any custom checks you may have defined.
+  - `Correctness`: Verifies if the agent's response matches the expected output (reference answer).
+  - `Conformity`: Ensures the agent's response adheres to the rules, such as "The agent must be polite."
+  - `Groundedness`: Ensures the agent's response is grounded in the conversation.
+  - `String matching`: Checks if the agent's response contains a specific string, keyword, or sentence.
+  - `Metadata`: Verifies the presence of specific (tool calls, user information, etc.) metadata in the agent's response.
+  - `Semantic Similarity`: Verifies that the agent's response is semantically similar to the expected output.
+  - And any custom checks you may have defined.
 - `Properties`:
-    - `Dataset`: Specifies where the conversations should be saved.
-    - `Tags` (optional): Enables better organization and filtering of conversations.
+  - `Dataset`: Specifies where the conversations should be saved.
+  - `Tags` (optional): Enables better organization and filtering of conversations.
 
 :::tip
 For detailed information about checks like correctness, conformity, groundedness, string matching, metadata, and semantic similarity, including examples and how they work, see [Annotation overview](/hub/ui/annotate/overview).
@@ -89,13 +89,13 @@ The screen above shows three sections:
 
 - `Messages`: the conversation you want to save to the dataset. Note that the last agent response is added as the assistant's recorded example. Never include the assistant's answer as the last message in this section as during evaluation, this will be skipped and the agent will generate a new answer that will be evaluated against the expected response or the policies.
 - `Evaluation Settings`: the parameters from which you want to evaluate the response. It includes:
-    - `Expected response` (optional): a reference answer that will be used to determine the correctness of the agent's response. There can only be one expected response. If it is not provided, we do not check for the Correctness metric.
-    - `Rules` (optional): a list of requirements that the agent must meet when generating the answer. There can be one or more rules. If it is not provided, we do not check for the Conformity metric.
-    - `Context` (optional): the context of the conversation. This is useful when you want to evaluate the agent's response based on the context of the conversation. If it is not provided, we do not check for the Groundedness metric.
-    - `Keyword` (optional): a keyword that the agent's response must contain. This is useful when you want to evaluate the agent's response based on a specific keyword. If it is not provided, we do not check for the String matching metric.
-    - `Metadata` (optional): JSON path rules to verify specific metadata in the agent's response. If it is not provided, we do not check for the Metadata metric.
-    - `Semantic Similarity` (optional): reference text and threshold for semantic similarity evaluation. If it is not provided, we do not check for the Semantic Similarity metric.
-    - And any custom checks you may have defined.
+  - `Expected response` (optional): a reference answer that will be used to determine the correctness of the agent's response. There can only be one expected response. If it is not provided, we do not check for the Correctness metric.
+  - `Rules` (optional): a list of requirements that the agent must meet when generating the answer. There can be one or more rules. If it is not provided, we do not check for the Conformity metric.
+  - `Context` (optional): the context of the conversation. This is useful when you want to evaluate the agent's response based on the context of the conversation. If it is not provided, we do not check for the Groundedness metric.
+  - `Keyword` (optional): a keyword that the agent's response must contain. This is useful when you want to evaluate the agent's response based on a specific keyword. If it is not provided, we do not check for the String matching metric.
+  - `Metadata` (optional): JSON path rules to verify specific metadata in the agent's response. If it is not provided, we do not check for the Metadata metric.
+  - `Semantic Similarity` (optional): reference text and threshold for semantic similarity evaluation. If it is not provided, we do not check for the Semantic Similarity metric.
+  - And any custom checks you may have defined.
 - `Dataset`: where the conversations are saved
 - `Tags` (optional): allows for better organization and filtering conversations
 
@@ -189,14 +189,15 @@ This example demonstrates effective conversation history handling for several re
 The important thing is to remember that once you have tested what you wanted, you should send the conversation to the dataset, keeping the length of the conversations short and focused.
 
 :::tip
+
 - Test out-of-scope questions to ensure the agent appropriately handles unknown queries.
 - Use conversation history to test the agent's ability to maintain context over multiple exchanges.
 - Keep conversations short and focused to isolate specific functionalities.
 - Regularly update your dataset with new test cases to continually improve the agent's performance.
-:::
+  :::
 
 ## Next steps
 
-* **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
-* **Generate test cases** - Try [Knowledge base tests](/hub/ui/datasets/knowledge-base) or [Scenario tests](/hub/ui/datasets/scenario)
-* **Review test case** - Make sure to [Annotate](/hub/ui/annotate)
+- **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
+- **Generate test cases** - Try [Knowledge base tests](/hub/ui/datasets/knowledge-base) or [Scenario tests](/hub/ui/datasets/scenario)
+- **Review test case** - Make sure to [Annotate](/hub/ui/annotate)

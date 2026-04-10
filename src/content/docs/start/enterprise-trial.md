@@ -24,7 +24,6 @@ sidebar:
 ## Getting started
 
 1. **Request your trial**
-
    - Visit our [contact page ↗](https://www.giskard.ai/contact)
    - We suggest adding some information about your organization and LLM use case.
 
@@ -36,13 +35,11 @@ Thanks for helping us keep things personal and impactful!
 :::
 
 2. **Set up your workspace**
-
    - Create your first project
    - Invite team members
    - Configure your first model
 
 3. **Secure your Agents**
-
    - Generate synthetic tests to evaluate your agents
    - Manage datasets and track their versions
    - Set up continuous red teaming

@@ -85,18 +85,18 @@ You can find examples of business vulnerabilities in our [RealPerformance datase
 
 **Example 1: Detail Hallucination**
 
-*Context*: "Our product supports basic authentication."
-*Model Response*: "Our product supports basic authentication with OAuth 2.0, JWT tokens, and multi-factor authentication."
-*Issue*: Added unsupported authentication methods
+_Context_: "Our product supports basic authentication."
+_Model Response_: "Our product supports basic authentication with OAuth 2.0, JWT tokens, and multi-factor authentication."
+_Issue_: Added unsupported authentication methods
 
 **Example 2: Service Expansion**
 
-*Context*: "We offer customer support via email."
-*Model Response*: "We offer customer support via email, phone, live chat, and 24/7 assistance."
-*Issue*: Added unsupported support channels
+_Context_: "We offer customer support via email."
+_Model Response_: "We offer customer support via email, phone, live chat, and 24/7 assistance."
+_Issue_: Added unsupported support channels
 
 **Example 3: Feature Invention**
 
-*Context*: "The app has a dashboard feature."
-*Model Response*: "The app has a dashboard feature with real-time analytics, customizable widgets, and export capabilities."
-*Issue*: Added unsupported dashboard features
+_Context_: "The app has a dashboard feature."
+_Model Response_: "The app has a dashboard feature with real-time analytics, customizable widgets, and export capabilities."
+_Issue_: Added unsupported dashboard features
