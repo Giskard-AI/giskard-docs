@@ -9,6 +9,16 @@ Below you will find the release notes for each version of Giskard Hub UI. Each e
 
 ---
 
+## 2.5.1 (2026-03-31)
+
+We're releasing a fix for an issue where checks were not executed on local evaluation results.
+
+### What's fixed?
+
+- **Local evaluation checks** - Fixed an issue where checks were skipped on local evaluations when model output was already present. All local evaluation results are now correctly evaluated instead of being marked as skipped.
+
+---
+
 ## 2.5.0 (2026-03-31)
 
 We are releasing a new version of the Hub that introduces a unified data table experience with saveable table views, stateful agent support for multi-turn conversations, server-side pagination for large evaluation and dataset pages, fine-grained probe selection for scans, and a new TokenBreak security probe.
@@ -48,6 +58,32 @@ We are releasing a new version of the Hub that introduces a unified data table e
 
 ---
 
+## 2.4.2 (2026-03-04)
+
+We're releasing a patch with fixes for test case management, groundedness evaluation, and UI reliability.
+
+### What's fixed?
+
+- **Test case status persistence** - Fixed an issue where the draft/published status was not saved when creating or updating a single test case via the API.
+
+- **Groundedness evaluation accuracy** - Corrected minor contradictions in groundedness scoring that could produce inconsistent results in edge cases.
+
+- **Scan page navigation** - Fixed scroll-to-section failures on slow-loading scan pages by retrying until the target section is available.
+
+---
+
+## 2.4.1 (2026-02-25)
+
+We're releasing a patch that refines groundedness confidence scoring and changes how custom groundedness instructions are configured.
+
+### What's changed?
+
+- **Groundedness confidence scoring** - Improved confidence score calculation by removing the auto-pass shortcut for grounded answers and using clearer per-claim scoring. This may produce slightly different confidence scores compared to previous versions.
+
+- **Groundedness extra instructions** - The `extra_instructions` parameter has been moved from assertion params to the `GISKARD_HUB_GROUNDEDNESS_EXTRA_INSTRUCTIONS` environment variable. If you were using custom groundedness instructions, update your environment configuration accordingly.
+
+---
+
 ## 2.4.0 (2026-02-24)
 
 We are releasing a new version of the Hub that introduces a server-backed dataset table for managing large datasets, enhanced Playground interactivity, a redesigned three-step groundedness evaluation pipeline, annotation highlights in the compare view, and safer markdown rendering in scan results.
@@ -84,6 +120,16 @@ We are releasing a new version of the Hub that introduces a server-backed datase
 - **Playground cursor position** - Editing messages in the Playground chat input now preserves the cursor position, even when typing in the middle of the text.
 
 - **Agent description handling** - Forms no longer error when an agent has no description set.
+
+---
+
+## 2.3.1 (2026-02-20)
+
+We're releasing a fix for a container permission issue affecting OpenShift deployments.
+
+### What's fixed?
+
+- **OpenShift compatibility** - Fixed a permission error that prevented the frontend from starting correctly on OpenShift deployments.
 
 ---
 
@@ -139,6 +185,16 @@ We are releasing a new version of the Hub that brings significant improvements t
 - **Task permissions** - Fixed permission issues on tasks to ensure proper access control.
 
 - **Chart tooltips** - Improved tooltip rendering in evaluation charts.
+
+---
+
+## 2.2.2 (2026-01-05)
+
+We're releasing a fix for an issue where API keys were not generated for newly created users.
+
+### What's fixed?
+
+- **User creation API key generation** - Fixed an issue where new users did not receive an API key on creation. The Keycloak extension now correctly generates API keys for all new users, including those created via the admin API.
 
 ---
 
