@@ -1,11 +1,11 @@
 ---
 title: Playground Chats
-description: Access and export conversations captured from the Giskard Hub playground.
+description: Access, export, and analyze playground chat conversations from the Giskard Hub using the Python SDK for LLM testing.
 sidebar:
   order: 7
 ---
 
-The Hub's **Playground** lets you chat with registered agents interactively from the UI. Each conversation is automatically saved as a **Playground Chat**, which you can then access programmatically for analysis, export, or import into a dataset.
+The Hub's **Playground** lets you chat with registered agents interactively from the UI. Each conversation is automatically saved as a **Playground Chat**, which you can then access programmatically for analysis, export, or import into a dataset. To create test cases manually from the UI, see the [manual dataset creation page](/hub/ui/datasets/manual).
 
 ## List playground chats
 

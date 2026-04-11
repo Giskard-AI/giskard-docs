@@ -149,7 +149,7 @@ If you don't know if the agent answers correctly or not and there needs to be a 
 
 When reviewing a test case, the first thing to check is whether the test case passed or failed. By opening the test case, you can see the metrics along with the failure category and tags on the right side of the screen.
 
-![Review test metrics](/_static/images/hub/review-test-metrics.png)
+![Test case review showing check results and failure category](/_static/images/hub/review-test-metrics.png)
 
 **PASS:**
 

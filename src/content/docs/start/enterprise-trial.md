@@ -1,6 +1,6 @@
 ---
 title: "Request your enterprise trial"
-description: "Experience team collaboration, continuous red teaming, and state-of-the-art enterprise-grade LLM agent testing features with full access to all Hub capabilities."
+description: "Request a Giskard Hub enterprise trial with team collaboration, continuous red teaming, and full access to LLM agent testing."
 sidebar:
   order: 3
 ---
@@ -21,7 +21,7 @@ sidebar:
 **🔒 Unsure if our trial infrastructure meets your company's security standards?** Visit our [trust center ↗](https://trust.giskard.ai) to learn more about our security practices and compliance.
 :::
 
-## Getting started
+## Start your enterprise trial
 
 1. **Request your trial**
    - Visit our [contact page ↗](https://www.giskard.ai/contact)

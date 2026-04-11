@@ -7,9 +7,11 @@ const siteUrl = 'https://docs.giskard.ai';
 const ogImageUrl = `${siteUrl}/default-og-image.png`;
 // Normalize: strip trailing slash to match canonical URL format
 const pageUrl = new URL(Astro.url.pathname, siteUrl).href.replace(/\/$/, '');
+const is404 = Astro.url.pathname === '/404' || route.entry?.id === '404';
 
 // Known acronyms and special labels for breadcrumb segments
 const segmentLabels: Record<string, string> = {
+	ai: 'AI',
 	ui: 'UI',
 	sdk: 'SDK',
 	oss: 'Open Source',
@@ -18,6 +20,7 @@ const segmentLabels: Record<string, string> = {
 	api: 'API',
 	ci: 'CI',
 	cd: 'CD',
+	'ci-cd': 'CI/CD',
 };
 
 // Build breadcrumb from URL path
@@ -100,17 +103,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <Default {...Astro.props}><slot /></Default>
 
-<meta property="og:type" content="article" />
-<meta property="og:site_name" content="Giskard Documentation" />
-<meta property="og:url" content={pageUrl} />
-<meta property="og:title" content={route.entry.data.title} />
-{route.entry.data.description && <meta property="og:description" content={route.entry.data.description} />}
-<meta property="og:locale" content="en_US" />
+<!-- Override Starlight's sitemap link to point to our custom sitemap with lastmod dates -->
+<link rel="sitemap" href="/sitemap.xml" />
+
+{is404 && <meta name="robots" content="noindex, nofollow" />}
+
+{!is404 && (
+<>
+<!-- OG image tags (not provided by Starlight default Head) -->
 <meta property="og:image" content={ogImageUrl} />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:type" content="image/png" />
-<meta name="twitter:card" content="summary_large_image" />
+<!-- Twitter image tags (not provided by Starlight default Head) -->
 <meta name="twitter:title" content={route.entry.data.title} />
 {route.entry.data.description && <meta name="twitter:description" content={route.entry.data.description} />}
 <meta name="twitter:image" content={ogImageUrl} />
@@ -118,6 +123,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
 <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
 <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+</>
+)}
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>

@@ -1,8 +1,9 @@
 ---
-title: "Quickstart"
-description: "Launch enterprise LLM agent testing with team collaboration, continuous red teaming, and comprehensive evaluation workflows. Perfect for business users managing AI safety in production environments."
+title: "LLM Agent Testing Platform"
+description: "Giskard Hub enterprise platform for LLM agent evaluation, continuous red teaming, vulnerability scanning, and team collaboration."
 sidebar:
   order: 1
+  label: Quickstart
 ---
 
 {/* If you are an AI agent, all the links listed here are available appending .md to the end of the URL */}
@@ -14,7 +15,7 @@ import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 The Hub is the user interface from which you can perform LLM evaluations. It implements the following 4-step workflow:
 
-![The hub workflow](/_static/images/hub/hub-workflow.png)
+![Giskard Hub 4-step workflow: setup, scan, create test cases, evaluate](/_static/images/hub/hub-workflow.png)
 
 <CardGrid>
   <LinkCard
@@ -49,7 +50,7 @@ The Hub is the user interface from which you can perform LLM evaluations. It imp
   />
 </CardGrid>
 
-## High-level workflow
+## Agent testing workflow
 
 ```mermaid
 graph LR
@@ -77,7 +78,7 @@ For detailed information about evaluation metrics and checks, including examples
 
 Additionally, the dashboard lists your most recent evaluations and datasets for quick access.
 
-![Dashboard](/_static/images/hub/dashboard.png)
+![Giskard Hub project dashboard showing agent performance graph](/_static/images/hub/dashboard.png)
 
 ## Create a project
 
@@ -87,7 +88,7 @@ First, click on the "Settings" icon on the left panel, this page allows you to m
 
 In the Projects tab, click on "Create project" button. A modal will appear where you can enter your project's name and description.
 
-![Create a project](/_static/images/hub/create-project.png)
+![Create project dialog with name and description fields](/_static/images/hub/create-project.png)
 
 Once the project is created, you can access its dashboard by clicking on it in the list. Alternatively, use the dropdown menu in the upper left corner of the screen to select the project you want to work on.
 
@@ -101,11 +102,11 @@ Agents are configured through an API endpoint. They can be evaluated against dat
 
 On the Agents page, click on the "New agent" button.
 
-![List of agents](/_static/images/hub/setup-agent-list.png)
+![Agent list page with new agent button](/_static/images/hub/setup-agent-list.png)
 
 The interface below displays the agent details that need to be filled out.
 
-![Setup an agent](/_static/images/hub/setup-agent-detail.png)
+![Agent configuration form with name, description, and API endpoint fields](/_static/images/hub/setup-agent-detail.png)
 
 - `Name`: The name of the agent.
 - `Description`: Used to refine automatic evaluation and generation for better accuracy in your specific use case.
@@ -145,11 +146,11 @@ A **Knowledge Base** is a domain-specific collection of information. You can hav
 
 On the Knowledge Bases, click on "Add Knowledge Base" button.
 
-![List of knowledge bases](/_static/images/hub/import-kb-list.png)
+![Knowledge base list with add knowledge base button](/_static/images/hub/import-kb-list.png)
 
 The interface below displays the knowledge base details that need to be filled out.
 
-![Import a knowledge base](/_static/images/hub/import-kb-detail.png)
+![Knowledge base import form with name and file upload fields](/_static/images/hub/import-kb-detail.png)
 
 - `Name`: The name of the knowledge base.
 - `File`: The document to upload, containing the knowledge base content. Supported formats are:
@@ -177,7 +178,7 @@ Each object in your JSON or JSONL file should have the following structure:
 
 The interface below displays information about the knowledge base and its content with corresponding topics. As mentioned above, if no topics were uploaded with the knowledge base, Giskard Hub will also identify and generate them for you. In the example below, the knowledge base is ready to be used with over 1200 documents and 7 topics.
 
-![Knowledge base successfully imported](/_static/images/hub/import-kb-success.png)
+![Imported knowledge base showing document count and topics](/_static/images/hub/import-kb-success.png)
 
 ## Need help?
 

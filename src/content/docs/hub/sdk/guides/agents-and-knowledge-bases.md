@@ -99,7 +99,7 @@ hub.agents.update("agent-id", description=description)
 
 ### Using a local Python function as an agent
 
-For evaluations where you don't want to expose an HTTP endpoint — for example, when evaluating a model locally during development — pass a Python callable to `hub.helpers.evaluate()`. See [Evaluations](/hub/sdk/guides/evaluations#local-evaluations) for details.
+For evaluations where you don't want to expose an HTTP endpoint (for example, when evaluating a model locally during development), pass a Python callable to `hub.helpers.evaluate()`. See [Evaluations](/hub/sdk/guides/evaluations#local-evaluations) for details.
 
 ### List, update, and delete agents
 
@@ -117,9 +117,9 @@ hub.agents.delete("agent-id")
 
 A **Knowledge Base** is an indexed collection of text documents. It has three primary uses in the Hub:
 
-1. **Document-based dataset generation** — the Hub uses your documents as source material to auto-generate realistic test cases.
-2. **Grounded vulnerability scans** — probes are anchored to your actual content, making attacks more realistic and specific to your domain.
-3. **Groundedness check context** — retrieve relevant documents via `hub.knowledge_bases.search_documents()` and pass them as the `context` field of a `groundedness` check assertion to verify that your agent's responses are grounded in your actual documents rather than hallucinated content.
+1. **Document-based dataset generation**: the Hub uses your documents as source material to auto-generate realistic test cases.
+2. **Grounded vulnerability scans**: probes are anchored to your actual content, making attacks more realistic and specific to your domain.
+3. **Groundedness check context**: retrieve relevant documents via `hub.knowledge_bases.search_documents()` and pass them as the `context` field of a `groundedness` check assertion to verify that your agent's responses are grounded in your actual documents rather than hallucinated content.
 
 ## Create a knowledge base
 

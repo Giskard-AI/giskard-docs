@@ -1,6 +1,6 @@
 ---
 title: "Launch a scan"
-description: "Launch comprehensive vulnerability scans for your AI agents. Configure scan parameters, select vulnerability categories, and monitor real-time progress with intuitive visual tools."
+description: "Launch vulnerability scans for AI agents. Configure scan parameters, select vulnerability categories, and monitor real-time progress."
 sidebar:
   order: 2
 ---
@@ -24,13 +24,13 @@ Start testing your AI agent for security vulnerabilities.
 5. **Start the scan**
    Click **Launch Scan** to begin the red teaming process
 
-![Launch scan configuration page](/_static/images/hub/scan/launch-scan.png)
+![Scan configuration with agent, vulnerability categories, and options](/_static/images/hub/scan/launch-scan.png)
 
 ## Monitor scan progress
 
 Once started, you can track the scan's progress in real-time:
 
-![Scan progress view](/_static/images/hub/scan/scan-running.png)
+![Live scan progress showing probe execution and results](/_static/images/hub/scan/scan-running.png)
 
 The scan typically takes 5-15 minutes depending on your agent's complexity and the number of categories selected.
 

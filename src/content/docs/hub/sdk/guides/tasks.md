@@ -1,11 +1,11 @@
 ---
 title: Tasks
-description: Create and manage tasks to track issues found during evaluations and scans.
+description: Create and manage tasks with the Giskard SDK to track issues found during LLM agent evaluations and security scans.
 sidebar:
   order: 6
 ---
 
-**Tasks** are a lightweight issue tracker built into the Hub. When an evaluation or scan surfaces a problem, you can create a task to track the fix, assign it to a team member, and mark it as resolved — all from the SDK.
+**Tasks** are a lightweight issue tracker built into the Hub. When an evaluation or scan surfaces a problem, you can create a task to track the fix, assign it to a team member, and mark it as resolved, all from the SDK. You can also manage tasks from the [Hub UI task management page](/hub/ui/annotate/task-management).
 
 ## Create a task
 

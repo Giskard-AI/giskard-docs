@@ -17,7 +17,7 @@ The third version of the library is available as a pre-release (Beta). This vers
 Looking for Giskard v2 features such as **RAGET** and **Scan**? They are not available yet in Giskard v3. If you still want to use them, please check the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai). We are working to bring them to Giskard v3 as soon as possible! Follow our progress on the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252).
 :::
 
-## Need Help?
+## Resources and support
 
 - **Contributing**: See [Contribute to Giskard](/oss/contributing) for the official guide, AI-agent notes, and repos to star
 - **Documentation**: Explore the [Checks documentation](/oss/checks) for detailed guides

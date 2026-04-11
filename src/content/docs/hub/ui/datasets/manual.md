@@ -1,6 +1,6 @@
 ---
 title: "Create manual tests"
-description: "Build test datasets manually with custom test cases and scenarios from the red teaming playground. Create targeted tests for specific LLM agent use cases with intuitive visual tools."
+description: "Build test datasets manually with custom test cases and scenarios from the red teaming playground for specific LLM agent use cases."
 sidebar:
   order: 2
 ---
@@ -18,7 +18,7 @@ In this section, we will walk you through both and show how to create a test cas
 
 On the Datasets page, click on "New dataset" button in the upper right corner of the screen. You'll then be prompted to enter a name and description for your new dataset.
 
-![Create a dataset](/_static/images/hub/create-dataset.png)
+![New dataset creation dialog with name and description](/_static/images/hub/create-dataset.png)
 
 After creating the dataset, you can add individual conversations to it.
 
@@ -30,7 +30,7 @@ Remind however that **the conversation should always end with a user message**. 
 
 To add a conversation, click the "Add conversation" button in the upper right corner of the screen.
 
-![Add a conversation](/_static/images/hub/add-conversation.png)
+![Add conversation interface with message and check fields](/_static/images/hub/add-conversation.png)
 
 A conversation consists of the following components:
 
@@ -65,7 +65,7 @@ To understand more about how to write an expected response and rules, check out 
 
 You can create manual tests in the red teaming playground. Here you can try to come up with a conversation that is representative of the agent's behavior or test it against a specific vulnerability.
 
-![The red teaming playground](/_static/images/hub/playground.png)
+![Red teaming playground chat interface for testing AI agents](/_static/images/hub/playground.png)
 
 The Chat section is where you can query and talk to the agent. You write your message on the agent part of the screen.
 

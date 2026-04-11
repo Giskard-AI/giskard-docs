@@ -1,6 +1,6 @@
 ---
 title: "Generate scenario-based tests"
-description: "Create targeted, business-specific test cases using scenario-based dataset generation. Test your agents with specific personas and business rules without editing your agent's core functionality."
+description: "Create business-specific test cases using scenario-based generation. Test LLM agents with custom personas and business rules."
 sidebar:
   order: 4
 ---
@@ -16,7 +16,7 @@ Scenario-based generations are a powerful way to ensure your agent is prepared f
 
 By moving from generic stress testing to rule-driven scenarios, you get higher quality datasets that are more reliable for evaluations, and ultimately, an agent that truly understands your business boundaries.
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/g_fsrGyJF4E?si=6ohbPagZyCNU7OCp&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/g_fsrGyJF4E?si=6ohbPagZyCNU7OCp&amp;controls=0" title="How to generate scenario-based test cases in Giskard Hub" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Getting started
 
@@ -28,7 +28,7 @@ To begin, navigate to the Datasets page and click **Generate** in the upper-righ
 
 You'll see a subset of all the personas that you've defined---the user personas that might interact with your bots. You can select an existing one or create a new one.
 
-![Select or create a persona](/_static/images/hub/scenario-persona-choose.png)
+![Persona selection interface for scenario-based testing](/_static/images/hub/scenario-persona-choose.png)
 
 When creating a new persona scenario, it's always nice to have:
 
@@ -39,7 +39,7 @@ When creating a new persona scenario, it's always nice to have:
 
 You can then add specific rules that define behaviors your agent should respect and that are at risk of being broken when interacting with the selected personas. These rules help evaluate different persona scenarios and will be used for the generation of test cases that specifically test whether your agent maintains these behaviors.
 
-![Configure persona with rules](/_static/images/hub/scenario-persona-create.png)
+![Persona configuration form with name, description, and rules](/_static/images/hub/scenario-persona-create.png)
 
 For example:
 
@@ -58,7 +58,7 @@ Once you've configured your persona and rules, you can:
 - **Select your agent**: Choose the agent you want to test (e.g., Zephyr Bank multilingual agent)
 - **Set the number of test cases**: Specify how many test cases you want to generate
 
-![Select agent and number of test cases to generate](/_static/images/hub/scenario-generate.png)
+![Scenario generation settings with agent and test case count](/_static/images/hub/scenario-generate.png)
 
 Start running the generation, which will be relatively quick. After running the generation, you'll have high-quality evaluated datasets.
 

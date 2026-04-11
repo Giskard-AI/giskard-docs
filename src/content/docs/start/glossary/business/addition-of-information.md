@@ -1,6 +1,6 @@
 ---
 title: "Addition of Information"
-description: "Learn about LLM addition of information business failures and how to detect and prevent models from adding incorrect or fabricated information not present in the context."
+description: "Detect and prevent LLM addition of information failures where models fabricate details not present in the source context."
 sidebar:
   order: 2
 ---
