@@ -24,6 +24,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Cloudflare Wrangler local state
+.wrangler/
+
 # Environment variables
 .env
 .env.production

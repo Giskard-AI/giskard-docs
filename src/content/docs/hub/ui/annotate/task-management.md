@@ -7,7 +7,7 @@ sidebar:
 
 Tasks allow you to manage and distribute work among you and your coworkers.
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/u5ctBhfArNY?si=76o_0VIQzdPXFELk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/u5ctBhfArNY?si=76o_0VIQzdPXFELk" title="How to manage review tasks in Giskard Hub" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 Tasks provide several key benefits for managing evaluation workflows:
 
@@ -55,7 +55,7 @@ The Hub UI provides a comprehensive overview of all your tasks, including:
 - **Assignees** - Know who is responsible for each task
 - **Filters** - Filter tasks by your own tasks or unassigned tasks
 
-![Tasks overview](/_static/images/hub/tasks-overview.png)
+![Task management page with priority, status, and assignee columns](/_static/images/hub/tasks-overview.png)
 
 ## Create a task
 
@@ -95,7 +95,7 @@ To create a task from a scan result:
    - **Assignees** - Select one or more team members
    - **Description** - Provide a clear description of what needs to be done
 
-![Create a task from a probe evaluation](/_static/images/hub/tasks-from-probe.png)
+![Creating a task from a vulnerability scan probe result](/_static/images/hub/tasks-from-probe.png)
 
 ### From evaluation runs
 
@@ -122,7 +122,7 @@ To create a task from an evaluation run:
 
 When iterating on a task, there are various things you can can change. First, you need to open the task and view it.
 
-![Edit a task](/_static/images/hub/tasks-edit.png)
+![Task editing interface with assignee, status, and priority fields](/_static/images/hub/tasks-edit.png)
 
 When editing a task, you can change the following information:
 
@@ -175,7 +175,7 @@ An important feature related to tasks is the ability to set conversations to dra
 When you go to the conversation linked to an evaluation run and create a task, you can set the linked failed test case to draft status. Before using it again, you need to resolve all associated tasks.
 Similarly, you can select a conversation from a dataset and set it to draft status.
 
-![Set a conversation to draft status](/_static/images/hub/tasks-draft.png)
+![Draft status toggle excluding conversation from evaluations](/_static/images/hub/tasks-draft.png)
 
 ## Follow the review process
 
@@ -224,7 +224,7 @@ To add a comment:
 3. Add your comment
 4. Press the "Post comment" button
 
-![Comment on a test case](/_static/images/hub/comment-create.png)
+![Adding a comment to a test case for team review](/_static/images/hub/comment-create.png)
 
 ## Best practices
 

@@ -1,23 +1,27 @@
 ---
-title: "Overview"
-description: "Overview of security vulnerabilities in AI systems, including prompt injection, harmful content, information disclosure, and more."
+title: "AI Security Vulnerabilities"
+description: "Common security vulnerabilities in AI agents and LLMs: prompt injection, harmful content, information disclosure, and excessive agency."
 sidebar:
   order: 1
 ---
 
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-Security vulnerabilities in AI systems represent critical weaknesses that can be exploited by malicious actors to compromise system integrity, extract sensitive information, or manipulate model behavior for harmful purposes.
+AI agents and LLMs are exposed to a category of security vulnerabilities that doesn't exist in traditional software. Because these systems interpret natural language instructions and generate free-form responses, they can be manipulated through carefully crafted inputs. No code exploits required.
 
-## Understanding Security Vulnerabilities
+## Understanding AI security vulnerabilities
 
-Security vulnerabilities differ from business failures in that they focus on malicious exploitation and system integrity rather than accuracy and reliability. These vulnerabilities can lead to data breaches, privacy violations, system manipulation, and other security incidents that pose significant risks to organizations and users.
+Unlike traditional software bugs, AI security vulnerabilities arise from the model's ability to follow instructions, generate content, and access tools. An attacker doesn't need to find a buffer overflow or SQL injection; they can simply craft a prompt that tricks the model into revealing its system instructions, generating harmful content, or performing unauthorized actions.
+
+These vulnerabilities are categorized separately from [business logic failures](/start/glossary/business) (like hallucination or omission) because they involve deliberate exploitation rather than accidental errors. However, both categories should be tested together as part of a comprehensive evaluation strategy.
+
+The [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/) provides a widely referenced framework for classifying these risks. Giskard's [automated red teaming scan](/hub/ui/scan) tests for these vulnerabilities using [55+ specialized attack probes](/hub/ui/scan/vulnerability-categories).
 
 :::tip
 You can find examples of security vulnerabilities in our [RealHarm dataset ↗](https://realharm.giskard.ai/).
 :::
 
-## Types of Security Vulnerabilities
+## Types of security vulnerabilities
 
 <CardGrid>
   <LinkCard
@@ -52,14 +56,14 @@ You can find examples of security vulnerabilities in our [RealHarm dataset ↗](
   />
 </CardGrid>
 
-## Getting Started with Security Testing
+## Getting started with AI security testing
 
-To begin securing your AI systems:
+Detecting these vulnerabilities requires a combination of automated scanning and targeted red teaming. Start with an automated scan to establish a baseline, then build a test dataset that covers the vulnerability categories most relevant to your use case.
 
 <CardGrid>
   <LinkCard
-    title="Giskard Hub UI Security Dataset"
+    title="AI Red Teaming Scan"
     href="/hub/ui/scan"
-    description="Our state-of-the-art enterprise-grade security vulnerability testing."
+    description="Scan your agent for vulnerabilities with 55+ specialized attack probes."
   />
 </CardGrid>

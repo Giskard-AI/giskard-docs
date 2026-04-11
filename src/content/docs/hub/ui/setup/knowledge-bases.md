@@ -1,6 +1,6 @@
 ---
 title: "Setup knowledge bases"
-description: "Create, manage, and organize projects, agents and knowledge bases through the user interface. Set up workspaces, configure access controls, and manage team collaboration."
+description: "Create and manage knowledge bases in Giskard Hub. Upload domain documents to generate targeted test cases for LLM agent evaluation."
 sidebar:
   order: 4
 ---
@@ -15,13 +15,13 @@ A **Knowledge Base** is a domain-specific collection of information. You can hav
 
 On the Knowledge Bases, click on "Add Knowledge Base" button.
 
-![List of knowledge bases](/_static/images/hub/import-kb-list.png)
+![Knowledge base list with add knowledge base button](/_static/images/hub/import-kb-list.png)
 
 ## Knowledge base fields
 
 The interface below displays the knowledge base details that need to be filled out.
 
-![Import a knowledge base](/_static/images/hub/import-kb-detail.png)
+![Knowledge base import form for JSON and JSONL files](/_static/images/hub/import-kb-detail.png)
 
 - `Name`: The name of the knowledge base.
 - `File`: The document to upload, containing the knowledge base content. Supported formats are:
@@ -53,7 +53,7 @@ Each object in your JSON or JSONL file should have the following structure:
 
 The interface below displays information about the knowledge base and its content with corresponding topics. As mentioned above, if no topics were uploaded with the knowledge base, Giskard Hub will also identify and generate them for you. In the example below, the knowledge base is ready to be used with over 1200 documents and 7 topics.
 
-![Knowledge base successfully imported](/_static/images/hub/import-kb-success.png)
+![Imported knowledge base showing document count and topics](/_static/images/hub/import-kb-success.png)
 
 ## Next steps
 

@@ -35,8 +35,8 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Request your Enterprise Trial: https://docs.giskard.ai/start/enterprise-trial.md
 
 ### Knowledge Glossary
-- Introduction: https://docs.giskard.ai/start/glossary.md
-- Testing Methodologies: https://docs.giskard.ai/start/glossary/testing-methodologies.md
+- AI Testing & Evaluation Glossary: https://docs.giskard.ai/start/glossary.md
+- AI Testing Methodologies: https://docs.giskard.ai/start/glossary/testing-methodologies.md
 
 ### Glossary — Business Failures
 - Overview: https://docs.giskard.ai/start/glossary/business.md

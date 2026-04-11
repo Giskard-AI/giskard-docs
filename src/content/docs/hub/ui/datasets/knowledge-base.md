@@ -1,6 +1,6 @@
 ---
 title: "Generate knowledge base tests"
-description: "Generate and manage knowledge base test cases for your LLM agents. Test compliance, domain-specific scenarios, and business requirements through comprehensive automated testing."
+description: "Generate knowledge base test cases for LLM agents. Test compliance, domain-specific scenarios, and business requirements automatically."
 sidebar:
   order: 5
 ---
@@ -35,13 +35,13 @@ These clusters and topics are then used to generate dedicated tests that challen
 
 To begin, navigate to the Datasets page and click **Generate** in the upper-right corner of the screen. This will open a modal with two options: Knowledge Base, and Scenario. Select the **Knowledge Base** option.
 
-![Select scenario option from generation modal](/_static/images/hub/generate-knowledge-base-select.png)
+![Dataset generation modal with knowledge base option selected](/_static/images/hub/generate-knowledge-base-select.png)
 
 ## Select a knowledge base
 
 The Knowledge Base tab allows you to generate a dataset with examples based on your knowledge base.
 
-![Generate knowledge base based dataset](/_static/images/hub/generate-dataset-document-based.png)
+![Knowledge base test generation form with topic selection](/_static/images/hub/generate-dataset-document-based.png)
 
 In this case, dataset generation requires two additional pieces of information:
 

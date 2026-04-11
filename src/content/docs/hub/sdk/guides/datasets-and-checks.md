@@ -1,6 +1,6 @@
 ---
 title: Datasets & Checks
-description: Build datasets and test cases manually, by file import, or via auto-generation. Use built-in checks to evaluate agent responses, or define custom checks for domain-specific criteria.
+description: Build datasets and checks with the Giskard SDK. Create test cases, use built-in checks, or define custom checks for LLM evaluation.
 sidebar:
   order: 4
 ---

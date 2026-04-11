@@ -1,6 +1,6 @@
 ---
 title: "Import tests"
-description: "Import your existing test data into Giskard Hub. Bring conversations, CSV files, and other data formats to build comprehensive test datasets with intuitive visual tools."
+description: "Import existing test data into Giskard Hub from conversations, CSV files, and JSONL formats to build evaluation datasets."
 sidebar:
   order: 3
 ---
@@ -13,7 +13,7 @@ In this section, we will walk you through how to import existing datasets from a
 
 On the Datasets page, click on "New dataset" button in the upper right corner of the screen. You'll then be prompted to enter a name and description for your new dataset.
 
-![Create a dataset](/_static/images/hub/create-dataset.png)
+![New dataset creation dialog with name and description](/_static/images/hub/create-dataset.png)
 
 After creating the dataset, you can either import multiple conversations or add individual conversations to it.
 
@@ -21,7 +21,7 @@ After creating the dataset, you can either import multiple conversations or add 
 
 To import conversations, click the "Import" button in the upper right corner of the screen.
 
-![List of conversations](/_static/images/hub/import-conversations.png)
+![Dataset conversations list with import button](/_static/images/hub/import-conversations.png)
 
 You can import data in **JSON or JSONL format**, containing an array of conversations (or a conversation object per line, if JSONL).
 
@@ -35,7 +35,7 @@ Each conversation must be defined as a JSON object with a `messages` field conta
 For detailed information about built-in checks like correctness, conformity, groundedness, string matching, metadata, and semantic similarity, including examples and how they work, see [Annotation overview](/hub/ui/annotate/overview).
 :::
 
-![Import a conversation](/_static/images/hub/import-conversations-detail.png)
+![Conversation import interface for JSON test data](/_static/images/hub/import-conversations-detail.png)
 
 Here's an example of the structure and content in a dataset:
 

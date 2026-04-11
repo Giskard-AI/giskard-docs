@@ -1,13 +1,13 @@
 ---
 title: "Run and review evaluations"
-description: "Run and manage LLM agent evaluations through the user interface. Execute tests, schedule automated evaluations, and analyze results with comprehensive reporting and detailed metrics."
+description: "Run and manage LLM agent evaluations through the Giskard Hub UI. Execute tests, schedule automated runs, and analyze results with metrics."
 sidebar:
   order: 2
 ---
 
 On the Evaluations page, click on "Run evaluation" button in the upper right corner of the screen.
 
-![List of evaluations](/_static/images/hub/evaluation-list.png)
+![Evaluation runs list with run evaluation button](/_static/images/hub/evaluation-list.png)
 
 ## Configure the evaluation
 
@@ -19,7 +19,7 @@ Next, set the parameters for the evaluation:
 
 - `Tags` (optional): Limit the evaluation to a specific subset of the dataset by applying tags.
 
-![New evaluation run](/_static/images/hub/evaluation-run.png)
+![Evaluation configuration form with agent and dataset selection](/_static/images/hub/evaluation-run.png)
 
 ## Checks used in the evaluation
 
@@ -59,7 +59,7 @@ The metrics view displays performance statistics for each check that was used in
 
 The pie chart below displays the number of evaluations that passed, failed, or were unexecuted.
 
-![Evaluation metrics](/_static/images/hub/evaluation-metrics.png)
+![Evaluation metrics view showing pass/fail rates per check](/_static/images/hub/evaluation-metrics.png)
 
 The metrics view helps you:
 
@@ -77,7 +77,7 @@ The failure categories view groups test failures by their failure category. This
 
 The pie chart below displays the number of evaluations that passed, failed, or were unexecuted.
 
-![Evaluation categories](/_static/images/hub/evaluation-categories.png)
+![Failure categories view grouping test results by root cause](/_static/images/hub/evaluation-categories.png)
 
 Using failure categories helps you:
 
@@ -94,7 +94,7 @@ You can read about failure category changes in [Modify test cases](/hub/ui/annot
 
 The tags view helps you filter and analyze results by custom tags.
 
-![Evaluation tags](/_static/images/hub/evaluation-tags.png)
+![Tags view showing test results filtered by category](/_static/images/hub/evaluation-tags.png)
 
 Using tags helps you:
 
@@ -111,7 +111,7 @@ You can read about tag definitions in [Annotate overview](/hub/ui/annotate/overv
 
 The evaluation run table displays test cases with several columns that provide important information:
 
-![Evaluation columns](/_static/images/hub/evaluation-columns.png)
+![Evaluation results table with status, metrics, and failure columns](/_static/images/hub/evaluation-columns.png)
 
 These columns help you:
 
