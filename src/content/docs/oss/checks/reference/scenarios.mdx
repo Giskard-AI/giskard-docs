@@ -30,7 +30,7 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
   Add an interaction to the scenario. Returns self for chaining.
 
   <Property name="inputs" type="value | Callable" required>Static value or callable `(trace) -> value`.</Property>
-  <Property name="outputs" type="value | Callable" required>Static value, callable `(inputs) -> value`, or `(trace, inputs) -> value`.</Property>
+  <Property name="outputs" type="value | Callable">Static value, callable `(inputs) -> value`, or `(trace, inputs) -> value`. Optional when the scenario / suite has a `target`.</Property>
   <Property name="metadata" type="dict | None">Optional metadata dictionary.</Property>
 </MethodCard>
 
@@ -41,9 +41,9 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 </MethodCard>
 
 <MethodCard name=".add_interaction()" returnType="self">
-  Add a pre-constructed `Interaction` or `InteractionSpec` object.
+  Add a pre-constructed `InteractionSpec` object.
 
-  <Property name="interaction" type="Interaction | InteractionSpec" required>The interaction or spec to add.</Property>
+  <Property name="interaction" type="InteractionSpec" required>The interaction spec to add.</Property>
 </MethodCard>
 
 <MethodCard name=".extend()" returnType="self">
@@ -55,6 +55,7 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 <MethodCard name=".run()" returnType="ScenarioResult">
   Execute the scenario against the SUT and return results.
 
+  <Property name="target" type="Callable | None" defaultValue="None">Override the scenario's default target system-under-test for this run.</Property>
   <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
 </MethodCard>
 
@@ -118,6 +119,9 @@ scenario = (
 Result of scenario execution with trace and check results.
 
 <TypeTable name="ScenarioResult">
+  <Property name="scenario_name" type="str">
+    Name of the scenario that produced this result.
+  </Property>
   <Property name="status" type="ScenarioStatus">
     Overall status (PASS/FAIL/ERROR/SKIP).
   </Property>
@@ -129,6 +133,15 @@ Result of scenario execution with trace and check results.
   </Property>
   <Property name="passed" type="bool">
     True when all steps passed.
+  </Property>
+  <Property name="failed" type="bool">
+    True when any step failed.
+  </Property>
+  <Property name="errored" type="bool">
+    True when any step errored.
+  </Property>
+  <Property name="skipped" type="bool">
+    True when all steps were skipped.
   </Property>
   <Property name="duration_ms" type="int">
     Total execution time in milliseconds.
@@ -166,7 +179,7 @@ Group multiple scenarios and run them together.
   </Property>
 </MethodCard>
 
-<MethodCard name=".append()" returnType="None">
+<MethodCard name=".append()" returnType="Suite">
   Add a scenario to the suite.
 
   <Property name="scenario" type="Scenario" required>The scenario to add.</Property>
@@ -213,7 +226,19 @@ Aggregate result from suite execution.
   <Property name="failed_count" type="int">
     Number of failed scenarios.
   </Property>
+  <Property name="errored_count" type="int">
+    Number of scenarios that errored.
+  </Property>
+  <Property name="skipped_count" type="int">
+    Number of scenarios that were skipped.
+  </Property>
 </TypeTable>
+
+<MethodCard name=".to_junit_xml()" returnType="str">
+  Export the suite result as a JUnit XML string. Optionally write to a file.
+
+  <Property name="path" type="str | Path | None" defaultValue="None">File path to write the XML to. Returns the XML string regardless.</Property>
+</MethodCard>
 
 ---
 
@@ -226,6 +251,9 @@ Low-level runner for executing scenarios. Most users should use `Scenario(...).r
 <MethodCard name=".run()" returnType="ScenarioResult">
   <Property name="scenario" type="Scenario" required>
     The scenario to execute.
+  </Property>
+  <Property name="target" type="Callable | None" defaultValue="None">
+    Override the scenario's target SUT.
   </Property>
   <Property name="return_exception" type="bool" defaultValue="False">
     Return results on exceptions.

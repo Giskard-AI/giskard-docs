@@ -107,7 +107,7 @@ Result of test case execution with check outcomes.
 
 <TypeTable name="TestCaseResult">
   <Property name="status" type="TestCaseStatus">
-    Overall test case status (PASS/FAIL/ERROR).
+    Overall test case status (PASS/FAIL/ERROR/SKIP).
   </Property>
   <Property name="results" type="list[CheckResult]">
     Results from all checks.
@@ -118,10 +118,20 @@ Result of test case execution with check outcomes.
   <Property name="failed" type="bool">
     True if any check failed.
   </Property>
+  <Property name="errored" type="bool">
+    True if any check errored.
+  </Property>
+  <Property name="skipped" type="bool">
+    True if all checks were skipped.
+  </Property>
   <Property name="duration_ms" type="int">
     Execution time in milliseconds.
   </Property>
 </TypeTable>
+
+<MethodCard name=".assert_passed()" returnType="None">
+  Raise `AssertionError` with formatted failure messages if any check did not pass. Useful in pytest.
+</MethodCard>
 
 ```python
 result = await test_case.run()
