@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-Every significant action in the Hub — creating, updating, or deleting a resource — is recorded in the **Audit Log**. Use the SDK to query these events for compliance reporting, change history, or debugging unexpected changes.
+Every significant action in the Hub (creating, updating, or deleting a resource) is recorded in the **Audit Log**. Use the SDK to query these events for compliance reporting, change history, or debugging unexpected changes. You can also browse audit events from the [Hub UI event logs page](/hub/ui/event-logs).
 
 ## Search audit events
 
@@ -61,7 +61,7 @@ for event in events:
 
 ## Retrieve audit history for a specific entity
 
-If you want to see every change made to a particular resource — for example, a specific agent or dataset — use `list_entities`:
+If you want to see every change made to a particular resource (for example, a specific agent or dataset), use `list_entities`:
 
 ```python
 history = hub.audit_logs.list_entities(
@@ -85,7 +85,7 @@ for entry in history:
 
 ## Common use cases
 
-**Compliance report — who deleted evaluations this month:**
+**Compliance report: who deleted evaluations this month**
 
 ```python
 from datetime import datetime, timezone

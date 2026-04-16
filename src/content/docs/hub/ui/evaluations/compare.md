@@ -1,6 +1,6 @@
 ---
 title: "Compare evaluations"
-description: "Compare evaluation results across different agent versions, datasets, and time periods. Identify regressions, track improvements, and maintain quality standards with detailed analytics."
+description: "Compare LLM evaluation results across agent versions, datasets, and time periods. Identify regressions and track improvements."
 sidebar:
   order: 4
 ---
@@ -18,7 +18,7 @@ In this section, we will walk you through how to compare evaluations in Giskard 
 
 On the Evaluations page, select at least two evaluations to compare, then click the "Compare" button in the top right corner of the table. The page will display a comparison of the selected evaluations.
 
-![Compare evaluation runs](/_static/images/hub/comparison-overview.png)
+![Side-by-side comparison of two evaluation runs](/_static/images/hub/comparison-overview.png)
 
 ## Understanding the comparison view
 
@@ -28,7 +28,7 @@ First, it shows the success rate - the percentage of conversations that the chec
 
 Clicking on a conversation will show a detailed comparison.
 
-![Comparison details](/_static/images/hub/comparison-detail.png)
+![Conversation-level comparison showing response differences](/_static/images/hub/comparison-detail.png)
 
 Within this comparison you can explore the performance of the agent on a specific conversation and metrics.
 

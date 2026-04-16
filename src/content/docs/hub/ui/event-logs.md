@@ -1,13 +1,13 @@
 ---
 title: "Track event logs"
-description: "Track every change made to entities in Giskard Hub with comprehensive event logs. View complete history of modifications to checks, datasets, and test cases for full traceability."
+description: "Track every change made to entities in Giskard Hub with event logs. View history of modifications to checks, datasets, and test cases."
 sidebar:
   order: 8
 ---
 
 Event logs provide full traceability for all changes made to entities within Giskard Hub. This feature allows you to keep track of every change that every person has made on every entity, providing complete audit trails for your evaluation configurations.
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/W_9MhdmHouk?si=0cW-jUuMaO8lifS5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/W_9MhdmHouk?si=0cW-jUuMaO8lifS5" title="How to track entity changes with event logs in Giskard Hub" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 **Why use event logs?**
 
@@ -22,7 +22,7 @@ Event logs are essential for maintaining accountability and understanding the ev
 
 To begin, click on the "Settings" icon on the left panel, then select "Event logs".
 
-![Event logs](/_static/images/hub/event-logs.png)
+![Event logs page showing tracked entity changes](/_static/images/hub/event-logs.png)
 
 Every entity in Giskard Hub maintains a complete history of all modifications. This includes:
 
@@ -46,7 +46,7 @@ To view the event history for a specific entity in the Event logs overview:
 2. Click the **History** button
 3. Review the list of changes
 
-![Event logs history](/_static/images/hub/event-logs-history.png)
+![Event history detail view with change timeline](/_static/images/hub/event-logs-history.png)
 
 ## Best practices
 

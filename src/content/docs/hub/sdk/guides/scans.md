@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-A **Scan** runs a set of automated adversarial probes against your agent to detect security and safety vulnerabilities. Giskard covers the [OWASP LLM Top 10 (2025)](https://owasp.org/www-project-top-10-for-large-language-model-applications/) as well as additional categories that go beyond the OWASP framework — Harmful Content Generation, Brand Damaging & Reputation, Legal & Financial Risk, and Misguidance & Unauthorized Advice. See the full [attack category catalogue](https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/index.html) for details.
+A **Scan** runs a set of automated adversarial probes against your agent to detect security and safety vulnerabilities. You can also launch and review scans from the [Hub UI scan page](/hub/ui/scan). Giskard covers the [OWASP LLM Top 10 (2025)](https://owasp.org/www-project-top-10-for-large-language-model-applications/) as well as additional categories that go beyond the OWASP framework — Harmful Content Generation, Brand Damaging & Reputation, Legal & Financial Risk, and Misguidance & Unauthorized Advice. See the full [attack category catalogue](https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/index.html) for details.
 
 ## Launch a scan
 

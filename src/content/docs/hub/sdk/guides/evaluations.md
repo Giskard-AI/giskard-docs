@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-An **Evaluation** runs an agent against all test cases in a dataset, applies the configured checks to each response, and produces a per-test-case result with a pass/fail verdict.
+An **Evaluation** runs an agent against all test cases in a dataset, applies the configured checks to each response, and produces a per-test-case result with a pass/fail verdict. You can also run and review evaluations from the [Hub UI evaluations page](/hub/ui/evaluations).
 
 ## Remote evaluations
 
@@ -301,7 +301,7 @@ hub.evaluations.delete("evaluation-id")
 
 ## Scheduled evaluations
 
-**Scheduled Evaluations** automatically run an evaluation on a regular cadence — daily, weekly, or monthly. They're the foundation of continuous quality monitoring: set them up once and the Hub will run them automatically, so you catch regressions without any manual effort.
+**Scheduled Evaluations** automatically run an evaluation on a regular cadence (daily, weekly, or monthly). They're the foundation of continuous quality monitoring: set them up once and the Hub will run them automatically, so you catch regressions without any manual effort.
 
 ### Create a scheduled evaluation
 

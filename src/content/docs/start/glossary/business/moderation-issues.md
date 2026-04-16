@@ -1,6 +1,6 @@
 ---
 title: "Moderation Issues"
-description: "Learn about LLM moderation issues business failures and how to detect and prevent models from applying overly restrictive content filters to valid business queries."
+description: "Detect LLM moderation failures where models apply overly restrictive content filters to valid business queries."
 sidebar:
   order: 6
 ---

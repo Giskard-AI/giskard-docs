@@ -1,6 +1,6 @@
 ---
 title: "Understand metrics, failure categories and tags"
-description: "Comprehensive guide to organizing and analyzing test cases using tags, metrics, and failure categories. Learn how to structure your test datasets and interpret evaluation results effectively."
+description: "Organize and analyze test cases using tags, metrics, and failure categories. Structure datasets and interpret LLM evaluation results."
 sidebar:
   order: 2
 ---
@@ -24,17 +24,17 @@ You can then focus on improving your agent's compliance with business rules spec
 
 Metrics provide quantitative measurements of your agent's performance across different checks. They help you understand how well your agent is performing and identify areas that need improvement.
 
-<iframe width="100%" height="400" src="https://www.youtube.com/embed/VLejoLvDy-o?si=FXzYphE06Oi1fiBH" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="100%" height="400" src="https://www.youtube.com/embed/VLejoLvDy-o?si=FXzYphE06Oi1fiBH" title="How to create and configure evaluation checks in Giskard Hub" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### Create a check
 
 To create a check, click on the "Create a new check" button in the upper right corner of the screen.
 
-![List of checks](/_static/images/hub/checks-create.png)
+![Checks page with create new check button](/_static/images/hub/checks-create.png)
 
 After, you can configure the check parameters which depends on the check type. This will look something like this:
 
-![Create a new check](/_static/images/hub/checks-create-configure.png)
+![Check configuration form with type and parameter fields](/_static/images/hub/checks-create-configure.png)
 
 :::tip
 Before creating or changing a check, we recommend you to read about the best practices for modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
@@ -209,7 +209,7 @@ The advantage of custom checks is that they can be tailored to your specific use
 
 On the Checks page, you can create custom checks by clicking on the "New check" button in the upper right corner of the screen.
 
-![List of checks](/_static/images/hub/checks-create.png)
+![Custom checks page with new check button](/_static/images/hub/checks-create.png)
 
 Next, set the parameters for the check:
 
@@ -225,7 +225,7 @@ Next, set the parameters for the check:
 - `Semantic Similarity`: The output of the agent should be semantically similar to the reference.
 - And a set of parameters specific to the check type. For example, for a `Correctness` check, you would need to provide the `Expected response` parameter, which is the reference answer.
 
-![Create a new check](/_static/images/hub/checks-create-configure.png)
+![Custom check setup with name, identifier, and type selection](/_static/images/hub/checks-create-configure.png)
 
 Once you have created a custom check, you can apply it to conversations in your dataset. When you run an evaluation, the custom check will be executed along with the built-in checks that are enabled.
 
@@ -241,7 +241,7 @@ To add or edit failure categories, go to **Settings** -> **Project Settings**. A
 
 When a test fails, a failure category is assigned to the test automatically, however you can manually update the failure category to a different one.
 
-![Failure categories](/_static/images/hub/failure-categories.png)
+![Failure category selector on a failed test case](/_static/images/hub/failure-categories.png)
 
 :::tip
 You can read about modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
@@ -306,7 +306,7 @@ Tags are optional but highly recommended labels that help you organize and filte
 
 To create a tag, first open a conversation and click on the "Add tag" button in the "Properties" section at the right side of the screen.
 
-![Tags](/_static/images/hub/tags-create.png)
+![Add tag button in the conversation properties panel](/_static/images/hub/tags-create.png)
 
 :::tip
 Before creating a tag, we recommend you to read about the best practices for modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).

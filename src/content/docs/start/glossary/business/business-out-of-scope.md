@@ -1,6 +1,6 @@
 ---
 title: "Business Out of Scope"
-description: "Learn about LLM business out of scope business failures and how to detect and prevent models from providing information about products or services outside their defined business scope."
+description: "Detect and prevent LLM out-of-scope failures where models answer about products or services outside their defined business boundaries."
 sidebar:
   order: 3
 ---

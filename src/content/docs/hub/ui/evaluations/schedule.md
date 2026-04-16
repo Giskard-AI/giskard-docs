@@ -1,6 +1,6 @@
 ---
 title: "Schedule evaluations"
-description: "Schedule evaluations to run automatically at regular intervals. Detect regressions in agent performance over time with automated testing workflows and comprehensive monitoring."
+description: "Schedule LLM agent evaluations to run automatically at regular intervals. Detect performance regressions with automated testing."
 sidebar:
   order: 3
 ---
@@ -11,13 +11,13 @@ You can schedule evaluations to run automatically at regular intervals. This is 
 
 On the Evaluations page, click on the "Schedule" tab. This will display a list of all the scheduled evaluations.
 
-![Evaluation schedule list](/_static/images/hub/evaluation-schedule-list.png)
+![List of scheduled evaluations with frequency and agent details](/_static/images/hub/evaluation-schedule-list.png)
 
 ## Create a new schedule
 
 To create a new scheduled evaluation, click on the "Schedule Evaluation" button in the upper right corner of the screen.
 
-![Evaluation schedule](/_static/images/hub/evaluation-schedule.png)
+![Schedule evaluation form with agent, dataset, and frequency options](/_static/images/hub/evaluation-schedule.png)
 
 ## Configure the schedule
 

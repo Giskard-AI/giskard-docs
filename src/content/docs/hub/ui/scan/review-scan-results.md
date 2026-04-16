@@ -1,6 +1,6 @@
 ---
 title: "Review scan results"
-description: "Review comprehensive vulnerability scan results with detailed security analysis. Understand security grades, explore attack details, and take actionable steps to improve AI agent security."
+description: "Review vulnerability scan results with security grades and attack details. Take actionable steps to improve AI agent security."
 sidebar:
   order: 3
 ---
@@ -16,19 +16,19 @@ Your scan results include a security grade from A to D:
 - **C**: A major issue was detected - moderate-risk vulnerability requiring attention
 - **D**: A critical issue was detected - high-risk vulnerability needing immediate action
 
-![Scan results overview with security grade](/_static/images/hub/scan/scan-results.png)
+![Scan results showing overall security grade and category breakdown](/_static/images/hub/scan/scan-results.png)
 
 ## Explore attack details
 
 Scroll to any vulnerability category to see the specific attacks that were tested:
 
-![List of probes and attack attempts](/_static/images/hub/scan/probe-listing.png)
+![Probe listing showing attack categories and success rates](/_static/images/hub/scan/probe-listing.png)
 
 ## Analyze individual vulnerabilities
 
 Click **Review** next to any probe to see detailed attack results:
 
-![Detailed view of a successful attack attempt](/_static/images/hub/scan/attempt-successful.png)
+![Attack detail showing prompt, agent response, and vulnerability](/_static/images/hub/scan/attempt-successful.png)
 
 This shows you:
 

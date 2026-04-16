@@ -1,13 +1,14 @@
 ---
-title: "Testing Methodologies"
-description: "Comprehensive guide to testing methodologies for AI systems including adversarial testing, red teaming, and continuous monitoring."
+title: "AI Testing Methodologies"
+description: "AI agent testing methodologies: adversarial testing, red teaming, regression testing, human-in-the-loop evaluation, and continuous monitoring."
 sidebar:
   order: 2
+  label: Testing methodologies
 ---
 
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-Effective testing of AI systems requires a comprehensive approach that combines multiple methodologies to ensure safety, security, and reliability. Giskard provides tools and frameworks for implementing robust testing strategies.
+AI agents and LLMs require testing approaches that go beyond traditional software QA. Because these systems produce non-deterministic outputs, they can fail in subtle and unpredictable ways: hallucinating facts, following injected instructions, generating harmful content, or behaving differently across model versions. Effective AI testing combines multiple complementary methodologies to cover functional correctness, safety, security, and reliability.
 
 ## Key testing approaches
 
@@ -56,38 +57,28 @@ Effective testing of AI systems requires a comprehensive approach that combines 
 
 ## Testing lifecycle
 
+AI testing is iterative. Each stage feeds into the next, and findings from production monitoring often cycle back to inform new test cases.
+
 ### 1. Planning phase
 
-- Define testing objectives and scope
-- Identify critical vulnerabilities and risks
-- Design test strategies and methodologies
-- Establish success criteria and metrics
+Define what you're testing and why. Identify the agent's critical use cases, the risks specific to your domain (e.g., medical advice, financial transactions), and which failure categories matter most. Establish measurable success criteria, for example a maximum acceptable failure rate for correctness checks or zero tolerance for prompt injection in a regulated context.
 
 ### 2. Execution phase
 
-- Implement automated testing frameworks
-- Conduct manual testing and validation
-- Perform adversarial and red team testing
-- Monitor and record results
+Run your test suite using a combination of automated and manual approaches. Start with an [automated red teaming scan](/hub/ui/scan) to establish a security baseline, then build out [test datasets](/hub/ui/datasets) covering functional, adversarial, and domain-specific scenarios. Use the [annotation workflow](/hub/ui/annotate) to assign evaluation criteria to each test case.
 
 ### 3. Analysis phase
 
-- Evaluate test results and findings
-- Prioritize vulnerabilities and issues
-- Generate comprehensive reports
-- Plan remediation strategies
+Review [evaluation results](/hub/ui/evaluations) across metrics, failure categories, and tags to identify patterns. [Compare evaluations](/hub/ui/evaluations/compare) across agent versions to detect regressions. Focus remediation on the failure categories with the highest impact on your use case.
 
-### 4. Remediation phase
+### 4. Remediation and continuous monitoring
 
-- Address identified vulnerabilities
-- Implement fixes and improvements
-- Re-test to verify resolution
-- Update testing procedures
+Address identified vulnerabilities through prompt engineering, guardrails, model selection, or knowledge base updates. Re-evaluate to verify fixes. Then [schedule automated evaluations](/hub/ui/evaluations/schedule) and enable [continuous red teaming](/hub/ui/continuous-red-teaming) so that new failures are caught as your agent, data, and models evolve.
 
 ## Best practices
 
-- **Comprehensive Coverage**: Test all critical functionality and edge cases
-- **Regular Updates**: Keep testing frameworks and methodologies current
-- **Documentation**: Maintain detailed testing procedures and results
-- **Automation**: Automate repetitive testing tasks for efficiency
-- **Human Oversight**: Combine automated testing with human expertise
+- **Test at every stage**: Evaluate during development (prompt iteration), deployment (CI/CD gates), and production (scheduled monitoring).
+- **Combine automated and manual testing**: Automated scans catch known vulnerability patterns at scale; human red teamers find creative exploits that automated tools miss.
+- **Prioritize by risk**: Not all failures are equal. Focus on the vulnerability categories that pose the greatest risk to your users and business.
+- **Version your test data**: Keep test datasets versioned alongside your agent configuration so you can reproduce any evaluation.
+- **Close the loop**: Convert production incidents and user feedback into new test cases to prevent recurrence.

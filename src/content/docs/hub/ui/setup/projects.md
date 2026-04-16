@@ -13,7 +13,7 @@ First, click on the "Settings" icon on the left panel, this page allows you to m
 
 In the Projects tab, click on "Create project" button. A modal will appear where you can enter your project's name and description.
 
-![Create a project](/_static/images/hub/create-project.png)
+![Create project dialog with name and description fields](/_static/images/hub/create-project.png)
 
 Once the project is created, you can access its dashboard by clicking on it in the list. Alternatively, use the dropdown menu in the upper left corner of the screen to select the project you want to work on.
 

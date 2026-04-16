@@ -1,6 +1,6 @@
 ---
 title: "Setup agents"
-description: "Create, manage, and organize projects, agents and knowledge bases through the user interface. Set up workspaces, configure access controls, and manage team collaboration."
+description: "Create and configure AI agents in Giskard Hub. Define API endpoints, set parameters, and register agents for evaluation and red teaming."
 sidebar:
   order: 3
 ---
@@ -15,13 +15,13 @@ Agents are configured through an API endpoint. They can be evaluated against dat
 
 On the Agents page, click on the "New agent" button.
 
-![List of agents](/_static/images/hub/setup-agent-list.png)
+![Agent list page with new agent button](/_static/images/hub/setup-agent-list.png)
 
 ## Agent fields
 
 The interface below displays the agent details that need to be filled out.
 
-![Setup an agent](/_static/images/hub/setup-agent-detail.png)
+![Agent configuration form with API endpoint and header settings](/_static/images/hub/setup-agent-detail.png)
 
 - `Name`: The name of the agent.
 - `Description`: Used to refine automatic evaluation and generation for better accuracy in your specific use case.
