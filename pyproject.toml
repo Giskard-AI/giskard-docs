@@ -15,9 +15,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "nbmake>=1.5.5",
-    "pytest>=8.3",
-    "python-dotenv>=1.0",
+    "nbmake==1.5.5",
+    "pytest==9.0.3",
+    "python-dotenv==1.2.1",
 ]
 
 [tool.pytest.ini_options]
