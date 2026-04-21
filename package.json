@@ -17,7 +17,7 @@
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/starlight": "^0.37.6",
     "@astrojs/tailwind": "^6.0.2",
-    "astro": "^5.6.1",
+    "astro": "^6.1.6",
     "astro-mermaid": "^2.0.1",
     "mermaid": "^11.13.0",
     "sharp": "^0.34.2",
