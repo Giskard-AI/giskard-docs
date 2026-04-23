@@ -22,13 +22,13 @@
     "mermaid": "^11.13.0",
     "sharp": "^0.34.2",
     "starlight-auto-sidebar": "^0.1.4",
-    "tailwindcss": "^3.4.19"
+    "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
     "prettier": "^3.8.1",
     "wrangler": "^4.81.0"
   },
   "overrides": {
-    "undici": "^7.24.7"
+    "undici": "^8.0.0"
   }
 }
