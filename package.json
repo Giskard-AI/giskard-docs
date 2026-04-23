@@ -14,7 +14,7 @@
     "format:code": "node scripts/format-code-blocks.mjs"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.12",
+    "@astrojs/cloudflare": "^13.0.0",
     "@astrojs/starlight": "^0.37.6",
     "@astrojs/tailwind": "^6.0.2",
     "astro": "^5.6.1",
