@@ -1,0 +1,30 @@
+---
+title: Agent Skills
+description: "Drop-in skills for Claude Code and other coding agents that automate Giskard workflows."
+---
+
+import { Badge } from "@astrojs/starlight/components";
+
+**Giskard Agent Skills** are drop-in workflows for coding agents (Claude Code, Cursor, and more), installable via the [`skills` CLI](https://www.npmjs.com/package/skills). Install a skill once and your agent knows how to handle Giskard-specific tasks automatically, no hand-crafted elaborated prompts required.
+
+## Scenario Generator <Badge text="v1.0.0" variant="tip" />
+
+Turns your coding agent into an expert red-teamer for [Giskard Checks](/oss/checks). Describe your agent and the failure modes you worry about, and the skill produces a complete, runnable `giskard.checks` test suite with adversarial scenarios and layered checks.
+
+```bash
+npx skills add Giskard-AI/giskard-skills --skill scenario-generator
+```
+
+It activates on prompts like *"create test scenarios for my bot"*, *"red-team my RAG system"*, or *"generate checks for prompt injection"*. For example:
+
+```text title="Sample prompt" wrap
+My customer support bot available on @support_bot.py must never leak customer PII or discuss competitors. Generate a red-team suite.
+```
+
+[Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/oss/checks/scenario-generator)
+
+---
+
+:::note
+More skills are on the way. Star [Giskard-AI/giskard-skills ↗](https://github.com/Giskard-AI/giskard-skills) to follow along, or open a PR to contribute one.
+:::

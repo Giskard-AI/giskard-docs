@@ -62,6 +62,7 @@ export default defineConfig({
                     label: 'Get Started',
                     items: [
                         { label: 'Giskard Library', slug: 'oss' },
+                        { slug: 'oss/agent-skills', label: 'Agent Skills' },
                         { slug: 'oss/contributing', label: 'Contributing' },
                     ]
                 },

@@ -28,6 +28,10 @@ Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md 
 3. **The agent installs** `giskard-checks` and configures your LLM provider
 4. **You review** the changes and start writing checks
 
+:::tip[Want a permanent Giskard expert in your agent?]
+Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding agent a durable, opinionated workflow for generating adversarial test scenarios, red-team suites, and evaluation checks, triggered automatically by prompts like *"test my agent"* or *"red-team my chatbot"*.
+:::
+
 ## Install the Python package
 
 Giskard Checks requires **Python 3.12 or higher**. Install using pip:
