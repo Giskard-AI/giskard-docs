@@ -19,8 +19,9 @@ Looking for Giskard v2 features such as **RAGET** and **Scan**? They are not ava
 
 ## Resources and support
 
-- **Contributing**: See [Contribute to Giskard](/oss/contributing) for the official guide, AI-agent notes, and repos to star
 - **Documentation**: Explore the [Checks documentation](/oss/checks) for detailed guides
+- **Agent Skills**: Install [Giskard Agent Skills](/oss/agent-skills) to give Claude Code, Cursor, and other coding agents drop-in workflows for Giskard tasks
+- **Contributing**: See [Contribute to Giskard](/oss/contributing) for the official guide, AI-agent notes, and repos to star
 - **Examples**: Check our [GitHub repository ↗](https://github.com/Giskard-AI/giskard-oss) for more examples
 - **Community**: Join our [Discord ↗](https://discord.com/invite/ABvfpbu69R) for support and discussions
 - **Enterprise**: Ready for team collaboration? [Request a trial](https://docs.giskard.ai/start/enterprise-trial) of Giskard Hub

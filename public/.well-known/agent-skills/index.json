@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "scenario-generator",
+      "type": "skill-md",
+      "description": "Generates runnable giskard.checks test scenarios and suites that evaluate AI agents across quality (hallucination, factual accuracy, answer relevance, off-topic drift), safety (harmful content, bias, toxicity), security (prompt injection, data leakage, jailbreaking, tool misuse), robustness, and compliance. Describe your agent, its boundaries, and the failure modes you worry about, and the skill produces a complete test suite mixing functional and adversarial scenarios with layered checks. Activates on prompts like 'test my agent', 'generate checks for my chatbot', 'evaluate my RAG system', or 'red-team my AI'.",
+      "url": "https://raw.githubusercontent.com/Giskard-AI/giskard-skills/27270536f007ddc76b73c37cd3a0022ebdd76e55/oss/checks/scenario-generator/SKILL.md",
+      "digest": "sha256:f1f2352b8d0664762206c7f17b58060bf617591792cfb1a534c9e4746152738d"
+    }
+  ]
+}
