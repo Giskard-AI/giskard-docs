@@ -70,6 +70,10 @@ export default defineConfig({
                     label: 'Checks',
                     autogenerate: { directory: 'oss/checks', collapsed: false },
                 },
+                {
+                    label: 'giskard-llm',
+                    autogenerate: { directory: 'oss/giskard-llm', collapsed: false },
+                },
             ],
             routeMiddleware: './src/routeData.ts',
             expressiveCode: {

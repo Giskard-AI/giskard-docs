@@ -1,0 +1,83 @@
+---
+title: Giskard LLM API Reference
+description: "Public exports from giskard.llm, routing, protocols, and links to per-surface API facts."
+sidebar:
+  order: 1
+  label: Overview
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+This section summarizes **facts** about the stable surface of **`giskard-llm`** as exported from [`giskard.llm.__all__`](https://github.com/Giskard-AI/giskard-oss/blob/main/libs/giskard-llm/src/giskard/llm/__init__.py). Prefer upstream **docstrings** when you need parameter-by-parameter detail beyond these pages.
+
+## API modules
+
+<CardGrid>
+  <LinkCard
+    title="Chat completions"
+    description="`acompletion`, messages, tools, and `CompletionResponse`"
+    href="/oss/giskard-llm/reference/completions"
+  />
+  <LinkCard
+    title="Responses / Interactions"
+    description="`aresponse`, structured input, `ResponseResult`, and stateful continuation"
+    href="/oss/giskard-llm/reference/responses"
+  />
+  <LinkCard
+    title="Embeddings"
+    description="`aembedding`, batch input, and `EmbeddingResponse`"
+    href="/oss/giskard-llm/reference/embeddings"
+  />
+  <LinkCard
+    title="Errors & retries"
+    description="`LLMError` hierarchy, `UnsupportedOperationError`, and `should_retry`"
+    href="/oss/giskard-llm/reference/errors"
+  />
+  <LinkCard
+    title="Provider matrix"
+    description="Prefixes, SDKs, completions, embeddings, and `aresponse` support"
+    href="/oss/giskard-llm/reference/providers"
+  />
+</CardGrid>
+
+## Core entrypoints
+
+| Name                                       | Purpose                                                                                              |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `acompletion(model, messages, …)`          | Async chat completion on the global default client                                                   |
+| `aembedding(model, input, …)`              | Async embeddings when the provider exposes them                                                    |
+| `aresponse(model, input, …)`               | Stateful Responses / Interactions style calls when implemented                                       |
+| `configure(name, provider=None, **kwargs)` | Register config on the default client ([how-to](/oss/giskard-llm/how-to/named-providers-and-client)) |
+| `reset()`                                  | Drop cached configs/providers on the default client                                                  |
+
+`LLMClient` mirrors `acompletion` / `aembedding` / `aresponse` as instance methods sharing the same model-string routing.
+
+### Submodules
+
+- **`giskard.llm.chat`**: Tiny helpers (`user`, `assistant`, `system`, `developer`, `message`) constructing typed chat objects when you prefer constructors over plain dict literals.
+
+### Protocols
+
+| Protocol             | Capability checked before dispatch     |
+| -------------------- | -------------------------------------- |
+| `CompletionProvider` | `complete(...)` → `CompletionResponse` |
+| `EmbeddingProvider`  | `embed(...)` → `EmbeddingResponse`     |
+| `ResponseProvider`   | `respond(...)` → `ResponseResult`      |
+
+If you request an operation the resolved provider cannot perform, you get **`UnsupportedOperationError`** (see [Errors](/oss/giskard-llm/reference/errors)).
+
+## Exported types (selection)
+
+Chat completions and tools:
+
+- Completions: **`CompletionResponse`**, **`Choice`**, **`Usage`** — [Chat completions](/oss/giskard-llm/reference/completions)
+- Messages: **`ChatMessageParam`**
+- Tooling: **`ToolDefParam`**, **`FunctionDefParam`**, **`ToolCall`**, **`ToolCallFunction`**, **`FunctionCallOutputParam`**
+
+Embeddings:
+
+- **`EmbeddingResponse`**, **`EmbeddingData`**, **`EmbeddingUsage`** — [Embeddings](/oss/giskard-llm/reference/embeddings)
+
+Responses API:
+
+- **`ResponseResult`**, **`ResponseOutputItem`**, **`ResponseOutputText`**, **`ResponseOutputFunctionCall`** — [Responses / Interactions](/oss/giskard-llm/reference/responses)

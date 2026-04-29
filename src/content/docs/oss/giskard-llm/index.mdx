@@ -1,0 +1,79 @@
+---
+title: giskard-llm
+description: "Lightweight async LLM routing over native provider SDKs (OpenAI, Google Gemini, Anthropic, Azure)."
+sidebar:
+  order: 1
+---
+
+{/* Links work with `.md` suffix for agents and tooling: e.g. /oss/giskard-llm/installation.md */}
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+**giskard-llm** is a small Python library for calling models from several vendors—OpenAI, Google Gemini, Anthropic, Azure, and others—from one place. You choose a model and the library routes the request to the correct official SDK. Other Giskard open-source tools, such as [giskard-agents](https://github.com/Giskard-AI/giskard-oss), rely on this layer so wiring and retries stay consistent across providers.
+
+Use the **async helpers** (`acompletion`, `aembedding`, `aresponse`) with credentials from your environment, or an **`LLMClient`** when you need named setups—for example staging versus production or several API keys.
+
+:::caution
+The package ships as **pre-release** on PyPI alongside Giskard v3. Prefer pinning versions in production (`giskard-llm` follows semantic versioning intent; see releases on GitHub).
+:::
+
+## Documentation
+
+| Type                 | Audience need                                      | Sections                                                                                                                                                                                                                                   |
+| -------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Tutorial & setup** | First successful call                              | [Install](/oss/giskard-llm/installation), [Quickstart](/oss/giskard-llm/quickstart)                                                                                                                                                        |
+| **How-to**           | Config, tools, multi-account setups                | [Named providers & LLMClient](/oss/giskard-llm/how-to/named-providers-and-client), [Tools with `acompletion`](/oss/giskard-llm/how-to/tools-with-chat-completions), [Tools with `aresponse`](/oss/giskard-llm/how-to/tools-with-aresponse) |
+| **Explanation**      | Why types differ; chat vs Responses / Interactions | [Types & tool formats](/oss/giskard-llm/explanation/types-and-tools), [Response API gap](/oss/giskard-llm/explanation/response-api-gap)                                                                                                    |
+| **Reference**        | Look up APIs and provider matrix                   | [API reference](/oss/giskard-llm/reference)                                                                                                                                                                                                  |
+
+<CardGrid>
+  <LinkCard
+    title="Installation"
+    description="Extras per provider (openai, google, anthropic) and typical environment variables"
+    href="/oss/giskard-llm/installation"
+  />
+  <LinkCard
+    title="Quickstart"
+    description="Your first async completion using a prefixed model string"
+    href="/oss/giskard-llm/quickstart"
+  />
+  <LinkCard
+    title="How-to: Named providers"
+    description="LLMClient, aliases, os.environ wiring, bulk configuration"
+    href="/oss/giskard-llm/how-to/named-providers-and-client"
+  />
+  <LinkCard
+    title="How-to: Tools (acompletion)"
+    description="Tool definitions, tool_calls, and tool role messages in a chat loop"
+    href="/oss/giskard-llm/how-to/tools-with-chat-completions"
+  />
+  <LinkCard
+    title="How-to: Tools (aresponse)"
+    description="function_call_output items and previous_id for Responses / Interactions"
+    href="/oss/giskard-llm/how-to/tools-with-aresponse"
+  />
+  <LinkCard
+    title="Explanation: Types & tools"
+    description="Input vs output types and the unified tool-definition contract"
+    href="/oss/giskard-llm/explanation/types-and-tools"
+  />
+  <LinkCard
+    title="Explanation: Chat vs Responses"
+    description="How Chat Completions differ from Responses/Interactions and how the library bridges the gap"
+    href="/oss/giskard-llm/explanation/response-api-gap"
+  />
+  <LinkCard
+    title="API reference"
+    description="Overview, completions, responses, embeddings, errors, and provider matrix"
+    href="/oss/giskard-llm/reference"
+  />
+</CardGrid>
+
+## When to reach for giskard-llm
+
+- **You want one code path** for `openai/…`, `google/…`, `anthropic/…`, Azure OpenAI / Azure AI Foundry, **without** going through LiteLLM.
+- **You need programmable configuration** (`LLMClient`) for CI, multi-tenant setups, or tests that swap providers cleanly (`reset()`, named aliases).
+
+:::note[Giskard Checks and LLMs]
+[Giskard Checks](/oss/checks/installation) document configuring an **LLM judge** via LiteLLM-compatible environment variables—that path is geared toward evaluation workloads. **giskard-llm** is a separate routing layer aligned with native SDK usage; use whichever fits your integration.
+:::
