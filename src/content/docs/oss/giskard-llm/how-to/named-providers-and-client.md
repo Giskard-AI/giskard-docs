@@ -76,7 +76,7 @@ When a provider implements **`ResponseProvider`**, you can call **`aresponse`** 
 
 ```python
 result = await client.aresponse(
-    "openai-staging/gpt-4.1-mini",
+    "openai-staging/gpt-4o-mini",
     "Summarize this in one line: ...",
 )
 ```

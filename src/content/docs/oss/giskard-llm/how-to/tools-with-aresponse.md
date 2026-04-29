@@ -41,7 +41,7 @@ import json
 from giskard.llm import aresponse
 
 result = await aresponse(
-    model="openai/gpt-4.1-mini",
+    model="openai/gpt-4o-mini",
     input="What is 19 plus 23? Use add.",
     tools=TOOLS,
 )
@@ -51,7 +51,7 @@ Inspect proposed calls with **`result.function_calls`** (see [Reference — `Res
 
 ## Step 3 — Send tool results as `function_call_output` items
 
-Canonical input items use **`type": "function_call_output"`** with **`call_id`**, **`output`** (string), and optionally **`name`**. Include **`name`** matching the function when calling **Google**; OpenAI ignores it, but the shared contract keeps one code path ([design.md ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/libs/giskard-llm/docs/design.md)).
+Canonical input items use **`"type": "function_call_output"`** with **`call_id`**, **`output`** (string), and optionally **`name`**. Include **`name`** matching the function when calling **Google**; OpenAI ignores it, but the shared contract keeps one code path ([design.md ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/libs/giskard-llm/docs/design.md)).
 
 ```python
 follow_up_items: list[dict] = []
@@ -72,7 +72,7 @@ for call in result.function_calls:
     )
 
 next_result = await aresponse(
-    model="openai/gpt-4.1-mini",
+    model="openai/gpt-4o-mini",
     input=follow_up_items,
     tools=TOOLS,
     previous_id=result.id,
