@@ -25,7 +25,7 @@ from giskard.llm import acompletion
 
 async def main() -> None:
     response = await acompletion(
-        model="openai/gpt-5-mini",
+        model="openai/gpt-4o-mini",
         messages=[{"role": "user", "content": "Hello from giskard-llm!"}],
     )
     print(response.choices[0].message.text)
@@ -37,7 +37,7 @@ asyncio.run(main())
 **Model strings** use `provider/model-name`. If you omit the prefix, **OpenAI is assumed** (equivalent to prefix `openai/`):
 
 ```python
-response = await acompletion(model="gpt-5-mini", messages=[...])
+response = await acompletion(model="gpt-4o-mini", messages=[...])
 ```
 
 ## 2. Optional — embeddings
@@ -70,7 +70,7 @@ from giskard.llm import aresponse
 
 async def main() -> None:
     result = await aresponse(
-        model="openai/gpt-4.1-mini",
+        model="openai/gpt-4o-mini",
         input="Say hello in one short sentence.",
     )
     print(result.output_text or result.id)
