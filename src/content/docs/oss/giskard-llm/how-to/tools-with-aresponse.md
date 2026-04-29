@@ -1,5 +1,5 @@
 ---
-title: Tools with aresponse
+title: "Tools with `aresponse`"
 description: "Send tool definitions to aresponse, read ResponseResult.function_calls, and return results with function_call_output items (including name for Google)."
 sidebar:
   order: 3
