@@ -11,11 +11,11 @@ Module-level **`aembedding`** and **`LLMClient.aembedding`** dispatch to **`Embe
 
 ### `aembedding` / `LLMClient.aembedding`
 
-| Parameter  | Type           | Meaning                                                                                         |
-| ---------- | -------------- | ----------------------------------------------------------------------------------------------- |
-| `model`    | `str`          | `provider/model-name` (bare name defaults to `openai/`).                                        |
-| `input`    | `list[str]`    | Texts to embed in one request (batch).                                                          |
-| `**params` | `Any`          | Provider-specific fields merged by the translator (dimensions, encoding format, …) where supported. |
+| Parameter  | Type        | Meaning                                                                                             |
+| ---------- | ----------- | --------------------------------------------------------------------------------------------------- |
+| `model`    | `str`       | `provider/model-name` (bare name defaults to `openai/`).                                            |
+| `input`    | `list[str]` | Texts to embed in one request (batch).                                                              |
+| `**params` | `Any`       | Provider-specific fields merged by the translator (dimensions, encoding format, …) where supported. |
 
 **Returns:** **`EmbeddingResponse`**
 
@@ -23,11 +23,11 @@ Module-level **`aembedding`** and **`LLMClient.aembedding`** dispatch to **`Embe
 
 ### `EmbeddingResponse` and related types
 
-| Field / member | Type                    | Meaning                                              |
-| -------------- | ----------------------- | ---------------------------------------------------- |
-| `data`         | `list[EmbeddingData]`   | One entry per input string, in order.                |
-| `model`        | `str \| None`           | Embedding model id reported by the provider.       |
-| `usage`        | `EmbeddingUsage \| None`| Token usage when returned.                           |
+| Field / member | Type                     | Meaning                                      |
+| -------------- | ------------------------ | -------------------------------------------- |
+| `data`         | `list[EmbeddingData]`    | One entry per input string, in order.        |
+| `model`        | `str \| None`            | Embedding model id reported by the provider. |
+| `usage`        | `EmbeddingUsage \| None` | Token usage when returned.                   |
 
 **`EmbeddingData`**: **`embedding`** (`list[float]`), **`index`** (position in the batch).
 

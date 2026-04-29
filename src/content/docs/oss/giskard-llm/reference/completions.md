@@ -11,12 +11,12 @@ Module-level **`acompletion`** and **`LLMClient.acompletion`** dispatch to **`Co
 
 ### `acompletion` / `LLMClient.acompletion`
 
-| Parameter   | Type                                                                                    | Meaning                                                                                                                                                                      |
-| ----------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `model`     | `str`                                                                                   | `provider/model-name` (bare name defaults to `openai/`).                                                                                                                     |
-| `messages`  | `Sequence[ChatMessageParam \| ChatMessage]`                                             | Chat turns in OpenAI-style shape; plain dicts match **`ChatMessageParam`**. Validated **`ChatMessage`** Pydantic models from **`giskard.llm.types`** are also accepted.      |
-| `tools`     | `Sequence[ToolDefParam \| ToolDef] \| None`                                             | Optional tool definitions in nested chat format; providers map to their wire shape ([Types & tool formats](/oss/giskard-llm/explanation/types-and-tools)).                  |
-| `**params`  | `Any`                                                                                   | Provider-specific request fields (temperature, `max_tokens`, …) merged by the translator.                                                                                    |
+| Parameter  | Type                                        | Meaning                                                                                                                                                                 |
+| ---------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `model`    | `str`                                       | `provider/model-name` (bare name defaults to `openai/`).                                                                                                                |
+| `messages` | `Sequence[ChatMessageParam \| ChatMessage]` | Chat turns in OpenAI-style shape; plain dicts match **`ChatMessageParam`**. Validated **`ChatMessage`** Pydantic models from **`giskard.llm.types`** are also accepted. |
+| `tools`    | `Sequence[ToolDefParam \| ToolDef] \| None` | Optional tool definitions in nested chat format; providers map to their wire shape ([Types & tool formats](/oss/giskard-llm/explanation/types-and-tools)).              |
+| `**params` | `Any`                                       | Provider-specific request fields (temperature, `max_tokens`, …) merged by the translator.                                                                               |
 
 **Returns:** **`CompletionResponse`**
 
@@ -28,11 +28,11 @@ Union of TypedDict-style parameters; names and fields mirror [chat_param.py ↗]
 
 ### `CompletionResponse` and `Choice`
 
-| Field / member | Type               | Meaning                                                                                         |
-| -------------- | ------------------ | ----------------------------------------------------------------------------------------------- |
-| `choices`      | `list[Choice]`     | Normalized completion choices (see below).                                                      |
-| `model`        | `str \| None`      | Model identifier reported by the provider, if present.                                          |
-| `usage`        | `Usage \| None`    | Token usage when the provider returns it.                                                       |
+| Field / member | Type            | Meaning                                                |
+| -------------- | --------------- | ------------------------------------------------------ |
+| `choices`      | `list[Choice]`  | Normalized completion choices (see below).             |
+| `model`        | `str \| None`   | Model identifier reported by the provider, if present. |
+| `usage`        | `Usage \| None` | Token usage when the provider returns it.              |
 
 **`Choice`**: **`index`**, **`finish_reason`**, and **`message`** (**`AssistantMessage`**) with **`content`**, optional **`refusal`**, optional **`tool_calls`**, plus a **`.text`** helper that surfaces assistant-visible string(s).
 
