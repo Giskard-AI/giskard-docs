@@ -17,13 +17,14 @@ Multi-step workflow testing with scenario builders and runners.
 
 **Module:** `giskard.checks.core.scenario`
 
-The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Call `.run()` to execute against the SUT. You can also use `Scenario.extend(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
+The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Internally, the runner executes **steps**: each step runs one or more interactions against the shared trace, then runs that step’s checks. Call `.run()` to execute against the SUT. You can also use `Scenario.extend(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
 
 <MethodCard name="Scenario()" returnType="Scenario">
   Create a new scenario.
 
-  <Property name="name" type="str | None" defaultValue="None">Scenario name for identification.</Property>
+  <Property name="name" type="str" defaultValue="Unnamed Scenario">Scenario name for identification. Pass the first argument positionally as in <code>Scenario("my_name")</code>.</Property>
   <Property name="trace_type" type="type[TraceType] | None" defaultValue="None">Optional custom trace type for advanced use cases.</Property>
+  <Property name="multiple_runs" type="int" defaultValue="1">Default cap on full scenario executions when <code>run()</code> is called without <code>multiple_runs=...</code>. Must be ≥ 1.</Property>
 </MethodCard>
 
 <MethodCard name=".interact()" returnType="self">
@@ -57,6 +58,7 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 
   <Property name="target" type="Callable | None" defaultValue="None">Override the scenario's default target system-under-test for this run.</Property>
   <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
+  <Property name="multiple_runs" type="int | None" defaultValue="None">When set, overrides the scenario’s `multiple_runs` field: maximum full scenario executions (fresh trace each time). Each run must pass for the next to run; stops on the first FAIL, ERROR, or SKIP. Not a retry-until-success loop.</Property>
 </MethodCard>
 
 ### Multi-step example
@@ -126,25 +128,31 @@ Result of scenario execution with trace and check results.
     Overall status (PASS/FAIL/ERROR/SKIP).
   </Property>
   <Property name="steps" type="list[TestCaseResult]">
-    Results for each step (interact + check).
+    Results for each step (interactions in that step, then checks).
   </Property>
   <Property name="final_trace" type="Trace">
     Complete trace of all interactions.
   </Property>
   <Property name="passed" type="bool">
-    True when all steps passed.
+    True when the aggregated status is PASS (no failures or errors; not the all-skipped case).
   </Property>
   <Property name="failed" type="bool">
-    True when any step failed.
+    True when at least one step failed and none errored.
   </Property>
   <Property name="errored" type="bool">
-    True when any step errored.
+    True when at least one step errored.
   </Property>
   <Property name="skipped" type="bool">
     True when all steps were skipped.
   </Property>
   <Property name="duration_ms" type="int">
     Total execution time in milliseconds.
+  </Property>
+  <Property name="multiple_runs" type="int">
+    Configured cap on full scenario executions for this invocation (from the scenario or the `run(multiple_runs=...)` override).
+  </Property>
+  <Property name="runs_executed" type="int">
+    How many full scenario executions ran before stopping (at most `multiple_runs`).
   </Property>
 </TypeTable>
 
@@ -215,7 +223,7 @@ Aggregate result from suite execution.
     Scenario results in order.
   </Property>
   <Property name="pass_rate" type="float">
-    Fraction of non-skipped scenarios that passed.
+    Fraction of non-skipped scenarios that passed. If every scenario was skipped, this is `1.0`.
   </Property>
   <Property name="duration_ms" type="int">
     Total execution time in milliseconds.
@@ -257,6 +265,9 @@ Low-level runner for executing scenarios. Most users should use `Scenario(...).r
   </Property>
   <Property name="return_exception" type="bool" defaultValue="False">
     Return results on exceptions.
+  </Property>
+  <Property name="multiple_runs" type="int | None" defaultValue="None">
+    Optional override of the scenario’s `multiple_runs` (same semantics as `Scenario.run(multiple_runs=...)`).
   </Property>
 </MethodCard>
 
