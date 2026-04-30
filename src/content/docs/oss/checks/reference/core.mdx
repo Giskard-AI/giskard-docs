@@ -105,20 +105,18 @@ result = CheckResult.skip(message="Skipped: No outputs available")
 
 ### Instance properties
 
-<TypeTable name="CheckResult properties">
-  <Property name="passed" type="bool">
-    True if status is PASS.
-  </Property>
-  <Property name="failed" type="bool">
-    True if status is FAIL.
-  </Property>
-  <Property name="errored" type="bool">
-    True if status is ERROR.
-  </Property>
-  <Property name="skipped" type="bool">
-    True if status is SKIP.
-  </Property>
-</TypeTable>
+<Property name="passed" type="bool">
+  True if status is PASS.
+</Property>
+<Property name="failed" type="bool">
+  True if status is FAIL.
+</Property>
+<Property name="errored" type="bool">
+  True if status is ERROR.
+</Property>
+<Property name="skipped" type="bool">
+  True if status is SKIP.
+</Property>
 
 ---
 
@@ -317,8 +315,8 @@ Extract values using JSONPath expressions from a trace.
   <Property name="trace" type="Trace" required>
     The trace to extract from.
   </Property>
-  <Property name="path" type="str" required>
-    JSONPath expression.
+  <Property name="key" type="str" required>
+    JSONPath expression to evaluate against the trace.
   </Property>
 </MethodCard>
 
@@ -351,10 +349,10 @@ model_name = resolve(trace, "trace.interactions[0].metadata.model")
 <MethodCard name="set_default_generator()" returnType="None">
   Set the default LLM generator used by all LLM-based checks.
 
-  <Property name="generator" type="Generator" required>The generator instance to use as default.</Property>
+  <Property name="generator" type="BaseGenerator" required>The generator instance to use as default.</Property>
 </MethodCard>
 
-<MethodCard name="get_default_generator()" returnType="Generator">
+<MethodCard name="get_default_generator()" returnType="BaseGenerator">
   Get the currently configured default generator.
 </MethodCard>
 

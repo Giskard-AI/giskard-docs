@@ -17,20 +17,21 @@ Multi-step workflow testing with scenario builders and runners.
 
 **Module:** `giskard.checks.core.scenario`
 
-The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Call `.run()` to execute against the SUT. You can also use `Scenario.extend(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
+The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Internally, the runner executes **steps**: each step runs one or more interactions against the shared trace, then runs that step’s checks. Call `.run()` to execute against the SUT. You can also use `Scenario.extend(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
 
 <MethodCard name="Scenario()" returnType="Scenario">
   Create a new scenario.
 
-  <Property name="name" type="str | None" defaultValue="None">Scenario name for identification.</Property>
+  <Property name="name" type="str" defaultValue="Unnamed Scenario">Scenario name for identification. Pass the first argument positionally as in <code>Scenario("my_name")</code>.</Property>
   <Property name="trace_type" type="type[TraceType] | None" defaultValue="None">Optional custom trace type for advanced use cases.</Property>
+  <Property name="multiple_runs" type="int" defaultValue="1">Default cap on full scenario executions when <code>run()</code> is called without <code>multiple_runs=...</code>. Must be ≥ 1.</Property>
 </MethodCard>
 
 <MethodCard name=".interact()" returnType="self">
   Add an interaction to the scenario. Returns self for chaining.
 
   <Property name="inputs" type="value | Callable" required>Static value or callable `(trace) -> value`.</Property>
-  <Property name="outputs" type="value | Callable" required>Static value, callable `(inputs) -> value`, or `(trace, inputs) -> value`.</Property>
+  <Property name="outputs" type="value | Callable">Static value, callable `(inputs) -> value`, or `(trace, inputs) -> value`. Optional when the scenario / suite has a `target`.</Property>
   <Property name="metadata" type="dict | None">Optional metadata dictionary.</Property>
 </MethodCard>
 
@@ -41,9 +42,9 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 </MethodCard>
 
 <MethodCard name=".add_interaction()" returnType="self">
-  Add a pre-constructed `Interaction` or `InteractionSpec` object.
+  Add a pre-constructed `InteractionSpec` object.
 
-  <Property name="interaction" type="Interaction | InteractionSpec" required>The interaction or spec to add.</Property>
+  <Property name="interaction" type="InteractionSpec" required>The interaction spec to add.</Property>
 </MethodCard>
 
 <MethodCard name=".extend()" returnType="self">
@@ -55,7 +56,9 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 <MethodCard name=".run()" returnType="ScenarioResult">
   Execute the scenario against the SUT and return results.
 
+  <Property name="target" type="Callable | None" defaultValue="None">Override the scenario's default target system-under-test for this run.</Property>
   <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
+  <Property name="multiple_runs" type="int | None" defaultValue="None">When set, overrides the scenario’s `multiple_runs` field: maximum full scenario executions (fresh trace each time). Each run must pass for the next to run; stops on the first FAIL, ERROR, or SKIP. Not a retry-until-success loop.</Property>
 </MethodCard>
 
 ### Multi-step example
@@ -118,20 +121,38 @@ scenario = (
 Result of scenario execution with trace and check results.
 
 <TypeTable name="ScenarioResult">
+  <Property name="scenario_name" type="str">
+    Name of the scenario that produced this result.
+  </Property>
   <Property name="status" type="ScenarioStatus">
     Overall status (PASS/FAIL/ERROR/SKIP).
   </Property>
   <Property name="steps" type="list[TestCaseResult]">
-    Results for each step (interact + check).
+    Results for each step (interactions in that step, then checks).
   </Property>
   <Property name="final_trace" type="Trace">
     Complete trace of all interactions.
   </Property>
   <Property name="passed" type="bool">
-    True when all steps passed.
+    True when the aggregated status is PASS (no failures or errors; not the all-skipped case).
+  </Property>
+  <Property name="failed" type="bool">
+    True when at least one step failed and none errored.
+  </Property>
+  <Property name="errored" type="bool">
+    True when at least one step errored.
+  </Property>
+  <Property name="skipped" type="bool">
+    True when all steps were skipped.
   </Property>
   <Property name="duration_ms" type="int">
     Total execution time in milliseconds.
+  </Property>
+  <Property name="multiple_runs" type="int">
+    Configured cap on full scenario executions for this invocation (from the scenario or the `run(multiple_runs=...)` override).
+  </Property>
+  <Property name="runs_executed" type="int">
+    How many full scenario executions ran before stopping (at most `multiple_runs`).
   </Property>
 </TypeTable>
 
@@ -166,7 +187,7 @@ Group multiple scenarios and run them together.
   </Property>
 </MethodCard>
 
-<MethodCard name=".append()" returnType="None">
+<MethodCard name=".append()" returnType="Suite">
   Add a scenario to the suite.
 
   <Property name="scenario" type="Scenario" required>The scenario to add.</Property>
@@ -202,7 +223,7 @@ Aggregate result from suite execution.
     Scenario results in order.
   </Property>
   <Property name="pass_rate" type="float">
-    Fraction of non-skipped scenarios that passed.
+    Fraction of non-skipped scenarios that passed. If every scenario was skipped, this is `1.0`.
   </Property>
   <Property name="duration_ms" type="int">
     Total execution time in milliseconds.
@@ -213,7 +234,19 @@ Aggregate result from suite execution.
   <Property name="failed_count" type="int">
     Number of failed scenarios.
   </Property>
+  <Property name="errored_count" type="int">
+    Number of scenarios that errored.
+  </Property>
+  <Property name="skipped_count" type="int">
+    Number of scenarios that were skipped.
+  </Property>
 </TypeTable>
+
+<MethodCard name=".to_junit_xml()" returnType="str">
+  Export the suite result as a JUnit XML string. Optionally write to a file.
+
+  <Property name="path" type="str | Path | None" defaultValue="None">File path to write the XML to. Returns the XML string regardless.</Property>
+</MethodCard>
 
 ---
 
@@ -227,8 +260,14 @@ Low-level runner for executing scenarios. Most users should use `Scenario(...).r
   <Property name="scenario" type="Scenario" required>
     The scenario to execute.
   </Property>
+  <Property name="target" type="Callable | None" defaultValue="None">
+    Override the scenario's target SUT.
+  </Property>
   <Property name="return_exception" type="bool" defaultValue="False">
     Return results on exceptions.
+  </Property>
+  <Property name="multiple_runs" type="int | None" defaultValue="None">
+    Optional override of the scenario’s `multiple_runs` (same semantics as `Scenario.run(multiple_runs=...)`).
   </Property>
 </MethodCard>
 

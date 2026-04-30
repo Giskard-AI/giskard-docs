@@ -20,14 +20,17 @@ Input generators for creating dynamic test data and simulating user interactions
 
 **Module:** `giskard.checks.generators.user`
 
-<Property name="instructions" type="str" required>
-  Instructions defining the user's behavior and goals.
+<Property name="persona" type="str" required>
+  Predefined persona name (e.g., `"frustrated_customer"`) or a custom persona description.
 </Property>
-<Property name="max_steps" type="int" defaultValue="10">
-  Maximum number of interaction steps to generate.
+<Property name="max_steps" type="int" defaultValue="3">
+  Maximum number of conversation turns to generate.
 </Property>
-<Property name="generator" type="BaseGenerator | None" defaultValue="None">
-  LLM generator for simulating user behavior.
+<Property name="context" type="str | None" defaultValue="None">
+  Optional context to customize the persona's behavior.
+</Property>
+<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+  LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
 </Property>
 
 ```python
@@ -35,13 +38,13 @@ from giskard.checks.generators.user import UserSimulator
 from giskard.agents.generators import Generator
 
 user_sim = UserSimulator(
-    instructions="""
+    persona="""
     You are a customer trying to book a flight.
     - Start by asking about available flights to Paris
     - Ask about prices
     - Request to book if the price is reasonable
     """,
-    max_steps=5,
+    max_steps=3,
     generator=Generator(model="openai/gpt-5"),
 )
 ```
@@ -106,32 +109,30 @@ Output format for user simulator results.
 
 **Module:** `giskard.checks.core.input_generator`
 
-<MethodCard name=".generate()" returnType="Any | None">
-  Generate the next input value. Return `None` when no more inputs are available.
+<MethodCard name=".__call__()" returnType="AsyncGenerator[InputType, TraceType]">
+  Yield input values one at a time. Receives the current trace via `send()` between yields, so the generator can adapt to prior interactions.
 
-  <Property name="trace" type="Trace" required>The current trace for context-aware generation.</Property>
+  <Property name="trace" type="TraceType" required>The initial trace passed in when the generator is first called.</Property>
 </MethodCard>
 
 ### Sequential generator
 
 ```python
+from collections.abc import AsyncGenerator
+
+from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-class SequentialInputGenerator(InputGenerator):
-    def __init__(self, inputs_list: list[str]):
-        self.inputs_list = inputs_list
-        self.index = 0
+class SequentialInputGenerator(InputGenerator[str, Trace]):
+    inputs_list: list[str]
 
-    async def generate(self, trace):
-        if self.index >= len(self.inputs_list):
-            return None
-        input_value = self.inputs_list[self.index]
-        self.index += 1
-        return input_value
+    async def __call__(self, trace: Trace) -> AsyncGenerator[str, Trace]:
+        for value in self.inputs_list:
+            trace = yield value
 
 
-gen = SequentialInputGenerator(["Hello", "How are you?", "Goodbye"])
+gen = SequentialInputGenerator(inputs_list=["Hello", "How are you?", "Goodbye"])
 
 scenario = Scenario("sequential").interact(
     inputs=gen, outputs=lambda inputs: chatbot(inputs)
@@ -141,21 +142,33 @@ scenario = Scenario("sequential").interact(
 ### Context-aware generator
 
 ```python
-class ContextAwareGenerator(InputGenerator):
-    def __init__(self, strategy: str = "follow_up"):
-        self.strategy = strategy
+from collections.abc import AsyncGenerator
 
-    async def generate(self, trace):
-        if not trace.last:
-            return "Hello, I need help"
+from giskard.checks.core import Trace
+from giskard.checks.core.input_generator import InputGenerator
 
-        last_output = trace.last.outputs
-        if self.strategy == "follow_up":
-            if "question" in last_output.lower():
-                return "Yes, please tell me more"
-            elif "help" in last_output.lower():
-                return "I need assistance with my account"
-        return "Thank you"
+
+class ContextAwareGenerator(InputGenerator[str, Trace]):
+    strategy: str = "follow_up"
+    max_steps: int = 5
+
+    async def __call__(self, trace: Trace) -> AsyncGenerator[str, Trace]:
+        # First message — no prior interactions yet.
+        trace = yield "Hello, I need help"
+
+        for _ in range(self.max_steps - 1):
+            if not trace.last:
+                return
+
+            last_output = trace.last.outputs
+            if self.strategy == "follow_up":
+                if "question" in last_output.lower():
+                    trace = yield "Yes, please tell me more"
+                    continue
+                if "help" in last_output.lower():
+                    trace = yield "I need assistance with my account"
+                    continue
+            trace = yield "Thank you"
 ```
 
 </ResourceSection>
@@ -172,21 +185,21 @@ from giskard.checks.generators.user import UserSimulator
 personas = [
     {
         "name": "impatient",
-        "instructions": "You are impatient and want quick answers.",
+        "persona": "You are impatient and want quick answers.",
     },
     {
         "name": "detailed",
-        "instructions": "You like detailed explanations. Ask follow-ups.",
+        "persona": "You like detailed explanations. Ask follow-ups.",
     },
     {
         "name": "confused",
-        "instructions": "You are confused and need things explained simply.",
+        "persona": "You are confused and need things explained simply.",
     },
 ]
 
 results = {}
 for persona in personas:
-    sim = UserSimulator(instructions=persona["instructions"], max_steps=5)
+    sim = UserSimulator(persona=persona["persona"], max_steps=3)
     scenario = Scenario(persona["name"]).interact(
         inputs=sim, outputs=lambda inputs: agent(inputs)
     )
