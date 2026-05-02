@@ -8,16 +8,16 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13,<4.0"
 dependencies = [
-    "giskard-core==1.0.1b2",
-    "giskard-agents==1.0.2b1",
-    "giskard-checks==1.0.2b1",
+    "giskard-core==1.0.1b3",
+    "giskard-agents==1.0.2b2",
+    "giskard-checks==1.0.2b2",
 ]
 
 [dependency-groups]
 dev = [
-    "nbmake>=1.5.5",
-    "pytest>=8.3",
-    "python-dotenv>=1.0",
+    "nbmake==1.5.5",
+    "pytest==9.0.3",
+    "python-dotenv==1.2.2",
 ]
 
 [tool.pytest.ini_options]
