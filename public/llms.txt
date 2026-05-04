@@ -137,6 +137,14 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Tasks: https://docs.giskard.ai/hub/sdk/guides/tasks.md
 - Audit Logs: https://docs.giskard.ai/hub/sdk/guides/audit.md
 
+### giskard-llm (Open Source)
+- Overview: https://docs.giskard.ai/oss/giskard-llm.md
+- Installation: https://docs.giskard.ai/oss/giskard-llm/installation.md
+- Quickstart: https://docs.giskard.ai/oss/giskard-llm/quickstart.md
+- How-to — Named providers & LLMClient: https://docs.giskard.ai/oss/giskard-llm/how-to/named-providers-and-client.md
+- Explanation — Types & tool formats: https://docs.giskard.ai/oss/giskard-llm/explanation/types-and-tools.md
+- API reference: https://docs.giskard.ai/oss/giskard-llm/reference
+
 ### Giskard Checks (Open Source)
 - Giskard Library: https://docs.giskard.ai/oss.md
 - Agent Skills: https://docs.giskard.ai/oss/agent-skills.md
