@@ -70,6 +70,10 @@ hub = HubClient(
 For CI/CD pipelines, always use environment variables rather than hard-coding credentials.
 :::
 
+:::note[Multi-tenant Hubs]
+If `base_url` reaches the backend through a non-tenant hostname (e.g. internal Docker networking), set `GISKARD_HUB_TENANT_HOST` (or pass `tenant_host` to the client) to address the right tenant. Most users don't need this.
+:::
+
 ## 3. Create a project
 
 Projects are the top-level container for all your resources. Create one or retrieve an existing one:

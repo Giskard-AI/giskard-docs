@@ -111,6 +111,15 @@ hub = HubClient(
 >
   Base URL of your Hub instance.
 </Property>
+<Property
+  name="tenant_host"
+  type="str | None"
+  defaultValue="env GISKARD_HUB_TENANT_HOST"
+>
+  Hub tenant hostname. When set, the SDK attaches it as `X-Forwarded-Host` on
+  every request. Only needed when `base_url`'s host isn't the tenant host (e.g.
+  internal Docker networking).
+</Property>
 <Property name="auto_add_api_suffix" type="bool" defaultValue="True">
   Automatically append `/_api` to `base_url`.
 </Property>
@@ -170,6 +179,15 @@ hub = AsyncHubClient(
   defaultValue="env GISKARD_HUB_BASE_URL"
 >
   Base URL of your Hub instance.
+</Property>
+<Property
+  name="tenant_host"
+  type="str | None"
+  defaultValue="env GISKARD_HUB_TENANT_HOST"
+>
+  Hub tenant hostname. When set, the SDK attaches it as `X-Forwarded-Host` on
+  every request. Only needed when `base_url`'s host isn't the tenant host (e.g.
+  internal Docker networking like `backend:8000`).
 </Property>
 <Property name="auto_add_api_suffix" type="bool" defaultValue="True">
   Automatically append `/_api` to `base_url`.
