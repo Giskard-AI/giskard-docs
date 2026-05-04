@@ -187,7 +187,7 @@ hub = AsyncHubClient(
 >
   Hub tenant hostname. When set, the SDK attaches it as `X-Forwarded-Host` on
   every request. Only needed when `base_url`'s host isn't the tenant host (e.g.
-  internal Docker networking like `backend:8000`).
+  internal Docker networking).
 </Property>
 <Property name="auto_add_api_suffix" type="bool" defaultValue="True">
   Automatically append `/_api` to `base_url`.
