@@ -5,8 +5,15 @@
       "name": "scenario-generator",
       "type": "skill-md",
       "description": "Generates runnable giskard.checks test scenarios and suites that evaluate AI agents across quality (hallucination, factual accuracy, answer relevance, off-topic drift), safety (harmful content, bias, toxicity), security (prompt injection, data leakage, jailbreaking, tool misuse), robustness, and compliance. Describe your agent, its boundaries, and the failure modes you worry about, and the skill produces a complete test suite mixing functional and adversarial scenarios with layered checks. Activates on prompts like 'test my agent', 'generate checks for my chatbot', 'evaluate my RAG system', or 'red-team my AI'.",
-      "url": "https://raw.githubusercontent.com/Giskard-AI/giskard-skills/27270536f007ddc76b73c37cd3a0022ebdd76e55/oss/checks/scenario-generator/SKILL.md",
+      "url": "https://raw.githubusercontent.com/Giskard-AI/giskard-skills/88a5979bf6574f8889b07cfc4b67ff2596878026/oss/checks/scenario-generator/SKILL.md",
       "digest": "sha256:f1f2352b8d0664762206c7f17b58060bf617591792cfb1a534c9e4746152738d"
+    },
+    {
+      "name": "rag-evaluator",
+      "type": "skill-md",
+      "description": "Generates tailored giskard.checks evaluation suites for RAG (Retrieval-Augmented Generation) systems. Use whenever a user describes a Q&A bot grounded in documents, a knowledge-base chatbot, a retrieval system, or wants to evaluate answer groundedness, faithfulness, hallucination, retrieval quality, citation accuracy, or out-of-scope handling. Triggers on phrases like 'evaluate my RAG', 'test my retrieval', 'check groundedness', 'build a RAG eval suite', 'eval my chatbot answers from docs', 'test if my agent hallucinates', 'check if my answers are faithful to the sources', or any evaluation task involving an agent that answers from documents, FAQs, wikis, or a knowledge base. Use this skill even when the user does not explicitly say 'RAG' but describes an agent grounded in documents. For adversarial / red-teaming evaluation, use the 'scenario-generator' skill instead. This skill focuses on quality, not safety.",
+      "url": "https://raw.githubusercontent.com/Giskard-AI/giskard-skills/88a5979bf6574f8889b07cfc4b67ff2596878026/oss/checks/rag-evaluator/SKILL.md",
+      "digest": "sha256:74a14e304072d7c923aa3ec88c76e438c0e0d084a40e81a9022e30a3f111a9b3"
     }
   ]
 }

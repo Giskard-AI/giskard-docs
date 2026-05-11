@@ -23,6 +23,24 @@ My customer support bot available on @support_bot.py must never leak customer PI
 
 [Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/oss/checks/scenario-generator)
 
+## RAG Evaluator <Badge text="v1.0.0" variant="tip" />
+
+Turns your coding agent into an expert RAG evaluation engineer for [Giskard Checks](/oss/checks). Describe a Q&A bot grounded in documents and the skill produces a quality-focused `giskard.checks` evaluation suite covering groundedness, answer relevance, retrieval quality, hallucination, citation accuracy, and out-of-scope handling.
+
+```bash
+npx skills add Giskard-AI/giskard-skills --skill rag-evaluator
+```
+
+It activates on prompts like *"evaluate my RAG"*, *"test my retrieval"*, *"check groundedness"*, or *"test if my agent hallucinates"*. For example:
+
+```text title="Sample prompt" wrap
+My knowledge-base assistant in @assistant.py answers questions from documents under ./docs. Build a RAG eval suite that checks groundedness and retrieval quality.
+```
+
+This skill is **quality-focused**. For adversarial or red-teaming evaluation, use [Scenario Generator](#scenario-generator) instead. The two are complementary and most RAG projects benefit from both.
+
+[Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/oss/checks/rag-evaluator)
+
 ---
 
 :::note
