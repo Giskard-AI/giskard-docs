@@ -1,7 +1,9 @@
 ---
 import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+import ImageZoom from 'starlight-image-zoom/components/ImageZoom.astro';
 ---
 
+<ImageZoom />
 <div class="content-wrapper">
     <Default {...Astro.props}>
         <slot />

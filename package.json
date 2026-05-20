@@ -22,6 +22,7 @@
     "mermaid": "^11.13.0",
     "sharp": "^0.34.2",
     "starlight-auto-sidebar": "^0.1.4",
+    "starlight-image-zoom": "^0.13.2",
     "tailwindcss": "^3.4.19"
   },
   "devDependencies": {

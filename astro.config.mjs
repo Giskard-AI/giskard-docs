@@ -7,6 +7,7 @@ import tailwind from "@astrojs/tailwind";
 
 import mermaid from "astro-mermaid";
 import starlightAutoSidebar from "starlight-auto-sidebar";
+import starlightImageZoom from "starlight-image-zoom";
 
 // https://astro.build/config
 export default defineConfig({
@@ -87,7 +88,8 @@ export default defineConfig({
                 Sidebar: './src/components/Sidebar.astro',
             },
             plugins: [
-                starlightAutoSidebar()
+                starlightAutoSidebar(),
+                starlightImageZoom(),
             ]
         }),
         tailwind({
