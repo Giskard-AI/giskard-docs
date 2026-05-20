@@ -69,7 +69,8 @@ jobs:
 
       - name: Run notebook tests
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AZURE_AI_API_KEY: ${{ secrets.AZURE_AI_API_KEY }}
+          AZURE_AI_API_BASE: ${{ secrets.AZURE_AI_API_BASE }}
           OVERWRITE_NB: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
         run: uv run pytest tests/test_docs_nb.py -v --tb=short
 
