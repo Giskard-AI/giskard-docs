@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.0.0",
-    "@astrojs/starlight": "0.37.7",
+    "@astrojs/starlight": "0.39.2",
     "@astrojs/tailwind": "6.0.2",
     "astro": "^6.3.0",
     "astro-mermaid": "2.0.1",
