@@ -1,0 +1,13 @@
+; DNS for AI Discovery (DNS-AID) records for docs.giskard.ai
+;
+; Spec:    draft-mozleywilliams-dnsop-dnsaid
+; SVCB/HTTPS RR format: RFC 9460
+;
+; These records advertise the docs site as the agent-discovery entry point.
+; The index target serves the agent-skills manifest at:
+;   https://docs.giskard.ai/.well-known/agent-skills/index.json
+;
+; $ORIGIN docs.giskard.ai.
+; $TTL 3600
+
+_index._agents.docs.giskard.ai. 3600 IN HTTPS 1 docs.giskard.ai. alpn="h2,http/1.1" port=443 mandatory=alpn,port
