@@ -1,4 +1,15 @@
 /* Custom CSS for Giskard Docs */
+@import "tailwindcss";
+
+@theme {
+  --color-giskard-light-bg: #FFFFFF;
+  --color-giskard-light-text: #0F1729;
+  --color-giskard-light-accent: #0284C9;
+  --color-giskard-dark-bg: #002929;
+  --color-giskard-dark-text: #C6FFFF;
+  --color-giskard-dark-accent: #C6FFFF;
+  --font-sans: 'Osmose', system-ui, sans-serif;
+}
 
 /* Font Faces */
 @font-face {

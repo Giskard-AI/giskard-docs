@@ -1,9 +1,9 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import tailwindcss from "@tailwindcss/vite";
 
 import cloudflare from "@astrojs/cloudflare";
 import starlight from "@astrojs/starlight";
-import tailwind from "@astrojs/tailwind";
 
 import mermaid from "astro-mermaid";
 import starlightAutoSidebar from "starlight-auto-sidebar";
@@ -92,13 +92,12 @@ export default defineConfig({
                 starlightImageZoom(),
             ]
         }),
-        tailwind({
-            // Disable base styles to avoid conflict with Starlight if needed,
-            // but Starlight's tailwind plugin handles this.
-            applyBaseStyles: false,
-        }),
         mermaid(),
     ],
+
+    vite: {
+        plugins: [tailwindcss()],
+    },
 
     adapter: cloudflare(),
 });
