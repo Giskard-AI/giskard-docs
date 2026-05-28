@@ -2,7 +2,7 @@
   "name": "giskard-docs",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@10.33.4",
+  "packageManager": "pnpm@11.3.0",
   "scripts": {
     "dev": "node scripts/convert-notebooks.mjs && astro dev",
     "start": "astro dev",
@@ -29,12 +29,5 @@
   "devDependencies": {
     "prettier": "3.8.3",
     "wrangler": "4.95.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "sharp",
-      "workerd"
-    ]
   }
 }
