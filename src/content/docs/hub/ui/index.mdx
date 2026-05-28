@@ -116,7 +116,7 @@ The interface below displays the agent details that need to be filled out.
   - `Headers`: These are useful for authentication and other custom headers.
   - `Stateful mode`: Controls how the Hub handles conversation history when calling your agent.
 
-The endpoint should expect an object with the following structure:
+In the default (stateless) mode, the endpoint should expect an object with the following structure:
 
 ```python
 {
@@ -128,12 +128,30 @@ The endpoint should expect an object with the following structure:
 }
 ```
 
-The endpoint's response should have the following structure:
+And the response should have the following structure:
 
 ```python
 {
     "response": {"role": "assistant", "content": "An orange is green"},
     "metadata": {"some_key": "whatever value"},
+}
+```
+
+In stateful mode, the Hub sends only the latest user message along with a `thread_id` in `metadata`, and your agent is responsible for storing the conversation history server-side. After the first turn, requests and responses look like this:
+
+```python
+{
+    "messages": [
+        {"role": "user", "content": "What color is an orange?"},
+    ],
+    "metadata": {"thread_id": "abc-123"}
+}
+```
+
+```python
+{
+    "response": {"role": "assistant", "content": "An orange is orange."},
+    "metadata": {"thread_id": "abc-123"}
 }
 ```
 
