@@ -5,20 +5,21 @@ Documentation site built with [Astro](https://astro.build) + [Starlight](https:/
 ## Requirements
 
 - Node.js 18+
-- Python 3 + `black` (optional — only needed for `npm run format`)
+- [pnpm](https://pnpm.io/) (auto-managed via the `packageManager` field in `package.json`; enable with `corepack enable`)
+- Python 3 + `black` (optional, only needed for `pnpm run format`)
 
 ## Commands
 
-| Command                 | Description                                                           |
-| :---------------------- | :-------------------------------------------------------------------- |
-| `npm install`           | Install dependencies                                                  |
-| `npm run dev`           | Start local dev server at `localhost:4321` (converts notebooks first) |
-| `npm run build`         | Format, convert notebooks, and build production site to `dist/`       |
-| `npm run build:ci`      | Convert notebooks and build without formatting — use this in CI       |
-| `npm run preview`       | Preview the production build locally                                  |
-| `npm run format`        | Run Prettier + black on all `.md`/`.mdx` files                        |
-| `npm run format:prose`  | Run Prettier only                                                     |
-| `npm run format:code`   | Run black on Python code blocks only                                  |
+| Command                | Description                                                           |
+| :--------------------- | :-------------------------------------------------------------------- |
+| `pnpm install`         | Install dependencies                                                  |
+| `pnpm dev`             | Start local dev server at `localhost:4321` (converts notebooks first) |
+| `pnpm build`           | Format, convert notebooks, and build production site to `dist/`       |
+| `pnpm build:ci`        | Convert notebooks and build without formatting (use this in CI)       |
+| `pnpm preview`         | Preview the production build locally                                  |
+| `pnpm format`          | Run Prettier + black on all `.md`/`.mdx` files                        |
+| `pnpm format:prose`    | Run Prettier only                                                     |
+| `pnpm format:code`     | Run black on Python code blocks only                                  |
 
 ## Project structure
 
@@ -44,7 +45,7 @@ Documentation site built with [Astro](https://astro.build) + [Starlight](https:/
 ## Adding content
 
 - **Markdown/MDX pages**: drop `.md` or `.mdx` files into `src/content/docs/`. The URL mirrors the file path.
-- **Jupyter notebooks**: add `.ipynb` files alongside other content. Running `npm run dev` or `npm run build:ci` converts them to `.mdx` automatically. The generated `.mdx` files are git-ignored — do not commit them.
+- **Jupyter notebooks**: add `.ipynb` files alongside other content. Running `pnpm dev` or `pnpm build:ci` converts them to `.mdx` automatically. The generated `.mdx` files are git-ignored — do not commit them.
 - **Sidebar ordering**: controlled by `_meta.yaml` files in each content directory (via `starlight-auto-sidebar`).
 
 ## Notebook conventions

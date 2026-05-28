@@ -5,12 +5,12 @@ pre-commit-install: ## Setup pre-commit hooks
 .PHONY: pre-commit-install
 
 install: ## Install project dependencies
-	uv sync --all-extras && npm install
+	uv sync --all-extras && pnpm install
 .PHONY: setup
 
 
 dev: ## Start development server
-	npm run dev
+	pnpm dev
 .PHONY: dev
 
 test-docs-nb: ## Run notebook E2E tests (overwrites outputs by default; set OVERWRITE_NB=0 to skip)

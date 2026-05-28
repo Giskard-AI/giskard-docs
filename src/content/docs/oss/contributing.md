@@ -65,8 +65,8 @@ CI will run the same checks. A maintainer will review your PR — most PRs recei
 This docs site (<a href="https://github.com/Giskard-AI/giskard-docs" target="_blank">giskard-docs ↗</a>) is a separate Astro / Starlight project. To contribute:
 
 1. Fork and clone `giskard-docs`
-2. Install dependencies: `npm install`
-3. Preview locally: `npm run dev`
+2. Install dependencies: `pnpm install`
+3. Preview locally: `pnpm dev`
 4. Edit pages under `src/content/docs/` and open a PR
 
 ## Star our repositories on GitHub
