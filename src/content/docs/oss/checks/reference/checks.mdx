@@ -245,12 +245,12 @@ check = JsonValid(
 
 ### `RegoPolicy`
 
-<ResourceSection description="Evaluate an inline Rego policy against trace data using regorus (Open Policy Agent). Extracts the OPA input document from the trace via JSONPath, merges optional static data, and evaluates a boolean rule.">
+<ResourceSection description="Evaluate an inline Rego policy against trace data using Regorus, an OPA-compatible Rego engine. Extracts the value passed as input from the trace via JSONPath, merges optional static data, and evaluates a boolean rule.">
 
 **Module:** `giskard.checks.builtin.rego_policy`
 
 :::note[Optional dependency]
-Requires the `regorus` extra: `pip install 'giskard-checks[regorus]'` (installs the `celine-regorus` wheel; import as `regorus`).
+Requires the `regorus` extra: `pip install 'giskard-checks[regorus]'` (installs the [Regorus](https://github.com/microsoft/regorus) `celine-regorus` wheel; import as `regorus`).
 :::
 
 <Property name="policy" type="str" required>
@@ -260,10 +260,10 @@ Requires the `regorus` extra: `pip install 'giskard-checks[regorus]'` (installs 
   Fully qualified boolean rule path (e.g. `data.giskard.allow`). Must evaluate to a boolean, be undefined (fail), or error on other types.
 </Property>
 <Property name="key" type="str" defaultValue='"trace.last.outputs"'>
-  JSONPath into the trace for the OPA input document.
+  JSONPath into the trace for the JSON value exposed to the policy as `input`.
 </Property>
 <Property name="data" type="dict[str, Any]" defaultValue="{}">
-  Static data document merged into the policy engine via `engine.add_data`.
+  Static `data` document merged into the policy engine via `engine.add_data` (separate from `input`).
 </Property>
 
 ```python
