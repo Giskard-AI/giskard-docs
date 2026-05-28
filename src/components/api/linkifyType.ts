@@ -137,7 +137,6 @@ export const OSS_CHECKS_TYPE_PAGES: Readonly<Record<string, string>> = {
   UserSimulatorOutput: "/oss/checks/reference/generators",
   // Scenarios (scenarios.mdx)
   ScenarioResult: "/oss/checks/reference/scenarios",
-  ScenarioCategory: "/oss/checks/reference/scenarios",
   SuiteResult: "/oss/checks/reference/scenarios",
   // Testing utilities (testing-utils.mdx)
   TestCase: "/oss/checks/reference/testing-utils",
