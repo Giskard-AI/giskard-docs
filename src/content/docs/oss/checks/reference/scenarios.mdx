@@ -172,23 +172,6 @@ for i, check_result in enumerate(
 
 ---
 
-## `Step`
-
-**Module:** `giskard.checks.core.scenario`
-
-Groups interaction specs and checks executed together before advancing the shared trace. The fluent `Scenario.interact()` / `.check()` API builds steps implicitly; use `Step` when constructing scenarios from pre-built components.
-
-<TypeTable name="Step">
-  <Property name="interacts" type="list[InteractionSpec]">
-    Interaction specs run in this step.
-  </Property>
-  <Property name="checks" type="list[Check]">
-    Checks validated after this step's interactions.
-  </Property>
-</TypeTable>
-
----
-
 ## `ScenarioCategory`
 
 **Module:** `giskard.checks.scenarios.catalog`
