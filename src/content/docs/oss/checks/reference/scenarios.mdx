@@ -172,6 +172,55 @@ for i, check_result in enumerate(
 
 ---
 
+## `ScenarioCategory`
+
+**Module:** `giskard.checks.scenarios.catalog`
+
+Enumeration of scenario categories available for security suite generation.
+
+| Value | Description |
+| ----- | ----------- |
+| `LLM01_INDIRECT_INJECTION` | Indirect prompt injection scenarios |
+
+---
+
+## `generate_suite`
+
+**Module:** `giskard.checks.scenarios.catalog`
+
+Generate a `Suite` of scenarios for the given categories from the built-in catalog.
+
+<MethodCard name="generate_suite()" returnType="Suite">
+  <Property name="description" type="str" required>
+    Description of the agent under test. Injected into each scenario's annotations as `"description"`.
+  </Property>
+  <Property name="categories" type="list[ScenarioCategory] | None" defaultValue="None">
+    Categories to include. `None` selects all available categories.
+  </Property>
+  <Property name="max_scenarios" type="int | None" defaultValue="None">
+    Maximum number of scenarios to include. `None` means all.
+  </Property>
+  <Property name="seed" type="int" defaultValue="42">
+    Random seed for reproducible sampling.
+  </Property>
+  <Property name="name" type="str" defaultValue='"Security Suite"'>
+    Suite name.
+  </Property>
+</MethodCard>
+
+```python
+from giskard.checks import generate_suite, ScenarioCategory
+
+suite = generate_suite(
+    description="A customer support chatbot for an e-commerce store.",
+    categories=[ScenarioCategory.LLM01_INDIRECT_INJECTION],
+    max_scenarios=10,
+)
+result = await suite.run(target=my_agent)
+```
+
+---
+
 ## `Suite`
 
 **Module:** `giskard.checks.scenarios.suite`
