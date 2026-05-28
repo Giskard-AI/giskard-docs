@@ -85,6 +85,7 @@ jobs:
         with:
           app-id: ${{ vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
 
       - name: Commit updated notebooks and docs (main only)
         if: github.ref == 'refs/heads/main'
