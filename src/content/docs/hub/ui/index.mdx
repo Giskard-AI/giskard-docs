@@ -106,16 +106,17 @@ On the Agents page, click on the "New agent" button.
 
 The interface below displays the agent details that need to be filled out.
 
-![Agent configuration form with name, description, and API endpoint fields](/_static/images/hub/setup-agent-detail.png)
+![Agent configuration form with API endpoint and header settings](/_static/images/hub/setup-agent-detail.png)
 
 - `Name`: The name of the agent.
 - `Description`: Used to refine automatic evaluation and generation for better accuracy in your specific use case.
 - `Supported Languages`: Add the languages your agent can handle. Note that this affects data generation.
 - `Connection Settings`:
   - `Agent API Endpoint`: The URL of your agent's API endpoint. This is where requests are sent to interact with your agent.
-  - `Headers`: These are useful for authentication and other custom headers
+  - `Headers`: These are useful for authentication and other custom headers.
+  - `Stateful mode`: Controls how the Hub handles conversation history when calling your agent.
 
-The endpoint should expect an object with the following structure:
+In the default (stateless) mode, the endpoint should expect an object with the following structure:
 
 ```python
 {
@@ -127,7 +128,7 @@ The endpoint should expect an object with the following structure:
 }
 ```
 
-The endpoint's response should have the following structure:
+And the response should have the following structure:
 
 ```python
 {
@@ -135,6 +136,26 @@ The endpoint's response should have the following structure:
     "metadata": {"some_key": "whatever value"},
 }
 ```
+
+In stateful mode, the Hub sends only the latest user message along with a `thread_id` in `metadata`, and your agent is responsible for storing the conversation history server-side. After the first turn, requests and responses look like this:
+
+```python
+{
+    "messages": [
+        {"role": "user", "content": "What color is an orange?"},
+    ],
+    "metadata": {"thread_id": "abc-123"}
+}
+```
+
+```python
+{
+    "response": {"role": "assistant", "content": "An orange is orange."},
+    "metadata": {"thread_id": "abc-123"}
+}
+```
+
+The Hub also supports authenticated endpoints and chatbots whose native API doesn't match this canonical shape, and the Giskard team will help you configure these during onboarding. For details on authentication, connecting custom chatbot formats, and stateful conversations, see [Setup agents](/hub/ui/setup/agents).
 
 ## Import a knowledge base
 
