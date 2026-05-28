@@ -2,7 +2,7 @@
   "name": "giskard-docs",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@10.29.1",
+  "packageManager": "pnpm@10.33.4",
   "scripts": {
     "dev": "node scripts/convert-notebooks.mjs && astro dev",
     "start": "astro dev",
