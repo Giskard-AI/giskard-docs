@@ -4,7 +4,7 @@ End-to-end tests for Jupyter notebooks.
 
 Cells tagged skip-execution (the colab-install cells) are skipped automatically.
 
-- No AZURE_AI_API_KEY / AZURE_AI_API_BASE → only NO_API_NOTEBOOKS run; the rest skip.
+- No AZURE_AI_API_KEY / AZURE_AI_ENDPOINT → only NO_API_NOTEBOOKS run; the rest skip.
 - OVERWRITE_NB=0    → skip writing outputs back (default is to overwrite).
                       After the run, regenerate .mdx files:
                       node scripts/convert-notebooks.mjs
@@ -47,8 +47,8 @@ def pytest_generate_tests(metafunc):
 
 def test_notebook(nb_path):
     if _needs_api(nb_path):
-        if not (os.environ.get("AZURE_AI_API_KEY") and os.environ.get("AZURE_AI_API_BASE")):
-            pytest.skip("AZURE_AI_API_KEY and AZURE_AI_API_BASE not set")
+        if not (os.environ.get("AZURE_AI_API_KEY") and os.environ.get("AZURE_AI_ENDPOINT")):
+            pytest.skip("AZURE_AI_API_KEY and AZURE_AI_ENDPOINT not set")
 
     from nbmake.nb_run import NotebookRun
     import nbformat

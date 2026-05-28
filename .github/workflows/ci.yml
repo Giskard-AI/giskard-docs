@@ -70,7 +70,7 @@ jobs:
       - name: Run notebook tests
         env:
           AZURE_AI_API_KEY: ${{ secrets.AZURE_AI_API_KEY }}
-          AZURE_AI_API_BASE: ${{ secrets.AZURE_AI_API_BASE }}
+          AZURE_AI_ENDPOINT: ${{ secrets.AZURE_AI_API_BASE }}
           OVERWRITE_NB: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
         run: uv run pytest tests/test_docs_nb.py -v --tb=short
 
