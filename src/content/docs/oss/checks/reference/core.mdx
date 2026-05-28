@@ -120,6 +120,23 @@ result = CheckResult.skip(message="Skipped: No outputs available")
 
 ---
 
+## `Metric`
+
+**Module:** `giskard.checks.core.result`
+
+Named quantitative measurement attached to a check result (e.g. performance timings, confidence scores).
+
+<TypeTable name="Metric">
+  <Property name="name" type="str" required>
+    Identifier for the metric.
+  </Property>
+  <Property name="value" type="float" required>
+    Numerical value of the metric.
+  </Property>
+</TypeTable>
+
+---
+
 ## `CheckStatus`
 
 **Module:** `giskard.checks.core.result`
@@ -299,6 +316,37 @@ result = await (
 )
 
 print(f"Status: {result.status}")
+```
+
+---
+
+## `Step`
+
+**Module:** `giskard.checks.core.scenario`
+
+A scenario step: a sequence of interaction specs followed by checks. Each step maps to one test case at runtime.
+
+<TypeTable name="Step">
+  <Property name="interacts" type="list[InteractionSpec]">
+    Interaction specs to apply to the trace in this step.
+  </Property>
+  <Property name="checks" type="list[Check]">
+    Checks to run against the trace after interactions in this step.
+  </Property>
+</TypeTable>
+
+```python
+from giskard.checks import Scenario, Step, Interact, Equals
+
+scenario = Scenario(
+    name="multi_step_test",
+    steps=[
+        Step(
+            interacts=[Interact(inputs="Hello", outputs="Hi")],
+            checks=[Equals(expected_value="Hi", key="trace.last.outputs")],
+        ),
+    ],
+)
 ```
 
 ---
