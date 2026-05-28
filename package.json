@@ -14,19 +14,19 @@
     "format:code": "node scripts/format-code-blocks.mjs"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^13.0.0",
+    "@astrojs/cloudflare": "13.5.5",
     "@astrojs/starlight": "0.39.2",
-    "@tailwindcss/vite": "^4.0.0",
-    "astro": "^6.3.0",
+    "@tailwindcss/vite": "4.3.0",
+    "astro": "6.3.8",
     "astro-mermaid": "2.0.1",
     "mermaid": "11.15.0",
     "sharp": "0.34.5",
-    "starlight-auto-sidebar": "^0.4.0",
-    "starlight-image-zoom": "0.13.2",
-    "tailwindcss": "^4.0.0"
+    "starlight-auto-sidebar": "0.4.0",
+    "starlight-image-zoom": "0.14.2",
+    "tailwindcss": "4.3.0"
   },
   "devDependencies": {
-    "prettier": "3.8.1",
-    "wrangler": "^4.95.0"
+    "prettier": "3.8.3",
+    "wrangler": "4.95.0"
   }
 }
