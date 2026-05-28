@@ -31,5 +31,7 @@ repos:
             \.secrets\.baseline$|
             \.python-version$|
             venv\.lock$|
-            version\.json$
+            version\.json$|
+            pnpm-lock\.yaml$|
+            package-lock\.json$
           )$
