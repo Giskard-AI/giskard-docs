@@ -28,8 +28,5 @@
   "devDependencies": {
     "prettier": "3.8.1",
     "wrangler": "^4.95.0"
-  },
-  "overrides": {
-    "undici": "7.24.7"
   }
 }
