@@ -97,6 +97,9 @@ export default defineConfig({
 
     vite: {
         plugins: [tailwindcss()],
+        optimizeDeps: {
+            exclude: ['starlight-auto-sidebar'],
+        },
     },
 
     adapter: cloudflare(),
