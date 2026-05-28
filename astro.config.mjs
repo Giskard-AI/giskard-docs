@@ -42,7 +42,7 @@ export default defineConfig({
                         {
                             label: 'Knowledge Glossary',
                             collapsed: true,
-                            autogenerate: { directory: 'start/glossary', collapsed: true },
+                            items: [{ autogenerate: { directory: 'start/glossary', collapsed: true } }],
                         },
                         { label: 'Contact us ↗', link: 'https://www.giskard.ai/contact', attrs: { target: '_blank' } },
                         { label: 'Blog ↗', link: 'https://www.giskard.ai/knowledge-categories/blog', attrs: { target: '_blank' } },
@@ -51,12 +51,12 @@ export default defineConfig({
                 // Hub UI sidebar
                 {
                     label: 'Hub UI',
-                    autogenerate: { directory: 'hub/ui', collapsed: false },
+                    items: [{ autogenerate: { directory: 'hub/ui', collapsed: false } }],
                 },
                 // Hub SDK sidebar
                 {
                     label: 'Hub SDK',
-                    autogenerate: { directory: 'hub/sdk', collapsed: false },
+                    items: [{ autogenerate: { directory: 'hub/sdk', collapsed: false } }],
                 },
                 // Open Source sidebar
                 {
@@ -69,7 +69,7 @@ export default defineConfig({
                 },
                 {
                     label: 'Checks',
-                    autogenerate: { directory: 'oss/checks', collapsed: false },
+                    items: [{ autogenerate: { directory: 'oss/checks', collapsed: false } }],
                 },
             ],
             routeMiddleware: './src/routeData.ts',
