@@ -25,5 +25,9 @@ regen-mdx: ## Regenerate .mdx files from .ipynb notebooks
 	node scripts/convert-notebooks.mjs
 .PHONY: regen-mdx
 
-test-docs: test-docs-nb ## Run all doc tests
+test-tables: ## Build and verify Markdown tables render
+	pnpm run build:ci && pnpm run test:tables
+.PHONY: test-tables
+
+test-docs: test-docs-nb test-tables ## Run all doc tests
 .PHONY: test-docs
