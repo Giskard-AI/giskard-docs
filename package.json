@@ -12,13 +12,14 @@
     "astro": "astro",
     "format": "prettier --write 'src/**/*.{md,mdx}' && node scripts/format-code-blocks.mjs",
     "format:prose": "prettier --write 'src/**/*.{md,mdx}'",
-    "format:code": "node scripts/format-code-blocks.mjs"
+    "format:code": "node scripts/format-code-blocks.mjs",
+    "test:tables": "node scripts/check-mdx-tables.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "13.6.0",
     "@astrojs/starlight": "0.39.2",
     "@tailwindcss/vite": "4.3.0",
-    "astro": "6.4.2",
+    "astro": "6.3.8",
     "astro-mermaid": "2.0.1",
     "mermaid": "11.15.0",
     "sharp": "0.34.5",
