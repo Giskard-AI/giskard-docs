@@ -19,9 +19,10 @@ const MDX_TABLE_PAGES = [
   "hub/sdk/reference",
 ];
 
-// A GFM table delimiter row, e.g. "| :--- | ---: |". Its presence in rendered
-// prose means a Markdown table was not parsed into a <table>.
-const SEPARATOR = /\|\s*:?-{3,}:?\s*\|/;
+// A GFM table delimiter row, with or without outer pipes (e.g. "| :--- |" or
+// "--- | ---"; GFM makes the leading/trailing pipes optional). Its presence in
+// rendered prose means a Markdown table was not parsed into a <table>.
+const SEPARATOR = /(?:\|\s*:?-{3,}:?\s*\||:?-{3,}:?\s*\|\s*:?-{3,}:?)/;
 
 function walk(dir, acc = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -32,10 +33,11 @@ function walk(dir, acc = []) {
   return acc;
 }
 
-// Drop code, script and style blocks so legitimate examples that show table
-// syntax inside <pre>/<code> do not trip the scan.
+// Strip HTML comments plus code, script and style blocks so framework markers
+// and examples that show table syntax do not trip the scan.
 function prose(html) {
   return html
+    .replace(/<!--[\s\S]*?-->/g, "")
     .replace(/<pre[\s\S]*?<\/pre>/gi, "")
     .replace(/<code[\s\S]*?<\/code>/gi, "")
     .replace(/<script[\s\S]*?<\/script>/gi, "")
