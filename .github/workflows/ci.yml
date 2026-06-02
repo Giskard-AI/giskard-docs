@@ -39,9 +39,6 @@ jobs:
       - name: Build site
         run: pnpm run build:ci
 
-      - name: Check MDX tables render
-        run: pnpm run test:tables
-
   doc_tests:
     name: Test and update notebooks
     runs-on: ubuntu-latest
@@ -75,6 +72,12 @@ jobs:
 
       - name: Install Node deps
         run: pnpm install --frozen-lockfile
+
+      - name: Build site
+        run: pnpm run build:ci
+
+      - name: Check MDX tables render
+        run: pnpm run test:tables
 
       - name: Run notebook tests
         env:
