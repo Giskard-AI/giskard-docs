@@ -55,7 +55,10 @@ const htmlFiles = walkDir(assetsDir);
 
 for (const file of htmlFiles) {
   // e.g. dist/client/hub/sdk/quickstart/index.html → /hub/sdk/quickstart
-  const relative = file.slice(assetsDir.length).replace(/\/index\.html$/, "");
+  const relative = file
+    .slice(assetsDir.length)
+    .replace(/\\/g, "/")
+    .replace(/\/index\.html$/, "");
   const pagePath = relative || "/";
 
   if (pagePath === "/") continue; // skip root
