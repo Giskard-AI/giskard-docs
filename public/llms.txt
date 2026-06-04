@@ -32,7 +32,6 @@ Open research on AI safety and security, including the Phare multilingual benchm
 ### Overview
 - Welcome to Giskard: https://docs.giskard.ai/.md
 - Open Source vs Hub: https://docs.giskard.ai/start/comparison.md
-- Request your Enterprise Trial: https://docs.giskard.ai/start/enterprise-trial.md
 
 ### Knowledge Glossary
 - AI Testing & Evaluation Glossary: https://docs.giskard.ai/start/glossary.md

@@ -38,7 +38,6 @@ export default defineConfig({
                     items: [
                         { slug: 'index', label: 'Welcome to Giskard' },
                         { slug: 'start/comparison', label: 'Open Source vs Hub' },
-                        { slug: 'start/enterprise-trial', label: 'Request your enterprise trial' },
                         {
                             label: 'Knowledge Glossary',
                             collapsed: true,
