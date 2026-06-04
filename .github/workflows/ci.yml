@@ -79,6 +79,9 @@ jobs:
       - name: Check MDX tables render
         run: pnpm run test:tables
 
+      - name: Check redirects
+        run: pnpm run test:redirects
+
       - name: Run notebook tests
         env:
           AZURE_AI_API_KEY: ${{ secrets.AZURE_AI_API_KEY }}
