@@ -13,7 +13,8 @@
     "format": "prettier --write 'src/**/*.{md,mdx}' && node scripts/format-code-blocks.mjs",
     "format:prose": "prettier --write 'src/**/*.{md,mdx}'",
     "format:code": "node scripts/format-code-blocks.mjs",
-    "test:tables": "node scripts/check-mdx-tables.mjs"
+    "test:tables": "node scripts/check-mdx-tables.mjs",
+    "test:redirects": "node scripts/check-redirects.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "13.6.0",

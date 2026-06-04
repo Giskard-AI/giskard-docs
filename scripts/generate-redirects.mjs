@@ -1,10 +1,18 @@
-import { readFileSync, writeFileSync, readdirSync, statSync } from "fs";
+import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const distDir = resolve(root, "dist");
+
+// The Cloudflare adapter emits static assets to dist/client, and Cloudflare only
+// processes _redirects (and _headers) from the root of that assets directory.
+// Writing to dist/ leaves the file outside the served assets, so the rules would
+// silently never apply. Fall back to dist/ if the client dir is absent.
+const assetsDir = existsSync(resolve(distDir, "client"))
+  ? resolve(distDir, "client")
+  : distDir;
 
 // 1. Explicit redirects from the redirect map
 const redirects = JSON.parse(
@@ -28,7 +36,7 @@ for (const [from, to] of Object.entries(redirects)) {
 }
 
 // 2. Generic .html and /index.html stripping for all built pages
-//    Scan dist/ for all index.html files to discover page paths
+//    Scan the assets dir for all index.html files to discover page paths
 
 function walkDir(dir, results = []) {
   for (const entry of readdirSync(dir)) {
@@ -43,11 +51,14 @@ function walkDir(dir, results = []) {
   return results;
 }
 
-const htmlFiles = walkDir(distDir);
+const htmlFiles = walkDir(assetsDir);
 
 for (const file of htmlFiles) {
-  // e.g. dist/hub/sdk/quickstart/index.html → /hub/sdk/quickstart
-  const relative = file.slice(distDir.length).replace(/\/index\.html$/, "");
+  // e.g. dist/client/hub/sdk/quickstart/index.html → /hub/sdk/quickstart
+  const relative = file
+    .slice(assetsDir.length)
+    .replace(/\\/g, "/")
+    .replace(/\/index\.html$/, "");
   const pagePath = relative || "/";
 
   if (pagePath === "/") continue; // skip root
@@ -58,6 +69,7 @@ for (const file of htmlFiles) {
   addRule(`${pagePath}/index.html`, pagePath);
 }
 
-writeFileSync(resolve(distDir, "_redirects"), lines.join("\n") + "\n");
+const outFile = resolve(assetsDir, "_redirects");
+writeFileSync(outFile, lines.join("\n") + "\n");
 
-console.log(`Generated dist/_redirects with ${lines.length} rules`);
+console.log(`Generated ${outFile.slice(root.length + 1)} with ${lines.length} rules`);
