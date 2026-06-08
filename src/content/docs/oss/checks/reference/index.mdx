@@ -20,7 +20,7 @@ Complete API documentation for Giskard Checks -- a comprehensive testing framewo
   />
   <LinkCard
     title="Checks"
-    description="Ready-to-use validation checks: string matching, comparisons, LLM-based checks"
+    description="Ready-to-use validation checks: string matching, comparisons, RegoPolicy, composition, LLM judges"
     href="/oss/checks/reference/checks"
   />
   <LinkCard
@@ -61,12 +61,18 @@ from giskard.checks import (
     # Built-in checks
     FnCheck,
     StringMatching,
+    RegexMatching,
+    JsonValid,
     Equals,
     NotEquals,
     LesserThan,
     GreaterThan,
     LesserThanEquals,
     GreaterEquals,
+    AllOf,
+    AnyOf,
+    Not,
+    RegoPolicy,
     # Configuration
     set_default_generator,
     get_default_generator,
@@ -77,10 +83,18 @@ from giskard.checks import (
     BaseLLMCheck,
     LLMCheckResult,
     Groundedness,
+    AnswerRelevance,
+    Toxicity,
     Conformity,
     LLMJudge,
     SemanticSimilarity,
 )
+
+# Scenarios
+from giskard.checks import generate_suite, ScenarioCategory
+
+# Generators
+from giskard.checks import LLMGenerator
 ```
 
 ## Package structure
@@ -98,15 +112,21 @@ giskard.checks/
 │   ├── fn.py             # FnCheck
 │   ├── text_matching.py  # StringMatching, RegexMatching
 │   ├── comparison.py     # Equals, NotEquals, etc.
+│   ├── composition.py    # AllOf, AnyOf, Not
+│   ├── json_valid.py     # JsonValid
+│   ├── rego_policy.py    # RegoPolicy
 │   └── semantic_similarity.py
 ├── judges/               # LLM-based checks
 │   ├── base.py           # BaseLLMCheck, LLMCheckResult
 │   ├── groundedness.py   # Groundedness
+│   ├── answer_relevance.py
+│   ├── toxicity.py
 │   ├── conformity.py     # Conformity
 │   └── judge.py          # LLMJudge
 ├── scenarios/            # Multi-step workflows
 │   ├── runner.py         # ScenarioRunner
-│   └── suite.py          # Suite
+│   ├── suite.py          # Suite
+│   └── catalog.py        # generate_suite, ScenarioCategory
 ├── testing/              # Testing utilities
 │   ├── runner.py         # TestCaseRunner
 │   └── spy.py            # WithSpy

@@ -126,8 +126,10 @@ export const OSS_CHECKS_TYPE_PAGES: Readonly<Record<string, string>> = {
   // Core (giskard-docs/src/content/docs/oss/checks/reference/core.mdx)
   Check: "/oss/checks/reference/core",
   CheckResult: "/oss/checks/reference/core",
+  Metric: "/oss/checks/reference/core",
   Interaction: "/oss/checks/reference/core",
   Trace: "/oss/checks/reference/core",
+  Step: "/oss/checks/reference/core",
   // Built-in / LLM checks (checks.mdx)
   BaseLLMCheck: "/oss/checks/reference/checks",
   LLMCheckResult: "/oss/checks/reference/checks",
