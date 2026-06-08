@@ -5,7 +5,11 @@ sidebar:
   order: 1
 ---
 
-The Giskard library provides an automatic **scan** that detects safety and security vulnerabilities affecting your LLM-based agents. Instead of writing adversarial test cases by hand, you describe your agent in plain language. The scan then generates probes that try to make it misbehave, runs them, and reports what it found.
+The Giskard library provides an automatic **scan** that detects safety and security vulnerabilities affecting your LLM-based agents. Instead of writing adversarial test cases by hand, you describe your agent in plain language. The scan then generates probes that try to make it misbehave, runs them, and reports what it found. It is the fastest way to find out how your agent can be jailbroken, misused, or pushed off-topic, before it reaches production.
+
+:::note[Coming from Giskard v2?]
+The scan has been redesigned in v3. Instead of wrapping your model with `giskard.Model(...)` and running `giskard.scan(model, dataset)` over a dataset, you wrap your agent as an async function, generate probes from a plain-language description with `generate_suite(...)`, and run them with `suite.run(...)`. There is no dataset to prepare and no `model_type` or `feature_names` to declare.
+:::
 
 ## How does it work?
 
@@ -18,7 +22,7 @@ Differently from benchmarks that score a foundation model in the abstract, Giska
 
 ### What vulnerabilities does it detect?
 
-The scan organizes its probes into the vulnerability categories used across Giskard. The table below shows what is available in the open-source library today and what is on the immediate roadmap.
+The scan organizes its probes into the vulnerability categories used across Giskard, aligned with industry references such as the [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/). The table below shows what is available in the open-source library today and what is on the immediate roadmap.
 
 | Vulnerability category                | What it tests                                                                                                            | Status         |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------- |
@@ -46,10 +50,10 @@ Yes. Pass the languages your agent is expected to handle through the `languages`
 
 ## Before starting
 
-Install the library with the LiteLLM extra, which powers the generator and judge models:
+Install the scan with the LiteLLM extra, which powers the generator and judge models. Nothing else is needed: `giskard-scan` pulls in the rest of the library, and the LiteLLM extra lets you reach any provider through a single model string.
 
 ```bash
-pip install giskard "giskard-agents[litellm]"
+pip install "giskard-scan[litellm]"
 ```
 
 Then choose the LLM that will generate and judge the probes, and set it as the default:
@@ -224,8 +228,14 @@ suite_result = await suite.run(
 ```
 
 :::note
-Need fully custom evaluation logic? The scan is built on [Giskard Checks](/oss/checks), where you can define your own LLM-as-a-judge checks and assemble bespoke test suites.
+Beyond the built-in probes, you can write your own evaluation logic with custom LLM-as-a-judge checks. See [Giskard Checks](/oss/checks) for building bespoke test suites.
 :::
+
+## Roadmap
+
+The scan is under active development. Today it covers the categories marked available in the table above, and the remaining ones are being migrated to v3 next, so coverage keeps growing without any change to the workflow on this page.
+
+Our direction is to make `giskard.scan` the single entry point for red teaming in the open-source library, with broader vulnerability coverage and richer multi-turn attacks, and to bring the same product-first approach to RAG and agent evaluation. As new probes land, the `generate_suite` and `suite.run` calls you already wrote pick them up automatically.
 
 ## Troubleshooting
 
