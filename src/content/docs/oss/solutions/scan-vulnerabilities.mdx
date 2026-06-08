@@ -5,6 +5,8 @@ sidebar:
   order: 1
 ---
 
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
 The Giskard library provides an automatic **scan** that detects safety and security vulnerabilities affecting your LLM-based agents. Instead of writing adversarial test cases by hand, you describe your agent in plain language. The scan then generates probes that try to make it misbehave, runs them, and reports what it found. It is the fastest way to find out how your agent can be jailbroken, misused, or pushed off-topic, before it reaches production.
 
 :::note[Coming from Giskard v2?]
@@ -50,37 +52,82 @@ Yes. Pass the languages your agent is expected to handle through the `languages`
 
 ## Before starting
 
-Install the scan with the LiteLLM extra, which powers the generator and judge models. Nothing else is needed: `giskard-scan` pulls in the rest of the library, and the LiteLLM extra lets you reach any provider through a single model string.
+Install the scan and choose the model that will generate and judge the probes. `giskard-scan` pulls in the rest of the library, so you only add the extra for the provider you use. Pick yours below:
+
+<Tabs>
+<TabItem label="OpenAI">
+
+```bash
+pip install "giskard-scan[openai]"
+```
+
+```python
+from giskard.agents.generators import GiskardLLMGenerator
+from giskard.checks import set_default_generator
+
+llm_judge = GiskardLLMGenerator(model="openai/gpt-4o")
+set_default_generator(llm_judge)
+```
+
+Set `OPENAI_API_KEY` in your environment.
+
+</TabItem>
+<TabItem label="Anthropic">
+
+```bash
+pip install "giskard-scan[anthropic]"
+```
+
+```python
+from giskard.agents.generators import GiskardLLMGenerator
+from giskard.checks import set_default_generator
+
+llm_judge = GiskardLLMGenerator(model="anthropic/claude-sonnet-4-20250514")
+set_default_generator(llm_judge)
+```
+
+Set `ANTHROPIC_API_KEY` in your environment.
+
+</TabItem>
+<TabItem label="Gemini">
+
+```bash
+pip install "giskard-scan[google]"
+```
+
+```python
+from giskard.agents.generators import GiskardLLMGenerator
+from giskard.checks import set_default_generator
+
+llm_judge = GiskardLLMGenerator(model="gemini/gemini-2.5-flash")
+set_default_generator(llm_judge)
+```
+
+Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment.
+
+</TabItem>
+<TabItem label="Any provider">
+
+LiteLLM reaches any provider through a single `"<provider>/<model-name>"` string, so it is the most flexible option.
 
 ```bash
 pip install "giskard-scan[litellm]"
 ```
 
-Then choose the LLM that will generate and judge the probes, and set it as the default:
-
 ```python
 from giskard.agents.generators import LiteLLMGenerator
 from giskard.checks import set_default_generator
 
-# The model string follows LiteLLM conventions: "<provider>/<model-name>"
 llm_judge = LiteLLMGenerator(model="<provider>/<model-name>")
-
-# Use this model by default for every probe and judge in the scan
 set_default_generator(llm_judge)
 ```
 
-:::note
-The model identifier follows [LiteLLM's provider conventions](https://docs.litellm.ai/docs/providers). A few examples:
+For example `mistral/mistral-large-latest`, `bedrock/anthropic.claude-3-sonnet-20240229-v1:0`, or `ollama/qwen2.5`. See [LiteLLM's provider conventions](https://docs.litellm.ai/docs/providers) and set the matching API key in your environment.
 
-- `openai/gpt-4o`
-- `azure_ai/gpt-4.1-nano`
-- `gemini/gemini-1.5-pro`
-- `mistral/mistral-large-latest`
-- `bedrock/anthropic.claude-3-sonnet-20240229-v1:0`
-- `ollama/qwen2.5`
+</TabItem>
+</Tabs>
 
-Set the matching API key in your environment (for example `OPENAI_API_KEY`).
-:::
+`set_default_generator` makes your chosen model the default for every probe and judge in the scan.
 
 ## Step 1: Wrap your model
 
