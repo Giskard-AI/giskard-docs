@@ -7,52 +7,41 @@ sidebar:
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-The Giskard library provides an automatic **scan** that detects safety and security vulnerabilities affecting your LLM-based agents. Instead of writing adversarial test cases by hand, you describe your agent in plain language. The scan then generates probes that try to make it misbehave, runs them, and reports what it found. It is the fastest way to find out how your agent can be jailbroken, misused, or pushed off-topic, before it reaches production.
+The Giskard library provides an automatic **scan** that detects safety and security vulnerabilities affecting your LLM-based agents.
 
 :::note[Coming from Giskard v2?]
-The scan has been redesigned in v3. Instead of wrapping your model with `giskard.Model(...)` and running `giskard.scan(model, dataset)` over a dataset, you wrap your agent as an async function, generate probes from a plain-language description with `generate_suite(...)`, and run them with `suite.run(...)`. There is no dataset to prepare and no `model_type` or `feature_names` to declare.
+The scan has been redesigned in v3. Instead of wrapping your model with `giskard.Model(...)` and running `giskard.scan(model, dataset)` over a dataset, you wrap your agent as an async function, generate scenarios from a plain-language description with `generate_suite(...)`, and run them with `suite.run(...)`. There is no dataset to prepare and no `model_type` or `feature_names` to declare.
 :::
 
 ## How does it work?
 
-The scan combines two families of probes:
+From a plain-language description of your agent, an LLM crafts adversarial scenarios tailored to it and runs them against your agent over single-turn and multi-turn conversations. A second LLM then acts as a judge, deciding whether each response reveals a vulnerability.
 
-- **Heuristics-based** probes reuse known attack patterns (for example a curated prompt-injection dataset) that are not specific to your agent.
-- **LLM-assisted** probes adapt to your agent. From your description, an LLM writes adversarial scenarios, sends them to your agent (single-turn or multi-turn), and a second LLM acts as a judge to decide whether the answer reveals a vulnerability.
+Differently from benchmarks that score a foundation model in the abstract, Giskard's scan performs an **in-depth, domain-specific assessment** of _your_ agent, based on the description you provide.
 
-Differently from benchmarks that score a foundation model in the abstract, Giskard's scan performs an **in-depth, domain-specific assessment** of _your_ agent: its instructions, its tools, and its use case.
+### Which attacks does it run?
 
-### What vulnerabilities does it detect?
+Today the scan generates three families of attack, mapped to the [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/) and the vulnerability categories used across Giskard:
 
-The scan organizes its probes into the vulnerability categories used across Giskard, aligned with industry references such as the [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/). The table below shows what is available in the open-source library today and what is on the immediate roadmap.
+| Attack                        | What it does                                                                                                                                                                                                                   | Vulnerability category                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| **Prompt injection**          | Hides an injected instruction inside plausible content to see whether the agent obeys it instead of its original instructions.                                                                                                 | Prompt Injection (OWASP LLM01)                                |
+| **Single-turn adversarial**   | Sends direct requests that test for harmful or unauthorized content such as stereotypes and discrimination, illegal activities, CBRN material, copyright, misinformation, and unqualified financial, medical, or legal advice. | Harmful Content Generation, Misguidance & Unauthorized Advice |
+| **GOAT multi-turn jailbreak** | Uses an attacker LLM that adapts over several turns, chaining strategies such as refusal suppression, persona modification, and hypothetical framing to push the agent toward objectives it should refuse.                     | Harmful Content Generation                                    |
 
-| Vulnerability category                | What it tests                                                                                                            | Status         |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | -------------- |
-| **Prompt Injection**                  | Crafted inputs that override the agent's original instructions.                                                          | ✅ Available   |
-| **Harmful Content Generation**        | Bypassing safety measures to produce dangerous, illegal, or harmful content, with single-turn and multi-turn jailbreaks. | ✅ Available   |
-| **Misguidance & Unauthorized Advice** | Coaxing the agent into professional advice (financial, medical, legal) outside its intended scope.                       | ✅ Available   |
-| **Hallucination & Misinformation**    | False, inconsistent, or fabricated information.                                                                          | 🚧 Coming soon |
-| **Excessive Agency**                  | Actions beyond the agent's intended scope or permissions.                                                                | 🚧 Coming soon |
-| **Data Privacy Exfiltration**         | Extraction of sensitive, personal, or confidential data.                                                                 | 🚧 Coming soon |
-| **Internal Information Exposure**     | Leaking system prompts, configuration, or other internal details.                                                        | 🚧 Coming soon |
-| **Training Data Extraction**          | Recovering information from the model's training data.                                                                   | 🚧 Coming soon |
-| **Denial of Service**                 | Inputs that exhaust resources or degrade performance.                                                                    | 🚧 Coming soon |
-| **Brand Damage & Reputation**         | Responses that create reputational or brand risk.                                                                        | 🚧 Coming soon |
-| **Legal & Financial Risk**            | Responses that create legal or financial liability.                                                                      | 🚧 Coming soon |
-
-For a detailed description of each category and its attack patterns, see the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories).
+These cover high-impact attack surfaces today, and the library keeps adding more. See the [roadmap](#roadmap) for what is coming, and the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) for the full taxonomy.
 
 ### What data is sent to Language Model providers?
 
-The scan uses an LLM in two roles: to **generate** adversarial probes and to **judge** your agent's answers. These models receive your agent's description and the responses it produces during the scan. They never receive anything you do not pass to the agent. You choose the provider and model (see [Before starting](#before-starting)).
+The scan uses an LLM both to **generate** adversarial scenarios and to **judge** your agent's answers. These models receive your agent's description and the responses it produces during the scan. They never receive anything you do not pass to the agent. You choose the provider and model (see [Before starting](#before-starting)).
 
 ### Will the scan work in any language?
 
-Yes. Pass the languages your agent is expected to handle through the `languages` argument (BCP-47 codes such as `"en"`, `"fr"`, or `"es"`), and the probes will be generated in those languages.
+Yes. Pass the languages your agent is expected to handle through the `languages` argument (BCP-47 codes such as `"en"`, `"fr"`, or `"es"`), and the scenarios will be generated in those languages. Since generation is handled by the LLM you configure, pick a model with strong support for your target languages for the best results.
 
 ## Before starting
 
-Install the scan and choose the model that will generate and judge the probes. `giskard-scan` pulls in the rest of the library, so you only add the extra for the provider you use. Pick yours below:
+Install the scan and choose the model that will generate and judge the scenarios. `giskard-scan` pulls in the rest of the library, so you only add the extra for the provider you use. Pick yours below:
 
 <Tabs>
 <TabItem label="OpenAI">
@@ -127,11 +116,11 @@ For example `mistral/mistral-large-latest`, `bedrock/anthropic.claude-3-sonnet-2
 </TabItem>
 </Tabs>
 
-`set_default_generator` makes your chosen model the default for every probe and judge in the scan.
+`set_default_generator` makes your chosen model the default used to generate and judge every scenario in the scan.
 
 ## Step 1: Wrap your model
 
-The scan needs a single entry point to talk to your agent: an **async function** that takes a typed input and returns a typed output. Both types are [Pydantic](https://docs.pydantic.dev/) models, which makes the contract explicit and validated.
+The scan talks to your agent through a single entry point, an **async function** that takes a typed input and returns a typed output. Both types are [Pydantic](https://docs.pydantic.dev/) models, which makes the contract explicit and validated.
 
 ```python
 from pydantic import BaseModel
@@ -153,40 +142,36 @@ async def my_agent(inputs: AgentInput) -> AgentOutput:
 
 This is the only glue you need. Anything callable from Python (a RAG pipeline, an agent, or a remote API) can be wrapped this way.
 
-:::tip
-The scan sends many probes, some of them deliberately adversarial. Your target function should **never raise**: a single unhandled exception can interrupt the run. Catch errors inside your function, return a safe fallback output, and cap how much work a single call can do.
-:::
-
 ## Step 2: Scan your model
 
-Describe your agent, generate a suite of probes, then run it against your wrapped model:
+Describe your agent, generate a suite of scenarios, then run it against your wrapped model:
 
 ```python
 from giskard.scan import generate_suite
 
-# Generate adversarial probes from a plain-language description
+# Generate adversarial scenarios from a plain-language description
 suite = await generate_suite(
     description="A Q&A agent that answers questions about our product.",
     languages=["en"],
 )
 
-# Run every probe against your agent
+# Run every scenario against your agent
 suite_result = await suite.run(target=my_agent)
 
 suite_result  # display the report in your notebook
 ```
 
-While the suite runs, Giskard shows live progress for each probe, with a running tally of how many passed and failed:
+While the suite runs, Giskard shows live progress for each scenario, with a running tally of how many passed and failed:
 
-![Giskard scan running: a progress bar over the scenarios with per-probe rows and a passed and failed count](/_static/images/oss/solutions/suite-run-progress.png)
+![Giskard scan running, with a progress bar over the scenarios, per-scenario rows, and a passed and failed count](/_static/images/oss/solutions/suite-run-progress.png)
 
-The `description` is what the LLM uses to generate **domain-specific** probes, so the more precisely you describe your agent's purpose and boundaries, the more relevant the findings. Outside a notebook, print the report to your console:
+The `description` is what the LLM uses to generate **domain-specific** scenarios, so the more precisely you describe your agent's purpose and boundaries, the more relevant the findings. Outside a notebook, print the report to your console:
 
 ```python
 suite_result.print_report()
 ```
 
-For every failed probe, the report shows the judge's verdict and the full conversation trace that triggered it, so you can see exactly how the agent was pushed off course:
+For every failed scenario, the report shows the judge's verdict and the full conversation trace that triggered it, so you can see exactly how the agent was pushed off course:
 
 ![A failed scan scenario showing the judge's verdict and the multi-turn conversation trace of inputs and outputs](/_static/images/oss/solutions/suite-report-failure.png)
 
@@ -194,7 +179,7 @@ For every failed probe, the report shows the judge's verdict and the full conver
 
 ### Save your suite
 
-Generating probes uses an LLM, so it is good practice to generate the suite once and reuse it. A `Suite` is a Pydantic model, so you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
+Generating scenarios uses an LLM, so it is good practice to generate the suite once and reuse it. A `Suite` is a Pydantic model, so you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
 
 ```python
 from pathlib import Path
@@ -204,7 +189,7 @@ Path("scan_suite.json").write_text(suite.model_dump_json())
 
 ### Run the suite in CI/CD
 
-In your pipeline, load the saved suite and run it against your agent. The probes are not regenerated (only judging calls the LLM, so configure a judge in CI as well). The run returns a result you can export as a JUnit XML report for your CI test dashboard:
+In your pipeline, load the saved suite and run it against your agent. The scenarios are not regenerated (only judging calls the LLM, so configure a judge in CI as well). The run returns a result you can export as a JUnit XML report for your CI test dashboard:
 
 ```python
 from pathlib import Path
@@ -216,9 +201,9 @@ suite_result = await suite.run(target=my_agent)
 suite_result.to_junit_xml("scan_results.xml")
 ```
 
-### Re-run the same probes on another model
+### Re-run the same scenarios on another model
 
-The same `suite` can be pointed at any target. Once you have fixed an issue or shipped a new version, run the exact same probes against the new agent to confirm the vulnerabilities are gone and that nothing regressed:
+The same `suite` can be pointed at any target. Once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm the vulnerabilities are gone and that nothing regressed:
 
 ```python
 suite_result = await suite.run(target=my_other_agent)
@@ -228,9 +213,9 @@ suite_result = await suite.run(target=my_other_agent)
 
 You can customize the scan by passing options to `generate_suite` and `suite.run`.
 
-### Run only specific probes
+### Run only specific scenarios
 
-By default the scan runs every registered probe. To focus on a single class of vulnerability, pass the generators you want:
+By default the scan runs all of its built-in scenarios. To focus on a single class of vulnerability, pass the generators you want:
 
 ```python
 from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
@@ -242,9 +227,9 @@ suite = await generate_suite(
 )
 ```
 
-### Configure a probe
+### Configure a scenario generator
 
-Some probes accept parameters. For example, the multi-turn jailbreak probe lets you set how many attacker turns it is allowed to take:
+Some scenario generators accept parameters. For example, the multi-turn jailbreak generator lets you set how many attacker turns it is allowed to take:
 
 ```python
 from giskard.scan import generate_suite, GOATAttackScenarioGenerator
@@ -258,7 +243,7 @@ suite = await generate_suite(
 
 ### Make the scan faster
 
-Cap the total number of probes with `max_scenarios`, and run them concurrently with `parallel` and `max_concurrency`:
+Cap the total number of scenarios with `max_scenarios`, and run them concurrently with `parallel` and `max_concurrency`:
 
 ```python
 suite = await generate_suite(
@@ -276,7 +261,7 @@ suite_result = await suite.run(
 
 ### Build a broader suite with a coding agent
 
-`generate_suite` assembles a suite from the built-in probes. To go further, the [Scenario Generator skill](/oss/agent-skills#scenario-generator-) turns your coding agent into a red-teamer: describe your agent and the failure modes you care about, and it writes or extends a runnable suite with adversarial scenarios and layered checks tailored to your case, which you then run with `suite.run(...)` exactly as above.
+The method `scan.generate_suite` assembles a suite from the built-in scenarios. To go further, the [Scenario Generator skill](/oss/agent-skills#scenario-generator-) turns your coding agent into a red-teamer. Describe your agent and the failure modes you care about, and it writes or extends a runnable suite with adversarial scenarios and layered checks tailored to your case, which you then run with `suite.run(...)` exactly as above.
 
 ```bash
 npx skills add Giskard-AI/giskard-skills --skill scenario-generator
@@ -285,19 +270,13 @@ npx skills add Giskard-AI/giskard-skills --skill scenario-generator
 For example, prompt your agent with _"red-team my support bot for PII leaks and competitor mentions"_. Browse the full set at [Giskard Skills](https://github.com/Giskard-AI/giskard-skills).
 
 :::note
-Beyond the built-in probes, you can write your own evaluation logic with custom LLM-as-a-judge checks. See [Giskard Checks](/oss/checks) for building bespoke test suites.
+Beyond the built-in scenarios, you can write your own evaluation logic with custom LLM-as-a-judge checks. See [Giskard Checks](/oss/checks) for building bespoke test suites.
 :::
 
 ## Roadmap
 
-The scan is under active development. Today it covers the categories marked available in the table above, and the remaining ones are being migrated to v3 next, so coverage keeps growing without any change to the workflow on this page.
-
-Our direction is to make `giskard.scan` the single entry point for red teaming in the open-source library, with broader vulnerability coverage and richer multi-turn attacks, and to bring the same product-first approach to RAG and agent evaluation. As new probes land, the `generate_suite` and `suite.run` calls you already wrote pick them up automatically.
+Our direction is to make `giskard.scan` the single entry point for red teaming in the open-source library. We are continuously expanding the attack library with new vulnerability categories and richer multi-turn attacks, and extending the same product-first approach to RAG and agent evaluation. Everything on this page keeps working unchanged as that coverage grows, since new scenarios are picked up automatically by the `generate_suite` and `suite.run` calls you already wrote.
 
 ## Troubleshooting
 
-If a scan stops early with an exception, the target function most likely raised instead of returning. The scan sends many probes, including malformed and adversarial ones, so your function needs to handle anything it receives: wrap your agent call in `try`/`except` and return a fallback output rather than letting the exception propagate. Passing `return_exception=True` to `suite.run` adds a safety net so that a single exception does not abort the entire run.
-
-If a probe seems to loop or run for a very long time, cap the work each call can do, for example by limiting the number of internal model requests or tool calls your agent makes. Setting `max_scenarios` also keeps the overall run bounded.
-
-And if the probes have no model to generate scenarios or judge answers, you have most likely not configured a judge yet. Call `set_default_generator(...)` before you generate or run the suite.
+If you encounter any issues, join our [Discord community](https://discord.com/invite/ABvfpbu69R) and ask in the #general channel.
