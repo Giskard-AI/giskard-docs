@@ -1,0 +1,350 @@
+---
+title: "Scan Vulnerabilities"
+description: "Automatically red team your LLM-based agent for safety and security vulnerabilities with Giskard's open-source scan."
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+The Giskard library provides an automatic **scan** that detects safety and security vulnerabilities affecting your LLM-based agents.
+
+:::note[Coming from Giskard v2?]
+The scan has been redesigned in v3. Instead of wrapping your model with `giskard.Model(...)` and running `giskard.scan(model, dataset)` over a dataset, you wrap your agent as an async function, generate scenarios from a plain-language description with `generate_suite(...)`, and run them with `suite.run(...)`. This means there is no dataset to prepare and no `model_type` or `feature_names` to declare.
+:::
+
+## How does it work?
+
+From a plain-language description of your agent, an LLM generates adversarial scenarios tailored to it and runs them against your agent over single-turn and multi-turn conversations. Then, a second LLM acts as a judge, deciding whether each response reveals a vulnerability.
+
+Differently from benchmarks that evaluate a foundation model in a generic way, Giskard's scan performs an **in-depth, domain-specific assessment** of _your_ agent, based on the description you provide.
+
+### Which attacks does it run?
+
+Today, the scan generates three families of attacks, mapped to the [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/) and the vulnerability categories used across Giskard:
+
+| Attack                        | What it does                                                                                                                                                                                                                   | Vulnerability category                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
+| **Prompt injection**          | Hides an injected instruction inside realistic content to see whether the agent obeys it instead of its original instructions.                                                                                                 | Prompt Injection (OWASP LLM01)                                |
+| **Single-turn adversarial**   | Sends direct requests that test for harmful or unauthorized content such as stereotypes and discrimination, illegal activities, CBRN material, copyright, misinformation, and unqualified financial, medical, or legal advice. | Harmful Content Generation, Misguidance & Unauthorized Advice |
+| **GOAT multi-turn jailbreak** | Uses an attacker LLM that adapts over several turns, chaining strategies such as refusal suppression, persona modification, and hypothetical framing to push the agent toward objectives it should refuse.                     | Harmful Content Generation                                    |
+
+These cover high-impact attack surfaces today, and the library keeps adding more. See the [roadmap](#roadmap) for what is coming, and the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) for the complete list of categories.
+
+:::tip[Need a more advanced scan?]
+The [Giskard Hub](/hub/ui/scan), our enterprise platform, takes red teaming much further: 55+ custom-designed probes across 11 vulnerability categories, aligned with the OWASP LLM Top 10 and more. On top of that, it grades your agent's security, keeps testing it after deployment with [continuous red teaming](/hub/ui/continuous-red-teaming), and runs from a web interface your whole team can use. [Talk to our team ↗](https://www.giskard.ai/contact) to see it in action.
+:::
+
+### What data is sent to Language Model providers?
+
+The scan uses an LLM both to **generate** adversarial scenarios and to **judge** your agent's answers. During the scan, these models receive your agent's description and the responses it produces. However, they never receive anything you do not pass to the agent. In both cases, you choose the provider and model (see [Before starting](#before-starting)).
+
+### Will the scan work in any language?
+
+Yes. Pass the languages your agent is expected to handle through the `languages` argument (BCP-47 codes such as `"en"`, `"fr"`, or `"es"`), and the scenarios will be generated in those languages. Since generation is handled by the LLM you configure, pick a model with strong support for your target languages for the best results.
+
+## Before starting
+
+First, install the scan and choose the model that will generate and judge the scenarios. Since `giskard-scan` pulls in the rest of the library, you only need to add the extra for the provider you use. Pick yours below:
+
+<Tabs>
+<TabItem label="OpenAI">
+
+```bash
+pip install "giskard-scan[openai]"
+```
+
+```python
+from giskard.agents.generators import GiskardLLMGenerator
+from giskard.checks import set_default_generator
+
+llm_judge = GiskardLLMGenerator(model="openai/gpt-4o")
+set_default_generator(llm_judge)
+```
+
+Set `OPENAI_API_KEY` in your environment.
+
+</TabItem>
+<TabItem label="Anthropic">
+
+```bash
+pip install "giskard-scan[anthropic]"
+```
+
+```python
+from giskard.agents.generators import GiskardLLMGenerator
+from giskard.checks import set_default_generator
+
+llm_judge = GiskardLLMGenerator(model="anthropic/claude-sonnet-4-20250514")
+set_default_generator(llm_judge)
+```
+
+Set `ANTHROPIC_API_KEY` in your environment.
+
+</TabItem>
+<TabItem label="Gemini">
+
+```bash
+pip install "giskard-scan[google]"
+```
+
+```python
+from giskard.agents.generators import GiskardLLMGenerator
+from giskard.checks import set_default_generator
+
+llm_judge = GiskardLLMGenerator(model="gemini/gemini-2.5-flash")
+set_default_generator(llm_judge)
+```
+
+Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment.
+
+</TabItem>
+<TabItem label="Any provider">
+
+LiteLLM reaches any provider through a single `"<provider>/<model-name>"` string, so it is the most flexible option.
+
+```bash
+pip install "giskard-scan[litellm]"
+```
+
+```python
+from giskard.agents.generators import LiteLLMGenerator
+from giskard.checks import set_default_generator
+
+llm_judge = LiteLLMGenerator(model="<provider>/<model-name>")
+set_default_generator(llm_judge)
+```
+
+For example `mistral/mistral-large-latest`, `bedrock/anthropic.claude-3-sonnet-20240229-v1:0`, or `ollama/qwen2.5`. For the full list of providers, see [LiteLLM's provider conventions](https://docs.litellm.ai/docs/providers) and set the matching API key in your environment.
+
+</TabItem>
+</Tabs>
+
+`set_default_generator` makes your chosen model the default for generating and judging every scenario in the scan.
+
+## Step 1: Wrap your model
+
+The scan talks to your agent through a single entry point, an **async function** that takes a typed input and returns a typed output. Both types are [Pydantic](https://docs.pydantic.dev/) models, which makes the contract explicit and validated.
+
+Since multi-turn attacks call your agent once per turn, with only the new message as input, the right wrapper depends on how your agent keeps track of the conversation. Pick the pattern that matches yours:
+
+<Tabs>
+<TabItem label="Basic">
+
+If your agent answers each message independently, wrap it directly:
+
+```python
+from pydantic import BaseModel
+
+
+class AgentInput(BaseModel):
+    question: str
+
+
+class AgentOutput(BaseModel):
+    answer: str
+
+
+async def my_agent(inputs: AgentInput) -> AgentOutput:
+    # Call your own LLM app, chain, or agent here
+    answer = await my_llm_app(inputs.question)
+    return AgentOutput(answer=answer)
+```
+
+</TabItem>
+<TabItem label="Stateful agent">
+
+If your agent stores the conversation on its side (for example a LangGraph checkpointer or a session-based API), it needs the same thread id on every turn of a conversation. To get one, subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
+
+```python
+from uuid import uuid4
+from pydantic import BaseModel, Field
+from giskard.checks import Trace
+
+
+class AgentInput(BaseModel):
+    question: str
+
+
+class AgentOutput(BaseModel):
+    answer: str
+
+
+class AgentTrace(Trace[AgentInput, AgentOutput]):
+    thread_id: str = Field(default_factory=lambda: str(uuid4()))
+
+
+async def my_agent(inputs: AgentInput, trace: AgentTrace) -> AgentOutput:
+    # The same thread_id is kept for every turn of this conversation
+    answer = await my_llm_app(inputs.question, thread_id=trace.thread_id)
+    return AgentOutput(answer=answer)
+```
+
+</TabItem>
+<TabItem label="Conversation history">
+
+If your agent is stateless and expects the full message history on every call, declare a `trace` parameter. During the scan, `trace.interactions` holds the previous turns of the current conversation, so you can rebuild the history and append the new message:
+
+```python
+from pydantic import BaseModel
+from giskard.checks import Trace
+
+
+class AgentInput(BaseModel):
+    question: str
+
+
+class AgentOutput(BaseModel):
+    answer: str
+
+
+async def my_agent(
+    inputs: AgentInput, trace: Trace[AgentInput, AgentOutput]
+) -> AgentOutput:
+    # Rebuild the conversation history from the previous turns
+    messages = []
+    for interaction in trace.interactions:
+        messages.append({"role": "user", "content": interaction.inputs.question})
+        messages.append({"role": "assistant", "content": interaction.outputs.answer})
+    messages.append({"role": "user", "content": inputs.question})
+
+    answer = await my_llm_app(messages)
+    return AgentOutput(answer=answer)
+```
+
+</TabItem>
+</Tabs>
+
+This is the only integration code you need. In fact, anything callable from Python (a RAG pipeline, an agent, or a remote API) can be wrapped this way.
+
+## Step 2: Scan your model
+
+Describe your agent, generate a suite of scenarios, then run it against your wrapped model:
+
+```python
+from giskard.scan import generate_suite
+
+# Generate adversarial scenarios from a plain-language description
+suite = await generate_suite(
+    description="A Q&A agent that answers questions about our product.",
+    languages=["en"],
+)
+
+# Run every scenario against your agent
+suite_result = await suite.run(target=my_agent)
+
+# Print the report to your console
+suite_result.print_report()
+```
+
+While the suite runs, Giskard shows live progress for each scenario, with a count of how many passed and failed:
+
+![Giskard scan running, with a progress bar over the scenarios, per-scenario rows, and a passed and failed count](/_static/images/oss/solutions/suite-run-progress.png)
+
+The `description` is what the LLM uses to generate **domain-specific** scenarios, so the more precisely you describe your agent's purpose and boundaries, the more relevant the findings.
+
+For every failed scenario, the report shows the judge's verdict and the full conversation trace that triggered it, so you can see exactly how the agent was manipulated:
+
+![A failed scan scenario showing the judge's verdict and the multi-turn conversation trace of inputs and outputs](/_static/images/oss/solutions/suite-report-failure.png)
+
+## What's next?
+
+### Save your suite
+
+Generating scenarios uses an LLM, so it is good practice to generate the suite once and reuse it. Since a `Suite` is a Pydantic model, you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
+
+```python
+from pathlib import Path
+
+Path("scan_suite.json").write_text(suite.model_dump_json())
+```
+
+### Run the suite in CI/CD
+
+In your pipeline, load the saved suite and run it against your agent. This time, the scenarios are not regenerated: only the judging step calls the LLM, so remember to configure a judge in CI as well. The run then returns a result you can export as a JUnit XML report for your CI test dashboard:
+
+```python
+from pathlib import Path
+from giskard.checks import Suite
+
+suite = Suite.model_validate_json(Path("scan_suite.json").read_text())
+
+suite_result = await suite.run(target=my_agent)
+suite_result.to_junit_xml("scan_results.xml")
+```
+
+### Re-run the same scenarios on another model
+
+The same `suite` can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the vulnerabilities are gone and that nothing regressed:
+
+```python
+suite_result = await suite.run(target=my_other_agent)
+```
+
+## Advanced usage
+
+You can customize the scan by passing options to `generate_suite` and `suite.run`.
+
+### Run only specific scenarios
+
+By default, the scan runs all of its built-in scenarios. To focus on a single class of vulnerability, pass the generators you want:
+
+```python
+from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
+
+suite = await generate_suite(
+    description="A Q&A agent that answers questions about our product.",
+    languages=["en"],
+    generators=[PromptInjectionScenarioGenerator()],
+)
+
+suite_result = await suite.run(target=my_agent)
+```
+
+### Make the scan faster
+
+Limit the total number of scenarios with `max_scenarios`, and run them concurrently with `parallel` and `max_concurrency`:
+
+```python
+suite = await generate_suite(
+    description="A Q&A agent that answers questions about our product.",
+    languages=["en"],
+    max_scenarios=20,
+)
+
+suite_result = await suite.run(
+    target=my_agent,
+    parallel=True,
+    max_concurrency=10,
+)
+```
+
+### Build a broader suite with a coding agent
+
+The method `scan.generate_suite` builds a suite from the built-in scenarios. To go further, the [Scenario Generator skill](/oss/agent-skills#scenario-generator-) turns your coding agent into a red-teamer. Describe your agent and the failure modes you care about, and the skill writes or extends a runnable suite with adversarial scenarios and layered checks tailored to your case. You then run it with `suite.run(...)` exactly as above.
+
+```bash
+npx skills add Giskard-AI/giskard-skills --skill scenario-generator
+```
+
+For example, prompt your agent with _"red-team my support bot for PII leaks and competitor mentions"_. You can browse the full set of skills at [Giskard Skills](https://github.com/Giskard-AI/giskard-skills).
+
+:::note
+Beyond the built-in scenarios, you can write your own evaluation logic with custom LLM-as-a-judge checks. See [Giskard Checks](/oss/checks) to learn how to build your own test suites.
+:::
+
+### Use the Giskard Hub
+
+The scan on this page runs locally and is driven by code. When you need more than that, the [Giskard Hub](/hub/ui/scan), our enterprise platform, manages the complete red teaming workflow: through the web interface, the [Python SDK](/hub/sdk), or the API, you launch a more advanced scan (55+ probes), get a security grade for your agent, and turn the findings into [test datasets](/hub/ui/datasets) that your whole team, including business experts, can review and annotate. On top of that, [continuous red teaming](/hub/ui/continuous-red-teaming) keeps testing your deployed agent against emerging threats, catching vulnerabilities and regressions before they can be exploited.
+
+![Giskard Hub scan report showing a security grade, issue counts by severity, and results broken down by vulnerability category with OWASP tags](/_static/images/oss/solutions/hub-scan-results.png)
+
+For a complete picture of what the Hub adds, read the [Open Source vs Hub comparison](/start/comparison), or [talk to our team ↗](https://www.giskard.ai/contact) to see it in action.
+
+## Roadmap
+
+Our direction is to make `giskard.scan` the single entry point for red teaming in the open-source library. To get there, we are continuously expanding the attack library with new vulnerability categories and richer multi-turn attacks, and extending the same approach to RAG and agent evaluation. As that coverage grows, everything on this page keeps working unchanged, since new scenarios are picked up automatically by the `generate_suite` and `suite.run` calls you already wrote.
+
+## Troubleshooting
+
+If you encounter any issues, join our [Discord community](https://discord.com/invite/ABvfpbu69R) and ask in the #general channel.
