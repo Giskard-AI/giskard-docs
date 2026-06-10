@@ -162,7 +162,8 @@ suite = await generate_suite(
 # Run every scenario against your agent
 suite_result = await suite.run(target=my_agent)
 
-suite_result  # display the report in your notebook
+# Print the report to your console
+suite_result.print_report()
 ```
 
 While the suite runs, Giskard shows live progress for each scenario, with a count of how many passed and failed:
@@ -170,12 +171,6 @@ While the suite runs, Giskard shows live progress for each scenario, with a coun
 ![Giskard scan running, with a progress bar over the scenarios, per-scenario rows, and a passed and failed count](/_static/images/oss/solutions/suite-run-progress.png)
 
 The `description` is what the LLM uses to generate **domain-specific** scenarios, so the more precisely you describe your agent's purpose and boundaries, the more relevant the findings.
-
-If you are not working in a notebook, you can print the report to your console:
-
-```python
-suite_result.print_report()
-```
 
 For every failed scenario, the report shows the judge's verdict and the full conversation trace that triggered it, so you can see exactly how the agent was manipulated:
 
