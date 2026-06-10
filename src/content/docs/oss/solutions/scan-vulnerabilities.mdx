@@ -126,6 +126,13 @@ For example `mistral/mistral-large-latest`, `bedrock/anthropic.claude-3-sonnet-2
 
 The scan talks to your agent through a single entry point, an **async function** that takes a typed input and returns a typed output. Both types are [Pydantic](https://docs.pydantic.dev/) models, which makes the contract explicit and validated.
 
+Since multi-turn attacks call your agent once per turn, with only the new message as input, the right wrapper depends on how your agent keeps track of the conversation. Pick the pattern that matches yours:
+
+<Tabs>
+<TabItem label="Basic">
+
+If your agent answers each message independently, wrap it directly:
+
 ```python
 from pydantic import BaseModel
 
@@ -143,6 +150,70 @@ async def my_agent(inputs: AgentInput) -> AgentOutput:
     answer = await my_llm_app(inputs.question)
     return AgentOutput(answer=answer)
 ```
+
+</TabItem>
+<TabItem label="Stateful agent">
+
+If your agent stores the conversation on its side (for example a LangGraph checkpointer or a session-based API), it needs the same thread id on every turn of a conversation. To get one, subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
+
+```python
+from uuid import uuid4
+from pydantic import BaseModel, Field
+from giskard.checks import Trace
+
+
+class AgentInput(BaseModel):
+    question: str
+
+
+class AgentOutput(BaseModel):
+    answer: str
+
+
+class AgentTrace(Trace[AgentInput, AgentOutput]):
+    thread_id: str = Field(default_factory=lambda: str(uuid4()))
+
+
+async def my_agent(inputs: AgentInput, trace: AgentTrace) -> AgentOutput:
+    # The same thread_id is kept for every turn of this conversation
+    answer = await my_llm_app(inputs.question, thread_id=trace.thread_id)
+    return AgentOutput(answer=answer)
+```
+
+</TabItem>
+<TabItem label="Conversation history">
+
+If your agent is stateless and expects the full message history on every call, declare a `trace` parameter. During the scan, `trace.interactions` holds the previous turns of the current conversation, so you can rebuild the history and append the new message:
+
+```python
+from pydantic import BaseModel
+from giskard.checks import Trace
+
+
+class AgentInput(BaseModel):
+    question: str
+
+
+class AgentOutput(BaseModel):
+    answer: str
+
+
+async def my_agent(
+    inputs: AgentInput, trace: Trace[AgentInput, AgentOutput]
+) -> AgentOutput:
+    # Rebuild the conversation history from the previous turns
+    messages = []
+    for interaction in trace.interactions:
+        messages.append({"role": "user", "content": interaction.inputs.question})
+        messages.append({"role": "assistant", "content": interaction.outputs.answer})
+    messages.append({"role": "user", "content": inputs.question})
+
+    answer = await my_llm_app(messages)
+    return AgentOutput(answer=answer)
+```
+
+</TabItem>
+</Tabs>
 
 This is the only integration code you need. In fact, anything callable from Python (a RAG pipeline, an agent, or a remote API) can be wrapped this way.
 
