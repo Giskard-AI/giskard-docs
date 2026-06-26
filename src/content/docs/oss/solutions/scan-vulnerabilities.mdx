@@ -219,22 +219,16 @@ This is the only integration code you need. In fact, anything callable from Pyth
 
 ## Step 2: Scan your model
 
-Describe your agent, generate a suite of scenarios, then run it against your wrapped model:
+Pass your wrapped agent, a plain-language description, and the languages it handles to `vulnerability_scan`. It generates the adversarial suite, runs every scenario, prints a grouped report, and returns the result:
 
 ```python
-from giskard.scan import generate_suite
+from giskard.scan import vulnerability_scan
 
-# Generate adversarial scenarios from a plain-language description
-suite = await generate_suite(
+suite_result = await vulnerability_scan(
+    target=my_agent,
     description="A Q&A agent that answers questions about our product.",
     languages=["en"],
 )
-
-# Run every scenario against your agent
-suite_result = await suite.run(target=my_agent)
-
-# Print the report to your console
-suite_result.print_report()
 ```
 
 While the suite runs, Giskard shows live progress for each scenario, with a count of how many passed and failed:
@@ -251,12 +245,12 @@ For every failed scenario, the report shows the judge's verdict and the full con
 
 ### Save your suite
 
-Generating scenarios uses an LLM, so it is good practice to generate the suite once and reuse it. Since a `Suite` is a Pydantic model, you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
+Generating scenarios uses an LLM, so it is good practice to generate the suite once and reuse it. The result exposes the suite that produced it via `suite_result.suite`. Since `Suite` is a Pydantic model, you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
 
 ```python
 from pathlib import Path
 
-Path("scan_suite.json").write_text(suite.model_dump_json())
+Path("scan_suite.json").write_text(suite_result.suite.model_dump_json())
 ```
 
 ### Run the suite in CI/CD
@@ -275,7 +269,7 @@ suite_result.to_junit_xml("scan_results.xml")
 
 ### Re-run the same scenarios on another model
 
-The same `suite` can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the vulnerabilities are gone and that nothing regressed:
+The saved suite can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the vulnerabilities are gone and that nothing regressed:
 
 ```python
 suite_result = await suite.run(target=my_other_agent)
@@ -283,11 +277,11 @@ suite_result = await suite.run(target=my_other_agent)
 
 ## Advanced usage
 
-You can customize the scan by passing options to `generate_suite` and `suite.run`.
+You can customize the scan by passing options directly to `vulnerability_scan`.
 
 ### Run only specific scenarios
 
-By default, the scan runs all of its built-in scenarios. To focus on a single class of vulnerability, pass the generators you want:
+By default, the scan runs all of its built-in generators. To focus on a single class of vulnerability, pass the generators you want via the lower-level `generate_suite` API:
 
 ```python
 from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
@@ -303,18 +297,14 @@ suite_result = await suite.run(target=my_agent)
 
 ### Make the scan faster
 
-Limit the total number of scenarios with `max_scenarios`, and run them concurrently with `parallel` and `max_concurrency`:
+Limit the total number of scenarios with `max_scenarios`, and cap concurrent execution with `max_concurrency`:
 
 ```python
-suite = await generate_suite(
+suite_result = await vulnerability_scan(
+    target=my_agent,
     description="A Q&A agent that answers questions about our product.",
     languages=["en"],
     max_scenarios=20,
-)
-
-suite_result = await suite.run(
-    target=my_agent,
-    parallel=True,
     max_concurrency=10,
 )
 ```
@@ -343,7 +333,7 @@ For a complete picture of what the Hub adds, read the [Open Source vs Hub compar
 
 ## Roadmap
 
-Our direction is to make `giskard.scan` the single entry point for red teaming in the open-source library. To get there, we are continuously expanding the attack library with new vulnerability categories and richer multi-turn attacks, and extending the same approach to RAG and agent evaluation. As that coverage grows, everything on this page keeps working unchanged, since new scenarios are picked up automatically by the `generate_suite` and `suite.run` calls you already wrote.
+Our direction is to make `giskard.scan` the single entry point for red teaming in the open-source library. To get there, we are continuously expanding the attack library with new vulnerability categories and richer multi-turn attacks, and extending the same approach to RAG and agent evaluation. As that coverage grows, everything on this page keeps working unchanged, since new scenarios are picked up automatically by the `vulnerability_scan` call you already wrote.
 
 ## Troubleshooting
 
