@@ -1,6 +1,11 @@
 /* Custom CSS for Giskard Docs */
 @import "tailwindcss";
 
+.sl-markdown-content :is(ol, ul) {
+  list-style: revert;
+  padding-inline-start: 1.25rem;
+}
+
 @theme {
   --color-giskard-light-bg: #FFFFFF;
   --color-giskard-light-text: #0F1729;
