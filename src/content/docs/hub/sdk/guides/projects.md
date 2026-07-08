@@ -72,7 +72,7 @@ preview = hub.projects.scenarios.preview(
     description="The user is frustrated and demands an immediate refund for a defective product.",
 )
 
-print(preview.conversation)
+print(preview.inputs)
 ```
 
 ### List and manage scenarios

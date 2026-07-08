@@ -65,11 +65,13 @@ Before running an evaluation, verify your agent endpoint is reachable and respon
 
 ```python
 ping = hub.agents.test_connection(
+    project_id="project-id",
+    agent_id="agent-id",
     url="https://your-app.example.com/api/chat",
     headers={"Authorization": "Bearer <token>"},
 )
 
-print(ping.response)
+print(ping["response"])
 ```
 
 ### Generate a completion
@@ -77,15 +79,17 @@ print(ping.response)
 You can invoke a registered agent directly from the SDK without running a full evaluation:
 
 ```python
-output = hub.agents.generate_completion(
+response = hub.agents.generate_completion(
     "agent-id",
-    messages=[
-        {"role": "user", "content": "What is the capital of France?"},
-    ],
+    input={
+        "messages": [
+            {"role": "user", "content": "What is the capital of France?"},
+        ]
+    }
 )
 
-print(output.response)
-print(output.metadata)  # any metadata returned by your agent
+print(response.output["response"])
+print(response.output["metadata"])  # any metadata returned by your agent
 ```
 
 ### Auto-generate a description
