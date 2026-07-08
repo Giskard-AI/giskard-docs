@@ -1,7 +1,7 @@
 /* Custom CSS for Giskard Docs */
 @import "tailwindcss";
 
-.sl-markdown-content :is(ol, ul) {
+.sl-markdown-content :is(ol, ul):not(.contains-task-list):not([role="tablist"]):not(.sl-steps):not(starlight-file-tree *) {
   list-style: revert;
   padding-inline-start: 1.25rem;
 }
