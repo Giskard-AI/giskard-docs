@@ -270,12 +270,14 @@ from giskard_hub.types import ChatMessage
 
 results = hub.evaluations.run_single(
     project_id="project-id",
+    input_data={
+        "messages": [{"role": "user", "content": "What is your return policy?"}]
+    },
     agent_output={
         "response": ChatMessage(
             role="assistant", content="You can return anything within 30 days."
         )
     },
-    messages=[{"role": "user", "content": "What is your return policy?"}],
     checks=[
         {"identifier": "tone_professional"},
     ],
