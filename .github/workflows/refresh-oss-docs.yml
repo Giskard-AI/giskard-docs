@@ -1,0 +1,126 @@
+name: Refresh OSS docs
+
+# Detects when the giskard-checks public API has drifted from what the docs
+# describe, and reports it. The heavy lifting (editing pages, opening the PR) is
+# done by the `refresh-oss-docs` skill, which a human or an agent runs; this
+# workflow is the tripwire that says "the docs are now stale".
+
+on:
+  schedule:
+    # Weekly, Monday 06:00 UTC. The check is cheap and exits early when the API
+    # has not moved, so a tighter cadence buys nothing.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "giskard-oss ref to check against (branch, tag or SHA)"
+        required: false
+        default: "main"
+
+permissions: {}
+
+concurrency:
+  group: refresh-oss-docs
+  cancel-in-progress: true
+
+jobs:
+  detect-drift:
+    name: Detect API drift
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Checkout giskard-oss
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: Giskard-AI/giskard-oss
+          ref: ${{ inputs.ref || 'main' }}
+          path: .giskard-oss
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+        with:
+          python-version: "3.13"
+
+      - name: Snapshot the target API
+        run: |
+          uv venv .venv-target
+          VIRTUAL_ENV="$PWD/.venv-target" uv pip install ./.giskard-oss/libs/giskard-checks
+          ./.venv-target/bin/python scripts/snapshot-api.py giskard.checks \
+            --distribution giskard-checks \
+            --ref "$(git -C .giskard-oss rev-parse --short HEAD)" \
+            -o new-snapshot.json
+
+      - name: Diff against the committed baseline
+        id: diff
+        run: |
+          # diff-api.py exits 0 when nothing changed, 1 when it did.
+          if python3 scripts/diff-api.py \
+              docs/api-baseline/giskard-checks.json new-snapshot.json \
+              -o delta.json 2> summary.txt; then
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+          fi
+          cat summary.txt
+
+      - name: Triage affected pages
+        if: steps.diff.outputs.drift == 'true'
+        run: |
+          python3 scripts/triage-docs.py delta.json -o work-order.json 2> triage.txt
+          cat triage.txt
+
+      - name: Upload the delta
+        if: steps.diff.outputs.drift == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: api-drift
+          path: |
+            new-snapshot.json
+            delta.json
+            work-order.json
+
+      - name: Open or update the drift issue
+        if: steps.diff.outputs.drift == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REF: ${{ inputs.ref || 'main' }}
+        run: |
+          {
+            echo "The \`giskard-checks\` public API has drifted from what the docs describe."
+            echo
+            echo "**Ref checked:** \`$REF\`"
+            echo
+            echo '```'
+            cat summary.txt triage.txt
+            echo '```'
+            echo
+            echo "Run the \`refresh-oss-docs\` skill to update the docs and open a PR:"
+            echo
+            echo '```'
+            echo "/refresh-oss-docs $REF"
+            echo '```'
+            echo
+            echo "The full delta and work order are attached to [this run]"\
+                 "(${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})."
+          } > body.md
+
+          existing=$(gh issue list --state open --label docs-drift \
+            --json number --jq '.[0].number // empty')
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file body.md
+          else
+            gh issue create \
+              --title "docs: giskard-checks API has drifted from the docs" \
+              --label docs-drift \
+              --body-file body.md
+          fi
