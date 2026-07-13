@@ -12,6 +12,13 @@ import TypeTable from "../../../../../components/api/TypeTable.astro";
 
 Ready-to-use validation checks for common testing scenarios, including function-based checks, string matching, comparisons, policy evaluation, check composition, JSON validation, and LLM-powered semantic validation.
 
+:::note[The `MISSING` sentinel]
+Optional parameters that may legitimately be set to `None` default to the `MISSING`
+sentinel rather than `None`. This lets a check distinguish "not provided" from
+"explicitly provided as `None`". You never need to pass `MISSING` yourself — just
+omit the parameter.
+:::
+
 ---
 
 ## Function-based Checks
@@ -74,17 +81,25 @@ check = FnCheck(fn=validate_response, name="async_validation")
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="keyword" type="str | None">
+<Property name="keyword" type="str | MISSING" defaultValue="MISSING">
   Substring to search for (or use `keyword_key` to extract from trace).
 </Property>
-<Property name="keyword_key" type="str | None">
+<Property name="keyword_key" type="str | MISSING" defaultValue="MISSING">
   JSONPath to extract keyword from trace.
 </Property>
-<Property name="text" type="str | None">JSONPath-resolved text to search in. If unset, falls back to `text_key`.</Property>
+<Property name="text" type="str | MISSING" defaultValue="MISSING">
+  JSONPath-resolved text to search in. If unset, falls back to `text_key`.
+</Property>
 <Property name="text_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to search in.
 </Property>
-<Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>Unicode normalization applied before matching.</Property>
+<Property
+  name="normalization_form"
+  type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None'
+  defaultValue='"NFKC"'
+>
+  Unicode normalization applied before matching.
+</Property>
 <Property name="case_sensitive" type="bool" defaultValue="True">
   Whether matching is case-sensitive.
 </Property>
@@ -108,15 +123,20 @@ check = StringMatching(
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="pattern" type="str | None">
+<Property name="pattern" type="str | MISSING" defaultValue="MISSING">
   Regular expression pattern.
 </Property>
-<Property name="pattern_key" type="str | None">JSONPath to extract the regex pattern from the trace. Provide exactly one of `pattern` or `pattern_key`.</Property>
-<Property name="text" type="str | None">JSONPath-resolved text to match against (alternative to `text_key`).</Property>
+<Property name="pattern_key" type="str | MISSING" defaultValue="MISSING">
+  JSONPath to extract the regex pattern from the trace. Provide exactly one of
+  `pattern` or `pattern_key`.
+</Property>
+<Property name="text" type="str | MISSING" defaultValue="MISSING">
+  JSONPath-resolved text to match against (alternative to `text_key`).
+</Property>
 <Property name="text_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to match against.
 </Property>
-<Property name="match_timeout_seconds" type="float" defaultValue="1.0">
+<Property name="match_timeout_seconds" type="float" defaultValue="2.0">
   Upper bound on how long regex matching may take before the check errors.
 </Property>
 
@@ -141,10 +161,14 @@ Validate numeric and comparable values against expected thresholds.
 
 All comparison checks share these parameters:
 
-<Property name="expected_value" type="Any | None">
+<Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
   Static expected value.
 </Property>
-<Property name="expected_value_key" type="JSONPathStr | NotProvided">
+<Property
+  name="expected_value_key"
+  type="JSONPathStr | MISSING"
+  defaultValue="MISSING"
+>
   JSONPath to extract expected value from trace.
 </Property>
 <Property name="key" type="str" required>
@@ -152,6 +176,16 @@ All comparison checks share these parameters:
 </Property>
 <Property name="normalization_form" type="str | None" defaultValue='"NFKC"'>
   Unicode normalization: `"NFC"`, `"NFD"`, `"NFKC"`, `"NFKD"`.
+</Property>
+<Property
+  name="match"
+  type='Literal["any", "all", "none"] | MISSING'
+  defaultValue="MISSING"
+>
+  How to apply the comparison when the resolved actual value is a collection.
+  When omitted, the resolved value is compared directly. `"any"` passes if at
+  least one item matches, `"all"` if every item matches, `"none"` if no item
+  matches. Requires a list, set, or tuple.
 </Property>
 
 Provide exactly one of `expected_value` or `expected_value_key`.
@@ -194,16 +228,21 @@ check = GreaterThan(
 check = GreaterEquals(expected_value=100, key="trace.last.outputs.user_count")
 ```
 
-### `LesserThan` / `LesserThanEquals`
+### `LessThan` / `LessThanEquals`
 
 ```python
-from giskard.checks import LesserThan, LesserThanEquals
+from giskard.checks import LessThan, LessThanEquals
 
-check = LesserThan(expected_value=500, key="trace.last.metadata.latency_ms")
-check = LesserThanEquals(
+check = LessThan(expected_value=500, key="trace.last.metadata.latency_ms")
+check = LessThanEquals(
     expected_value=1000, key="trace.last.metadata.token_count"
 )
 ```
+
+### `LesserThan` / `LesserThanEquals` (deprecated)
+
+Deprecated aliases for `LessThan` and `LessThanEquals`. They remain importable and
+behave identically; use the correctly-spelled names in new code.
 
 ---
 
@@ -211,14 +250,24 @@ check = LesserThanEquals(
 
 ### `JsonValid`
 
-<ResourceSection description="Check that a trace value is valid JSON. Accepts a JSON string or an already-parsed JSON-compatible value (dict, list, string, number, boolean, or None). Optionally validates against a JSON Schema.">
+<ResourceSection description="Check that a trace value is valid JSON. Optionally validates against a JSON Schema.">
 
 **Module:** `giskard.checks.builtin.json_valid`
 
 <Property name="key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath expression to extract the value to validate.
 </Property>
-<Property name="expected_schema" type="dict[str, Any] | None" defaultValue="None">
+<Property name="parse" type="bool" defaultValue="True">
+  When `True` (default), the extracted value must be a serialized JSON string,
+  parsed with `json.loads` before validation. When `False`, the value is treated
+  as an already-parsed JSON value (dict, list, string, number, boolean, or
+  `None`) and only checked for JSON serializability and schema conformance.
+</Property>
+<Property
+  name="expected_schema"
+  type="dict[str, Any] | None"
+  defaultValue="None"
+>
   Optional JSON Schema for the parsed value. Serialized as `schema` in JSON.
 </Property>
 
@@ -227,6 +276,9 @@ from giskard.checks import JsonValid
 
 check = JsonValid(key="trace.last.outputs")
 
+# Value is already a parsed object, not a JSON string
+check = JsonValid(key="trace.last.outputs", parse=False)
+
 check = JsonValid(
     key="trace.last.outputs",
     expected_schema={
@@ -234,6 +286,51 @@ check = JsonValid(
         "required": ["answer"],
         "properties": {"answer": {"type": "string"}},
     },
+)
+```
+
+</ResourceSection>
+
+---
+
+## Readability
+
+### `Readability`
+
+<ResourceSection description="Check that validates the readability of output text. Extracts a string from the trace, computes a readability score with textstat, and optionally validates that score against configured minimum and maximum thresholds.">
+
+**Module:** `giskard.checks.builtin.nlp_metrics`
+
+:::note[Optional dependency]
+Requires the `readability` extra: `pip install 'giskard-checks[readability]'`.
+:::
+
+<Property name="key" type="str" defaultValue='"trace.last.outputs"'>
+  JSONPath expression to extract the text to score.
+</Property>
+<Property
+  name="metric"
+  type='Literal["flesch_reading_ease", "flesch_kincaid_grade", "gunning_fog", "automated_readability_index", "coleman_liau_index", "dale_chall_readability_score"]'
+  defaultValue='"flesch_reading_ease"'
+>
+  Readability metric to compute.
+</Property>
+<Property name="min_score" type="float | None" defaultValue="None">
+  Optional lower bound on the score.
+</Property>
+<Property name="max_score" type="float | None" defaultValue="None">
+  Optional upper bound on the score.
+</Property>
+
+```python
+from giskard.checks import Readability
+
+check = Readability(min_score=60.0)
+
+check = Readability(
+    metric="flesch_kincaid_grade",
+    key="trace.last.outputs",
+    max_score=8.0,
 )
 ```
 
@@ -257,13 +354,15 @@ Requires the `regorus` extra: `pip install 'giskard-checks[regorus]'` (installs 
   Inline Rego source loaded into the engine.
 </Property>
 <Property name="rule" type="str" required>
-  Fully qualified boolean rule path (e.g. `data.giskard.allow`). Must evaluate to a boolean, be undefined (fail), or error on other types.
+  Fully qualified boolean rule path (e.g. `data.giskard.allow`). Must evaluate
+  to a boolean, be undefined (fail), or error on other types.
 </Property>
 <Property name="key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath into the trace for the JSON value exposed to the policy as `input`.
 </Property>
 <Property name="data" type="dict[str, Any]" defaultValue="{}">
-  Static `data` document merged into the policy engine via `engine.add_data` (separate from `input`).
+  Static `data` document merged into the policy engine via `engine.add_data`
+  (separate from `input`).
 </Property>
 
 ```python
@@ -300,11 +399,11 @@ Combine built-in or custom checks with logical operators. All composition checks
 </Property>
 
 ```python
-from giskard.checks import AllOf, LesserThan, Equals
+from giskard.checks import AllOf, LessThan, Equals
 
 check = AllOf(
     checks=[
-        LesserThan(expected_value=10, key="trace.last.outputs"),
+        LessThan(expected_value=10, key="trace.last.outputs"),
         Equals(expected_value=5, key="trace.last.outputs"),
     ]
 )
@@ -344,9 +443,7 @@ check = AnyOf(
 ```python
 from giskard.checks import Not, StringMatching
 
-check = Not(
-    check=StringMatching(keyword="forbidden", key="trace.last.outputs")
-)
+check = Not(check=StringMatching(keyword="forbidden", key="trace.last.outputs"))
 ```
 
 </ResourceSection>
@@ -364,7 +461,11 @@ Validation checks powered by Large Language Models for semantic understanding.
 **Module:** `giskard.checks.judges.base`
 
 <TypeTable name="BaseLLMCheck">
-  <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+  <Property
+    name="generator"
+    type="BaseGenerator"
+    defaultValue="get_default_generator()"
+  >
     LLM generator for evaluation. Falls back to the global default if not
     provided.
   </Property>
@@ -444,13 +545,17 @@ Default result model for LLM-based checks. This is the structured output format 
 
 **Module:** `giskard.checks.judges.groundedness`
 
-<Property name="answer" type="str | None">
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
   The answer text to evaluate (static).
 </Property>
 <Property name="answer_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract answer from trace.
 </Property>
-<Property name="context" type="str | list[str] | None">
+<Property
+  name="context"
+  type="str | list[str] | MISSING"
+  defaultValue="MISSING"
+>
   Context document(s) that should support the answer (static).
 </Property>
 <Property
@@ -460,7 +565,11 @@ Default result model for LLM-based checks. This is the structured output format 
 >
   JSONPath to extract context from trace.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
   LLM generator for evaluation.
 </Property>
 
@@ -487,28 +596,86 @@ check = Groundedness(
 
 ---
 
+### `Contradiction`
+
+<ResourceSection description="LLM-based check that fails only on clear contradictions with context. Uses the same inputs as Groundedness but applies a permissive criterion: omissions and unsupported additions are tolerated unless they directly conflict with the reference context.">
+
+**Module:** `giskard.checks.judges.contradiction`
+
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
+  The answer text to evaluate (static).
+</Property>
+<Property name="answer_key" type="str" defaultValue='"trace.last.outputs"'>
+  JSONPath to extract answer from trace.
+</Property>
+<Property
+  name="context"
+  type="str | list[str] | MISSING"
+  defaultValue="MISSING"
+>
+  Reference context document(s) the answer must not contradict (static).
+</Property>
+<Property
+  name="context_key"
+  type="str"
+  defaultValue='"trace.last.metadata.context"'
+>
+  JSONPath to extract context from trace.
+</Property>
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
+  LLM generator for evaluation.
+</Property>
+
+```python
+from giskard.checks import Contradiction
+
+check = Contradiction(
+    context=["Paris is the capital of France."],
+    answer_key="trace.last.outputs",
+)
+```
+
+:::tip[Contradiction vs Groundedness]
+`Groundedness` fails when the answer is not fully supported by the context.
+`Contradiction` only fails when the answer directly conflicts with it — use it
+when extra or omitted detail is acceptable.
+:::
+
+</ResourceSection>
+
+---
+
 ### `AnswerRelevance`
 
 <ResourceSection description="LLM-based check that evaluates whether the model's answer is relevant to the question. Uses conversation history for context but scores only the current turn.">
 
 **Module:** `giskard.checks.judges.answer_relevance`
 
-<Property name="question" type="str | None" defaultValue="None">
+<Property name="question" type="str | MISSING" defaultValue="MISSING">
   Question to evaluate against. Takes priority over `question_key` when set.
 </Property>
 <Property name="question_key" type="str" defaultValue='"trace.last.inputs"'>
   JSONPath to extract the question from the trace.
 </Property>
-<Property name="answer" type="str | None" defaultValue="None">
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
   Answer to evaluate. Takes priority over `answer_key` when set.
 </Property>
 <Property name="answer_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the answer from the trace.
 </Property>
-<Property name="context" type="str | None" defaultValue="None">
-  Optional domain context describing the chatbot's purpose (not extracted from the trace).
+<Property name="context" type="str | MISSING" defaultValue="MISSING">
+  Optional domain context describing the chatbot's purpose (not extracted from
+  the trace).
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
   LLM generator for evaluation (falls back to default).
 </Property>
 
@@ -533,16 +700,24 @@ scenario = (
 
 **Module:** `giskard.checks.judges.toxicity`
 
-<Property name="output" type="str | None" defaultValue="None">
+<Property name="output" type="str | MISSING" defaultValue="MISSING">
   Text to evaluate. If omitted, extracted from the trace using `output_key`.
 </Property>
 <Property name="output_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the output from the trace.
 </Property>
-<Property name="categories" type="list[str]" defaultValue='["hate_speech", "harassment", "threats", "self_harm", "sexual_content", "violence"]'>
+<Property
+  name="categories"
+  type="list[str]"
+  defaultValue='["hate_speech", "harassment", "threats", "self_harm", "sexual_content", "violence"]'
+>
   Toxicity categories to evaluate. Restrict the list to focus the judge.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
   LLM generator for evaluation (falls back to default).
 </Property>
 
@@ -574,7 +749,11 @@ check = Toxicity(
 <Property name="rule" type="str" required>
   The rule statement to evaluate against the trace (literal text).
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
   LLM generator for evaluation (falls back to default).
 </Property>
 
@@ -601,7 +780,11 @@ check = Conformity(rule="The last response should be polite.")
 <Property name="prompt_path" type="str | None">
   Path to a template file (e.g. `"checks::my_template.j2"`).
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
   LLM generator for evaluation.
 </Property>
 
@@ -667,7 +850,7 @@ check = LLMJudge(
 
 **Module:** `giskard.checks.builtin.semantic_similarity`
 
-<Property name="reference_text" type="str | None">
+<Property name="reference_text" type="str | MISSING" defaultValue="MISSING">
   Reference text to compare against (static).
 </Property>
 <Property
@@ -687,7 +870,13 @@ check = LLMJudge(
 <Property name="threshold" type="float" defaultValue="0.95">
   Similarity threshold (0.0 to 1.0).
 </Property>
-<Property name="embedding_model" type="BaseEmbeddingModel" defaultValue="get_default_embedding_model()">Embedding model used to compute similarity scores.</Property>
+<Property
+  name="embedding_model"
+  type="BaseEmbeddingModel"
+  defaultValue="get_default_embedding_model()"
+>
+  Embedding model used to compute similarity scores.
+</Property>
 
 ```python
 from giskard.checks import SemanticSimilarity

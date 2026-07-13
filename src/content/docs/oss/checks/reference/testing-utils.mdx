@@ -127,10 +127,15 @@ Result of test case execution with check outcomes.
   <Property name="duration_ms" type="int">
     Execution time in milliseconds.
   </Property>
+  <Property name="last_interaction_index" type="int | None" defaultValue="None">
+    0-based index of the last trace interaction added by this step's interacts
+    before its checks ran. `None` when no interactions were added.
+  </Property>
 </TypeTable>
 
 <MethodCard name=".assert_passed()" returnType="None">
-  Raise `AssertionError` with formatted failure messages if any check did not pass. Useful in pytest.
+  Raise `AssertionError` with formatted failure messages if any check did not
+  pass. Useful in pytest.
 </MethodCard>
 
 ```python
