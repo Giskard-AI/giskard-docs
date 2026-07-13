@@ -120,9 +120,23 @@ def parse_defaults(signature: str) -> dict[str, str]:
     return defaults
 
 
-def compare_entry(path: str, old: dict[str, Any], new: dict[str, Any]) -> list[dict[str, Any]]:
-    """Classify the changes between two snapshot entries for the same symbol."""
+def compare_entry(
+    path: str, old: dict[str, Any], new: dict[str, Any], member_of: str | None = None
+) -> list[dict[str, Any]]:
+    """Classify the changes between two snapshot entries for the same symbol.
+
+    `member_of` is the owning class when `path` is a method/property. It is
+    carried on every delta -- not just added/removed ones -- because downstream
+    triage searches members as attribute accesses (``.run(``) rather than as bare
+    words. Searching a member like `Check.run` by its leaf name matches the
+    English word "run" across the entire corpus.
+    """
     deltas: list[dict[str, Any]] = []
+
+    def tag(delta: dict[str, Any]) -> dict[str, Any]:
+        if member_of:
+            delta["member_of"] = member_of
+        return delta
 
     old_sig = old.get("signature", "")
     new_sig = new.get("signature", "")
@@ -148,36 +162,36 @@ def compare_entry(path: str, old: dict[str, Any], new: dict[str, Any]) -> list[d
 
         if changed_defaults and params_unchanged:
             deltas.append(
-                {
+                tag({
                     "kind": "default_changed",
                     "symbol": path,
                     "severity": "warning",
                     "defaults": changed_defaults,
                     "old_signature": old_sig,
                     "new_signature": new_sig,
-                }
+                })
             )
         else:
             deltas.append(
-                {
+                tag({
                     "kind": "signature_changed",
                     "symbol": path,
                     "severity": "error",
                     "old_signature": old_sig,
                     "new_signature": new_sig,
                     "defaults": changed_defaults or None,
-                }
+                })
             )
 
     if old.get("doc_summary", "") != new.get("doc_summary", ""):
         deltas.append(
-            {
+            tag({
                 "kind": "doc_summary_changed",
                 "symbol": path,
                 "severity": "info",
                 "old": old.get("doc_summary", ""),
                 "new": new.get("doc_summary", ""),
-            }
+            })
         )
 
     # Class members: recurse one level. Members are not full symbols, so they are
@@ -200,7 +214,9 @@ def compare_entry(path: str, old: dict[str, Any], new: dict[str, Any]) -> list[d
             }
         )
     for name in sorted(old_members.keys() & new_members.keys()):
-        deltas.extend(compare_entry(f"{path}.{name}", old_members[name], new_members[name]))
+        deltas.extend(
+            compare_entry(f"{path}.{name}", old_members[name], new_members[name], member_of=path)
+        )
 
     return deltas
 
