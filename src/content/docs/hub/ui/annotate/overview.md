@@ -105,7 +105,8 @@ To write effective rules, remember the following best practices:
 - **Write Custom Checks when your rules apply to multiple conversations**
   - Creating and enabling a custom check for multiple conversations is useful when you want to display the evaluation results for all conversations where the custom check is enabled.
   - _Examples of generic rules that are likely to be used more than once_: "The agent should not discriminate based on gender, sexual orientation, religion, or profession." "The agent should answer in English."
-    :::
+
+:::
 
 #### Groundedness
 
