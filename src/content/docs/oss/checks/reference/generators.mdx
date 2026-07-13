@@ -21,16 +21,27 @@ Input generators for creating dynamic test data and simulating user interactions
 **Module:** `giskard.checks.generators.user`
 
 <Property name="persona" type="str" required>
-  Predefined persona name (e.g., `"frustrated_customer"`) or a custom persona description.
+  Predefined persona name (e.g., `"frustrated_customer"`) or a custom persona
+  description.
 </Property>
 <Property name="max_steps" type="int" defaultValue="3">
   Maximum number of conversation turns to generate.
 </Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Maximum retry attempts per turn when the model refuses (schema issue) or the
+  request is blocked by a provider policy. Does not affect transient network
+  retries handled by the completion middleware.
+</Property>
 <Property name="context" type="str | None" defaultValue="None">
   Optional context to customize the persona's behavior.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
-  LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
+  LLM generator used to simulate the user's messages. Defaults to the
+  framework's default generator.
 </Property>
 
 ```python
@@ -101,10 +112,19 @@ if isinstance(output, UserSimulatorOutput):
 <Property name="max_steps" type="int" defaultValue="3">
   Maximum conversation turns to generate.
 </Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Maximum retry attempts per turn when the model refuses (schema issue) or the
+  request is blocked by a provider policy. Does not affect transient network
+  retries handled by the completion middleware.
+</Property>
 <Property name="as_template" type="bool" defaultValue="False">
   When True, render `prompt` as a Jinja2 template with trace context.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
   LLM generator used to produce inputs.
 </Property>
 
@@ -115,6 +135,38 @@ from giskard.checks import LLMGenerator
 
 gen = LLMGenerator(prompt="You are a user. Ask about the product.")
 gen = LLMGenerator(prompt_path="giskard.checks::scenarios/llm01.j2")
+```
+
+</ResourceSection>
+
+---
+
+## `DatasetInputGenerator`
+
+<ResourceSection description="Single-shot generator that places a fixed dataset prompt into the target input. For a str target the prompt is yielded verbatim (no LLM call). For a structured target the prompt is injected into an LLM-resolved, schema-only template; the LLM never sees the prompt itself.">
+
+**Module:** `giskard.checks.generators.dataset`
+
+<Property name="prompt" type="str" required>
+  Fixed dataset prompt, used verbatim. Must be non-empty.
+</Property>
+<Property
+  name="generator"
+  type="BaseGenerator"
+  defaultValue="get_default_generator()"
+>
+  LLM generator, used only to fill a structured target's schema. Not called for
+  a plain `str` target.
+</Property>
+
+```python
+from giskard.checks import DatasetInputGenerator, Scenario
+
+gen = DatasetInputGenerator(prompt="What is your refund policy?")
+
+scenario = Scenario("dataset_row").interact(
+    inputs=gen, outputs=lambda inputs: agent(inputs)
+)
 ```
 
 </ResourceSection>

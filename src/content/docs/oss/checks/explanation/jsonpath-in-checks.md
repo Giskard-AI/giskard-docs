@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-Built-in checks like `Groundedness`, `StringMatching`, and `LesserThan` accept path parameters (`key`, `answer_key`, `text_key`) that point into the trace. This page covers the syntax.
+Built-in checks like `Groundedness`, `StringMatching`, and `LessThan` accept path parameters (`key`, `answer_key`, `text_key`) that point into the trace. This page covers the syntax.
 
 ## The `trace.` Prefix
 

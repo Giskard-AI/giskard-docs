@@ -297,8 +297,18 @@ Ordered sequence of interaction specs and checks with shared trace. Provides a f
   <Property name="check" type="Check" required>A Check instance to validate the trace at this point.</Property>
 </MethodCard>
 
+<MethodCard name=".with_tags()" returnType="self">
+  Set scenario tags, used for grouping results and for Hub upload.
+
+  <Property name="tags" type="list[str]" required>Flat strings in `"Key:Value"` format. Tags without `:` are treated as bare labels.</Property>
+</MethodCard>
+
 <MethodCard name=".run()" returnType="ScenarioResult">
   Execute the scenario and return results.
+
+  <Property name="target" type="Target | MISSING" defaultValue="MISSING">Target to call for outputs. Defaults to the scenario's own `target`.</Property>
+  <Property name="return_exception" type="bool" defaultValue="False">Return exceptions in the result instead of raising them.</Property>
+  <Property name="multiple_runs" type="int | None" defaultValue="None">Override the scenario's `multiple_runs` count.</Property>
 </MethodCard>
 
 ```python
@@ -317,6 +327,37 @@ result = await (
 
 print(f"Status: {result.status}")
 ```
+
+---
+
+## `Target`
+
+**Module:** `giskard.checks` (type alias)
+
+The type of the callable a scenario or suite invokes to produce outputs. A target is
+any callable taking either `(inputs)` or `(inputs, trace)` and returning the output
+value (sync or async).
+
+```python
+from giskard.checks import Scenario, Target
+
+
+def my_agent(inputs: str) -> str:
+    return llm(inputs)
+
+
+# Targets accepting the trace can use the conversation history
+def stateful_agent(inputs: str, trace) -> str:
+    return llm(inputs, history=trace.interactions)
+
+
+scenario = Scenario("chat", target=my_agent)
+```
+
+Parameters typed `Target | MISSING` (such as `Scenario(target=...)`,
+`Suite(target=...)`, `.interact(outputs=...)`, and `.run(target=...)`) default to the
+`MISSING` sentinel, so an unset target is distinguishable from one explicitly set to
+`None`. You never need to pass `MISSING` yourself — just omit the argument.
 
 ---
 
