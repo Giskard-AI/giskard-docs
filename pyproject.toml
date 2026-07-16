@@ -8,15 +8,15 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13,<4.0"
 dependencies = [
-    "giskard-core==1.0.1b3",
-    "giskard-agents[openai]==1.0.2b3",
-    "giskard-checks==1.0.2b3",
+    "giskard-core==1.0.1b5",
+    "giskard-agents[openai]==1.0.2b5",
+    "giskard-checks==1.0.2b5",
 ]
 
 [dependency-groups]
 dev = [
     "nbmake==1.5.5",
-    "pytest==9.0.3",
+    "pytest==9.1.1",
     "python-dotenv==1.2.2",
 ]
 
