@@ -217,3 +217,30 @@ def test_class_members_are_searched_as_attribute_access(tmp_path: Path) -> None:
     assert not member.search(prose), "member pattern matched the English word 'run'"
     assert member.search(call)
     assert toplevel.search("Suite(checks=[...])")
+
+
+def test_foreign_receivers_do_not_match_a_member(tmp_path: Path) -> None:
+    """Anchoring on the dot is not enough: `asyncio.run(` is an attribute access
+    too. Four `.run` symbols changed signature in one release, so every page
+    showing the standard asyncio idiom collected four spurious error deltas."""
+    triage = load_script("triage-docs.py")
+    member = triage.symbol_pattern("giskard.checks.Suite.run", member_of="giskard.checks.Suite")
+
+    assert not member.search("result = asyncio.run(main())")
+    assert not member.search('subprocess.run(["ls"])')
+    assert not member.search("The run() method is async, so use asyncio.run():")
+
+    # Ours still match, including when nested inside the foreign call.
+    assert member.search("result = await scenario.run()")
+    assert member.search("result = asyncio.run(test_scenario.run())")
+
+
+def test_quickstart_is_owned_by_the_tutorial_editor() -> None:
+    """checks/quickstart.ipynb sits outside the Diataxis directories, so directory
+    typing alone orphans it into `other` -- where the skill forbids editing. It is
+    the highest-traffic page in the tree; it needs an owner."""
+    triage = load_script("triage-docs.py")
+
+    assert triage.diataxis_type(Path("src/content/docs/oss/checks/quickstart.ipynb")) == "tutorial"
+    # Genuinely out-of-scope trees must stay unowned.
+    assert triage.diataxis_type(Path("src/content/docs/oss/solutions/scan-vulnerabilities.mdx")) == "other"

@@ -41,10 +41,24 @@ DIATAXIS_BY_DIR = {
     "explanation": "explanation",
 }
 
+# Pages that sit outside a Diataxis directory but are not "other". Matched on the
+# path tail, and checked before DIATAXIS_BY_DIR. quickstart.ipynb is the case that
+# forced this: it lives at checks/quickstart.ipynb rather than
+# checks/tutorials/quickstart.ipynb, so directory typing alone orphans the single
+# highest-traffic page in the tree -- it drew 11 deltas on one refresh and no
+# editor was allowed to touch it.
+DIATAXIS_BY_PATH = {
+    "checks/quickstart.ipynb": "tutorial",
+}
+
 SEARCHABLE_SUFFIXES = {".md", ".mdx", ".ipynb"}
 
 
 def diataxis_type(path: Path) -> str:
+    posix = path.as_posix()
+    for suffix, kind in DIATAXIS_BY_PATH.items():
+        if posix.endswith(suffix):
+            return kind
     for part in path.parts:
         if part in DIATAXIS_BY_DIR:
             return DIATAXIS_BY_DIR[part]
@@ -93,6 +107,16 @@ def search_text(path: Path, pattern: re.Pattern[str]) -> list[dict[str, Any]]:
     return [{"line": n} for n, line in enumerate(lines, 1) if pattern.search(line)]
 
 
+# Receivers that are never a giskard object, for member names common enough to
+# collide. ``asyncio.run(`` is the one that actually bit: Suite.run, Scenario.run,
+# ScenarioRunner.run and Check.run all changed signature in a single release, so
+# every page showing the standard ``asyncio.run(main())`` idiom collected four
+# error-severity deltas and was dispatched to an editor that had nothing to do.
+FOREIGN_RECEIVERS = {
+    "run": ("asyncio", "unittest", "subprocess"),
+}
+
+
 def symbol_pattern(symbol: str, member_of: str | None) -> re.Pattern[str]:
     """Build the search pattern for one symbol.
 
@@ -102,9 +126,24 @@ def symbol_pattern(symbol: str, member_of: str | None) -> re.Pattern[str]:
     Class members must NOT be searched that way. ``Check.run`` would search for
     the bare word "run", which matches ordinary English prose on 310 pages. A
     member is only meaningful as an attribute access, so anchor it on the dot.
+
+    Anchoring on the dot is necessary but not sufficient: ``asyncio.run(`` is an
+    attribute access too. For leaf names listed in FOREIGN_RECEIVERS, also reject
+    the receivers that are definitely not ours -- ``scenario.run()`` still matches,
+    ``asyncio.run()`` no longer does.
     """
     leaf = symbol.split(".")[-1]
     if member_of:
+        foreign = FOREIGN_RECEIVERS.get(leaf)
+        if foreign:
+            # Python's re needs a fixed-width lookbehind and these receivers are
+            # different lengths, so match the receiver explicitly and rule it out
+            # with a lookahead instead.
+            alternation = "|".join(re.escape(name) for name in foreign)
+            return re.compile(
+                rf"(?:(?<![\w.])(?!(?:{alternation})\.)[\w\]\)]+)"
+                rf"\.{re.escape(leaf)}\s*[\(\[=,)\s]"
+            )
         return re.compile(rf"\.{re.escape(leaf)}\s*[\(\[=,)\s]")
     return re.compile(rf"\b{re.escape(leaf)}\b")
 
