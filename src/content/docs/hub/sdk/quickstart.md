@@ -150,16 +150,27 @@ dataset = hub.datasets.create(
 # Add a test case
 hub.test_cases.create(
     dataset_id=dataset.id,
-    messages=[
-        {"role": "user", "content": "What is your return policy?"},
-    ],
-    demo_output="We offer a 30-day return policy for all items.",
-    checks=[
+    interactions=[
         {
-            "identifier": "correctness",
-            "params": {
-                "reference": "We offer a 30-day return policy for all items."
+            "input": {
+                "messages": [
+                    {"role": "user", "content": "What is your return policy?"},
+                ]
             },
+            "output": {
+                "response": {
+                    "role": "assistant",
+                    "content": "We offer a 30-day return policy for all items.",
+                }
+            },
+            "checks": [
+                {
+                    "identifier": "correctness",
+                    "params": {
+                        "reference": "We offer a 30-day return policy for all items."
+                    },
+                }
+            ],
         },
     ],
 )
