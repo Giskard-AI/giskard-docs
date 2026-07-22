@@ -124,6 +124,89 @@ def test_changed_default_is_not_a_changed_signature(tmp_path: Path) -> None:
     assert delta["defaults"]["seed"] == {"old": "42", "new": "1337"}
 
 
+def _field_deltas(tmp_path: Path, old_fields: dict, new_fields: dict) -> list[dict]:
+    """Diff one class that differs only in its pydantic fields.
+
+    Built from literals rather than the committed baseline: that baseline was
+    generated before field tracking existed, and regenerating it here would also
+    advance it b3 -> b5 as a side effect.
+    """
+    def snapshot(fields: dict) -> dict:
+        return {
+            "package": "giskard-checks",
+            "module": "giskard.checks",
+            "version": "test",
+            "source_ref": "test",
+            "symbols": {
+                "giskard.checks.CheckResult": {
+                    "kind": "class",
+                    "bases": [],
+                    "signature": "(*, status: str) -> None",
+                    "doc_summary": "A result.",
+                    "members": {},
+                    "fields": fields,
+                }
+            },
+        }
+
+    old_path, new_path = tmp_path / "old.json", tmp_path / "new.json"
+    old_path.write_text(json.dumps(snapshot(old_fields)))
+    new_path.write_text(json.dumps(snapshot(new_fields)))
+    out = tmp_path / "delta.json"
+    run_script("diff-api.py", str(old_path), str(new_path), "-o", str(out))
+    return json.loads(out.read_text())["deltas"]
+
+
+def test_renamed_pydantic_field_is_an_error(tmp_path: Path) -> None:
+    """Pydantic keeps fields in ``model_fields``, not on the class, so a member
+    walk cannot see them at any depth. 48 of the 59 snapshotted symbols are
+    models; without field tracking a rename produces no delta at all. This is how
+    ``AssistantMessage.is_refusal`` -> ``refusal`` reached published docs and left
+    six notebooks failing."""
+    deltas = _field_deltas(
+        tmp_path,
+        {"message": {"annotation": "str", "required": True}},
+        {"is_message": {"annotation": "str", "required": True}},
+    )
+    by_key = {(d["kind"], d["symbol"]): d for d in deltas}
+
+    removed = by_key[("field_removed", "giskard.checks.CheckResult.message")]
+    assert removed["severity"] == "error"
+    assert ("field_added", "giskard.checks.CheckResult.is_message") in by_key
+
+
+def test_a_baseline_without_fields_reports_no_field_deltas(tmp_path: Path) -> None:
+    """The committed baseline predates field tracking. Treating its absent
+    "fields" as an empty one would report every field on every model as newly
+    added -- 180 phantom deltas on the real baseline, burying the genuine ones."""
+    deltas = _field_deltas(
+        tmp_path,
+        {},
+        {"message": {"annotation": "str", "required": True}},
+    )
+    assert not [d for d in deltas if "field" in d["kind"]]
+
+
+def test_field_becoming_required_outranks_a_widened_annotation(tmp_path: Path) -> None:
+    """An optional field turning required breaks every construction that omitted
+    it. A widened annotation usually does not, so only the former is an error."""
+    became_required = _field_deltas(
+        tmp_path,
+        {"message": {"annotation": "str", "required": False}},
+        {"message": {"annotation": "str", "required": True}},
+    )
+    (delta,) = [d for d in became_required if d["kind"] == "field_changed"]
+    assert delta["severity"] == "error"
+
+    widened = _field_deltas(
+        tmp_path,
+        {"message": {"annotation": "str", "required": False}},
+        {"message": {"annotation": "str | None", "required": False}},
+    )
+    (delta,) = [d for d in widened if d["kind"] == "field_changed"]
+    assert delta["severity"] == "warning"
+
+
 def test_renamed_parameter_is_an_error(tmp_path: Path) -> None:
     def mutate(symbols: dict) -> None:
         symbols["giskard.checks.Suite"]["signature"] = "(*, renamed: str) -> None"
@@ -217,6 +300,34 @@ def test_class_members_are_searched_as_attribute_access(tmp_path: Path) -> None:
     assert not member.search(prose), "member pattern matched the English word 'run'"
     assert member.search(call)
     assert toplevel.search("Suite(checks=[...])")
+
+
+def test_follow_referenced_captures_types_outside_the_module(tmp_path: Path) -> None:
+    """``walk`` refuses to leave the module being snapshotted, so a boundary type
+    like ``AssistantMessage`` is captured only as text inside a signature and a
+    rename on it produces no delta. Following them is what makes that visible."""
+    out = tmp_path / "snap.json"
+    result = run_script(
+        "snapshot-api.py",
+        "giskard.checks",
+        "--distribution", "giskard-checks",
+        "--ref", "test",
+        "--follow-referenced",
+        "-o", str(out),
+    )
+    assert result.returncode == 0, result.stderr
+
+    referenced = json.loads(out.read_text())["referenced"]
+    assert referenced, "no referenced types captured"
+
+    chat = "giskard.llm.types.chat.AssistantMessage"
+    assert chat in referenced, sorted(referenced)
+    # The exact field whose rename broke six notebooks in the first production run.
+    assert "refusal" in referenced[chat]["fields"]
+
+    # Depth 1: following referenced types' own signatures would turn a bounded
+    # set into an open-ended crawl.
+    assert all(not p.startswith("giskard.checks.") for p in referenced)
 
 
 def test_foreign_receivers_do_not_match_a_member(tmp_path: Path) -> None:

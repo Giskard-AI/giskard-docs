@@ -218,6 +218,50 @@ def compare_entry(
             compare_entry(f"{path}.{name}", old_members[name], new_members[name], member_of=path)
         )
 
+    # Pydantic fields. Reported like members, because that is how a reader meets
+    # them: `message.refusal` is an attribute access on the page, indistinguishable
+    # from a property. A removed field is an error -- every page touching it breaks.
+    old_fields = old.get("fields", {})
+    new_fields = new.get("fields", {})
+
+    # A baseline taken before field tracking existed has no "fields" at all. Every
+    # field would then read as newly added -- 180 phantom deltas on the first run,
+    # burying the real ones. Absent is not empty: say nothing until both sides have
+    # been snapshotted by a version that records fields.
+    if not old_fields:
+        return deltas
+    for name in sorted(old_fields.keys() - new_fields.keys()):
+        deltas.append(
+            {"kind": "field_removed", "symbol": f"{path}.{name}", "severity": "error", "member_of": path}
+        )
+    for name in sorted(new_fields.keys() - old_fields.keys()):
+        deltas.append(
+            {
+                "kind": "field_added",
+                "symbol": f"{path}.{name}",
+                "severity": "info",
+                "member_of": path,
+                "annotation": new_fields[name].get("annotation", ""),
+            }
+        )
+    for name in sorted(old_fields.keys() & new_fields.keys()):
+        old_field, new_field = old_fields[name], new_fields[name]
+        if old_field == new_field:
+            continue
+        # A field that becomes required breaks every construction that omitted it;
+        # a widened annotation usually does not. Only the former is an error.
+        became_required = new_field.get("required") and not old_field.get("required")
+        deltas.append(
+            {
+                "kind": "field_changed",
+                "symbol": f"{path}.{name}",
+                "severity": "error" if became_required else "warning",
+                "member_of": path,
+                "old": old_field,
+                "new": new_field,
+            }
+        )
+
     return deltas
 
 
@@ -251,6 +295,22 @@ def diff(old_snapshot: dict[str, Any], new_snapshot: dict[str, Any]) -> dict[str
 
     for path in sorted(old_symbols.keys() & new_symbols.keys()):
         deltas.extend(compare_entry(path, old_symbols[path], new_symbols[path]))
+
+    # Referenced types (--follow-referenced). Compared with the same machinery:
+    # a renamed field on AssistantMessage breaks a page exactly as hard as one on
+    # a primary symbol, so severity tracks impact, not distance from the module.
+    old_referenced = old_snapshot.get("referenced", {})
+    new_referenced = new_snapshot.get("referenced", {})
+    for path in sorted(old_referenced.keys() & new_referenced.keys()):
+        old_entry, new_entry = old_referenced[path], new_referenced[path]
+        # A type that stops resolving is a break in itself: the docs still name it.
+        if new_entry.get("kind") == "unresolved":
+            if old_entry.get("kind") != "unresolved":
+                deltas.append(
+                    {"kind": "symbol_removed", "symbol": path, "severity": "error", "was": "referenced type"}
+                )
+            continue
+        deltas.extend(compare_entry(path, old_entry, new_entry))
 
     by_kind: dict[str, int] = {}
     for delta in deltas:

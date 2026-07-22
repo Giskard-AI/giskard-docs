@@ -48,11 +48,20 @@ would leave the working tree in a state the user did not ask for.
 
 ```bash
 "$SCRATCH/.venv-target/bin/python" scripts/snapshot-api.py giskard.checks \
-    --distribution giskard-checks --ref <ref> -o "$SCRATCH/new-snapshot.json"
+    --distribution giskard-checks --ref <ref> --follow-referenced \
+    -o "$SCRATCH/new-snapshot.json"
 
 python3 scripts/diff-api.py docs/api-baseline/giskard-checks.json \
     "$SCRATCH/new-snapshot.json" -o "$SCRATCH/delta.json"
 ```
+
+`--follow-referenced` also records the giskard types named in `giskard.checks`
+signatures but defined elsewhere — the message types in `giskard.llm`, the
+generator bases in `giskard.agents`. They are boundary types the documented API
+hands to users, so a rename on one breaks pages just as hard: dropping
+`AssistantMessage.is_refusal` produced no delta at all and shipped six failing
+notebooks. Field-level changes on pydantic models are tracked the same way, and
+for the same reason.
 
 `diff-api.py` exits **0 when there are no changes**. In that case the docs are
 already current: say so and **stop**. No branch, no subagents, no PR — an

@@ -79,6 +79,37 @@ def describe_callable(obj: Any, kind: str) -> dict[str, Any]:
     return {"kind": kind, "signature": signature_of(obj), "doc_summary": doc_summary(obj)}
 
 
+def describe_fields(obj: Any) -> dict[str, Any]:
+    """Pydantic field names, annotations and requiredness -- or {} for a plain class.
+
+    Pydantic moves fields off the class and into ``model_fields``: ``refusal`` is
+    in neither ``vars(AssistantMessage)`` nor ``dir(AssistantMessage)``, so the
+    member walk below cannot see it at any depth. 49 of the 61 public
+    ``giskard.checks`` symbols are models, so without this the snapshot is blind
+    to most of the surface it claims to describe -- renaming a field produces no
+    delta, and the docs go stale silently. This is exactly how
+    ``AssistantMessage.is_refusal`` -> ``refusal`` reached published docs.
+
+    Defaults are recorded as a rendered string, not a value: a default that is a
+    factory or a mutable would otherwise make the snapshot unstable run to run.
+    """
+    fields = getattr(obj, "model_fields", None)
+    if not isinstance(fields, dict):
+        return {}
+
+    described = {}
+    for name, field in sorted(fields.items()):
+        entry: dict[str, Any] = {
+            "annotation": normalize(str(getattr(field, "annotation", ""))),
+            "required": bool(field.is_required()) if hasattr(field, "is_required") else True,
+        }
+        default = getattr(field, "default", None)
+        if entry["required"] is False and default is not None:
+            entry["default"] = normalize(repr(default))
+        described[name] = entry
+    return described
+
+
 def describe_class(obj: Any) -> dict[str, Any]:
     """Class with its public methods. Inherited members are skipped.
 
@@ -106,13 +137,20 @@ def describe_class(obj: Any) -> dict[str, Any]:
         elif inspect.isfunction(member):
             members[name] = describe_callable(member, "method")
 
-    return {
+    entry = {
         "kind": "class",
         "bases": [f"{b.__module__}.{b.__qualname__}" for b in obj.__bases__ if b is not object],
         "signature": signature_of(obj),
         "doc_summary": doc_summary(obj),
         "members": dict(sorted(members.items())),
     }
+
+    # Omitted entirely for non-models, so plain classes render exactly as before
+    # and adding this does not rewrite the whole baseline.
+    fields = describe_fields(obj)
+    if fields:
+        entry["fields"] = fields
+    return entry
 
 
 def walk(module: Any, root: str, symbols: dict[str, Any], seen: dict[int, str]) -> None:
@@ -155,7 +193,58 @@ def walk(module: Any, root: str, symbols: dict[str, Any], seen: dict[int, str]) 
         seen[id(obj)] = path
 
 
-def build_snapshot(module_name: str, distribution: str, source_ref: str) -> dict[str, Any]:
+# Dotted giskard paths as they appear inside a rendered signature.
+_GISKARD_REF = re.compile(r"giskard\.[A-Za-z0-9_.]+")
+
+
+def referenced_paths(symbols: dict[str, Any], primary: str) -> list[str]:
+    """Giskard types named in signatures but living outside the primary module.
+
+    ``walk`` deliberately refuses to leave the module being snapshotted, so a type
+    like ``giskard.llm.types.chat.AssistantMessage`` is captured only as text
+    inside a signature -- its members are never recorded and a change to them
+    produces no delta. These are the boundary types the documented API hands to
+    users, so a rename on one breaks pages just as hard as a rename on a primary
+    symbol.
+
+    Depth 1 only. ``giskard.checks`` signatures reference boundary types rather
+    than deep internals: on the 1.0.2b5 surface this resolves to 11 types, and
+    following their signatures in turn would trade that bounded set for an
+    open-ended crawl through the whole package.
+    """
+    found: set[str] = set()
+    for entry in symbols.values():
+        for text in json.dumps(entry).split('"'):
+            for match in _GISKARD_REF.findall(text):
+                if not match.startswith(f"{primary}."):
+                    found.add(match.rstrip("."))
+    return sorted(found)
+
+
+def resolve(path: str) -> Any:
+    """Import a dotted path, trying each split point as the module/attribute cut.
+
+    ``giskard.llm.types.chat.AssistantMessage`` gives no hint where the module
+    ends and the attribute begins, so try the longest module first.
+    """
+    parts = path.split(".")
+    for cut in range(len(parts) - 1, 0, -1):
+        try:
+            obj = importlib.import_module(".".join(parts[:cut]))
+        except ImportError:
+            continue
+        for attr in parts[cut:]:
+            obj = getattr(obj, attr, None)
+            if obj is None:
+                break
+        else:
+            return obj
+    return None
+
+
+def build_snapshot(
+    module_name: str, distribution: str, source_ref: str, follow_referenced: bool = False
+) -> dict[str, Any]:
     module = importlib.import_module(module_name)
 
     symbols: dict[str, Any] = {}
@@ -166,13 +255,28 @@ def build_snapshot(module_name: str, distribution: str, source_ref: str) -> dict
     except importlib.metadata.PackageNotFoundError:
         version = "unknown"
 
-    return {
+    snapshot = {
         "package": distribution,
         "module": module_name,
         "version": version,
         "source_ref": source_ref,
         "symbols": dict(sorted(symbols.items())),
     }
+
+    if follow_referenced:
+        referenced: dict[str, Any] = {}
+        for path in referenced_paths(symbols, module_name):
+            obj = resolve(path)
+            # Unresolvable is itself a finding -- `giskard.core.utils.NotProvided`
+            # is named in signatures but no longer importable. Record the absence
+            # so the diff reports it rather than silently dropping the type.
+            if obj is None:
+                referenced[path] = {"kind": "unresolved"}
+            elif inspect.isclass(obj):
+                referenced[path] = describe_class(obj)
+        snapshot["referenced"] = dict(sorted(referenced.items()))
+
+    return snapshot
 
 
 def main() -> int:
@@ -183,11 +287,16 @@ def main() -> int:
         help="Distribution name for the version lookup (default: module with dots as dashes)",
     )
     parser.add_argument("--ref", default="unknown", help="giskard-oss git ref this was built from")
+    parser.add_argument(
+        "--follow-referenced",
+        action="store_true",
+        help="Also record giskard types named in signatures but defined outside the module",
+    )
     parser.add_argument("-o", "--output", help="Write here instead of stdout")
     args = parser.parse_args()
 
     distribution = args.distribution or args.module.replace(".", "-")
-    snapshot = build_snapshot(args.module, distribution, args.ref)
+    snapshot = build_snapshot(args.module, distribution, args.ref, args.follow_referenced)
 
     # sort_keys + trailing newline: a stable file that diffs cleanly in review.
     text = json.dumps(snapshot, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
