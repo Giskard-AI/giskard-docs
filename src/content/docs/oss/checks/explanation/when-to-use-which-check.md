@@ -26,7 +26,7 @@ Equals(expected_value="potential_fraud", key="trace.last.outputs.label")
 StringMatching(
     keyword="Pre-authorization", text_key="trace.last.outputs.answer"
 )
-LesserThan(expected_value=500, key="trace.last.outputs.token_count")
+LessThan(expected_value=500, key="trace.last.outputs.token_count")
 ```
 
 **Semantic similarity** — when phrasing varies but meaning should be consistent. Cheaper and faster than an LLM judge.
@@ -70,7 +70,7 @@ def rag_system(query: str) -> dict:
 
 tc = (
     Scenario("rag_test")
-    .interact(inputs=question, outputs=lambda q: rag_system(q))
+    .interact(inputs=question, outputs=lambda inputs: rag_system(inputs))
     # Fast, free
     .check(
         GreaterThan(

@@ -57,17 +57,19 @@ from giskard.checks import (
     Trace,
     InteractionSpec,
     Scenario,
+    Target,
     TestCase,
     # Built-in checks
     FnCheck,
     StringMatching,
     RegexMatching,
     JsonValid,
+    Readability,
     Equals,
     NotEquals,
-    LesserThan,
+    LessThan,
     GreaterThan,
-    LesserThanEquals,
+    LessThanEquals,
     GreaterEquals,
     AllOf,
     AnyOf,
@@ -83,6 +85,7 @@ from giskard.checks import (
     BaseLLMCheck,
     LLMCheckResult,
     Groundedness,
+    Contradiction,
     AnswerRelevance,
     Toxicity,
     Conformity,
@@ -90,12 +93,22 @@ from giskard.checks import (
     SemanticSimilarity,
 )
 
-# Scenarios
-from giskard.checks import generate_suite, ScenarioCategory
+# Suites and results
+from giskard.checks import (
+    Suite,
+    SuiteResult,
+    GroupedSuiteResult,
+    GroupStats,
+)
 
 # Generators
-from giskard.checks import LLMGenerator
+from giskard.checks import LLMGenerator, DatasetInputGenerator, UserSimulator
 ```
+
+`LesserThan` and `LesserThanEquals` remain importable as deprecated aliases for
+`LessThan` and `LessThanEquals`.
+
+The installed version is available as `giskard.checks.__version__`.
 
 ## Package structure
 
@@ -103,34 +116,42 @@ from giskard.checks import LLMGenerator
 giskard.checks/
 ├── core/                 # Base classes and fundamental types
 │   ├── check.py          # Check base class
-│   ├── result.py         # CheckResult, CheckStatus
+│   ├── result.py         # CheckResult, CheckStatus, SuiteResult, GroupStats
 │   ├── scenario.py       # Scenario
 │   ├── testcase.py       # TestCase
 │   ├── extraction.py     # Extractors
+│   ├── mixin.py          # WithGeneratorMixin, WithEmbeddingMixin
+│   ├── input_generator.py
 │   └── interaction/      # Interaction types
 ├── builtin/              # Ready-to-use checks
 │   ├── fn.py             # FnCheck
 │   ├── text_matching.py  # StringMatching, RegexMatching
-│   ├── comparison.py     # Equals, NotEquals, etc.
+│   ├── comparison.py     # Equals, NotEquals, LessThan, etc.
 │   ├── composition.py    # AllOf, AnyOf, Not
 │   ├── json_valid.py     # JsonValid
+│   ├── nlp_metrics.py    # Readability
 │   ├── rego_policy.py    # RegoPolicy
 │   └── semantic_similarity.py
 ├── judges/               # LLM-based checks
 │   ├── base.py           # BaseLLMCheck, LLMCheckResult
 │   ├── groundedness.py   # Groundedness
+│   ├── contradiction.py  # Contradiction
 │   ├── answer_relevance.py
 │   ├── toxicity.py
 │   ├── conformity.py     # Conformity
 │   └── judge.py          # LLMJudge
 ├── scenarios/            # Multi-step workflows
 │   ├── runner.py         # ScenarioRunner
-│   ├── suite.py          # Suite
-│   └── catalog.py        # generate_suite, ScenarioCategory
+│   └── suite.py          # Suite
+├── export/               # Result export
+│   ├── hub.py            # SuiteResult.to_hub_format
+│   └── junit.py          # SuiteResult.to_junit_xml
 ├── testing/              # Testing utilities
 │   ├── runner.py         # TestCaseRunner
 │   └── spy.py            # WithSpy
 ├── generators/           # Input generators
+│   ├── base.py           # LLMGenerator
+│   ├── dataset.py        # DatasetInputGenerator
 │   └── user.py           # UserSimulator
 └── utils/                # Helper utilities
     ├── normalization.py
