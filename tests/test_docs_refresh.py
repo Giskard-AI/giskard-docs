@@ -346,6 +346,55 @@ def test_foreign_receivers_do_not_match_a_member(tmp_path: Path) -> None:
     assert member.search("result = asyncio.run(test_scenario.run())")
 
 
+def test_member_matches_attribute_access_without_a_trailing_delimiter() -> None:
+    """Closing the member pattern on a fixed set of trailing characters missed
+    the forms that carry no delimiter: a chained access, a set/dict literal, and
+    a member at end of cell. Those pages silently collected zero deltas."""
+    triage = load_script("triage-docs.py")
+
+    plain = triage.symbol_pattern("giskard.checks.Check.evaluate", member_of="giskard.checks.Check")
+    # `run` takes the FOREIGN_RECEIVERS branch, so cover that path too.
+    foreign = triage.symbol_pattern("giskard.checks.Suite.run", member_of="giskard.checks.Suite")
+
+    for pattern, leaf in ((plain, "evaluate"), (foreign, "run")):
+        assert pattern.search(f"value = obj.{leaf}.attribute")
+        assert pattern.search(f"{{obj.{leaf}}}")
+        assert pattern.search(f"handler = obj.{leaf}")
+        assert pattern.search(f"obj.{leaf}")
+
+        # A word boundary must not turn into a prefix match.
+        assert not pattern.search(f"obj.{leaf}ner(")
+        assert not pattern.search(f"obj.{leaf}_all(")
+
+
+def test_walk_does_not_follow_a_sibling_package_sharing_a_prefix(tmp_path: Path) -> None:
+    """`startswith("giskard.checks")` also matches `giskard.checks_addon`, which
+    would silently fold an unrelated package's surface into the baseline."""
+    snapshot = load_script("snapshot-api.py")
+
+    def leaf_module(name: str, symbol: str) -> ModuleType:
+        """A module exporting one function, so walking it leaves a trace."""
+        module = ModuleType(name)
+        function = lambda: None  # noqa: E731
+        function.__name__ = symbol
+        function.__qualname__ = symbol
+        function.__module__ = name
+        setattr(module, symbol, function)
+        module.__all__ = [symbol]
+        return module
+
+    root = ModuleType("pkg.mod")
+    root.sub = leaf_module("pkg.mod.sub", "owned")
+    root.sibling = leaf_module("pkg.mod_addon", "foreign")
+    root.__all__ = ["sub", "sibling"]
+
+    symbols: dict = {}
+    snapshot.walk(root, "pkg.mod", symbols, {})
+
+    assert "pkg.mod.sub.owned" in symbols, sorted(symbols)
+    assert not any("foreign" in path for path in symbols), sorted(symbols)
+
+
 def test_quickstart_is_owned_by_the_tutorial_editor() -> None:
     """checks/quickstart.ipynb sits outside the Diataxis directories, so directory
     typing alone orphans it into `other` -- where the skill forbids editing. It is

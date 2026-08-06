@@ -170,7 +170,9 @@ def walk(module: Any, root: str, symbols: dict[str, Any], seen: dict[int, str]) 
         if inspect.ismodule(obj):
             # Only follow submodules of the package being snapshotted; never
             # wander into third-party modules that happen to be re-exported.
-            if obj.__name__.startswith(module.__name__):
+            # Anchor on the dot: a bare prefix test also matches a sibling
+            # package (`giskard.checks_addon` while snapshotting `giskard.checks`).
+            if obj.__name__ == module.__name__ or obj.__name__.startswith(module.__name__ + "."):
                 walk(obj, path, symbols, seen)
             continue
 

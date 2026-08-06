@@ -204,8 +204,12 @@ async def my_agent(
     # Rebuild the conversation history from the previous turns
     messages = []
     for interaction in trace.interactions:
-        messages.append({"role": "user", "content": interaction.inputs.question})
-        messages.append({"role": "assistant", "content": interaction.outputs.answer})
+        messages.append(
+            {"role": "user", "content": interaction.inputs.question}
+        )
+        messages.append(
+            {"role": "assistant", "content": interaction.outputs.answer}
+        )
     messages.append({"role": "user", "content": inputs.question})
 
     answer = await my_llm_app(messages)

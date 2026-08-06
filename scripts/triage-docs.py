@@ -125,7 +125,10 @@ def symbol_pattern(symbol: str, member_of: str | None) -> re.Pattern[str]:
 
     Class members must NOT be searched that way. ``Check.run`` would search for
     the bare word "run", which matches ordinary English prose on 310 pages. A
-    member is only meaningful as an attribute access, so anchor it on the dot.
+    member is only meaningful as an attribute access, so anchor it on the dot
+    and close on a word boundary -- ``.run\b`` still rejects ``.runner``, while
+    matching the forms a trailing-delimiter class misses: ``obj.run.attribute``,
+    ``{obj.run}``, and ``obj.run`` at end of cell.
 
     Anchoring on the dot is necessary but not sufficient: ``asyncio.run(`` is an
     attribute access too. For leaf names listed in FOREIGN_RECEIVERS, also reject
@@ -142,9 +145,9 @@ def symbol_pattern(symbol: str, member_of: str | None) -> re.Pattern[str]:
             alternation = "|".join(re.escape(name) for name in foreign)
             return re.compile(
                 rf"(?:(?<![\w.])(?!(?:{alternation})\.)[\w\]\)]+)"
-                rf"\.{re.escape(leaf)}\s*[\(\[=,)\s]"
+                rf"\.{re.escape(leaf)}\b"
             )
-        return re.compile(rf"\.{re.escape(leaf)}\s*[\(\[=,)\s]")
+        return re.compile(rf"\.{re.escape(leaf)}\b")
     return re.compile(rf"\b{re.escape(leaf)}\b")
 
 
