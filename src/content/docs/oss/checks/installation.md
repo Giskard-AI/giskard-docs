@@ -29,7 +29,7 @@ Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md 
 4. **You review** the changes and start writing checks
 
 :::tip[Want a permanent Giskard expert in your agent?]
-Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding agent a durable, opinionated workflow for generating adversarial test scenarios, red-team suites, and RAG evaluation suites, triggered automatically by prompts like *"test my agent"*, *"red-team my chatbot"*, or *"evaluate my RAG"*.
+Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding agent a durable, opinionated workflow for generating adversarial test scenarios, red-team suites, and RAG evaluation suites, triggered automatically by prompts like _"test my agent"_, _"red-team my chatbot"_, or _"evaluate my RAG"_.
 :::
 
 ## Install the Python package
