@@ -131,6 +131,9 @@ Result of test case execution with check outcomes.
     0-based index of the last trace interaction added by this step's interacts
     before its checks ran. `None` when no interactions were added.
   </Property>
+  <Property name="error" type="TestCaseError | None" defaultValue="None">
+    Details of the execution error, if the test case failed to execute.
+  </Property>
 </TypeTable>
 
 <MethodCard name=".assert_passed()" returnType="None">
@@ -151,6 +154,29 @@ else:
 # Assert (raises if failed)
 result.assert_passed()
 ```
+
+---
+
+## `TestCaseError`
+
+**Module:** `giskard.checks.core.result`
+
+Captures why a test case failed to execute.
+
+<TypeTable name="TestCaseError">
+  <Property name="message" type="str">
+    Error message.
+  </Property>
+  <Property name="exception_type" type="str">
+    Name of the exception type that was raised.
+  </Property>
+  <Property name="traceback" type="str | None" defaultValue="None">
+    Formatted traceback, when available.
+  </Property>
+  <Property name="phase" type="str | None" defaultValue="None">
+    Execution phase in which the error occurred, when available.
+  </Property>
+</TypeTable>
 
 ---
 

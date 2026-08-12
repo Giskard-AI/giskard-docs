@@ -239,11 +239,6 @@ check = LessThanEquals(
 )
 ```
 
-### `LesserThan` / `LesserThanEquals` (deprecated)
-
-Deprecated aliases for `LessThan` and `LessThanEquals`. They remain importable and
-behave identically; use the correctly-spelled names in new code.
-
 ---
 
 ## JSON Validation
@@ -532,8 +527,8 @@ Default result model for LLM-based checks. This is the structured output format 
   <Property name="passed" type="bool">
     Whether the check passed.
   </Property>
-  <Property name="reason" type="str | None">
-    Optional explanation for the result.
+  <Property name="reason" type="str" required>
+    Explanation for the result. Must be a non-empty string.
   </Property>
 </TypeTable>
 
@@ -670,6 +665,9 @@ when extra or omitted detail is acceptable.
 <Property name="context" type="str | MISSING" defaultValue="MISSING">
   Optional domain context describing the chatbot's purpose (not extracted from
   the trace).
+</Property>
+<Property name="include_history" type="bool" defaultValue="True">
+  Whether to include the prior conversation history in the evaluation prompt.
 </Property>
 <Property
   name="generator"
