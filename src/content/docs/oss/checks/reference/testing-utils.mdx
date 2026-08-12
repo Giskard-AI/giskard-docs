@@ -203,34 +203,39 @@ Low-level runner for executing test cases. Most users should use `test_case.run(
 
 **Module:** `giskard.checks.testing.spy`
 
-Spy on function calls during interaction generation for debugging. Wraps an interaction spec and records all function calls made during generation.
+Spy on function calls during interaction generation for debugging. Wraps an interaction spec and replaces `target` with a `MagicMock` for the duration of generation, recording every call made to it.
 
 <TypeTable name="WithSpy">
   <Property name="interaction_generator" type="InteractionSpec" required>
     The interaction spec to spy on.
   </Property>
   <Property name="target" type="str" required>
-    JSONPath to the value to spy on.
+    Dotted import path of the object to patch, in `unittest.mock.patch` form
+    (e.g. `"myapp.llm.call_model"`). Not a JSONPath.
   </Property>
 </TypeTable>
 
+Each generated interaction carries the recorded calls under `metadata[target]`, with the keys `call_args_list`, `call_count`, `call_args`, and `mock_calls`. The spy is reset between interactions.
+
 ```python
+import textwrap
+
 from giskard.checks import Scenario, Interact, WithSpy
 
 interaction_spec = Interact(
-    inputs=lambda trace: f"Context: {trace.last.outputs if trace.last else 'None'}",
-    outputs=lambda inputs: my_model(inputs),
+    inputs="What is your refund policy?",
+    outputs=lambda inputs: textwrap.shorten(inputs, width=20),
 )
 
-spied_spec = WithSpy(
-    interaction_generator=interaction_spec, target="trace.last.outputs"
-)
+# In your own code, point `target` at the function you want to observe,
+# e.g. target="myapp.llm.call_model".
+spied_spec = WithSpy(interaction_generator=interaction_spec, target="textwrap.shorten")
 
 result = await Scenario("debug_test").add_interaction(spied_spec).run()
 
 # Access spy data from metadata
-spy_data = result.final_trace.last.metadata.get("trace.last.outputs")
-print(spy_data)
+spy_data = result.final_trace.last.metadata["textwrap.shorten"]
+print(spy_data["call_count"], spy_data["call_args_list"])
 ```
 
 :::tip

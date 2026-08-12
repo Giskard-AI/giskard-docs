@@ -38,8 +38,10 @@ Interactions are **immutable**, as they represent something that has already hap
 
 An `InteractionSpec` describes _how_ to generate an interaction and is used to describe a scenario. When you call `.interact(...)` in the fluent API, it adds an `InteractionSpec` to the scenario sequence. Inputs and outputs can be static values or dynamic callables, and you can mix both.
 
+`InteractionSpec` itself is an abstract base class — instantiate the built-in `Interact` (or your own subclass) instead.
+
 ```python
-from giskard.checks import InteractionSpec
+from giskard.checks import Interact
 from openai import OpenAI
 import random
 
@@ -57,7 +59,7 @@ def generate_answer(inputs: str) -> str:
     return response.choices[0].message.content
 
 
-spec = InteractionSpec(
+spec = Interact(
     inputs=generate_random_question,
     outputs=generate_answer,
     metadata={"category": "math", "difficulty": "easy"},

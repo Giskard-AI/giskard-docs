@@ -21,18 +21,24 @@ The tradeoff is that you need an event loop to call `Scenario.run()`. Giskard Ch
 ## Common Pitfalls
 
 ```python
-# Wrong — run() returns a coroutine, not a result
-result = test_scenario.run()
+import asyncio
 
+from giskard.checks import Scenario
 
-# Wrong — can't nest asyncio.run() inside an async function
-async def my_func():
-    result = asyncio.run(test_scenario.run())
+test_scenario = Scenario("demo").interact(inputs="Hello", outputs=lambda inputs: "Hi")
 
+# Wrong — run() returns a coroutine, not a result:
+#     result = test_scenario.run()
+#
+# Wrong — can't nest asyncio.run() inside an async function:
+#     async def my_func():
+#         result = asyncio.run(test_scenario.run())
 
 # Correct in a script
 result = asyncio.run(test_scenario.run())
 
-# Correct in pytest / notebook / async function
-result = await test_scenario.run()
+
+# Correct in pytest / notebook / any async function
+async def main():
+    return await test_scenario.run()
 ```

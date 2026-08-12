@@ -12,11 +12,16 @@ Built-in checks like `Groundedness`, `StringMatching`, and `LessThan` accept pat
 All paths must start with `trace.`:
 
 ```python
-# Correct
-Groundedness(answer_key="trace.last.outputs.answer", ...)
+from giskard.checks import Groundedness
 
-# Wrong — raises an error
-Groundedness(answer_key="last.outputs.answer", ...)
+# Correct
+Groundedness(
+    answer_key="trace.last.outputs.answer",
+    context_key="trace.last.inputs.context",
+)
+
+# Wrong — raises a validation error: "path must start with 'trace.'"
+#     Groundedness(answer_key="last.outputs.answer", ...)
 ```
 
 ## trace.last

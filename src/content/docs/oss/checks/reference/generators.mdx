@@ -211,7 +211,7 @@ from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-class SequentialInputGenerator(InputGenerator[str, Trace]):
+class SequentialInputGenerator(InputGenerator[Trace]):
     inputs_list: list[str]
 
     async def __call__(self, trace: Trace) -> AsyncGenerator[str, Trace]:
@@ -235,7 +235,7 @@ from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-class ContextAwareGenerator(InputGenerator[str, Trace]):
+class ContextAwareGenerator(InputGenerator[Trace]):
     strategy: str = "follow_up"
     max_steps: int = 5
 
