@@ -1,0 +1,129 @@
+---
+title: Settings
+description: "Configure the default LLM generator, embedding model, and REPL output of Giskard Checks through code or environment variables."
+sidebar:
+  order: 8
+---
+
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+
+Runtime and environment configuration for Giskard Checks: which model backs
+LLM checks by default, which embedding model semantic checks use, and how much
+of a suite report is printed.
+
+---
+
+## Settings
+
+**Module:** `giskard.checks.settings`
+
+### `GiskardChecksSettings`
+
+A Pydantic `BaseSettings` model holding the environment-backed configuration.
+Every field can be set through an environment variable prefixed with
+`GISKARD_CHECKS_`, or through a `.env` file at the project root. Unknown
+variables are ignored.
+
+<Property name="default_model" type="str" defaultValue='"openai/gpt-4o-mini"'>Default LLM model identifier used by checks that are constructed without an explicit generator. Environment variable: `GISKARD_CHECKS_DEFAULT_MODEL`.</Property>
+<Property name="default_embedding_model" type="str" defaultValue='"text-embedding-3-small"'>Default embedding model identifier used by checks that are constructed without an explicit model, such as `SemanticSimilarity`. Environment variable: `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL`.</Property>
+<Property name="disable_rich_pretty" type="bool" defaultValue="False">Skip installing `rich.pretty` on import. Importing `giskard.checks` normally installs rich's pretty printer for nicer REPL output; set this to disable it. Environment variable: `GISKARD_CHECKS_DISABLE_RICH_PRETTY`.</Property>
+<Property name="max_reported_failures" type="int | None" defaultValue="None">Maximum number of failures included in suite reports. `None` means unlimited. Values that cannot be parsed as a non-negative integer fall back to `None`. Environment variable: `GISKARD_CHECKS_MAX_REPORTED_FAILURES`.</Property>
+
+```bash
+# .env
+GISKARD_CHECKS_DEFAULT_MODEL=openai/gpt-5-mini
+GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL=text-embedding-3-large
+GISKARD_CHECKS_MAX_REPORTED_FAILURES=20
+GISKARD_CHECKS_DISABLE_RICH_PRETTY=true
+```
+
+<MethodCard name="get_settings()" returnType="GiskardChecksSettings">
+  Return the settings loaded from the environment. A fresh instance is built on
+  every call, so changes to environment variables are picked up without
+  restarting the process.
+</MethodCard>
+
+```python
+from giskard.checks import get_settings
+
+settings = get_settings()
+print(settings.default_model)  # "openai/gpt-4o-mini"
+```
+
+:::note
+`disable_rich_pretty` is read once, when `giskard.checks` is first imported.
+Set it in the environment or `.env` before the import for it to take effect.
+:::
+
+---
+
+## Default generator
+
+The default generator is what LLM-backed checks (`LLMJudge`, `Groundedness`,
+`Toxicity`, and friends) use when you do not pass a generator explicitly. A
+runtime override set with `set_default_generator` takes precedence over
+`GISKARD_CHECKS_DEFAULT_MODEL`.
+
+<MethodCard name="set_default_generator()" returnType="None">
+  Set the default LLM generator for all checks. The override is process-global.
+
+  <Property name="generator" type="BaseGenerator" required>The generator to use as the default for all LLM checks.</Property>
+</MethodCard>
+
+<MethodCard name="get_default_generator()" returnType="BaseGenerator">
+  Return the current default generator: the runtime override if one was set,
+  otherwise a `Generator` built from `GISKARD_CHECKS_DEFAULT_MODEL` (falling
+  back to `openai/gpt-4o-mini`).
+</MethodCard>
+
+```python
+from giskard.agents.generators import Generator
+from giskard.checks import get_default_generator, set_default_generator
+
+set_default_generator(Generator(model="openai/gpt-5-mini"))
+
+get_default_generator()  # Generator(model="openai/gpt-5-mini")
+```
+
+:::tip[Configuring pytest runs]
+Set the generator once per session in a `conftest.py` fixture rather than in
+every test module -- see [CI/CD Integration](/oss/checks/how-to/ci-cd).
+:::
+
+<MethodCard name="get_default_embedding_model()" returnType="EmbeddingModel">
+  Return an `EmbeddingModel` built from `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL`
+  (falling back to `text-embedding-3-small`). Importable from
+  `giskard.checks.settings`.
+</MethodCard>
+
+---
+
+## Imports
+
+`get_settings`, `set_default_generator`, and `get_default_generator` are
+re-exported at package level:
+
+```python
+from giskard.checks import (
+    get_default_generator,
+    get_settings,
+    set_default_generator,
+)
+```
+
+`GiskardChecksSettings` and `get_default_embedding_model` live in the settings
+module:
+
+```python
+from giskard.checks.settings import (
+    GiskardChecksSettings,
+    get_default_embedding_model,
+)
+```
+
+## See also
+
+- [Generators](/oss/checks/reference/generators) -- the generator classes you pass to `set_default_generator`
+- [Install & Configure](/oss/checks/installation) -- provider API keys and first-time setup
+- [CI/CD Integration](/oss/checks/how-to/ci-cd) -- configuring the generator once per test session

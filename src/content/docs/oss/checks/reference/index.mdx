@@ -43,6 +43,11 @@ Complete API documentation for Giskard Checks -- a comprehensive testing framewo
     description="Helper functions for normalization, value providers, and parameter injection"
     href="/oss/checks/reference/utils"
   />
+  <LinkCard
+    title="Settings"
+    description="Default model and embedding model, environment variables, and the default generator override"
+    href="/oss/checks/reference/settings"
+  />
 </CardGrid>
 
 ## Quick reference
@@ -76,6 +81,7 @@ from giskard.checks import (
     # Configuration
     set_default_generator,
     get_default_generator,
+    get_settings,
 )
 
 # LLM-based checks

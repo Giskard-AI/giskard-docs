@@ -259,7 +259,7 @@ Path("scan_suite.json").write_text(suite_result.suite.model_dump_json())
 
 ### Run the suite in CI/CD
 
-In your pipeline, load the saved suite and run it against your agent. This time, the scenarios are not regenerated: only the judging step calls the LLM, so remember to configure a judge in CI as well. The run then returns a result you can export as a JUnit XML report for your CI test dashboard:
+In your pipeline, load the saved suite and run it against your agent. Scenarios are not regenerated, but the judging step still calls the LLM, so configure a judge in CI as well:
 
 ```python
 from pathlib import Path
@@ -268,8 +268,9 @@ from giskard.checks import Suite
 suite = Suite.model_validate_json(Path("scan_suite.json").read_text())
 
 suite_result = await suite.run(target=my_agent)
-suite_result.to_junit_xml("scan_results.xml")
 ```
+
+For the workflow file, secrets, cost controls, and JUnit XML reporting, see [CI/CD Integration](/oss/checks/how-to/ci-cd).
 
 ### Re-run the same scenarios on another model
 
