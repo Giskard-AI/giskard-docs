@@ -259,10 +259,6 @@ result = await third_party_scan(
 
 Raises `ImportError` when the extra is missing and `ValueError` for an unknown tool.
 
-:::note[A third adapter exists but is not public]
-The package also ships a `"lidar"` adapter (`giskard.scan.integrations.lidar`). Lidar is a private Giskard package, so it is deliberately left out of the public docstrings, the unknown-tool error message, and this reference. It stays dispatchable for callers who already have it, but it is not a supported public integration.
-:::
-
 ---
 
 ## `list_scan_items`
