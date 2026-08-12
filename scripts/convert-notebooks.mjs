@@ -107,11 +107,6 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-/** Plain stream/plain output: safe to emit as literal text inside <Card> (not inside braces). */
-function isSafeMdxCardLiteral(text) {
-  return !/[<>{}]/.test(text);
-}
-
 function preSetHtml(innerHtml) {
   return `<pre
   class="notebook-output-rich"
@@ -175,12 +170,10 @@ function cellOutputsMdx(outputs) {
     if (seg.kind === 'html') {
       bodyParts.push(preSetHtml(seg.inner));
     } else {
-      const t = normalizeText(seg.text);
-      if (isSafeMdxCardLiteral(t)) {
-        bodyParts.push(t);
-      } else {
-        bodyParts.push(preEscapedText(t));
-      }
+      // Always <pre>: emitting stream text as literal MDX lets it be parsed as
+      // markdown (e.g. `=====` / `-----` separators become setext headings) and
+      // collapses the output's line breaks.
+      bodyParts.push(preEscapedText(seg.text));
     }
   }
 
