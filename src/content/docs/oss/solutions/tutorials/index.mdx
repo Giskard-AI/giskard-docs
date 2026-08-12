@@ -1,0 +1,21 @@
+---
+title: "Giskard Scan Tutorials"
+description: "Guided, hands-on lessons for running the Giskard scan against your own agent."
+sidebar:
+  order: 0
+  label: Overview
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+Learning-oriented walkthroughs. Follow them in order with a real Python file open — each one ends with something you can run again.
+
+<CardGrid>
+  <LinkCard
+    title="Your First Scan"
+    description="Run a vulnerability scan against a toy agent, read the report, and save the generated suite."
+    href="/oss/solutions/tutorials/your-first-scan"
+  />
+</CardGrid>
+
+You need an LLM provider configured before the scan can generate anything — see [Install & Configure](/oss/solutions/installation).

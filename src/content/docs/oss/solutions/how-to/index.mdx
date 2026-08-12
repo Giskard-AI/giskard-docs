@@ -1,0 +1,24 @@
+---
+title: "Giskard Scan How-to Guides"
+description: "Task-oriented guides for running the Giskard scan in CI and tuning its cost, concurrency, and reproducibility."
+sidebar:
+  order: 0
+  label: Overview
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+Short, task-shaped guides. They assume you have already run a scan once and want to change something about how it runs.
+
+<CardGrid>
+  <LinkCard
+    title="Run the Scan in CI"
+    description="Generate the suite once, commit it, and replay it on every pull request."
+    href="/oss/solutions/how-to/scan-in-ci"
+  />
+  <LinkCard
+    title="Tune a Scan Run"
+    description="Control budget, determinism, concurrency, and report grouping with the scan's keyword arguments."
+    href="/oss/solutions/how-to/tune-scan-options"
+  />
+</CardGrid>

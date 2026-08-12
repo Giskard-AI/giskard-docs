@@ -1,0 +1,29 @@
+---
+title: "Giskard Scan API Reference"
+description: "API documentation for giskard-scan: scan entry points, the scenario generator catalog, and knowledge bases."
+sidebar:
+  order: 0
+  label: Overview
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+Signatures, defaults, and types for everything exported by `giskard.scan`.
+
+<CardGrid>
+  <LinkCard
+    title="Scan API"
+    description="vulnerability_scan, quality_scan, generate_suite, third_party_scan, list_scan_items, ScanOptions, SuiteGeneratorRegistry."
+    href="/oss/solutions/reference/scan-api"
+  />
+  <LinkCard
+    title="Generators"
+    description="The scenario generator catalog — LLM-driven, dataset-backed, and knowledge-base generators."
+    href="/oss/solutions/reference/generators"
+  />
+  <LinkCard
+    title="Knowledge Base"
+    description="KnowledgeBase and Document, the document grounding used by the quality scan."
+    href="/oss/solutions/reference/knowledge-base"
+  />
+</CardGrid>

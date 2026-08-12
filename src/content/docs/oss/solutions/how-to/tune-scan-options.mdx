@@ -1,0 +1,93 @@
+---
+title: "Tune a Scan Run"
+description: "Control the cost, determinism, concurrency, and report grouping of a Giskard scan with max_scenarios, seed, parallel, max_concurrency, group_by, and the rest."
+sidebar:
+  order: 2
+---
+
+A default scan is deliberately unopinionated about your budget: every generator applies its own limit, every scenario runs at once, and the report is grouped the way that entry point thinks is most useful. All of that is adjustable through keyword arguments on `vulnerability_scan` and `quality_scan`.
+
+```python
+result = await vulnerability_scan(
+    target=my_agent,
+    description="A support assistant answering questions about our return policy.",
+    languages=["en"],
+    max_scenarios=20,
+    seed=7,
+    max_concurrency=4,
+)
+```
+
+## Cap the number of scenarios
+
+`max_scenarios` is a total upper bound across *all* generators, not a per-generator one — the budget is split between them before generation starts. Leave it as `None` (the default) and each generator falls back to its own limit, which is how a first scan can quietly turn into a few hundred LLM calls.
+
+Start low. Twenty scenarios is enough to tell you whether the plumbing works and whether your `description` is specific enough; raise it once the report stops being obviously wrong.
+
+## Make runs reproducible
+
+`seed` defaults to `42` and feeds the top-level RNG used for scenario sampling and generation. Child RNGs are spawned before the generators run concurrently, so the same seed gives the same scenarios regardless of how the event loop schedules things.
+
+Reproducible sampling is not reproducible *output*, though. The scenarios are stable; the LLM's answers and the judge's verdicts are not. If you need results that are comparable run over run, generate the suite once with `generate_suite` and replay the saved suite — see [Run the Scan in CI](/oss/solutions/how-to/scan-in-ci).
+
+## Control concurrency
+
+Two different kinds of concurrency are easy to conflate:
+
+**Generation** always runs generators concurrently. There is no flag for it.
+
+**Execution** — actually calling your agent with each generated scenario — is controlled by `parallel`, which defaults to `True` for both scans. Note that this differs from `Suite.run`, whose own `parallel` argument defaults to `False`; the scan helpers deliberately flip it.
+
+`max_concurrency` caps how many scenarios run at once when `parallel=True`. The default of `None` fires all of them simultaneously, which means your provider's rate limit becomes the real cap — usually visible as a wave of 429s halfway through a scan. Set it to something your agent and your API tier can absorb:
+
+```python
+result = await quality_scan(
+    target=my_agent,
+    description="...",
+    languages=["en"],
+    parallel=True,
+    max_concurrency=4,
+)
+```
+
+With `parallel=False` scenarios run one after another. A valid `max_concurrency` then has no effect on scheduling, but an invalid one is still rejected, so you cannot use it as an inert placeholder.
+
+## Keep a failed generation from killing the run
+
+If a scenario's input generation raises — a malformed LLM response, a provider timeout — the default `return_exception=False` lets the exception propagate and aborts the whole scan. Long scans against flaky providers are the case for `return_exception=True`, which records the failure as an errored result and carries on.
+
+Errored results are not passes. Read the error count in the report before you read the pass rate.
+
+## Group the report
+
+`group_by` names a result annotation key used to bucket the printed report. The default differs per entry point because the useful axis differs:
+
+| Scan | Default `group_by` |
+| --- | --- |
+| `vulnerability_scan` | `"threat-type"` |
+| `quality_scan` | `"component"` |
+
+Pass `None` to print the report ungrouped. The two axes are orthogonal — threat type is *what the attack tries to do*, component is *which part of your agent broke*; [How the Scan Works](/oss/solutions/explanation/how-scan-works) covers why both exist.
+
+## Vulnerability-scan-only knobs
+
+`commercial_use=True` excludes generators whose underlying datasets are not licensed for commercial use. It defaults to `False`, so a stock scan may pull in scenarios you cannot ship results from. This one is `vulnerability_scan` only — the quality scan has no equivalent.
+
+`target_mode` (`"singleturn"` or `"multiturn"`, default `"multiturn"`) is available on both scans and on `generate_suite`. Set `"singleturn"` when your agent has no conversation state: it skips generators that are multi-turn by design and caps turn budgets to 1 on the rest. Leaving it at `"multiturn"` for a stateless agent produces scenarios whose follow-up turns cannot land, which shows up as noise rather than as a clean skip.
+
+## About `ScanOptions`
+
+`ScanOptions` is a `TypedDict` describing exactly these keys, and its own docstring tells you to prefer explicit keyword arguments. It is there for the case where you are building the settings dynamically — reading them from a config file, say — and want type checking on the dict:
+
+```python
+from giskard.scan import ScanOptions, vulnerability_scan
+
+options: ScanOptions = {"max_scenarios": 20, "seed": 7, "commercial_use": True}
+result = await vulnerability_scan(target=my_agent, description="...", languages=["en"], **options)
+```
+
+`ScanOptions` extends `SharedScanOptions`, which holds everything except `commercial_use`, so the shared subset is what a quality scan will accept. Note that `target_mode` is not a member of either — it is a plain keyword argument only.
+
+## Reference
+
+Full signatures, types, and defaults live in the [Scan API reference](/oss/solutions/reference/scan-api).
