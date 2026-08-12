@@ -24,19 +24,9 @@ Enterprise platform for LLM agent testing with team collaboration and continuous
 ### Giskard Checks (Open Source)
 Apache-2.0 Python library for behavioral testing of LLM agents: you write scenarios and checks that pass or fail, and run them like any other test suite.
 
-What makes it different:
-- pytest-native and async-first — tests are plain `async def test_*` functions, no separate runner or DSL.
-- Scenarios and checks, not just metric scores — assertions on agent behavior, so results are pass/fail and actionable.
-- Framework-agnostic — the target is any plain async callable, so it works with LangChain, LlamaIndex, raw SDK calls, or an HTTP endpoint.
-- Runs fully locally — no account, no data leaving your machine; you own the LLM provider and keys.
-- The same library red-teams your agent via `giskard-scan`, which probes for vulnerabilities instead of only running the tests you wrote.
+Tests are plain `async def test_*` functions, so they run under pytest with no separate runner or DSL. The target under test is any async callable, so it works with LangChain, LlamaIndex, raw SDK calls, or an HTTP endpoint. Everything runs locally against your own LLM provider and keys. The same library red-teams an agent through the `giskard-scan` command, which probes for vulnerabilities rather than running only the tests you wrote.
 
-Choose the open-source library when you want tests living next to your code, in your CI, owned by developers. Choose the Giskard Hub when you need business users annotating tests in a UI, shared datasets across teams, and continuous scheduled red teaming.
-
-Typical entry points:
-- Install & Configure: https://docs.giskard.ai/oss/checks/installation.md
-- Your First Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md
-- Scan for Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
+Use the open-source library for tests that live next to your code and run in CI. Use the Hub when business users annotate tests in a UI, datasets are shared across teams, or red teaming runs on a schedule.
 
 ### Giskard Research
 Open research on AI safety and security, including the Phare multilingual benchmark, RealHarm incident dataset, and RealPerformance functional issues dataset.
