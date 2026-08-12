@@ -43,8 +43,6 @@ TAGS
 # Generated from notebooks — do not commit
 src/content/docs/oss/checks/quickstart.mdx
 src/content/docs/oss/checks/how-to/*.mdx
-# Hand-written, not notebook-generated
-!src/content/docs/oss/checks/how-to/quality-scan.mdx
 src/content/docs/oss/checks/tutorials/*.mdx
 src/content/docs/oss/checks/use-cases/*.mdx
 src/content/docs/oss/solutions/tutorials/*.mdx
