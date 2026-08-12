@@ -9,6 +9,10 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 The Giskard library provides an automatic **scan** that detects safety and security vulnerabilities affecting your LLM-based agents.
 
+:::tip[New to the scan?]
+Start with [Your First Scan](/oss/solutions/tutorials/your-first-scan) — a guided run against a toy agent in a few minutes. This page is the complete guide for wiring the scan to *your* agent.
+:::
+
 :::note[Coming from Giskard v2?]
 The scan has been redesigned in v3. Instead of wrapping your model with `giskard.Model(...)` and running `giskard.scan(model, dataset)` over a dataset, you wrap your agent as an async function, generate scenarios from a plain-language description with `generate_suite(...)`, and run them with `suite.run(...)`. This means there is no dataset to prepare and no `model_type` or `feature_names` to declare.
 :::
@@ -29,7 +33,7 @@ Today, the scan generates three families of attacks, mapped to the [OWASP LLM To
 | **Single-turn adversarial**   | Sends direct requests that test for harmful or unauthorized content such as stereotypes and discrimination, illegal activities, CBRN material, copyright, misinformation, and unqualified financial, medical, or legal advice. | Harmful Content Generation, Misguidance & Unauthorized Advice |
 | **GOAT multi-turn jailbreak** | Uses an attacker LLM that adapts over several turns, chaining strategies such as refusal suppression, persona modification, and hypothetical framing to push the agent toward objectives it should refuse.                     | Harmful Content Generation                                    |
 
-These cover high-impact attack surfaces today, and the library keeps adding more. See the [roadmap](#roadmap) for what is coming, and the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) for the complete list of categories.
+These cover high-impact attack surfaces today, and the library keeps adding more. See the [roadmap](#roadmap) for what is coming, the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) for the complete list of categories, and [How the Scan Works](/oss/solutions/explanation/how-scan-works) for how generators, threat types, and target modes fit together.
 
 :::tip[Need a more advanced scan?]
 The [Giskard Hub](/hub/ui/scan), our enterprise platform, takes red teaming much further: 55+ custom-designed probes across 11 vulnerability categories, aligned with the OWASP LLM Top 10 and more. On top of that, it grades your agent's security, keeps testing it after deployment with [continuous red teaming](/hub/ui/continuous-red-teaming), and runs from a web interface your whole team can use. [Talk to our team ↗](https://www.giskard.ai/contact) to see it in action.
@@ -247,9 +251,9 @@ For every failed scenario, the report shows the judge's verdict and the full con
 
 ## What's next?
 
-### Save your suite
+### Save the suite and run it in CI
 
-Generating scenarios uses an LLM, so it is good practice to generate the suite once and reuse it. The result exposes the suite that produced it via `suite_result.suite`. Since `Suite` is a Pydantic model, you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
+Generating scenarios uses an LLM, so generate the suite once and replay it. `suite_result.suite` is a Pydantic model you can serialize to JSON, commit, and load back in your pipeline — no regeneration, just judging:
 
 ```python
 from pathlib import Path
@@ -257,27 +261,11 @@ from pathlib import Path
 Path("scan_suite.json").write_text(suite_result.suite.model_dump_json())
 ```
 
-### Run the suite in CI/CD
+The full workflow, including the JUnit XML export and a GitHub Actions job, is in [Run the Scan in CI](/oss/solutions/how-to/scan-in-ci).
 
-In your pipeline, load the saved suite and run it against your agent. This time, the scenarios are not regenerated: only the judging step calls the LLM, so remember to configure a judge in CI as well. The run then returns a result you can export as a JUnit XML report for your CI test dashboard:
+### Understand what the scan did
 
-```python
-from pathlib import Path
-from giskard.checks import Suite
-
-suite = Suite.model_validate_json(Path("scan_suite.json").read_text())
-
-suite_result = await suite.run(target=my_agent)
-suite_result.to_junit_xml("scan_results.xml")
-```
-
-### Re-run the same scenarios on another model
-
-The saved suite can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the vulnerabilities are gone and that nothing regressed:
-
-```python
-suite_result = await suite.run(target=my_other_agent)
-```
+[How the Scan Works](/oss/solutions/explanation/how-scan-works) explains the generators, target modes, threat-type grouping, and why judge verdicts should be read rather than trusted outright.
 
 ### Read the API reference
 
