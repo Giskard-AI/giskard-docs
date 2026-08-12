@@ -97,14 +97,14 @@ const softwareJsonLd = {
 	applicationCategory: 'DeveloperApplication',
 	operatingSystem: 'Cross-platform',
 	license: 'https://www.apache.org/licenses/LICENSE-2.0',
-	codeRepository: 'https://github.com/Giskard-AI/giskard-oss',
+	sameAs: 'https://github.com/Giskard-AI/giskard-oss',
 	author: { '@type': 'Organization', name: 'Giskard', url: 'https://giskard.ai' },
 	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
 };
 
 // Opt-in per page via the `faq` frontmatter field (see src/content.config.ts).
 const faq = route.entry.data.faq;
-const faqJsonLd = faq?.length && {
+const faqJsonLd = faq?.length ? {
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
 	mainEntity: faq.map(({ q, a }) => ({
@@ -112,7 +112,7 @@ const faqJsonLd = faq?.length && {
 		name: q,
 		acceptedAnswer: { '@type': 'Answer', text: a },
 	})),
-};
+} : null;
 ---
 
 <link rel="preload" href="/fonts/osmose-regular.woff2" as="font" type="font/woff2" crossorigin />
