@@ -1,0 +1,367 @@
+---
+title: "Migrate from DeepEval or promptfoo"
+description: "Translate DeepEval metrics and promptfoo YAML assertions into Giskard Checks scenarios, with a concept map and honest notes on when to keep your existing tool."
+sidebar:
+  order: 13
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+If you already have an LLM test suite in [DeepEval](https://github.com/confident-ai/deepeval)
+or [promptfoo](https://github.com/promptfoo/promptfoo), most of it maps onto
+Giskard Checks mechanically. This page gives the translation tables, the concept
+mapping, and — just as importantly — the cases where migrating buys you nothing.
+
+<Aside type="note" title="Versions">
+Giskard snippets are verified against `giskard-checks==1.0.2b6`. DeepEval
+snippets follow the 3.x API (`deepeval.metrics`, `LLMTestCase`); promptfoo
+snippets follow the 0.1x `promptfooconfig.yaml` schema. Both of those projects
+move fast — re-check their current docs before assuming a snippet still parses.
+</Aside>
+
+## Concept mapping
+
+| DeepEval | promptfoo | Giskard Checks |
+| --- | --- | --- |
+| `LLMTestCase(input=…, actual_output=…)` | one `tests:` entry with `vars` | `Interaction` — one turn of inputs/outputs |
+| `ConversationalTestCase(turns=[…])` | *(no first-class equivalent)* | `Scenario` with several `.interact()` calls, exposed as a `Trace` |
+| a metric (`AnswerRelevancyMetric`, …) | one `assert` entry | a `Check` |
+| `metric.threshold` | `assert.threshold` | a constructor argument on the check (`threshold=`, `min_score=`) |
+| `EvaluationDataset` / `goldens` | `tests: file://cases.csv` | a Python list you loop over, or a `DatasetInputGenerator` |
+| `evaluate(dataset, metrics)` | `promptfoo eval` | `Suite(name=…, scenarios=[…]).run()` |
+| `assert_test(...)` in pytest | `promptfoo eval` exit code | `assert result.passed` in a pytest test |
+| `deepeval test run` | `promptfoo eval --output junit.xml` | `SuiteResult.to_junit_xml()` |
+| `ConversationSimulator` | *(no equivalent)* | `UserSimulator` |
+| custom `BaseMetric` subclass | `python:` / `javascript:` assert | `FnCheck`, or a `Check` subclass |
+
+The one structural difference worth internalising: DeepEval and promptfoo both
+evaluate a **flat record** (input, output, context). Giskard evaluates a
+**trace** — an ordered list of interactions — and every check addresses it with
+a JSONPath such as `trace.last.outputs`. Single-turn tests are just traces of
+length one, so nothing is lost, but multi-turn tests become expressible without
+a separate test-case class.
+
+## DeepEval metric → Giskard check
+
+| DeepEval metric | Giskard check | Notes |
+| --- | --- | --- |
+| `AnswerRelevancyMetric` | `AnswerRelevance` | Reads `trace.last.inputs` / `trace.last.outputs` by default |
+| `FaithfulnessMetric` | `Groundedness` | Context from `context=` or `trace.last.metadata.context` |
+| `HallucinationMetric` | `Contradiction` | Flags claims that contradict the supplied context |
+| `GEval(criteria=…)` | `Conformity(rule=…)` | For a plain natural-language rule |
+| `GEval` with a custom prompt | `LLMJudge(prompt=…)` | Full control of the judge prompt (Jinja over the trace) |
+| `ToxicityMetric` | `Toxicity` | Optional `categories=[…]` narrowing |
+| `BiasMetric` | `Conformity(rule=…)` or `LLMJudge` | No dedicated bias check; express it as a rule |
+| `JsonCorrectnessMetric` | `JsonValid(schema=…)` | Deterministic, no LLM call |
+| `SummarizationMetric` | `Groundedness` + `Conformity` | No single equivalent; compose the two |
+| `ContextualPrecision/Recall/Relevancy` | *(no equivalent)* | Retriever-scoring metrics; see [keep using DeepEval when…](#keep-using-deepeval-when) |
+| custom `BaseMetric` | `FnCheck(fn=…)` | Sync or async callable over the trace |
+
+### Single test case
+
+```python title="DeepEval 3.x"
+from deepeval import assert_test
+from deepeval.metrics import AnswerRelevancyMetric, FaithfulnessMetric
+from deepeval.test_case import LLMTestCase
+
+
+def test_rag_answer():
+    test_case = LLMTestCase(
+        input="What is the capital of France?",
+        actual_output=my_agent("What is the capital of France?"),
+        retrieval_context=["Paris is the capital and largest city of France."],
+    )
+    assert_test(
+        test_case,
+        [
+            AnswerRelevancyMetric(threshold=0.7),
+            FaithfulnessMetric(threshold=0.8),
+        ],
+    )
+```
+
+```python title="Giskard Checks 1.0.2b6"
+import pytest
+from giskard.checks import AnswerRelevance, Groundedness, Scenario
+
+CONTEXT = "Paris is the capital and largest city of France."
+
+
+@pytest.mark.asyncio
+async def test_rag_answer():
+    scenario = (
+        Scenario("rag_answer")
+        .interact(
+            inputs="What is the capital of France?",
+            outputs=lambda inputs: my_agent(inputs),
+            metadata={"context": CONTEXT},
+        )
+        .checks(
+            AnswerRelevance(name="answer is relevant"),
+            Groundedness(name="answer is grounded"),
+        )
+    )
+    result = await scenario.run()
+    assert result.passed
+```
+
+Two things changed. First, thresholds: Giskard's LLM-backed checks return a
+pass/fail judgement rather than a score you threshold, so `threshold=0.7`
+usually has no direct counterpart — tighten the check's `rule`/`prompt` instead
+of tuning a number. Second, context travels in interaction `metadata`, which
+`Groundedness` reads from `trace.last.metadata.context` by default.
+
+### Custom metric
+
+```python title="DeepEval 3.x"
+from deepeval.metrics import BaseMetric
+
+
+class LatencyMetric(BaseMetric):
+    def __init__(self, max_ms: int = 200):
+        self.max_ms = max_ms
+        self.threshold = 0.5
+
+    def measure(self, test_case) -> float:
+        self.score = 1.0 if test_case.latency_ms < self.max_ms else 0.0
+        self.success = self.score >= self.threshold
+        return self.score
+
+    @property
+    def __name__(self):
+        return "Latency"
+```
+
+```python title="Giskard Checks 1.0.2b6"
+from giskard.checks import FnCheck
+
+under_200ms = FnCheck(
+    name="under 200ms",
+    fn=lambda trace: trace.last.metadata["latency_ms"] < 200,
+)
+```
+
+`fn` may also be `async`, and may return a `CheckResult` instead of a bool when
+you want to attach details. For anything needing configuration or an LLM call,
+subclass `Check` — see [Custom Checks](/oss/checks/how-to/custom-checks).
+
+### Dataset and `evaluate()`
+
+```python title="DeepEval 3.x"
+from deepeval import evaluate
+from deepeval.dataset import EvaluationDataset
+from deepeval.metrics import AnswerRelevancyMetric
+from deepeval.test_case import LLMTestCase
+
+dataset = EvaluationDataset(
+    test_cases=[
+        LLMTestCase(input=q, actual_output=my_agent(q)) for q in QUESTIONS
+    ]
+)
+evaluate(dataset, [AnswerRelevancyMetric()])
+```
+
+```python title="Giskard Checks 1.0.2b6"
+from giskard.checks import AnswerRelevance, Scenario, Suite
+
+suite = Suite(
+    name="qa-regression",
+    scenarios=[
+        Scenario(f"qa_{i}")
+        .interact(inputs=q, outputs=lambda inputs: my_agent(inputs))
+        .check(AnswerRelevance(name="answer is relevant"))
+        for i, q in enumerate(QUESTIONS)
+    ],
+)
+
+result = await suite.run(parallel=True)
+print(result.passed_count, result.failed_count, result.pass_rate)
+```
+
+`SuiteResult` also exposes `print_report()`, `group_by(...)`, and
+`to_junit_xml()` — the last one is the drop-in replacement for
+`deepeval test run`'s JUnit output in CI.
+
+## promptfoo assertion → Giskard check
+
+Deterministic assertions map one-to-one and, like in promptfoo, run without an
+LLM call.
+
+| promptfoo `assert.type` | Giskard check |
+| --- | --- |
+| `contains` | `StringMatching(keyword=…)` |
+| `icontains` | `StringMatching(keyword=…, case_sensitive=False)` |
+| `equals` | `Equals(key="trace.last.outputs", expected_value=…)` |
+| `regex` | `RegexMatching(pattern=…)` |
+| `is-json` | `JsonValid()` |
+| `is-json` with `value:` schema | `JsonValid(schema={…})` |
+| `similar` (+ `threshold`) | `SemanticSimilarity(reference_text=…, threshold=…)` |
+| `llm-rubric` | `LLMJudge(prompt=…)` or `Conformity(rule=…)` |
+| `context-faithfulness` | `Groundedness` |
+| `answer-relevance` | `AnswerRelevance` |
+| `python` / `javascript` | `FnCheck(fn=…)` (Python only) |
+| `not-` prefix (`not-contains`, …) | `Not(check=…)` |
+| `assert-set` with `type: any-of` | `AnyOf(checks=[…])` |
+| `assert-set` with `type: all-of` | `AllOf(checks=[…])` |
+| `latency` / `cost` | `LessThan(key="trace.last.metadata.latency_ms", …)` — you populate the metadata |
+| `moderation` | `Toxicity` |
+| `is-valid-openai-function-call` | `FnCheck` over the trace, or a custom `Trace` subclass |
+| `perplexity`, `rouge-n`, `bleu`, `levenshtein` | *(no equivalent)* — see [keep using promptfoo when…](#keep-using-promptfoo-when) |
+
+### A config, translated
+
+```yaml title="promptfoo 0.1x — promptfooconfig.yaml"
+prompts:
+  - "Return the order status for {{order_id}} as JSON."
+providers:
+  - openai:gpt-4o-mini
+tests:
+  - vars:
+      order_id: A-1
+    assert:
+      - type: is-json
+        value:
+          type: object
+          required: [order_id, status]
+      - type: icontains
+        value: shipped
+      - type: not-contains
+        value: refunded
+      - type: llm-rubric
+        value: The response must not speculate about delivery dates.
+```
+
+```python title="Giskard Checks 1.0.2b6"
+from giskard.checks import (
+    Conformity,
+    JsonValid,
+    Not,
+    Scenario,
+    StringMatching,
+)
+
+order_status = (
+    Scenario("order_status")
+    .interact(
+        inputs="Return the order status for A-1 as JSON.",
+        outputs=lambda inputs: my_agent(inputs),
+    )
+    .checks(
+        JsonValid(
+            name="valid json",
+            schema={
+                "type": "object",
+                "properties": {
+                    "order_id": {"type": "string"},
+                    "status": {"type": "string"},
+                },
+                "required": ["order_id", "status"],
+            },
+        ),
+        StringMatching(name="is shipped", keyword="shipped", case_sensitive=False),
+        Not(name="not refunded", check=StringMatching(keyword="refunded")),
+        Conformity(rule="The response must not speculate about delivery dates."),
+    )
+)
+
+result = await order_status.run()
+```
+
+### Templated `vars` and CSV test files
+
+promptfoo's `{{var}}` templating plus `tests: file://cases.csv` becomes an
+ordinary Python loop — you keep the CSV, you just read it yourself.
+
+```yaml title="promptfoo 0.1x"
+prompts:
+  - "Answer the question: {{question}}"
+tests: file://cases.csv
+defaultTest:
+  assert:
+    - type: contains
+      value: "{{expected}}"
+```
+
+```python title="Giskard Checks 1.0.2b6"
+import csv
+
+from giskard.checks import Scenario, StringMatching, Suite
+
+with open("cases.csv") as f:
+    cases = list(csv.DictReader(f))
+
+suite = Suite(
+    name="qa-from-csv",
+    scenarios=[
+        Scenario(f"qa_{i}")
+        .interact(
+            inputs=f"Answer the question: {case['question']}",
+            outputs=lambda inputs: my_agent(inputs),
+        )
+        .check(StringMatching(name="contains expected", keyword=case["expected"]))
+        for i, case in enumerate(cases)
+    ],
+)
+```
+
+If you would rather generate the inputs than curate them, swap the CSV for a
+`DatasetInputGenerator` and pass it as `inputs=` — see
+[Dynamic Scenarios](/oss/checks/tutorials/dynamic-scenarios).
+
+### Multi-turn
+
+promptfoo has no first-class conversation type; the usual workaround is to bake
+the history into the prompt. In Giskard, turns are the primitive:
+
+```python title="Giskard Checks 1.0.2b6"
+conversation = (
+    Scenario("escalation")
+    .interact(inputs="My order never arrived.", outputs=lambda i: my_agent(i))
+    .check(Conformity(rule="The reply apologises and asks for an order number."))
+    .interact(inputs="It's A-1.", outputs=lambda i: my_agent(i))
+    .check(StringMatching(name="echoes order id", keyword="A-1"))
+)
+```
+
+Checks always see the whole trace, so a later check can assert on an earlier
+turn via `trace.interactions[0].outputs`.
+
+## Keep using DeepEval when…
+
+- **You need retriever metrics.** `ContextualPrecisionMetric`,
+  `ContextualRecallMetric`, and `ContextualRelevancyMetric` score the retrieval
+  step against expected output. Giskard has no equivalent — it checks whether the
+  answer is grounded in the context you pass, not whether the retriever found the
+  right context. If tuning a retriever is the job, DeepEval is the better tool.
+- **You depend on numeric scores and thresholds.** Giskard's LLM checks return
+  pass/fail with a reason rather than a 0–1 score, so score-trend dashboards and
+  threshold sweeps do not carry over.
+- **You are invested in Confident AI.** The hosted dataset/regression tooling is
+  tightly coupled to DeepEval's objects.
+
+## Keep using promptfoo when…
+
+- **You are comparing providers or prompts, not testing an agent.** promptfoo's
+  matrix over `prompts × providers × tests` with a side-by-side web view is its
+  strongest feature and Giskard does not attempt it. A prompt bake-off is a
+  promptfoo job.
+- **Your tests must be config, not code.** promptfoo suites are YAML that
+  non-engineers can edit. Giskard scenarios are Python.
+- **You rely on reference-based text metrics** (`bleu`, `rouge-n`,
+  `levenshtein`, `perplexity`) or on the red-team generators. Giskard has
+  `SemanticSimilarity` for the fuzzy-match case, but no n-gram overlap metrics.
+
+The two are not mutually exclusive, and the usual endpoint of a migration is not
+a total one: keep promptfoo for prompt selection, move the behavioural
+regression suite — the part that runs on every PR and must stay green — into
+Giskard, where multi-turn traces, stateful checks, and real agent invocation are
+first-class.
+
+## Next steps
+
+- [Core Concepts](/oss/checks/explanation/core-concepts) — Interaction, Trace,
+  Check, Scenario
+- [Custom Checks](/oss/checks/how-to/custom-checks) — porting a custom metric
+- [Run Tests with pytest](/oss/checks/how-to/run-in-pytest) — CI wiring
+- [Batch Evaluation](/oss/checks/how-to/batch-evaluation) — replacing
+  `evaluate()` / `promptfoo eval`
