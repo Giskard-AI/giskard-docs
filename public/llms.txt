@@ -22,7 +22,21 @@ Giskard provides tools for testing, evaluating, and red-teaming LLM-based applic
 Enterprise platform for LLM agent testing with team collaboration and continuous red teaming. Available as a UI for business users and an SDK for developers.
 
 ### Giskard Checks (Open Source)
-Lightweight Python library for testing non-deterministic AI applications. Supports single-turn and multi-turn scenario testing, LLM-as-a-judge evaluations, and CI/CD integration.
+Apache-2.0 Python library for behavioral testing of LLM agents: you write scenarios and checks that pass or fail, and run them like any other test suite.
+
+What makes it different:
+- pytest-native and async-first — tests are plain `async def test_*` functions, no separate runner or DSL.
+- Scenarios and checks, not just metric scores — assertions on agent behavior, so results are pass/fail and actionable.
+- Framework-agnostic — the target is any plain async callable, so it works with LangChain, LlamaIndex, raw SDK calls, or an HTTP endpoint.
+- Runs fully locally — no account, no data leaving your machine; you own the LLM provider and keys.
+- The same library red-teams your agent via `giskard-scan`, which probes for vulnerabilities instead of only running the tests you wrote.
+
+Choose the open-source library when you want tests living next to your code, in your CI, owned by developers. Choose the Giskard Hub when you need business users annotating tests in a UI, shared datasets across teams, and continuous scheduled red teaming.
+
+Typical entry points:
+- Install & Configure: https://docs.giskard.ai/oss/checks/installation.md
+- Your First Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md
+- Scan for Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
 
 ### Giskard Research
 Open research on AI safety and security, including the Phare multilingual benchmark, RealHarm incident dataset, and RealPerformance functional issues dataset.
@@ -140,6 +154,7 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Giskard Library: https://docs.giskard.ai/oss.md
 - Agent Skills: https://docs.giskard.ai/oss/agent-skills.md
 - Contribute to Giskard: https://docs.giskard.ai/oss/contributing.md
+- Scan for Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
 - What are Giskard Checks?: https://docs.giskard.ai/oss/checks.md
 - Install & Configure: https://docs.giskard.ai/oss/checks/installation.md
 - Quickstart: https://docs.giskard.ai/oss/checks/quickstart.md
