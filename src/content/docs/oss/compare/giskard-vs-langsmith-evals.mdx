@@ -1,0 +1,126 @@
+---
+title: Giskard vs LangSmith evaluations
+description: "An honest comparison of Giskard Checks and LangSmith's evaluation features — a local open-source library versus a hosted observability and evaluation platform."
+sidebar:
+  order: 5
+---
+
+LangSmith is LangChain's hosted platform for tracing, monitoring, and evaluating
+LLM applications. Its evaluation features are one part of a larger product whose
+centre of gravity is production observability.
+
+Giskard Checks is a local open-source library with no hosted component. This is
+the most lopsided comparison on this page — the two tools mostly do different
+jobs, and "LangSmith or Giskard" is usually the wrong question.
+
+## Feature comparison
+
+| | Giskard Checks | LangSmith evaluations |
+| --- | --- | --- |
+| License | Apache 2.0 (open source) | Closed source (hosted SaaS) |
+| Deployment | Local library, runs anywhere Python runs | Hosted cloud; self-hosting is Enterprise-only |
+| Account required | No | Yes |
+| Data location | Your machine, plus whichever LLM provider you configure | Traces and datasets stored in LangSmith |
+| Cost | Free | Free tier, then from ~$39/user/month with per-trace overages |
+| Production tracing | No | Yes — the core strength |
+| Dataset & experiment UI | No | Yes, and it is good |
+| Human annotation queues | No | Yes |
+| Test authoring | pytest tests in your repo | Python/TS SDK evaluators against hosted datasets |
+| LangChain coupling | None | Works without LangChain, but the ecosystem pull is real |
+| Multi-turn / stateful | First-class scenarios | Supported via traces and datasets |
+| Red teaming | `giskard-scan`, same primitives | Not a focus |
+| Offline / air-gapped CI | Yes | Not without an Enterprise self-hosted deployment |
+
+## Side by side
+
+**Giskard Checks**
+
+```python
+# test_agent.py
+from giskard.checks import Scenario, RegexMatching
+
+
+async def test_capital_of_france():
+    scenario = (
+        Scenario("capital_of_france")
+        .interact(
+            inputs="What is the capital of France?",
+            outputs=lambda inputs: my_agent(inputs),
+        )
+        .check(RegexMatching(pattern=r"Paris", name="mentions_paris"))
+    )
+
+    result = await scenario.run()
+    assert result.passed
+```
+
+**LangSmith**
+
+```python
+from langsmith import Client, evaluate
+
+client = Client()  # requires LANGSMITH_API_KEY
+
+def mentions_paris(outputs: dict, **kwargs) -> bool:
+    return "Paris" in outputs["output"]
+
+evaluate(
+    lambda inputs: {"output": my_agent(inputs["question"])},
+    data="capitals-dataset",     # lives in LangSmith
+    evaluators=[mentions_paris],
+)
+```
+
+The structural difference: the Giskard test is self-contained in your repo and
+its result is a pytest pass or fail. The LangSmith version references a dataset
+that lives in the platform and writes its results back there, which is what makes
+the experiment history and comparison UI possible — and also what makes an
+account mandatory.
+
+## Pick LangSmith when…
+
+- **You need production observability.** This is the honest headline. Giskard has
+  no answer here at all. If you want to trace live traffic, debug a bad
+  production response, and track latency and cost, LangSmith does that well and
+  Giskard does not do it.
+- **You want experiment history and a comparison UI.** Tracking scores across
+  runs, diffing two versions of a prompt, and sharing results with non-engineers
+  is genuinely valuable and genuinely absent from a pure library.
+- **You want human annotation in the loop.** Annotation queues and feedback
+  collection are first-class in LangSmith.
+- **You are deep in the LangChain / LangGraph ecosystem.** The integration is
+  close to zero-effort, and that convenience is real.
+- **You want production traces to become test datasets.** Turning a real bad
+  response into a dataset example is a strong workflow that a local library
+  cannot replicate on its own.
+
+## Pick Giskard when…
+
+- **Data cannot leave your infrastructure.** Giskard is fully local. There is no
+  account, no hosted backend, and nothing uploaded — the only egress is to the
+  LLM provider you configure. For regulated environments this is often decisive.
+- **You want evaluation in your repo, versioned with your code.** Tests live in
+  git next to the code they test, review in the same PR, and roll back with it.
+  Hosted datasets do not.
+- **Per-seat and per-trace pricing is a problem.** A library has no seat count.
+- **You want no vendor coupling.** Giskard talks to your agent through a plain
+  async callable.
+- **You want safety testing in the same tool.** See
+  [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities).
+
+## Using both
+
+These compose well and we would not argue against it: LangSmith for production
+tracing and Giskard for the pre-merge test suite. They do not compete for the
+same slot in your stack. If what you actually want is Giskard-style testing *with*
+a UI, collaboration, and continuous red teaming, that is the
+[Giskard Hub](/start/comparison).
+
+## See also
+
+- [CI/CD integration](/oss/checks/how-to/ci-cd)
+- [Open Source vs Hub](/start/comparison)
+
+Sources: [LangSmith pricing ↗](https://www.langchain.com/pricing-langsmith),
+[LangSmith documentation ↗](https://docs.langchain.com/langsmith/home). Pricing
+was last checked in August 2026 and changes often — verify before deciding.

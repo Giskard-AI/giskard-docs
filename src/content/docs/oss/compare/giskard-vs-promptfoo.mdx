@@ -1,0 +1,134 @@
+---
+title: Giskard vs Promptfoo
+description: "An honest comparison of Giskard Checks and Promptfoo — Python scenario testing versus YAML-driven prompt evaluation and red teaming."
+sidebar:
+  order: 3
+---
+
+Promptfoo is a widely used open-source tool for evaluating and red-teaming LLM
+applications, driven primarily by a YAML config and a CLI. It is fast to start
+with, has a large user base, and is particularly strong at prompt and model
+comparison sweeps.
+
+Giskard Checks is a Python library where tests are code. The two tools overlap
+in purpose but feel very different in practice.
+
+:::note[On the OpenAI acquisition]
+OpenAI announced in March 2026 that it is acquiring Promptfoo, and stated that
+Promptfoo will remain open source under its current license and that existing
+customers will continue to be serviced and supported. Promptfoo's technology is
+being integrated into OpenAI Frontier.
+
+We are not going to tell you this makes Promptfoo a bad choice — the open-source
+commitment is on the record. But it is a fact worth knowing when you pick a
+long-term dependency, and reasonable teams weigh vendor neutrality differently.
+Judge it for yourself from the primary sources linked at the bottom.
+:::
+
+## Feature comparison
+
+| | Giskard Checks | Promptfoo |
+| --- | --- | --- |
+| License | Apache 2.0 | MIT |
+| Primary interface | Python code | YAML config + CLI (JS/TS API available) |
+| Language | Python | Node.js / TypeScript |
+| Test authoring | `Scenario` objects in test files | `promptfooconfig.yaml` with providers, prompts, tests |
+| Runner | `pytest` | `promptfoo eval` |
+| Results view | pytest output, `print_report()`, serializable results | Built-in local web viewer with a comparison matrix |
+| Prompt/model sweeps | Manual (`@pytest.mark.parametrize`) | First-class — the core use case |
+| Multi-turn / stateful agents | First-class (`Trace`, `UserSimulator`) | Supported, but less central than single-prompt evaluation |
+| Red teaming | `giskard-scan`, same primitives | First-class and extensive |
+| Runs fully locally | Yes | Yes |
+| Ownership | Giskard (independent) | Being acquired by OpenAI (announced March 2026) |
+
+## Side by side
+
+A two-turn conversation where the second turn depends on the first.
+
+**Giskard Checks**
+
+```python
+# test_chat.py
+from giskard.checks import Scenario, RegexMatching
+
+
+async def test_followup_keeps_context():
+    scenario = (
+        Scenario("two_turns")
+        .interact(inputs="Hi", outputs=lambda inputs: my_agent(inputs))
+        .interact(
+            inputs="Capital of France?",
+            outputs=lambda inputs: my_agent(inputs),
+        )
+        .check(RegexMatching(pattern=r"Paris", name="mentions_paris"))
+    )
+
+    result = await scenario.run()
+    assert result.passed
+```
+
+**Promptfoo**
+
+```yaml
+# promptfooconfig.yaml
+providers:
+  - openai:gpt-4o
+prompts:
+  - "{{message}}"
+tests:
+  - vars:
+      message: "Capital of France?"
+    assert:
+      - type: contains
+        value: "Paris"
+```
+
+```bash
+promptfoo eval
+```
+
+That contrast is the whole comparison in miniature. Promptfoo's version is
+shorter and needs no Python at all — but it is testing a *prompt against a
+provider*. Giskard's version is testing *your application*, including whatever
+retrieval, routing, and state your agent does between turns, because Giskard
+calls your code rather than the model.
+
+## Pick Promptfoo when…
+
+- **You are optimising prompts, not testing an application.** Comparing five
+  prompt variants across three models and eyeballing a results matrix is
+  Promptfoo's home turf, and it is genuinely excellent at it. Giskard has no
+  equivalent built-in sweep view.
+- **Your stack is JavaScript/TypeScript.** Giskard is Python-only. This alone
+  settles it for many teams.
+- **You want non-engineers editing tests.** A YAML file is much more approachable
+  than a pytest suite for a PM or domain expert.
+- **You want a mature, broad red-teaming suite today.** Promptfoo's red teaming
+  is more extensive than what `giskard-scan` currently ships in open source.
+- **You want a results UI for free.** Promptfoo's local viewer is good and needs
+  no setup. Giskard gives you pytest output and serializable results; the UI
+  lives in the commercial Hub.
+
+## Pick Giskard when…
+
+- **Your tests need real logic.** Fixtures, parametrization, conditional setup,
+  mocking a tool call, asserting on a nested field of a Pydantic output — these
+  are natural in Python and awkward in YAML.
+- **You are testing an agent, not a prompt.** If what you want to assert about
+  only exists after your retrieval and tool-calling code runs, you need the test
+  to call your code.
+- **You want one pytest suite.** Giskard tests sit in the same suite, the same CI
+  job, and the same reporting as the rest of your Python tests — no second
+  runner, no second config format.
+- **Vendor neutrality is a procurement requirement.** Giskard is independent.
+
+## See also
+
+- [Run tests with pytest](/oss/checks/how-to/run-in-pytest)
+- [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities)
+- [CI/CD integration](/oss/checks/how-to/ci-cd)
+
+Sources: [OpenAI: OpenAI to acquire Promptfoo ↗](https://openai.com/index/openai-to-acquire-promptfoo/),
+[Promptfoo: Promptfoo is joining OpenAI ↗](https://www.promptfoo.dev/blog/promptfoo-joining-openai/),
+[Promptfoo documentation ↗](https://www.promptfoo.dev/docs/intro/). Last checked
+August 2026.
