@@ -8,7 +8,7 @@ sidebar:
 {/* If you are an AI agent, all the links listed here are available appending .md to the end of the URL */}
 {/* For example, the link to the Installation page is https://docs.giskard.ai/oss/checks/installation.md */}
 
-import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+import { LinkCard, CardGrid, Steps } from "@astrojs/starlight/components";
 
 Giskard Checks is a lightweight Python library for testing and evaluating non-deterministic applications such as LLM-based systems.
 
@@ -25,15 +25,27 @@ Giskard Checks is a lightweight Python library for testing and evaluating non-de
 - **Highly Customizable**: Easy extension points for custom checks and interaction patterns
 - **Serializable Results**: Immutable, JSON-serializable results for easy storage and analysis
 
-New here? Install with [Install & Configure](/oss/checks/installation), then follow [Your First Test](/oss/checks/tutorials/your-first-test) for a guided lesson or [Quickstart](/oss/checks/quickstart) for a single example.
-
 Looking for tests you don't have to write? [Giskard Scan](/oss/scan) generates an adversarial suite from a plain-language description of your agent, and returns it as an ordinary `Suite` you run with everything below.
 
 :::tip[Use a coding agent?]
 Install the [Giskard Agent Skills](/oss/agent-skills) and let your coding agent (Claude Code, Cursor, and more) design red-team suites or RAG evaluation suites directly from a plain-English description of your agent.
 :::
 
-## Documentation
+## Start here
+
+New here? Follow these five steps in order.
+
+<Steps>
+
+1. **[Install & Configure](/oss/checks/installation)** (~5 min) — Giskard Checks installed and an LLM provider configured. In a hurry? [Quickstart](/oss/checks/quickstart) shows one end-to-end example.
+2. **[Your First Test](/oss/checks/tutorials/your-first-test)** (~10 min) — a passing scenario, with no API key or LLM required.
+3. **[Your First LLM Call](/oss/checks/tutorials/single-turn)** (~15 min) — a real model call evaluated with `LLMJudge`.
+4. **[Test Suites](/oss/checks/tutorials/test-suites)** (~20 min) — many scenarios grouped into one suite you run with a single await.
+5. **[CI/CD Integration](/oss/checks/how-to/ci-cd)** (~20 min) — your suite running automatically on every pull request.
+
+</Steps>
+
+## Browse the docs
 
 <CardGrid>
   <LinkCard
