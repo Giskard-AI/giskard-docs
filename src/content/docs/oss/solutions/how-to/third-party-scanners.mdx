@@ -1,0 +1,129 @@
+---
+title: "Run Garak and DeepTeam Scanners"
+description: "Run the garak and deepteam red-team scanners against a Giskard target with third_party_scan, discover probes with list_scan_items, and read the unified SuiteResult."
+sidebar:
+  order: 5
+---
+
+Giskard's own generators are not the only red teams worth running. `third_party_scan` drives two external scanners against the same target you already scan with, and returns their findings as an ordinary `SuiteResult` — same shape, same `passed_count` / `failures_and_errors`, same CI export path.
+
+:::note[Experimental]
+The integrations package is marked experimental in the library. The adapters are thin translation layers over each tool's own runner, so their behaviour tracks upstream releases.
+:::
+
+## Install the extra
+
+Neither scanner ships with `giskard-scan`. Each is an optional extra, pinned in the library's `pyproject.toml`:
+
+| Extra | Installs | Command |
+| --- | --- | --- |
+| `garak` | `garak>=0.15,<1` | `pip install "giskard-scan[garak]"` |
+| `deepteam` | `deepteam>=1.0.7,<2` | `pip install "giskard-scan[deepteam]"` |
+
+Calling `third_party_scan` without the matching extra raises `ImportError` with the install command in the message — the import is lazy, so the package stays installable without either.
+
+## What each one adds
+
+The built-in generators produce scenarios from your `description` and a curated threat taxonomy. The two external scanners come at the problem from different directions:
+
+**garak** is a catalog of hand-written probes — hundreds of them, each with a specific known attack and a detector that scores the response. Where a Giskard generator asks an LLM to invent a prompt-injection attempt for your domain, garak replays attacks that are already documented to work: DAN jailbreaks, encoded-payload data exfiltration, model-specific quirks. Coverage is broad and fixed; the probes do not adapt to what your agent does.
+
+**deepteam** is attack-technique-driven. You pick *vulnerabilities* (what you are testing for) and *attacks* (how the prompt is obfuscated or escalated), and it produces the cross-product: `Toxicity` attempted via `Leetspeak`, `PIILeakage` via `CrescendoJailbreaking`, and so on. That gives you an axis the built-in generators do not expose separately — the same target risk hit through several encodings and multi-turn escalations.
+
+Neither replaces the built-in scan: only Giskard's own generators use your `description` and knowledge base to build attacks specific to what your agent is for.
+
+## Discover what you can select
+
+`list_scan_items` answers "what are the valid names" for each tool, including Giskard's own:
+
+```python
+from giskard.scan import list_scan_items
+
+list_scan_items("giskard")   # scenario generator class names from both registries
+list_scan_items("garak")     # loadable probe plugin names
+list_scan_items("deepteam")  # supported vulnerability and attack names
+```
+
+`"garak"` and `"deepteam"` raise `ImportError` when the extra is missing; any other tool name raises `ValueError`. For garak, only *active, loadable* probes are listed by default — `include_inactive=True` adds catalog entries garak marks inactive, which are skipped anyway if you request them explicitly. The argument is ignored for the other tools.
+
+The deepteam names come from a fixed map inside the adapter, not from deepteam's full catalog:
+
+| Kind | Supported names |
+| --- | --- |
+| Vulnerabilities | `Bias`, `Toxicity`, `PIILeakage`, `PromptLeakage`, `Misinformation` |
+| Single-turn attacks | `PromptInjection`, `Roleplay`, `Leetspeak`, `ROT13` |
+| Multi-turn attacks | `LinearJailbreaking`, `CrescendoJailbreaking`, `TreeJailbreaking`, `SequentialJailbreak`, `BadLikertJudge` |
+
+## Run garak
+
+```python
+from giskard.scan import third_party_scan
+
+suite_result = await third_party_scan(
+    target=support_bot,
+    tool="garak",
+    description="Bean & Bracket support bot for coffee subscriptions.",
+    probes=["probes.dan.AutoDANCached", "probes.lmrc.SlurUsage"],
+)
+```
+
+`probes` has three modes:
+
+- `None` — a curated default set of six probes, chosen to be small and to work without extra API keys.
+- `"all"` — every active loadable probe. That is on the order of a hundred conversations against your agent; treat it as a nightly job, not a pull-request check.
+- An explicit list — names as `list_scan_items("garak")` returns them.
+
+`description` is accepted for signature symmetry but garak has no target-profile concept and ignores it, as does `languages`. `target_mode` defaults to `"multiturn"`, which lets garak's iterative probes run their full search.
+
+A few adapter behaviours worth knowing before you read the results:
+
+- A requested probe that is unknown, inactive, or fails to load does **not** raise. It becomes a skipped `ScenarioResult` in the suite, with the reason in the check message. A probe that raises mid-run becomes an error result. Neither aborts the scan, so check the skips before reading a clean run as a clean bill of health.
+- Detector scores are in `[0, 1]` and anything strictly above `0.5` counts as a hit — an exact `0.5` is read as "uncertain", not a finding.
+- The adapter pins garak's `generations` to `1`, so one prompt yields one response rather than garak's default fan-out of five.
+- Probes run at most 8 at a time, which caps how hard the run hammers the agent under test.
+
+## Run deepteam
+
+```python
+suite_result = await third_party_scan(
+    target=support_bot,
+    tool="deepteam",
+    description="Bean & Bracket support bot for coffee subscriptions.",
+    vulnerabilities=["Toxicity", "PIILeakage"],
+    attacks=["PromptInjection", "CrescendoJailbreaking"],
+    attacks_per_vulnerability_type=1,
+)
+```
+
+Here `description` matters: it becomes deepteam's `target_purpose`, the thing its simulator uses to make the attacks plausible for your agent. `languages` is ignored.
+
+`vulnerabilities` and `attacks` default to a curated set each (all five vulnerabilities; `PromptInjection`, `Roleplay`, `Leetspeak`, `LinearJailbreaking`, `CrescendoJailbreaking`). Unknown names are skipped with a logged warning and a skip result, exactly as in the garak adapter. `target_mode="singleturn"` drops every multi-turn attack the same way — a skip result per dropped attack, not an error.
+
+`attacks_per_vulnerability_type` multiplies the run: each vulnerability has several subtypes, and this is how many attack attempts each subtype gets. It defaults to `1`; a non-positive or non-integer value raises `ValueError`. Cost scales with vulnerabilities × subtypes × attacks × this number, so raise it deliberately.
+
+Both the attack simulator and the evaluator run on your Giskard default generator, so the model you set with `set_default_generator` is the model deepteam bills against.
+
+:::caution[Polarity is flipped for you]
+deepteam scores a case in `[0, 1]` where `1.0` means the model fully resisted. The adapter translates that into scan polarity: a resisted attack is a **passed** scenario, a successful attack is a **failed** one. Read a `SuiteResult` from `third_party_scan` exactly like one from `vulnerability_scan` — failures are the vulnerabilities.
+:::
+
+## Read the results
+
+The return value is a `SuiteResult`, so everything you already do with a scan result works unchanged:
+
+```python
+print("failed:", suite_result.failed_count)
+
+for result in suite_result.failures_and_errors:
+    print("-", result.scenario_name)
+```
+
+garak scenarios are named after the probe with the `garak.probes.` prefix stripped; deepteam checks are labelled `vulnerability/vulnerability_type`. Skipped items carry `(skipped)` in the scenario name, errored ones `(error)`.
+
+From there the [CI guide](/oss/solutions/how-to/scan-in-ci) applies as written — the export step does not care which scanner produced the result.
+
+## See also
+
+- [Scan API reference](/oss/solutions/reference/scan-api) — the full `third_party_scan` and `list_scan_items` signatures
+- [Write a Custom Scenario Generator](/oss/solutions/tutorials/custom-scenario-generator) — the in-house alternative when neither tool covers your risk
+- [What the Scan Looks For](/oss/solutions/explanation/threat-taxonomy) — how the built-in threat coverage compares
