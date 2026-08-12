@@ -66,7 +66,7 @@ spec = InteractionSpec(
 
 Specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn) for practical examples.
 
-## What does a Trace hold?
+## What is a Trace?
 
 A `Trace` is an immutable snapshot of all data exchanged with the system under test. In its simplest form, it is a list of interactions.
 
