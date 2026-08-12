@@ -301,6 +301,15 @@ def test_class_members_are_searched_as_attribute_access(tmp_path: Path) -> None:
     assert member.search(call)
     assert toplevel.search("Suite(checks=[...])")
 
+    # Forms a trailing-delimiter class would miss.
+    errored = triage.symbol_pattern(
+        "giskard.checks.CheckResult.errored", member_of="giskard.checks.CheckResult"
+    )
+    assert errored.search("if result.errored:")
+    assert errored.search("print(result.errored)\n")
+    assert errored.search("result.errored")
+    assert not errored.search("result.erroredness")
+
 
 def test_follow_referenced_captures_types_outside_the_module(tmp_path: Path) -> None:
     """``walk`` refuses to leave the module being snapshotted, so a boundary type
