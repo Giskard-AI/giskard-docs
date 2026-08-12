@@ -1,0 +1,248 @@
+---
+title: "Find Hallucinations and Sycophancy with a Quality Scan"
+description: "Run quality_scan over a knowledge base to probe an agent for hallucinations, sycophancy, and out-of-scope answers, and read the grouped report."
+sidebar:
+  order: 12
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+`quality_scan` generates and runs a suite that probes an agent's **correctness**:
+does it stay grounded in your documents, does it fold under a confidently wrong
+premise, does it invent answers for things your knowledge base never covered.
+
+It lives in the `giskard-scan` package, next to `vulnerability_scan`.
+
+<Aside type="caution" title="Not executed in docs CI">
+This page is hand-written rather than generated from an executed notebook.
+`giskard-scan` requires `giskard-checks>=1.0.2b6`, while this documentation
+project currently pins `giskard-checks==1.0.2b3`, so the examples below cannot
+run in the docs notebook CI yet. The code is transcribed from the
+`giskard.scan` public API, but the outputs are not reproduced here because they
+have not been executed.
+</Aside>
+
+## Install
+
+```bash
+pip install --pre giskard-scan
+```
+
+## Minimal example
+
+`quality_scan` is async, and it needs a knowledge base: the documents the agent
+is supposed to be grounded in.
+
+```python
+import asyncio
+
+from giskard.scan import KnowledgeBase, quality_scan
+
+
+def support_agent(prompt: str) -> str:
+    # Your agent. Anything that maps an input to an output works as a target.
+    ...
+
+
+kb = KnowledgeBase.from_texts(
+    [
+        "Refunds are available within 30 days of purchase.",
+        "Pro plan costs $49 per seat per month, billed annually.",
+        "Support is available Monday to Friday, 9am-6pm CET.",
+        "We do not ship hardware; all products are software-only.",
+        "Data is stored in the EU (Frankfurt) region.",
+    ]
+)
+
+result = asyncio.run(
+    quality_scan(
+        target=support_agent,
+        description="A customer-support agent for a SaaS billing product.",
+        languages=["en"],
+        knowledge_base=kb,
+        max_scenarios=10,
+        target_mode="singleturn",
+    )
+)
+```
+
+`quality_scan` prints the grouped report itself and returns a `SuiteResult`.
+
+## Building the knowledge base
+
+Three inputs are accepted:
+
+```python
+from giskard.scan import Document, KnowledgeBase
+
+# 1. A plain list of strings — normalized into a KnowledgeBase for you.
+kb = ["Refunds are available within 30 days of purchase.", "..."]
+
+# 2. KnowledgeBase.from_texts — the same thing, explicitly.
+kb = KnowledgeBase.from_texts(["Refunds are available within 30 days.", "..."])
+
+# 3. Document objects, when you want tags carried alongside the content.
+kb = KnowledgeBase(
+    documents=(
+        Document(content="Refunds are available within 30 days.", tags=["billing"]),
+        Document(content="Support is 9am-6pm CET.", tags=["support"]),
+    )
+)
+```
+
+A bare `str` is rejected with a `TypeError` — otherwise `from_texts` would
+happily build one document per character.
+
+Embeddings are computed lazily, in one batch, the first time a generator needs
+nearest-neighbour retrieval. Creating a `KnowledgeBase` costs nothing.
+
+### Omitting the knowledge base
+
+Every quality generator is knowledge-base driven. If you pass no
+`knowledge_base` — or an empty one — the scan warns and skips all of them:
+
+```text
+RuntimeWarning: quality_scan received no knowledge base;
+knowledge-base quality scenarios will be skipped.
+```
+
+The scan still runs, but it has nothing to generate, so the report is empty.
+Treat that warning as an error in your own tooling.
+
+## What each generator probes
+
+`quality_scan` runs the whole quality registry:
+
+| Generator | What it probes |
+| --- | --- |
+| `HallucinationScenarioGenerator` | Answers that contradict the retrieved documents. Tagged `quality:direct-hallucination`, `component:llm`. |
+| `SycophancyScenarioGenerator` | Whether the agent caves when the user asserts a plausible premise the documents contradict. Tagged `quality:sycophancy-hallucinations`, `component:llm`. |
+| `SplitQuestionsScenarioGenerator` | Context in message one, the question in message two — does the agent carry the context? Tagged `quality:split-questions`, `component:history`. |
+| `MultiTopicScenarioGenerator` | Multi-turn questions that hop across knowledge-base topics. Tagged `quality:multi-topic-questions`, `component:retrieval`, `component:history`. |
+| `OutOfScopeScenarioGenerator` | Precise, plausible-sounding things your documents never mention — does the agent fabricate? Tagged `quality:fabricated-hallucination`, `component:llm`, `component:retrieval`. |
+
+### Narrowing to one family
+
+To probe a single behaviour, skip `quality_scan` and build the suite yourself
+with `generate_suite`:
+
+```python
+from giskard.scan import SycophancyScenarioGenerator, generate_suite
+
+suite = asyncio.run(
+    generate_suite(
+        description="A customer-support agent for a SaaS billing product.",
+        languages=["en"],
+        generators=[SycophancyScenarioGenerator()],
+        knowledge_base=kb,
+        max_scenarios=5,
+    )
+)
+
+result = asyncio.run(suite.run(support_agent, parallel=True))
+```
+
+<Aside type="danger" title="parallel defaults differ">
+`quality_scan` (and `vulnerability_scan`) default to `parallel=True`.
+`Suite.run` defaults to `parallel=False`. So the moment you drop down to
+`generate_suite` + `suite.run` — the snippet above, or re-running a persisted
+suite — execution silently becomes **serial** and gets much slower. Pass
+`parallel=True` explicitly, and cap it with `max_concurrency` if your provider
+rate-limits.
+
+`max_concurrency` only affects scheduling when `parallel=True`, but invalid
+values are rejected either way. Note that scenario *generation* is always
+concurrent; `parallel` only controls suite *execution*.
+</Aside>
+
+## Reading the report
+
+### `group_by` defaults to `"component"`
+
+A quality scan groups its report by `component:` tags — `llm`, `retrieval`,
+`history` — because the useful question is *which part of my pipeline is
+broken*: the model, the retriever, or conversation-history handling.
+
+`vulnerability_scan` defaults to `group_by="threat-type"` instead, because the
+useful question there is *what kind of attack got through*.
+
+Both accept any annotation key, and `group_by=None` prints the ungrouped
+report:
+
+```python
+result = asyncio.run(quality_scan(..., group_by="quality"))  # group by failure mode
+result = asyncio.run(quality_scan(..., group_by=None))       # flat report
+```
+
+You can also regroup after the fact without re-running anything:
+
+```python
+print(result.group_by("quality").groups)
+```
+
+### The `recommendation` field
+
+A `SuiteResult` returned by `quality_scan` carries a `recommendation`: an
+LLM-generated prose summary of what failed and what to do about it, built from
+the per-`component` and per-`quality` pass rates.
+
+```python
+if result.recommendation:
+    print(result.recommendation)
+```
+
+Three things to know:
+
+- It is **quality-only**. `vulnerability_scan` does not produce one.
+- It is **empty when nothing failed** (`result.failures_and_errors` is empty).
+- It is **best-effort**. Generating it is an extra LLM call, and if that call
+  fails the exception is logged and `recommendation` falls back to `""` — the
+  scan result itself is never lost. Always guard with `if result.recommendation:`
+  rather than assuming a string is there.
+
+## Full signature
+
+```python
+async def quality_scan(
+    target,
+    description: str,
+    languages: list[str],
+    *,
+    knowledge_base: KnowledgeBase | list[str] | None = None,
+    max_scenarios: int | None = None,
+    seed: int = 42,
+    group_by: str | None = "component",
+    parallel: bool = True,
+    max_concurrency: int | None = None,
+    return_exception: bool = False,
+    target_mode: TargetMode = DEFAULT_TARGET_MODE,
+) -> SuiteResult: ...
+```
+
+- `max_scenarios` — total budget across *all* generators, divided between them.
+  `None` lets each generator use its own default. Set it explicitly to keep
+  cost predictable.
+- `seed` — defaults to `42`; the same arguments and seed produce the same
+  scenarios.
+- `return_exception` — `False` (default) lets an input-generation failure abort
+  the scan. `True` records it as an errored result and keeps going. Use `True`
+  for unattended runs, `False` while you are still debugging your target.
+- `target_mode` — `"singleturn"` skips generators that are multi-turn by design
+  and caps turn budgets to 1 on the rest. Pass it for any target that does not
+  accept conversation history, otherwise you will be scored on turns your agent
+  never saw.
+
+## Quality scan vs vulnerability scan
+
+| | `quality_scan` | `vulnerability_scan` |
+| --- | --- | --- |
+| Asks | Is the agent **correct and grounded**? | Is the agent **safe**? |
+| Needs | A `knowledge_base` | Nothing beyond a description |
+| Default `group_by` | `"component"` | `"threat-type"` |
+| `recommendation` | Yes | No |
+| Extra options | — | `commercial_use` (filters datasets) |
+
+They are complementary: a scan-clean agent can still be confidently wrong, and
+a perfectly grounded agent can still be jailbroken. See
+[Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities) for the safety
+half.
