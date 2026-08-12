@@ -22,7 +22,7 @@ At runtime, the flow looks like this:
     3.  Checks run against the current Trace.
 3.  Results are returned as a ScenarioResult.
 
-## Interaction
+## What is an Interaction?
 
 An `Interaction` represents a single turn of data exchange with the system under test. Interactions are computed at execution time by resolving `InteractionSpec` objects into the trace.
 
@@ -34,7 +34,7 @@ An `Interaction` represents a single turn of data exchange with the system under
 
 Interactions are **immutable**, as they represent something that has already happened.
 
-## InteractionSpec
+## What is an InteractionSpec?
 
 An `InteractionSpec` describes _how_ to generate an interaction and is used to describe a scenario. When you call `.interact(...)` in the fluent API, it adds an `InteractionSpec` to the scenario sequence. Inputs and outputs can be static values or dynamic callables, and you can mix both.
 
@@ -66,7 +66,7 @@ spec = InteractionSpec(
 
 Specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn) for practical examples.
 
-## Trace
+## What does a Trace hold?
 
 A `Trace` is an immutable snapshot of all data exchanged with the system under test. In its simplest form, it is a list of interactions.
 
@@ -102,7 +102,7 @@ scenario = Scenario(
 )
 ```
 
-## Checks
+## What does a Check do?
 
 A `Check` validates something about a trace and returns a `CheckResult`. Checks run after each interaction in a scenario and can inspect any part of the trace — including outputs from earlier turns.
 
@@ -127,7 +127,7 @@ check = Groundedness(
 )
 ```
 
-## Scenario
+## What is a Scenario?
 
 A `Scenario` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. Scenarios work for both single-turn and multi-turn tests.
 
@@ -160,7 +160,7 @@ result = asyncio.run(main())
 
 In async contexts (like pytest with `@pytest.mark.asyncio`), you can use `await` directly.
 
-## Fluent API Mapping
+## How does the fluent API map to these primitives?
 
 The fluent API is the preferred user-facing entry point and maps directly to the core primitives above:
 

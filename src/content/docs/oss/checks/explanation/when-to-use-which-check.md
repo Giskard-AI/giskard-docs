@@ -7,7 +7,7 @@ sidebar:
 
 Three check families cover most use cases. Pick the simplest one that can express your requirement.
 
-## Tradeoffs at a Glance
+## How do the check types compare?
 
 |                   | Rule-based                            | Semantic similarity        | LLM-as-judge                             |
 | ----------------- | ------------------------------------- | -------------------------- | ---------------------------------------- |
@@ -17,7 +17,7 @@ Three check families cover most use cases. Pick the simplest one that can expres
 | **Deterministic** | Yes                                   | Near-deterministic         | No                                       |
 | **Best for**      | Exact values, keywords, formats       | Meaning-equivalent answers | Tone, reasoning, policy compliance       |
 
-## Choosing the Right Check
+## Which check type should I use?
 
 **Rule-based** — when you can express the pass condition as a predicate: required keywords, value ranges, exact labels. Use these first; they're free, instant, and never flaky.
 
@@ -49,7 +49,7 @@ Groundedness(
 Conformity(rule="Response must not give medical advice")
 ```
 
-## Combining Check Types
+## Can I combine check types?
 
 Layer all three in a single scenario: run the cheap deterministic checks first, and only reach for LLM judges when you genuinely need them.
 

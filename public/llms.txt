@@ -145,18 +145,18 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Quickstart: https://docs.giskard.ai/oss/checks/quickstart.md
 
 ### Checks Tutorials
-- Your First Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md
+- Your First LLM Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md
 - Your First LLM Call: https://docs.giskard.ai/oss/checks/tutorials/single-turn.md
 - Multi-Turn Scenarios: https://docs.giskard.ai/oss/checks/tutorials/multi-turn.md
 - Dynamic Scenarios: https://docs.giskard.ai/oss/checks/tutorials/dynamic-scenarios.md
-- Test Suites: https://docs.giskard.ai/oss/checks/tutorials/test-suites.md
+- LLM Test Suites: https://docs.giskard.ai/oss/checks/tutorials/test-suites.md
 
 ### Checks How-to Guides
-- Run Tests with pytest: https://docs.giskard.ai/oss/checks/how-to/run-in-pytest.md
+- Test LLM Apps with pytest: https://docs.giskard.ai/oss/checks/how-to/run-in-pytest.md
 - Simulate Users: https://docs.giskard.ai/oss/checks/how-to/simulate-users.md
 - Spy on Internal Calls: https://docs.giskard.ai/oss/checks/how-to/spy-on-calls.md
 - Testing Structured Outputs: https://docs.giskard.ai/oss/checks/how-to/structured-output.md
-- Batch Evaluation: https://docs.giskard.ai/oss/checks/how-to/batch-evaluation.md
+- Batch Evaluation of LLM Outputs: https://docs.giskard.ai/oss/checks/how-to/batch-evaluation.md
 - Stateful Checks: https://docs.giskard.ai/oss/checks/how-to/stateful-checks.md
 - Custom Checks: https://docs.giskard.ai/oss/checks/how-to/custom-checks.md
 - CI/CD Integration: https://docs.giskard.ai/oss/checks/how-to/ci-cd.md
@@ -177,6 +177,6 @@ Open research on AI safety and security, including the Phare multilingual benchm
 
 ### Checks Use Cases
 - RAG Evaluation: https://docs.giskard.ai/oss/checks/use-cases/rag-evaluation.md
-- Testing Agents: https://docs.giskard.ai/oss/checks/use-cases/testing-agents.md
-- Chatbot Testing: https://docs.giskard.ai/oss/checks/use-cases/chatbot-testing.md
-- Content Moderation: https://docs.giskard.ai/oss/checks/use-cases/content-moderation.md
+- Testing AI Agents: https://docs.giskard.ai/oss/checks/use-cases/testing-agents.md
+- Testing LLM Chatbots: https://docs.giskard.ai/oss/checks/use-cases/chatbot-testing.md
+- Content Moderation for LLM Apps: https://docs.giskard.ai/oss/checks/use-cases/content-moderation.md
