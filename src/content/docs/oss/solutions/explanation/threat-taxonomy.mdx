@@ -1,0 +1,100 @@
+---
+title: "What the Scan Looks For"
+description: "The tag vocabulary behind Giskard's scan reports: threat types, quality failure modes, components, and which generator produces each one."
+sidebar:
+  order: 2
+---
+
+Every scenario the scan generates carries tags, and those tags are what the report groups by. Knowing the vocabulary tells you what a clean report actually proves — and, more usefully, what it does not.
+
+[How the Scan Works](/oss/solutions/explanation/how-scan-works) covers the pipeline. This page is the catalog: which label means what, and which generator emits it.
+
+## Three tag families
+
+| Prefix | Answers | Used by |
+| --- | --- | --- |
+| `threat-type:` | What kind of harm is this? | vulnerability scan |
+| `quality:` | What kind of mistake is this? | quality scan |
+| `component:` | Which part of my pipeline is at fault? | quality scan |
+
+`vulnerability_scan` defaults to `group_by="threat-type"`, `quality_scan` to `group_by="component"`. That is not an arbitrary difference. A vulnerability report answers *how exposed am I*, which is a question about risk categories. A quality report answers *what do I fix*, which is a question about your architecture.
+
+Two more prefixes show up on individual scenarios: `owasp:` maps a scenario to an OWASP LLM Top-10 entry, and `probe-type:` records the attack shape (`multi-turn`). Both are groupable — `group_by` takes any tag prefix — but neither is a default.
+
+## Threat types
+
+The vulnerability scan uses three:
+
+### `harmful-content-generation`
+
+The broadest of the three. It covers everything the adversarial generator's categories aim at: stereotypes and discrimination, politics, religion, CBRN materials, copyright violation, misinformation and disinformation, and illegal activities. It is also the tag on every multi-turn jailbreak scenario, because GOAT and Crescendo both work toward a harmful objective — they differ in route, not in destination.
+
+Emitted by `AdversarialScenarioGenerator`, `GOATAttackScenarioGenerator`, `CrescendoAttackScenarioGenerator`, and inherited by dataset scenarios drawn from harmful-prompt corpora.
+
+### `misguidance-and-unauthorized-advice`
+
+Financial, medical, and legal advice the agent has no business giving. It gets its own tag rather than sitting under harmful content because the failure is different in kind: the answer may be entirely accurate and still be a liability. `AdversarialScenarioGenerator` emits it from its "Unauthorized Advice" category.
+
+### `prompt-injection`
+
+Instructions smuggled into content the agent processes — pasted text, retrieved documents, tool output — that the agent then obeys. `PromptInjectionScenarioGenerator` emits it, paired with `owasp:llm-top-10-2025:LLM01`.
+
+## What each generator family probes
+
+| Family | Generators | Attack shape |
+| --- | --- | --- |
+| **LLM-driven** | `AdversarialScenarioGenerator` | An LLM writes conformity rules per category, then crafts a prompt to break each one. Tailored to your description. |
+| **Multi-turn attacks** | `GOATAttackScenarioGenerator`, `CrescendoAttackScenarioGenerator` | The attacker opens benign and escalates across turns. GOAT rotates through named strategies; Crescendo builds on the agent's own prior answers. |
+| **Dataset-backed** | `PromptInjectionScenarioGenerator`, `HuggingFaceDatasetScenarioGenerator` | Fixed corpora replayed verbatim. Identical every run, no generation cost. |
+| **Token-level** | `GCGInjectionScenarioGenerator` | Harmful prompts from a dataset with an adversarial suffix appended, testing whether nonsense token sequences defeat the safety layer. |
+| **Knowledge-base** | the five quality generators, below | Questions derived from your own documents. |
+
+The distinction that matters when reading a report: dataset-backed and token-level generators ask the *same* questions of every agent, so a pass tells you your agent handles a known corpus. LLM-driven generators ask questions specific to your `description`, so a pass tells you something about *your* agent — and a vague description makes that guarantee correspondingly vague.
+
+`GCGInjectionScenarioGenerator` deserves one caveat: its suffixes are English-tuned and appended verbatim regardless of the base prompt's language. Its results are weakest evidence on non-English scans.
+
+## Quality failure modes and components
+
+The quality scan's five generators each pair a failure mode with the components that could have caused it:
+
+| Generator | `quality:` tag | `component:` tags |
+| --- | --- | --- |
+| `HallucinationScenarioGenerator` | `direct-hallucination` | `llm` |
+| `SycophancyScenarioGenerator` | `sycophancy-hallucinations` | `llm` |
+| `OutOfScopeScenarioGenerator` | `fabricated-hallucination` | `llm`, `retrieval` |
+| `MultiTopicScenarioGenerator` | `multi-topic-questions` | `retrieval`, `history` |
+| `SplitQuestionsScenarioGenerator` | `split-questions` | `history` |
+
+Reading them in order of what they ask:
+
+- **Direct questions** are answerable from a single document. A failure means the agent contradicted a document it was given — the narrowest, most damning result in the scan.
+- **Sycophantic questions** attach a false premise to a direct question ("since you charge a cancellation fee, how do I avoid it?"). A failure means the agent agreed with the user over its own source.
+- **Out-of-scope questions** are about topics deliberately absent from the knowledge base. A failure means the agent answered anyway instead of saying it does not know.
+- **Multi-topic questions** span several documents across several turns, which is where a top-1 retriever falls apart.
+- **Split questions** deliver one question across several turns, testing whether the agent carries context forward.
+
+Three components appear in the reports:
+
+- **`llm`** — the model contradicted, invented, or capitulated despite having what it needed.
+- **`retrieval`** — the right document never reached the model, or the wrong one did.
+- **`history`** — the failure only appears across turns; earlier context was dropped or misused.
+
+A generator tagged with two components is saying it cannot distinguish between them from the outside — an out-of-scope fabrication looks the same whether retrieval returned nothing or the model ignored what it returned. The grouped report narrows the suspects; the conversation trace tells you which.
+
+## How grouping actually behaves
+
+`group_by` matches a tag prefix and buckets scenarios by the part after the colon. A scenario with two `component:` tags appears in both buckets, so bucket counts can exceed the scenario count, and scenarios carrying no tag with that key land in an unnamed bucket. `group_by=None` prints the flat report.
+
+Three things to hold on to when reading a grouped table:
+
+1. **An empty bucket is not a clean bill of health.** `max_scenarios` is split by a multinomial draw across generators, so a small budget leaves some generators with nothing. A threat type with zero scenarios was not tested — it did not pass.
+2. **A bucket's pass rate is a sample, not a measurement.** Four scenarios passing tells you little; the number is a prompt to read the failures, not a metric to trend at low budgets.
+3. **Tags are per scenario, not per check.** A scenario can carry several checks; the grouping follows the scenario.
+
+The quality scan adds one more artifact: a written recommendation generated from the grouped results. It is produced by an LLM and the call is wrapped in a `try` — a failure yields an empty string. **An empty recommendation means recommendation generation failed, never that the scan found nothing.** Read `failed_count` for that.
+
+## See also
+
+- [How the Scan Works](/oss/solutions/explanation/how-scan-works) — the pipeline these tags travel through
+- [Generators reference](/oss/solutions/reference/generators) — every generator with its parameters
+- [Scan a RAG Agent](/oss/solutions/tutorials/scan-a-rag-agent) — the quality tags on a real report
