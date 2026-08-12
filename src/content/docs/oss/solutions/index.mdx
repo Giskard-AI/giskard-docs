@@ -1,0 +1,55 @@
+---
+title: "Giskard Scan"
+description: "Automatically red team your LLM agent for safety and security vulnerabilities with Giskard's open-source scan."
+sidebar:
+  order: 0
+  label: Overview
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+`giskard-scan` red teams your LLM agent automatically. From a plain-language description, it generates adversarial scenarios tailored to your agent, runs them, and reports which ones broke it.
+
+```bash
+pip install "giskard-scan[openai]"
+```
+
+## Start here
+
+<CardGrid>
+  <LinkCard
+    title="Tutorial: Your First Scan"
+    description="Run a scan against a toy agent, read the findings, and save the suite — a guided first run."
+    href="/oss/solutions/tutorials/your-first-scan"
+  />
+  <LinkCard
+    title="Scan Vulnerabilities"
+    description="The full guide: wrap your agent, configure the judge model, run the scan, and act on the report."
+    href="/oss/solutions/scan-vulnerabilities"
+  />
+  <LinkCard
+    title="How-to: Run in CI"
+    description="Save the generated suite, replay it in your pipeline, and export JUnit XML."
+    href="/oss/solutions/how-to/scan-in-ci"
+  />
+  <LinkCard
+    title="Explanation: How the scan works"
+    description="Generators, target modes, threat types, and why judge verdicts are opinions."
+    href="/oss/solutions/explanation/how-scan-works"
+  />
+  <LinkCard
+    title="Reference: Scan API"
+    description="Every argument of vulnerability_scan, quality_scan, generate_suite, and the generator catalog."
+    href="/oss/solutions/reference/scan-api"
+  />
+</CardGrid>
+
+## Scan or checks?
+
+The scan **generates** tests for you from a description. [Giskard Checks](/oss/checks) is the library you use to **write** tests yourself. They share the same runtime — a scan returns an ordinary `Suite`, so anything you learn about running, filtering, or asserting on suites in Checks applies to scan results too.
+
+Use the scan to discover unknown vulnerabilities; use Checks to lock in the behaviour you already care about. Most teams run both.
+
+## Beyond the open-source scan
+
+The [Giskard Hub](/hub/ui/scan) runs 55+ custom-designed probes across 11 vulnerability categories, grades your agent's security, and keeps testing it after deployment with [continuous red teaming](/hub/ui/continuous-red-teaming). See the [Open Source vs Hub comparison](/start/comparison).
