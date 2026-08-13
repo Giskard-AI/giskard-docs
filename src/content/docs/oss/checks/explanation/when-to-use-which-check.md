@@ -3,13 +3,6 @@ title: When to use which check
 description: "Compare rule-based checks, semantic similarity, and LLM-as-a-judge — tradeoffs in cost, latency, determinism, and reliability."
 sidebar:
   order: 2
-faq:
-  - q: When should I use a rule-based check?
-    a: Use a rule-based check such as Equals, StringMatching, or FnCheck whenever the pass condition can be expressed as a predicate — required keywords, value ranges, or exact labels. They are free, run in under a millisecond, and are fully deterministic, so try them first.
-  - q: When should I use semantic similarity instead of an LLM judge?
-    a: Use SemanticSimilarity when the phrasing of an answer can vary but its meaning should stay consistent. It costs a single embedding call (~50–200 ms) and is near-deterministic, making it cheaper and faster than an LLM-as-judge check.
-  - q: When is an LLM-as-judge check worth the cost?
-    a: Reach for Groundedness, Conformity, or LLMJudge only for qualities no rule or embedding can capture — tone, reasoning quality, or policy compliance. They cost an LLM call (~1–10 s) and are non-deterministic, so use them last.
 ---
 
 Three check families cover most use cases. Pick the simplest one that can express your requirement.
