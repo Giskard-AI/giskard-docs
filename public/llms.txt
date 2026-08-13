@@ -24,7 +24,7 @@ Enterprise platform for LLM agent testing with team collaboration and continuous
 ### Giskard Checks (Open Source)
 Apache-2.0 Python library for behavioral testing of LLM agents: you write scenarios and checks that pass or fail, and run them like any other test suite.
 
-Tests are plain `async def test_*` functions, so they run under pytest with no separate runner or DSL. The target under test is any async callable, so it works with LangChain, LlamaIndex, raw SDK calls, or an HTTP endpoint. Everything runs locally against your own LLM provider and keys. The same library red-teams an agent through the `giskard-scan` command, which probes for vulnerabilities rather than running only the tests you wrote.
+Tests are plain `async def test_*` functions, so they run under pytest with no separate runner or DSL. The target under test is any async callable, so it works with LangChain, LlamaIndex, raw SDK calls, or an HTTP endpoint. Everything runs locally against your own LLM provider and keys. The same library also red-teams an agent: the `giskard-scan` package provides `vulnerability_scan()`, which probes for vulnerabilities and returns a suite you can re-run as a regression test.
 
 Use the open-source library for tests that live next to your code and run in CI. Use the Hub when business users annotate tests in a UI, datasets are shared across teams, or red teaming runs on a schedule.
 
