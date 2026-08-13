@@ -107,9 +107,13 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-/** Plain stream/plain output: safe to emit as literal text inside <Card> (not inside braces). */
+/**
+ * Plain stream/plain output: safe to emit as literal text inside <Card> (not inside braces).
+ * A line of only - or = would be parsed as a setext heading underline, turning the
+ * line above it into an <h2>; such output has to go through the <pre> path instead.
+ */
 function isSafeMdxCardLiteral(text) {
-  return !/[<>{}]/.test(text);
+  return !/[<>{}]/.test(text) && !/^[ \t]*[-=]{2,}[ \t]*$/m.test(text);
 }
 
 function preSetHtml(innerHtml) {
