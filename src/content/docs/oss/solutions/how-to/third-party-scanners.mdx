@@ -17,8 +17,8 @@ Neither scanner ships with `giskard-scan`. Each is an optional extra, pinned in 
 
 | Extra | Installs | Command |
 | --- | --- | --- |
-| `garak` | `garak>=0.15,<1` | `pip install "giskard-scan[garak]"` |
-| `deepteam` | `deepteam>=1.0.7,<2` | `pip install "giskard-scan[deepteam]"` |
+| `garak` | `garak>=0.15,<1` | `pip install --pre "giskard-scan[garak]"` |
+| `deepteam` | `deepteam>=1.0.7,<2` | `pip install --pre "giskard-scan[deepteam]"` |
 
 Calling `third_party_scan` without the matching extra raises `ImportError` with the install command in the message — the import is lazy, so the package stays installable without either.
 
