@@ -47,18 +47,42 @@ jobs:
     environment: docs-deploy
     permissions:
       contents: read # checkout
+      pull-requests: read # changed-files detection
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      # Notebook execution is slow and needs provider API keys, so only run it
+      # when the PR actually touches notebooks or the notebook test harness.
+      # Pushes to main/dev always run (OVERWRITE_NB depends on it).
+      - name: Detect notebook-relevant changes
+        id: nbchanges
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          files=$(gh api "repos/$REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename')
+          if echo "$files" | grep -Eq '\.ipynb$|^tests/test_docs_nb\.py$|^pyproject\.toml$|^uv\.lock$|^\.github/workflows/ci\.yml$|^scripts/convert-notebooks\.mjs$'; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install uv
+        if: steps.nbchanges.outputs.relevant == 'true'
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           python-version: "3.13"
 
       - name: Install Python deps
+        if: steps.nbchanges.outputs.relevant == 'true'
         run: uv sync --all-extras
 
       - name: Set up pnpm
@@ -83,6 +107,7 @@ jobs:
         run: pnpm run test:redirects
 
       - name: Run notebook tests
+        if: steps.nbchanges.outputs.relevant == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.AZURE_AI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.AZURE_AI_API_BASE }}
