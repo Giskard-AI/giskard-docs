@@ -55,7 +55,7 @@ First, install the scan and choose the model that will generate and judge the sc
 <TabItem label="OpenAI">
 
 ```bash
-pip install "giskard-scan[openai]"
+pip install --pre giskard-scan "giskard-agents[openai]"
 ```
 
 ```python
@@ -72,7 +72,7 @@ Set `OPENAI_API_KEY` in your environment.
 <TabItem label="Anthropic">
 
 ```bash
-pip install "giskard-scan[anthropic]"
+pip install --pre giskard-scan "giskard-agents[anthropic]"
 ```
 
 ```python
@@ -89,7 +89,7 @@ Set `ANTHROPIC_API_KEY` in your environment.
 <TabItem label="Gemini">
 
 ```bash
-pip install "giskard-scan[google]"
+pip install --pre giskard-scan "giskard-agents[google]"
 ```
 
 ```python
@@ -108,7 +108,7 @@ Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment.
 LiteLLM reaches any provider through a single `"<provider>/<model-name>"` string, so it is the most flexible option.
 
 ```bash
-pip install "giskard-scan[litellm]"
+pip install --pre giskard-scan "giskard-agents[litellm]"
 ```
 
 ```python
