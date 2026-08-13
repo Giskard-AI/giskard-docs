@@ -2,7 +2,7 @@
 title: "Scan Vulnerabilities"
 description: "Automatically red team your LLM-based agent for safety and security vulnerabilities with Giskard's open-source scan."
 sidebar:
-  order: 1
+  order: 2
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
@@ -25,7 +25,7 @@ Differently from benchmarks that evaluate a foundation model in a generic way, G
 
 ### Which attacks does it run?
 
-Today, the scan generates three families of attacks, mapped to the [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/) and the vulnerability categories used across Giskard:
+The families below are the ones you will see most often in a report, mapped to the [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/) and the vulnerability categories used across Giskard:
 
 | Attack                        | What it does                                                                                                                                                                                                                   | Vulnerability category                                        |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
@@ -33,7 +33,7 @@ Today, the scan generates three families of attacks, mapped to the [OWASP LLM To
 | **Single-turn adversarial**   | Sends direct requests that test for harmful or unauthorized content such as stereotypes and discrimination, illegal activities, CBRN material, copyright, misinformation, and unqualified financial, medical, or legal advice. | Harmful Content Generation, Misguidance & Unauthorized Advice |
 | **GOAT multi-turn jailbreak** | Uses an attacker LLM that adapts over several turns, chaining strategies such as refusal suppression, persona modification, and hypothetical framing to push the agent toward objectives it should refuse.                     | Harmful Content Generation                                    |
 
-These cover high-impact attack surfaces today, and the library keeps adding more. See the [roadmap](#roadmap) for what is coming, the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) for the complete list of categories, and [How the Scan Works](/oss/solutions/explanation/how-scan-works) for how generators, threat types, and target modes fit together.
+They are not the whole catalog — a vulnerability scan also runs Crescendo multi-turn attacks, GCG suffix injections, and two Hugging Face attack datasets; the [generators reference](/oss/solutions/reference/generators) is the source of truth. The library keeps adding more. See the [roadmap](#roadmap) for what is coming, the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) for the complete list of categories, and [How the Scan Works](/oss/solutions/explanation/how-scan-works) for how generators, threat types, and target modes fit together.
 
 :::tip[Need a more advanced scan?]
 The [Giskard Hub](/hub/ui/scan), our enterprise platform, takes red teaming much further: 55+ custom-designed probes across 11 vulnerability categories, aligned with the OWASP LLM Top 10 and more. On top of that, it grades your agent's security, keeps testing it after deployment with [continuous red teaming](/hub/ui/continuous-red-teaming), and runs from a web interface your whole team can use. [Talk to our team ↗](https://www.giskard.ai/contact) to see it in action.
@@ -49,7 +49,7 @@ Yes. Pass the languages your agent is expected to handle through the `languages`
 
 ## Before starting
 
-First, install the scan and choose the model that will generate and judge the scenarios. Since `giskard-scan` pulls in the rest of the library, you only need to add the extra for the provider you use. Pick yours below:
+First, install the scan and choose the model that will generate and judge the scenarios. `giskard-scan` pulls in the rest of the library, so you only add the `giskard-agents` extra for the provider you use. Pick yours below — [Install & Configure](/oss/solutions/installation) has the longer version.
 
 <Tabs>
 <TabItem label="OpenAI">
@@ -311,7 +311,7 @@ suite_result = await vulnerability_scan(
 
 ### Build a broader suite with a coding agent
 
-The method `scan.generate_suite` builds a suite from the built-in scenarios. To go further, the [Scenario Generator skill](/oss/agent-skills#scenario-generator-) turns your coding agent into a red-teamer. Describe your agent and the failure modes you care about, and the skill writes or extends a runnable suite with adversarial scenarios and layered checks tailored to your case. You then run it with `suite.run(...)` exactly as above.
+The method `scan.generate_suite` builds a suite from the built-in scenarios. To go further, the [Scenario Generator skill](/oss/agent-skills#scenario-generator) turns your coding agent into a red-teamer. Describe your agent and the failure modes you care about, and the skill writes or extends a runnable suite with adversarial scenarios and layered checks tailored to your case. You then run it with `suite.run(...)` exactly as above.
 
 ```bash
 npx skills add Giskard-AI/giskard-skills --skill scenario-generator

@@ -38,7 +38,7 @@ This is the reason the `description` matters so much. Dataset-backed generators 
 
 ### The scenario budget
 
-`max_scenarios` is a **total** across all generators, distributed by a multinomial draw rather than split evenly. Two things follow. First, you can get fewer scenarios than you asked for, because individual generators have their own internal caps. Second, a generator that draws a zero budget is skipped entirely — so with a very small budget, some threat types simply will not be covered on that run. Raise `max_scenarios` when you want breadth; keep it small only while iterating.
+`max_scenarios` defaults to `None`, which means every generator runs its own default budget — that is how a first scan quietly becomes a few hundred LLM calls. When you set it, it is a **total** across all generators, distributed by a multinomial draw rather than split evenly. Two things follow. First, you can get fewer scenarios than you asked for, because individual generators have their own internal caps. Second, a generator that draws a zero budget is skipped entirely — so with a very small budget, some threat types simply will not be covered on that run. Raise `max_scenarios` when you want breadth; keep it small only while iterating.
 
 `seed` (default `42`) makes the draw and the generation reproducible.
 
@@ -47,7 +47,7 @@ This is the reason the `description` matters so much. Dataset-backed generators 
 `target_mode` declares what kind of conversation your agent can hold, and it silently changes which attacks exist:
 
 - **`"multiturn"`** (default) — the attacker gets several turns and can adapt. This is where GOAT and Crescendo live: they open benign and escalate, which is how real jailbreaks work.
-- **`"singleturn"`** — every scenario is one message. Multi-turn-only generators log a warning and return **nothing**.
+- **`"singleturn"`** — every scenario is one message. Multi-turn-only generators log a warning and return **nothing**, and the generators that do run have their turn budget capped to 1.
 
 So `target_mode="singleturn"` is not just "faster" — it removes a whole class of vulnerability from the report. Use it only when your agent genuinely cannot hold a conversation; otherwise you are choosing not to look.
 

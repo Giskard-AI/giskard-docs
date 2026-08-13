@@ -210,7 +210,7 @@ The returned suite is named `"Scenarios"`.
 
 Run an external security scanner against a Giskard target and return its results as a standard `SuiteResult`. Coroutine — `await` it. Experimental.
 
-Requires the scanner's optional extra: `pip install giskard-scan[garak]` or `pip install giskard-scan[deepteam]`.
+Requires the scanner's optional extra: `pip install --pre "giskard-scan[garak]"` or `pip install --pre "giskard-scan[deepteam]"`.
 
 <MethodCard name="third_party_scan()" returnType="SuiteResult">
   <Property name="target" type="Target" required>

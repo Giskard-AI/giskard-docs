@@ -11,15 +11,15 @@ The library is available on [GitHub](https://github.com/Giskard-AI/giskard) and 
 Giskard v3 is currently in Pre-release (Beta). We are actively refining the APIs and welcome early adopters to provide feedback and report issues as we move toward a stable 3.0.0 release.
 :::
 
-The third version of the library is available as a pre-release (Beta). This version is a major rewrite and includes new features such as [Checks](/oss/checks).
+The third version of the library is available as a pre-release (Beta). This version is a major rewrite and includes new features such as [Checks](/oss/checks) and the redesigned [Scan](/oss/solutions).
 
 :::note
-Looking for Giskard v2 features such as **RAGET** and **Scan**? They are not available yet in Giskard v3. If you still want to use them, please check the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai). We are working to bring them to Giskard v3 as soon as possible! Follow our progress on the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252).
+Looking for other Giskard v2 features such as **RAGET**? They are not available yet in Giskard v3. If you still want to use them, please check the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai). We are working to bring them to Giskard v3 as soon as possible! Follow our progress on the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252).
 :::
 
 ## Resources and support
 
-- **Documentation**: Explore the [Checks documentation](/oss/checks) for detailed guides
+- **Documentation**: Explore the [Scan documentation](/oss/solutions) to red team an agent automatically, and the [Checks documentation](/oss/checks) to write your own tests
 - **Agent Skills**: Install [Giskard Agent Skills](/oss/agent-skills) to give Claude Code, Cursor, and other coding agents drop-in workflows for Giskard tasks
 - **Contributing**: See [Contribute to Giskard](/oss/contributing) for the official guide, AI-agent notes, and repos to star
 - **Examples**: Check our [GitHub repository ↗](https://github.com/Giskard-AI/giskard-oss) for more examples
