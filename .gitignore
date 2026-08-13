@@ -31,6 +31,9 @@ pnpm-debug.log*
 .env
 .env.production
 
+# JUnit reports written by the CI-gating tutorial notebook
+src/content/docs/oss/checks/**/reports/
+
 # macOS
 .DS_Store
 
