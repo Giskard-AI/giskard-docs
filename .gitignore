@@ -45,3 +45,4 @@ src/content/docs/oss/checks/quickstart.mdx
 src/content/docs/oss/checks/how-to/*.mdx
 src/content/docs/oss/checks/tutorials/*.mdx
 src/content/docs/oss/checks/use-cases/*.mdx
+src/content/docs/oss/solutions/tutorials/*.mdx
