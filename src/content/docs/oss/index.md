@@ -19,6 +19,8 @@ v3 is a major rewrite, with new features such as [Checks](/oss/checks) and a red
 Coming from Giskard v2? Scan has shipped in v3 with a new design, see [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities). RAGET is still v2-only; until it lands, use the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai). Follow our progress on the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252).
 :::
 
+New here? Start with [Install & Configure](/oss/checks/installation), then write your first scenario in [Your First Test](/oss/checks/tutorials/your-first-test).
+
 ## Resources and support
 
 - **Checks**: Explore the [Checks documentation](/oss/checks) for detailed guides
