@@ -87,6 +87,16 @@ delta at all — a signature that still reads `outputs: Target[...]` can reject 
 callable it used to accept. Notebook and snippet execution in Phase 5 is the only
 thing that catches this class; a clean delta is not proof the docs still run.
 
+### Hand-maintained lists the delta cannot see
+
+Some pages transcribe a list that lives in the library. Nothing generates them, so
+a new generator or a renamed tag never shows up in the delta. Re-read the source
+and check these by hand on every refresh:
+
+| Page | Table | Source of truth in `giskard-oss` |
+| --- | --- | --- |
+| `oss/solutions/explanation/threat-taxonomy.mdx` | tag families, threat types, generator families, `quality:`/`component:` tags per generator | `libs/giskard-scan/src/giskard/scan/generators/` (each generator's `tags` default) and `libs/giskard-scan/src/giskard/scan/vulnerability.py` (`VULNERABILITY_GENERATORS`) |
+
 Pages typed `other` (e.g. `oss/solutions/`, `oss/agent-skills.mdx`) have no owning
 editor. Do not edit them; list them in the PR body for a human.
 

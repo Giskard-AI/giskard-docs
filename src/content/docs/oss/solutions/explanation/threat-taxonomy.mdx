@@ -5,9 +5,9 @@ sidebar:
   order: 2
 ---
 
-A scan produces dozens or hundreds of **scenarios**, each one a test case: a message, or a short conversation, plus the checks that decide whether the agent's reply was acceptable. A flat list of failures is hard to act on. So every scenario carries tags naming what it was probing, and the report groups by those tags.
+A scan produces dozens or hundreds of **scenarios**, each one a test case: a message, or a short conversation, plus the checks that decide whether the agent's reply was acceptable. Every scenario carries tags naming what it was probing, and the report groups by those tags.
 
-A **threat type** is one of those tags: the kind of harm a scenario tries to cause, such as [prompt injection](/start/glossary/security/injection) or [harmful content](/start/glossary/security/harmful-content). Grouping by threat type turns "47 failures" into "most failures are prompt injection", which points at one defense to add rather than 47 replies to read.
+A **threat type** is one of those tags: the kind of harm a scenario tries to cause, such as [prompt injection](/start/glossary/security/injection) or [harmful content](/start/glossary/security/harmful-content). Grouping by it turns a flat list of 47 failures into "most failures are prompt injection", which points at one defense to add rather than 47 replies to read.
 
 This page is the catalog: which tag means what, which generator emits it, and how to read a grouped table without over-reading it. [How the Scan Works](/oss/solutions/explanation/how-scan-works) covers the pipeline that produces them.
 
@@ -21,7 +21,7 @@ This page is the catalog: which tag means what, which generator emits it, and ho
 
 A **component** is a part of your pipeline: the model, the retriever, or the conversation history.
 
-Two more prefixes show up on individual scenarios. `owasp:` maps a scenario to an OWASP LLM Top-10 entry, and `probe-type:` records the attack shape (`multi-turn`, meaning the attack is spread over several messages rather than one). Both are groupable, neither is a default.
+Two more prefixes show up on individual scenarios. `owasp:` maps a scenario to an OWASP LLM Top-10 entry, and `probe-type:` records the attack shape (`multi-turn`, meaning the attack is spread over several messages rather than one).
 
 ## Threat types
 
