@@ -19,14 +19,14 @@ Which generators you run decides what the scan can find. Drop one and the failur
 | [`AdversarialScenarioGenerator`](#adversarialscenariogenerator) | LLM-driven | Yes | `vulnerability_scan` |
 | [`CrescendoAttackScenarioGenerator`](#crescendoattackscenariogenerator) | LLM-driven | Multi-turn only | `vulnerability_scan` |
 | [`GOATAttackScenarioGenerator`](#goatattackscenariogenerator) | LLM-driven | Multi-turn only | `vulnerability_scan` |
-| [`PromptInjectionScenarioGenerator`](#promptinjectionscenariogenerator) | Bundled dataset | No | `vulnerability_scan` |
+| [`PromptInjectionScenarioGenerator`](#promptinjectionscenariogenerator) | Bundled dataset | Yes (dataset-defined) | `vulnerability_scan` |
 | [`GCGInjectionScenarioGenerator`](#gcginjectionscenariogenerator) | Hugging Face dataset | No | `vulnerability_scan` |
 | [`HuggingFaceDatasetScenarioGenerator`](#huggingfacedatasetscenariogenerator) | Hugging Face dataset | No | `vulnerability_scan` |
 | [`LocalDatasetScenarioGenerator`](#localdatasetscenariogenerator) | Bundled dataset | No | n/a |
 | [`HallucinationScenarioGenerator`](#hallucinationscenariogenerator) | Knowledge base | Yes | `quality_scan` |
 | [`SycophancyScenarioGenerator`](#sycophancyscenariogenerator) | Knowledge base | Yes | `quality_scan` |
-| [`SplitQuestionsScenarioGenerator`](#splitquestionsscenariogenerator) | Knowledge base | Yes (exactly 2 turns) | `quality_scan` |
-| [`MultiTopicScenarioGenerator`](#multitopicscenariogenerator) | Knowledge base | Yes (2+ turns) | `quality_scan` |
+| [`SplitQuestionsScenarioGenerator`](#splitquestionsscenariogenerator) | Knowledge base | Multi-turn only (exactly 2 turns) | `quality_scan` |
+| [`MultiTopicScenarioGenerator`](#multitopicscenariogenerator) | Knowledge base | Multi-turn only (2+ turns) | `quality_scan` |
 | [`OutOfScopeScenarioGenerator`](#outofscopescenariogenerator) | Knowledge base | Yes | `quality_scan` |
 
 ---
@@ -168,7 +168,7 @@ These load scenarios from a static dataset rather than generating them with an L
   Stem of the `.jsonl` file inside the package `data/` directory (e.g. `"prompt_injection"`). A missing file raises `RuntimeError`.
 </Property>
 <Property name="tags" type="list[str]" defaultValue="[]">
-  Tags applied to every loaded scenario.
+  Tags applied to every loaded scenario. They replace the scenario's own tags rather than adding to them, so on a generator that ships default `threat-type:` and `owasp:` tags, passing `tags=` drops those and the default `group_by="threat-type"` report loses its buckets. Repeat the defaults in your list if you want to keep them.
 </Property>
 
 There is no attack style of its own: it replays whatever prompts the file holds. Use it, or `HuggingFaceDatasetScenarioGenerator`, when you have a corpus of attacks the LLM-driven generators will not invent, such as ones collected from your own production traffic.
@@ -191,6 +191,8 @@ generator = LocalDatasetScenarioGenerator(
 **Module:** `giskard.scan.generators.prompt_injection`
 
 A [prompt injection](/start/glossary/security/injection) tries to override your agent's own instructions with instructions in the user's message. These are published attempts that already work on other systems, so they are cheap to run and catch an agent that follows any instruction it reads.
+
+Some bundled scenarios carry their own turn budget: the indirect-injection entries declare `max_steps: 3`, so they run as short conversations under the default `target_mode="multiturn"`. Under `"singleturn"` they are clamped to one step rather than skipped.
 
 <Property name="dataset_name" type="str" defaultValue='"prompt_injection"'>
   Bundled dataset stem.
@@ -253,6 +255,8 @@ A **suffix** is a short string of nonsense-looking tokens, found by an optimizer
 
 Subclasses [`HuggingFaceDatasetScenarioGenerator`](#huggingfacedatasetscenariogenerator), so it inherits the per-language subset handling and the dataset's own safety judge. One adversarial suffix is appended to each loaded scenario, rotating through the suffix list by scenario index, so the output count matches the base dataset and `max_scenarios` is not inflated.
 
+It also appends its `gcg-suffix:<n>` tag to whatever tags the base scenario already had, instead of replacing them the way the `tags` field does. The dataset's `threat-type:` and `dataset:` tags survive, so grouped reports still work.
+
 The suffixes are English-tuned and appended verbatim regardless of the base prompt's language; per the upstream probe, they may not generalize to translated prompts.
 
 ```python
@@ -269,6 +273,8 @@ generator = GCGInjectionScenarioGenerator()
 
 Document-grounded quality generators. They sample seed documents from the run's [`KnowledgeBase`](/oss/solutions/reference/knowledge-base), retrieve nearest neighbors as private reference context, and build scenarios whose checks compare the agent's answers to that context. With no knowledge base in the run context they return an empty list.
 
+Two of the five are multi-turn by design. `SplitQuestionsScenarioGenerator` and `MultiTopicScenarioGenerator` log a warning and return no scenarios under `target_mode="singleturn"`, so `quality_scan(target_mode="singleturn")` runs three generators, not five, and produces no `component:history` results. Check the warnings if a single-turn quality report looks thinner than you expected.
+
 ### `KnowledgeBaseScenarioGenerator`
 
 <ResourceSection description="Base class for document-grounded quality scenarios. It owns seed document sampling, nearest-neighbor retrieval, language sampling, turn-budget handling, and the default contradiction scenario shape; subclasses supply the prompt, scenario name, and quality tags.">
@@ -279,7 +285,7 @@ Document-grounded quality generators. They sample seed documents from the run's 
   Maximum number of nearest-neighbor documents used as private reference context for each scenario (`>= 1`).
 </Property>
 <Property name="max_turns" type="int" defaultValue="3">
-  Maximum user-simulator turns per scenario (`>= 1`). `target_mode="singleturn"` caps it to one turn.
+  Maximum user-simulator turns per scenario (`>= 1`). `target_mode="singleturn"` caps it to one turn, except on the two subclasses that skip single-turn runs entirely.
 </Property>
 
 Without an explicit `max_scenarios`, subclasses generate `DEFAULT_KNOWLEDGE_BASE_SCENARIOS` (5) scenarios. A subclass that does not define non-empty `scenario_name_prefix`, `prompt_path`, and `quality_tags` class variables raises `TypeError` at definition time.
@@ -334,6 +340,8 @@ generator = SycophancyScenarioGenerator()
 
 The question is only answerable if the agent still has the first message. It catches retrieval that runs on the latest message alone and so searches for the wrong thing.
 
+Multi-turn by design: with `target_mode="singleturn"` the generator logs a warning and returns no scenarios.
+
 Scenario name prefix: `"Knowledge Base Split Questions"`.
 
 ```python
@@ -355,6 +363,8 @@ generator = SplitQuestionsScenarioGenerator()
 </Property>
 
 Each turn changes subject. It catches an agent that answers the second topic using documents retrieved for the first.
+
+Multi-turn by design: with `target_mode="singleturn"` the generator logs a warning and returns no scenarios. It also needs at least two knowledge-base documents, and returns none below that.
 
 Scenario name prefix: `"Knowledge Base Multi Topic Questions"`.
 

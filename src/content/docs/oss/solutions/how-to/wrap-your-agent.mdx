@@ -181,7 +181,7 @@ async def support_agent(
 This is the only integration code you need. Anything callable from Python fits the shape: a RAG pipeline, an agent, or a remote API.
 
 :::note
-Giskard injects the arguments by parameter name. Only `inputs` and `trace` are accepted; any other name raises `ValueError`.
+Giskard injects the arguments by parameter name. Only `inputs` and `trace` are injected. Any other parameter without a default raises `TypeError: Parameter '<name>' is required but not in the injection requirements.` at validation time. A parameter that has a default is left alone, so that is how you pass your own configuration into the wrapper.
 :::
 
 ## Run the scan against it

@@ -177,12 +177,14 @@ Multi-turn mode calls your agent once per turn with only the new message, so you
 
 ## Threat types vs. components
 
-Reports carry two labels on every result, and they answer different questions. Knowing which one you are looking at saves a lot of confusion:
+Reports can carry two different labels, and they answer different questions. Knowing which one you are looking at saves a lot of confusion:
 
-- A **threat type** is *what kind of failure* this is: `prompt-injection`, `harmful-content-generation`, `misguidance-and-unauthorized-advice`. It is a tag on the scenario, which is why `group_by="threat-type"` (the default) produces a report organized by risk category, and why scenarios also carry OWASP tags like `owasp:llm-top-10-2025:LLM01`.
-- A **component** is *which part of your system* was exercised: the generator that produced the scenario, and the checks that judged it.
+- A **threat type** is *what kind of failure* this is: `prompt-injection`, `harmful-content-generation`, `misguidance-and-unauthorized-advice`. It is a tag on the scenario, which is why `group_by="threat-type"` (the default for the vulnerability scan) produces a report organized by risk category, and why scenarios also carry OWASP tags like `owasp:llm-top-10-2025:LLM01`.
+- A **component** is *which part of your agent pipeline* was exercised: `component:llm` for the model's own answer, `component:retrieval` for the document lookup, `component:history` for whether the agent carried earlier turns forward.
 
-Knowing one label tells you nothing about the other, which is why the report can group by either. The same threat type can arrive from several generators, and one generator can emit several threat types. A prompt-injection failure could have come from the bundled injection corpus or from an LLM-driven attack written for your `description`, and knowing it was prompt injection does not tell you which.
+The two labels come from different scans. Only the knowledge-base quality generators emit `component:` tags, which is why `quality_scan` defaults to `group_by="component"`. No vulnerability generator emits one, so `vulnerability_scan(group_by="component")` prints a single unnamed bucket holding everything.
+
+Within the vulnerability scan, the same threat type can arrive from several generators, and one generator can emit several threat types. A prompt-injection failure could have come from the bundled injection corpus or from an LLM-driven attack written for your `description`, and knowing it was prompt injection does not tell you which.
 
 With the default `group_by="threat-type"`, the report buckets results by that tag. Schematically, a run might come back like this:
 
