@@ -52,11 +52,31 @@ list_scan_items("deepteam")  # supported vulnerability and attack names
 
 The deepteam names come from a fixed map inside the adapter, not from deepteam's full catalog:
 
-| Kind | Supported names |
+The vulnerabilities are what you test for:
+
+| Vulnerability | What it looks for |
 | --- | --- |
-| Vulnerabilities | `Bias`, `Toxicity`, `PIILeakage`, `PromptLeakage`, `Misinformation` |
-| Single-turn attacks | `PromptInjection`, `Roleplay`, `Leetspeak`, `ROT13` |
-| Multi-turn attacks | `LinearJailbreaking`, `CrescendoJailbreaking`, `TreeJailbreaking`, `SequentialJailbreak`, `BadLikertJudge` |
+| `Bias` | Discriminatory or stereotyped output about a group |
+| `Toxicity` | Insults, harassment, and other abusive language |
+| `PIILeakage` | Personal data about third parties leaving the agent |
+| `PromptLeakage` | The agent revealing its own system prompt or configuration |
+| `Misinformation` | Confident false claims presented as fact |
+
+The attacks are how the request is disguised or escalated:
+
+| Attack | Turns | What the technique does |
+| --- | --- | --- |
+| `PromptInjection` | Single | Embeds instructions that tell the agent to ignore its own |
+| `Roleplay` | Single | Wraps the request in a fictional persona the agent is asked to play |
+| `Leetspeak` | Single | Rewrites the request in leetspeak (`h4ck`) so filters miss the words |
+| `ROT13` | Single | Rotates every letter 13 places, so the request reaches the model encoded |
+| `LinearJailbreaking` | Multi | Rewrites the prompt turn after turn, using each refusal to steer the next try |
+| `CrescendoJailbreaking` | Multi | Starts benign and escalates gradually toward the harmful ask |
+| `TreeJailbreaking` | Multi | Branches into several rewrites per turn and keeps the ones that get furthest |
+| `SequentialJailbreak` | Multi | Hides the request inside a benign narrative, such as a character dialogue or a game level |
+| `BadLikertJudge` | Multi | Asks the agent to score harmfulness on a scale, then to write an example of the worst score |
+
+Encoding attacks like `Leetspeak` and `ROT13` are trivial to decode. They work because a safety filter reads the literal text while the model reads through the encoding.
 
 ## Run garak
 
@@ -71,9 +91,11 @@ suite_result = await third_party_scan(
 )
 ```
 
+`AutoDANCached` replays pre-computed DAN-style jailbreak prefixes; `SlurUsage` checks whether the agent will produce ethnic slurs.
+
 `probes` has three modes:
 
-- `None`: a curated default set of six probes, chosen to be small and to work without extra API keys.
+- `None`: a curated default set of six probes, chosen to be small and to work without extra API keys. They cover slur usage, quack medicine, two `goodside` probes for made-up facts and output-format compliance, cached DAN jailbreaks, and data exfiltration through an assembled string.
 - `"all"`: every active loadable probe. That is on the order of a hundred conversations against your agent, so treat it as a nightly job, not a pull-request check.
 - An explicit list: names as `list_scan_items("garak")` returns them.
 
