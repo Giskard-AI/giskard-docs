@@ -249,6 +249,10 @@ check = GreaterThan(
 check = GreaterThanEquals(expected_value=100, target_key="trace.last.outputs.user_count")
 ```
 
+:::note[Renamed in v3]
+`GreaterThanEquals` is named `GreaterEquals` in releases before v3. If you are pinned to an earlier version, import that name instead. `GreaterThan`, `LessThan` and `LessThanEquals` are unchanged and work on both.
+:::
+
 ### `LessThan` / `LessThanEquals`
 
 ```python
