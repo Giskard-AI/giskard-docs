@@ -34,11 +34,37 @@ Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding age
 
 ## Install the Python package
 
-Giskard Checks requires **Python 3.12 or higher**. Install using pip:
+Giskard Checks requires **Python 3.12 or higher**. Install it together with the SDK for the LLM provider you will use as a judge -- an LLM the library calls to grade your agent's replies:
 
 ```bash
 pip install "giskard[openai]==3.0.0rc1"
 ```
+
+No provider SDK ships with `giskard-checks` itself, so installing it alone leaves LLM-based checks unable to reach a model.
+
+Pick the extra that matches your provider:
+
+| Provider prefix | Install | SDK |
+| --- | --- | --- |
+| `openai/` | `"giskard-agents[openai]"` | `openai` |
+| `google/` or `gemini/` | `"giskard-agents[google]"` | `google-genai` |
+| `anthropic/` | `"giskard-agents[anthropic]"` | `anthropic` |
+| `azure/` | `"giskard-llm[azure]"` | `openai` |
+| `azure_ai/` | `"giskard-llm[azure]"` | `openai` |
+
+Use `"giskard-agents[all]"` for all three native SDKs at once.
+
+:::note[Using LiteLLM instead]
+LiteLLM is supported as an opt-in escape hatch for providers with no native route. Install `"giskard-agents[litellm]"` and pass `LiteLLMGenerator` explicitly:
+
+```python
+from giskard.agents.generators import LiteLLMGenerator
+
+llm_judge = LiteLLMGenerator(model="bedrock/anthropic.claude-3-sonnet")
+```
+
+The default `Generator` does not use LiteLLM.
+:::
 
 ## Configure the default LLM judge model
 
@@ -71,13 +97,14 @@ from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
 # Create a generator with giskard.agents
+# The provider prefix picks the SDK: openai/, google/, anthropic/, azure/, azure_ai/
 llm_judge = Generator(model="openai/gpt-5-mini")
 
 # Configure the checks to use this judge model by default
 set_default_generator(llm_judge)
 ```
 
-We use the `giskard-agents` library to handle LLM generations.
+`Generator` is `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`.
 
 ## Next Steps
 
