@@ -68,7 +68,7 @@ The default `Generator` does not use LiteLLM.
 
 ## Configure the default LLM judge model
 
-Some checks require calling an LLM (`LLMJudge`, `Groundedness`, `Conformity`). To use them, configure a provider SDK. The default `Generator` uses Giskard's native provider SDK integrations; install the matching `giskard` extra, such as `openai` above. LiteLLM is optional through `giskard[litellm]`.
+A judge is an LLM that reads your agent's reply and decides whether it satisfies a rule you wrote in plain language. Some checks need one (`LLMJudge`, `Groundedness`, `Conformity`). To use them, configure a provider SDK. The default `Generator` uses Giskard's native provider SDK integrations; install the matching `giskard` extra, such as `openai` above. LiteLLM is optional through `giskard[litellm]`.
 
 When a judge runs, its prompt includes the test inputs and agent outputs. Those values are sent to the configured LLM provider, so use a provider and model that meet your data-handling requirements. A weak judge model can produce unreliable verdicts.
 
@@ -104,7 +104,7 @@ llm_judge = Generator(model="openai/gpt-5-mini")
 set_default_generator(llm_judge)
 ```
 
-`Generator` is `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`.
+`Generator` is `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`. Use a frontier-tier model; small local models give unreliable verdicts in both directions, passing replies they should fail and failing replies that were fine. Read the failures before acting on them.
 
 ## Next Steps
 
