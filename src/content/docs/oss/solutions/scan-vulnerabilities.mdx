@@ -7,7 +7,9 @@ sidebar:
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-The Giskard library provides an automatic **scan** that detects safety and security vulnerabilities affecting your LLM-based agents.
+The Giskard library provides an automatic **scan**: it attacks your own agent on purpose, with hostile inputs generated for it, and reports the ones it handled badly. That practice is called red teaming. Use it to find safety and security problems in an LLM-based agent before your users do.
+
+A scan is a search, not a certification. It samples generated attacks; it does not cover every attack, and a run that finds nothing means those attacks did not break your agent, not that the agent is safe. The verdicts come from an LLM, which is sometimes wrong in both directions, so read each failure before acting on it. Do not present scan output as an audit or a compliance result.
 
 :::note[Coming from Giskard v2?]
 The scan has been redesigned in v3. Instead of wrapping your model with `giskard.Model(...)` and running `giskard.scan(model, dataset)` over a dataset, you wrap your agent as an async function, generate scenarios from a plain-language description with `generate_suite(...)`, and run them with `suite.run(...)`. This means there is no dataset to prepare and no `model_type` or `feature_names` to declare.
@@ -16,6 +18,8 @@ The scan has been redesigned in v3. Instead of wrapping your model with `giskard
 ## How does it work?
 
 From a plain-language description of your agent, an LLM generates adversarial scenarios tailored to it and runs them against your agent over single-turn and multi-turn conversations. Then, a second LLM acts as a judge, deciding whether each response reveals a vulnerability.
+
+In plain terms: a scenario is one attempted attack, sent as a single message (single-turn) or as a conversation where the attacker keeps pushing over several messages (multi-turn). Adversarial means the input is written to make your agent misbehave, not to represent a normal user. The [glossary](/start/glossary) describes the failure types being hunted, such as [prompt injection](/start/glossary/security/injection), [harmful content](/start/glossary/security/harmful-content), and [information disclosure](/start/glossary/security/information-disclosure).
 
 Differently from benchmarks that evaluate a foundation model in a generic way, Giskard's scan performs an **in-depth, domain-specific assessment** of _your_ agent, based on the description you provide.
 
@@ -45,13 +49,13 @@ Yes. Pass the languages your agent is expected to handle through the `languages`
 
 ## Before starting
 
-First, install the scan and choose the model that will generate and judge the scenarios. Since `giskard-scan` pulls in the rest of the library, you only need to add the extra for the provider you use. Pick yours below:
+First, install the scan and choose the model that will generate and judge the scenarios. `giskard-scan` pulls in the rest of the library; the provider extras live on `giskard-agents`, so install both. Pick your provider below:
 
 <Tabs>
 <TabItem label="OpenAI">
 
 ```bash
-pip install "giskard-scan[openai]"
+pip install giskard-scan "giskard-agents[openai]"
 ```
 
 ```python
@@ -68,7 +72,7 @@ Set `OPENAI_API_KEY` in your environment.
 <TabItem label="Anthropic">
 
 ```bash
-pip install "giskard-scan[anthropic]"
+pip install giskard-scan "giskard-agents[anthropic]"
 ```
 
 ```python
@@ -85,7 +89,7 @@ Set `ANTHROPIC_API_KEY` in your environment.
 <TabItem label="Gemini">
 
 ```bash
-pip install "giskard-scan[google]"
+pip install giskard-scan "giskard-agents[google]"
 ```
 
 ```python
@@ -104,7 +108,7 @@ Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment.
 LiteLLM reaches any provider through a single `"<provider>/<model-name>"` string, so it is the most flexible option.
 
 ```bash
-pip install "giskard-scan[litellm]"
+pip install giskard-scan "giskard-agents[litellm]"
 ```
 
 ```python
@@ -249,7 +253,7 @@ For every failed scenario, the report shows the judge's verdict and the full con
 
 ### Save your suite
 
-Generating scenarios uses an LLM, so it is good practice to generate the suite once and reuse it. The result exposes the suite that produced it via `suite_result.suite`. Since `Suite` is a Pydantic model, you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
+Generating scenarios uses an LLM, so each scan produces different scenarios and a different pass rate. Two runs are only comparable when they use the same saved suite, so generate the suite once and reuse it. The result exposes the suite that produced it via `suite_result.suite`. Since `Suite` is a Pydantic model, you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
 
 ```python
 from pathlib import Path
@@ -276,7 +280,7 @@ For the workflow file, secrets, cost controls, and JUnit XML reporting, see [CI/
 
 ### Re-run the same scenarios on another model
 
-The saved suite can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the vulnerabilities are gone and that nothing regressed:
+The saved suite can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the attacks that used to succeed no longer do:
 
 ```python
 suite_result = await suite.run(target=my_other_agent)

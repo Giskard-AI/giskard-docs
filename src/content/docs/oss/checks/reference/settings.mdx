@@ -12,6 +12,13 @@ Complete configuration reference for Giskard Checks: the default LLM model
 behind LLM checks, the embedding model used by semantic checks, and how much of
 a suite report gets printed.
 
+Two models are configured here. The generator is the LLM the library calls; when
+a check uses it to decide whether an answer is acceptable, that role is called
+the judge. The embedding model turns text into vectors so checks like
+`SemanticSimilarity` can compare meaning rather than exact wording. Both default
+to OpenAI models and both send your test inputs and agent outputs to the
+provider you configure.
+
 ---
 
 ## Settings
@@ -64,6 +71,11 @@ The default generator is what LLM-backed checks (`LLMJudge`, `Groundedness`,
 `Toxicity`, and the other LLM-backed checks) use when you do not pass a generator explicitly. A
 runtime override set with `set_default_generator` takes precedence over
 `GISKARD_CHECKS_DEFAULT_MODEL`.
+
+Point this at a capable model. A weak model produces unreliable verdicts in both
+directions: tests pass on answers that should fail, and fail on answers that were
+correct. That shows up as flaky tests, not as an error, so read the failing
+verdicts before you trust them.
 
 <MethodCard name="set_default_generator()" returnType="None">
   Set the default LLM generator for all checks. The override is process-global.
