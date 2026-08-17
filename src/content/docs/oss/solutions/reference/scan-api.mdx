@@ -48,7 +48,7 @@ Build a suite from the vulnerability generator registry, run it against the targ
     BCP-47 language codes the agent is expected to handle (e.g. `["en", "fr"]`).
   </Property>
   <Property name="max_scenarios" type="int | None" defaultValue="None">
-    Total upper bound on scenarios across all vulnerability generators. `None` lets each generator apply its own default, which is a few hundred LLM calls. Set it low and the budget is spread thin, so some attack types get no scenarios at all and go untested. Keep it small while iterating, raise it before you trust the result.
+    Total upper bound on scenarios across all vulnerability generators. `None` lets each generator apply its own default, so seven generators each contribute scenarios and the run is large. Set it low and the budget is spread thin, so some attack types get no scenarios at all and go untested. Keep it small while iterating, raise it before you trust the result.
   </Property>
   <Property name="seed" type="int" defaultValue="42">
     Integer seed used for reproducible scenario generation. Two runs with different seeds generate different scenarios, so their pass rates are not comparable.
@@ -258,11 +258,15 @@ result = await third_party_scan(
     my_agent,
     "garak",
     description="A customer support chatbot for an e-commerce store.",
-    probes=["dan.Dan_11_0"],
+    probes=["probes.dan.AutoDANCached"],
 )
 ```
 
+Probe names are garak's own catalog keys and carry the `probes.` prefix. An unqualified name matches nothing and is skipped rather than rejected, so the scan returns clean with nothing run. Read the names from `list_scan_items("garak")`.
+
 Raises `ImportError` when the extra is missing and `ValueError` for an unknown tool.
+
+The returned `SuiteResult` has no `suite`: third-party results export with `to_junit_xml` but cannot be saved and replayed. See [Run Garak and DeepTeam Scanners](/oss/solutions/how-to/third-party-scanners).
 
 ---
 
@@ -334,7 +338,7 @@ result = await vulnerability_scan(
 )
 ```
 
-`ScanOptions` extends `SharedScanOptions`, which holds every key except `commercial_use` and is what `quality_scan` accepts.
+`ScanOptions` extends `SharedScanOptions`, which holds every key except `commercial_use` and is what `quality_scan` accepts. `quality_scan` has no `commercial_use` parameter: its generators are all knowledge-base driven and read your documents, not a licensed dataset. `SharedScanOptions` is not re-exported from `giskard.scan`, so import it from `giskard.scan.types` if you need to annotate with it.
 
 ---
 
@@ -384,6 +388,15 @@ generators = registry.generators()
 vulnerability_suite_generator_registry.register(
     PromptInjectionScenarioGenerator(tags=["team:security"])
 )
+```
+
+The quality scan reads its own registry the same way. Drop a generator from it and the next `quality_scan` call stops producing those scenarios:
+
+```python
+from giskard.scan import quality_suite_generator_registry
+from giskard.scan.generators import SycophancyScenarioGenerator
+
+quality_suite_generator_registry.unregister(SycophancyScenarioGenerator)
 ```
 
 ---

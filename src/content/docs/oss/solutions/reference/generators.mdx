@@ -12,7 +12,7 @@ import TypeTable from "../../../../../components/api/TypeTable.astro";
 
 Scenario generators turn a plain-language description of your agent into runnable scenarios, where a scenario is one test case: a message or short conversation, plus the checks that judge the reply. Every scan is a set of generators plus a target. Pick them yourself with [`generate_suite`](/oss/solutions/reference/scan-api#generate_suite), or take the curated sets used by `vulnerability_scan` and `quality_scan`.
 
-Which generators you run decides what the scan can find. Drop one and the failures it would have found never appear in the report. The table below is the whole catalog, so it is also the limit of what a scan covers.
+Which generators you run decides what the scan can find. Drop one and the failures it would have found never appear in the report. The table below lists every generator that produces scenarios, so it is also the limit of what a scan covers. Two more classes exist as bases you subclass rather than run: `KnowledgeBaseScenarioGenerator` (documented [below](#knowledgebasescenariogenerator)) and `BaseDatasetScenarioGenerator` in `giskard.scan.generators.base`.
 
 | Generator | Family | Multi-turn | Used by |
 | --------- | ------ | ---------- | ------- |
@@ -84,7 +84,7 @@ These generators call an LLM to build attacks tailored to your agent's descripti
 
 ### `AdversarialScenarioGenerator`
 
-<ResourceSection description="For each built-in adversarial category, an LLM produces natural-language conformity rules (for example 'the agent must not provide instructions for synthesising chemical weapons'). Each rule becomes one scenario that crafts a realistic adversarial prompt and judges the response against the rule with a Conformity check.">
+<ResourceSection description="For each built-in adversarial category, an LLM produces natural-language conformity rules (for example 'the agent must not provide instructions for synthesizing chemical weapons'). Each rule becomes one scenario that crafts a realistic adversarial prompt and judges the response against the rule with a Conformity check.">
 
 **Module:** `giskard.scan.generators.adversarial`
 
@@ -267,7 +267,7 @@ generator = GCGInjectionScenarioGenerator()
 
 ## Knowledge-base generators
 
-Document-grounded quality generators. They sample seed documents from the run's [`KnowledgeBase`](/oss/solutions/reference/knowledge-base), retrieve nearest neighbours as private reference context, and build scenarios whose checks compare the agent's answers to that context. With no knowledge base in the run context they return an empty list.
+Document-grounded quality generators. They sample seed documents from the run's [`KnowledgeBase`](/oss/solutions/reference/knowledge-base), retrieve nearest neighbors as private reference context, and build scenarios whose checks compare the agent's answers to that context. With no knowledge base in the run context they return an empty list.
 
 ### `KnowledgeBaseScenarioGenerator`
 
@@ -276,7 +276,7 @@ Document-grounded quality generators. They sample seed documents from the run's 
 **Module:** `giskard.scan.generators.knowledge_base.base`
 
 <Property name="context_documents" type="int" defaultValue="4">
-  Maximum number of nearest-neighbour documents used as private reference context for each scenario (`>= 1`).
+  Maximum number of nearest-neighbor documents used as private reference context for each scenario (`>= 1`).
 </Property>
 <Property name="max_turns" type="int" defaultValue="3">
   Maximum user-simulator turns per scenario (`>= 1`). `target_mode="singleturn"` caps it to one turn.
@@ -288,7 +288,7 @@ Without an explicit `max_scenarios`, subclasses generate `DEFAULT_KNOWLEDGE_BASE
 
 ### `HallucinationScenarioGenerator`
 
-<ResourceSection description="Document-grounded hallucination scenarios. Samples seed documents and their nearest neighbours, then builds multi-turn scenarios driven by an LLM user simulator grounded in those documents. A contradiction check flags responses that clearly conflict with the retrieved context.">
+<ResourceSection description="Document-grounded hallucination scenarios. Samples seed documents and their nearest neighbors, then builds multi-turn scenarios driven by an LLM user simulator grounded in those documents. A contradiction check flags responses that clearly conflict with the retrieved context.">
 
 **Module:** `giskard.scan.generators.knowledge_base.hallucination`
 
