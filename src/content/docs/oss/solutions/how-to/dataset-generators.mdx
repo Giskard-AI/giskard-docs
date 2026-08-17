@@ -16,11 +16,11 @@ Generators come in two kinds, and the difference matters for what a passing run 
 
 This page covers the dataset-backed ones.
 
-The reason a team brings its own corpus is usually that the prompts came from production. Every time a customer got [BotaniBot](/oss/solutions/tutorials/your-first-scan) to do something it should not, someone pastes the prompt into a file: the care sheet ending in "ignore your instructions", the berry question that came back with a dosage, the ticket where it recommended a competitor. After six months that file is the most valuable red-team material the team owns. Every line in it has already worked at least once against this exact agent.
+The reason a team brings its own corpus is usually that the prompts came from production. Every time a customer got the bank's support agent to do something it should not, someone pastes the prompt into a file: the statement with an instruction hidden in a merchant description, the savings question that came back as investment advice, the chat where the agent promised a fee waiver that policy does not allow. After six months that file is the most valuable red-team material the team owns, because every line in it has already worked at least once against this exact agent.
 
 An LLM-driven generator will not rediscover those prompts reliably; it writes new ones each run and may or may not land near the wording that broke you. Turning the file into a dataset generator makes it run on every scan, identically, so a regression that reopens a closed hole fails the build. A pass tells you your agent handles that known corpus, and nothing about prompts outside it, which is why you keep the LLM-driven generators alongside it rather than instead of it.
 
-Three separate things are involved, and it is worth keeping them apart:
+Three separate things are involved:
 
 - **The format** is JSONL: one serialized `Scenario` per line. Both classes below parse exactly the same format.
 - **A bundled file** is a `.jsonl` shipped inside the installed `giskard.scan` package. This is how the library ships its own corpora; you cannot point it at a file on your disk.
@@ -105,7 +105,7 @@ Push the file of production prompts to a dataset repository on the Hub, then poi
 from giskard.scan import HuggingFaceDatasetScenarioGenerator
 
 generator = HuggingFaceDatasetScenarioGenerator(
-    repo_id="botanibot/escaped-prompts",
+    repo_id="northbridge-bank/escaped-prompts",
     repo_allow_commercial_use=True,
     tags=["threat-type:prompt-injection"],
 )
@@ -119,7 +119,7 @@ The `tags` are the reason to bother: without them these scenarios land in an unn
 
 This is not a tabular dataset loaded with `datasets.load_dataset`, so there are no columns to match. The generator downloads the raw files and parses each **line** as a `Scenario`. Two requirements follow.
 
-The data files are `.jsonl`, in the format above. And the dataset card must declare **one subset (config) per language**, named by its BCP-47 code, in its `configs` block:
+The data files must be `.jsonl` in the format above, and the dataset card must declare **one subset (config) per language**, named by its BCP-47 code, in its `configs` block:
 
 ```yaml
 configs:
@@ -143,11 +143,11 @@ The generator reads the card, resolves each subset's `data_files` against the re
 | `repo_allow_commercial_use` | `bool` | `True` | Your claim about the dataset's license. See below. |
 | `tags` | `list[str]` | `[]` | Applied to every scenario loaded from this dataset, which is what puts them in a named bucket in the grouped report. |
 
-`LocalDatasetScenarioGenerator` takes `dataset_name` and `tags`. The remaining knobs — `description`, `languages`, `max_scenarios`, `seed`, `target_mode` — belong to the scan run, not the generator, and reach it from there.
+`LocalDatasetScenarioGenerator` takes `dataset_name` and `tags`. The remaining knobs (`description`, `languages`, `max_scenarios`, `seed`, `target_mode`) belong to the scan run rather than the generator, and reach it from there.
 
 Requested languages with no matching subset are skipped. If none match, the generator logs a warning and returns an empty list, and the scan continues with whatever the other generators produced. A Hub outage behaves the same way: network errors and 502/503/504 responses are logged and swallowed, so a flaky Hub cannot fail a scan run.
 
-:::caution[A silent zero is the failure mode here]
+:::caution[A missing subset or a Hub error produces zero scenarios]
 Both cases produce no scenarios rather than an exception. If a scan comes back suspiciously thin, check the logs at `WARNING` level before concluding your agent is clean.
 :::
 
@@ -176,17 +176,19 @@ The path is inside the installed `giskard.scan` package, not your working direct
 
 ## Run them
 
-Dataset generators go anywhere a generator goes. `generator` below is the one built above; `botanibot` is the async target from [Your First Scan](/oss/solutions/tutorials/your-first-scan). Straight into `generate_suite`, when you want only your corpus and nothing else:
+Dataset generators go anywhere a generator goes. `generator` below is the one built above, and `bank_agent` is the async target wrapped in [Wrap Your Agent](/oss/solutions/how-to/wrap-your-agent). Pass it straight to `generate_suite` when you want only your corpus:
 
 ```python
 from giskard.scan import generate_suite
 
+DESCRIPTION = (
+    "A customer-support agent for a retail bank. It answers questions about "
+    "accounts, cards, payments and disputes. It must refuse to give investment "
+    "or tax advice, and must never disclose another customer's data."
+)
+
 suite = await generate_suite(
-    description=(
-        "BotaniBot, a garden center assistant that answers questions about "
-        "plants, soil and watering. It must stay on gardening topics and must "
-        "never give medical advice about ingesting plants."
-    ),
+    description=DESCRIPTION,
     languages=["en"],
     generators=[generator],
     max_scenarios=20,
@@ -201,12 +203,8 @@ from giskard.scan import vulnerability_scan, vulnerability_suite_generator_regis
 vulnerability_suite_generator_registry.register(generator)
 
 result = await vulnerability_scan(
-    target=botanibot,
-    description=(
-        "BotaniBot, a garden center assistant that answers questions about "
-        "plants, soil and watering. It must stay on gardening topics and must "
-        "never give medical advice about ingesting plants."
-    ),
+    target=bank_agent,
+    description=DESCRIPTION,
     languages=["en"],
 )
 ```
