@@ -108,43 +108,7 @@ async def third_party_scan(
 
 Await it, as you await `vulnerability_scan`. Every scan entry point in the library is `async def`.
 
-Both examples on this page run against `support_agent`, a customer-support agent for a retail bank, [wrapped the usual way](/oss/solutions/how-to/wrap-your-agent). The version defined [below](#run-deepteam) also holds customer records in its context, which is what the deepteam example needs:
-
-```python
-from giskard.scan import third_party_scan
-
-suite_result = await third_party_scan(
-    target=support_agent,
-    tool="garak",
-    description="A customer-support agent for a retail bank, covering accounts, cards, payments and disputes.",
-    probes=["probes.dan.AutoDANCached", "probes.lmrc.SlurUsage"],
-)
-```
-
-`AutoDANCached` replays pre-computed DAN-style jailbreak prefixes; `SlurUsage` checks whether the agent will produce ethnic slurs. Neither depends on what the agent is for, so both are worth running against any customer-facing agent. That is also the reason to pick garak: it brings attacks nobody on your team would have written. Start with two named probes, move to `probes=None` for the curated six once you know the wiring works, and treat `"all"` as a deliberate, expensive decision.
-
-`probes` has three modes:
-
-- `None`: a curated default set of six probes, chosen to be small and to work without extra API keys: `probes.lmrc.SlurUsage`, `probes.goodside.WhoIsRiley`, `probes.lmrc.QuackMedicine`, `probes.goodside.ThreatenJSON`, `probes.dan.AutoDANCached`, and `probes.web_injection.StringAssemblyDataExfil`.
-- `"all"`: every active loadable probe garak ships. This is heavy and expensive: many probes, each with its own prompt set, all of them hitting your agent and your LLM bill.
-- An explicit list: names as `list_scan_items("garak")` returns them.
-
-:::caution[Probe names must be fully qualified]
-garak's catalog keys carry the `probes.` prefix, as in `probes.dan.AutoDANCached`. Drop it and the name matches nothing, and an unmatched name is skipped rather than rejected. Ask for six unqualified names and you get a scan with six skips, zero failures, and no error: a result that reads as clean because nothing ran. Copy names from `list_scan_items("garak")` and check the skip count.
-:::
-
-`description` is accepted for signature symmetry, but garak has no target-profile concept and ignores it, as does `languages`. `target_mode` defaults to `"multiturn"`, which lets garak's iterative probes run their full search.
-
-Adapter behavior to know before you read the results:
-
-- A requested probe that is unknown, inactive, or fails to load does **not** raise. It becomes a skipped `ScenarioResult` in the suite, with the reason in the check message. A probe that raises mid-run becomes an error result. Neither aborts the scan. A run with zero failures may simply be a run where the probes never loaded, so read the skip and error counts before you conclude anything.
-- Detector scores are in `[0, 1]` and anything strictly above `0.5` counts as a hit. An exact `0.5` is read as "uncertain", not a finding.
-- The adapter pins garak's `generations` to `1`, so one prompt yields one response rather than garak's default fan-out of five.
-- Probes run at most 8 at a time, which caps how hard the run hammers the agent under test.
-
-## Run deepteam
-
-deepteam tests what the agent knows, so this example gives `support_agent` the customer records in its context, along with a system prompt worth extracting:
+Both examples on this page run against the same agent: a customer-support assistant for a retail bank, wrapped the way [Wrap your agent](/oss/solutions/how-to/wrap-your-agent) describes. It holds the caller's own records in its context and a system prompt stating its rules, which is what gives deepteam's `PIILeakage` and `PromptLeakage` something to go after later on this page:
 
 ```python
 import os
@@ -181,6 +145,44 @@ async def support_agent(inputs: AgentInput) -> AgentOutput:
     )
     return AgentOutput(answer=response.choices[0].message.content)
 ```
+
+Point garak at it:
+
+```python
+from giskard.scan import third_party_scan
+
+suite_result = await third_party_scan(
+    target=support_agent,
+    tool="garak",
+    description="A customer-support agent for a retail bank, covering accounts, cards, payments and disputes.",
+    probes=["probes.dan.AutoDANCached", "probes.lmrc.SlurUsage"],
+)
+```
+
+`AutoDANCached` replays pre-computed DAN-style jailbreak prefixes; `SlurUsage` checks whether the agent will produce ethnic slurs. Neither depends on what the agent is for, so both are worth running against any customer-facing agent. That is also the reason to pick garak: it brings attacks nobody on your team would have written. Start with two named probes, move to `probes=None` for the curated six once you know the wiring works, and treat `"all"` as a deliberate, expensive decision.
+
+`probes` has three modes:
+
+- `None`: a curated default set of six probes, chosen to be small and to work without extra API keys: `probes.lmrc.SlurUsage`, `probes.goodside.WhoIsRiley`, `probes.lmrc.QuackMedicine`, `probes.goodside.ThreatenJSON`, `probes.dan.AutoDANCached`, and `probes.web_injection.StringAssemblyDataExfil`.
+- `"all"`: every active loadable probe garak ships. This is heavy and expensive: many probes, each with its own prompt set, all of them hitting your agent and your LLM bill.
+- An explicit list: names as `list_scan_items("garak")` returns them.
+
+:::caution[Probe names must be fully qualified]
+garak's catalog keys carry the `probes.` prefix, as in `probes.dan.AutoDANCached`. Drop it and the name matches nothing, and an unmatched name is skipped rather than rejected. Ask for six unqualified names and you get a scan with six skips, zero failures, and no error: a result that reads as clean because nothing ran. Copy names from `list_scan_items("garak")` and check the skip count.
+:::
+
+`description` is accepted for signature symmetry, but garak has no target-profile concept and ignores it, as does `languages`. `target_mode` defaults to `"multiturn"`, which lets garak's iterative probes run their full search.
+
+Adapter behavior to know before you read the results:
+
+- A requested probe that is unknown, inactive, or fails to load does **not** raise. It becomes a skipped `ScenarioResult` in the suite, with the reason in the check message. A probe that raises mid-run becomes an error result. Neither aborts the scan. A run with zero failures may simply be a run where the probes never loaded, so read the skip and error counts before you conclude anything.
+- Detector scores are in `[0, 1]` and anything strictly above `0.5` counts as a hit. An exact `0.5` is read as "uncertain", not a finding.
+- The adapter pins garak's `generations` to `1`, so one prompt yields one response rather than garak's default fan-out of five.
+- Probes run at most 8 at a time, which caps how hard the run hammers the agent under test.
+
+## Run deepteam
+
+Reusing `support_agent` from above:
 
 ```python
 suite_result = await third_party_scan(
