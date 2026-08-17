@@ -5,15 +5,16 @@ sidebar:
   order: 5
 ---
 
-**garak** and **deepteam** are open-source red-teaming tools: they send attack prompts to an LLM app and report which ones got through. Both ship libraries of published attacks, so they test your agent against attacks other people have already found. Giskard's own generators do something different: they write attacks from your `description`, specific to what your agent is for.
+[**garak**](https://github.com/NVIDIA/garak) ↗ and [**deepteam**](https://github.com/confident-ai/deepteam) ↗ are open-source red-teaming tools: they send attack prompts to an LLM app and report which ones got through. They work in different ways, and the difference decides which one you reach for.
 
-Reach for one of these when you want the known-attack catalog too. `third_party_scan` runs either tool against the same target you already scan with, and returns its findings as an ordinary `SuiteResult`: same shape, same `failed_count` and `failures_and_errors`, same CI export path.
+- **garak** mainly replays a fixed corpus of published attacks. Each probe carries a prompt set that is fixed when the probe loads, so it tests your agent against attacks other people have already found. Some of its detectors do use an LLM to judge the response.
+- **deepteam** generates its attacks. It hands your `description` to an LLM as the target's purpose, synthesizes attacks against each vulnerability you selected, and then rewrites or escalates them with the attack techniques you selected.
 
-Neither tool is exhaustive either. Each covers the attacks its own maintainers have written, and a clean result from both still only means these attacks did not work.
+Giskard's own generators also write attacks from your `description`. So deepteam and Giskard overlap on approach and differ in taxonomy and technique; garak is the one that brings a published catalog you would not otherwise run.
 
-:::note[Experimental]
-The library marks the third-party integrations package experimental. The adapters are thin translation layers over each tool's own runner, so their behavior tracks upstream releases. This applies to these two integrations only, not to the rest of Giskard.
-:::
+`third_party_scan` runs either tool against the same target you already scan with, and returns its findings as an ordinary `SuiteResult`: same shape, same `failed_count` and `failures_and_errors`, same CI export path.
+
+No tool here is exhaustive. Each covers the attacks its own maintainers wrote or its own model invented, and a clean result from all three still only means these attacks did not work.
 
 ## Install the extra
 
@@ -28,13 +29,17 @@ Calling `third_party_scan` without the matching extra raises `ImportError` with 
 
 ## What each one adds
 
-The built-in generators produce scenarios from your `description` and a curated threat taxonomy. The two external scanners work differently:
+The built-in generators produce scenarios from your `description` and a curated threat taxonomy. The two external scanners select their work differently, and you configure them differently as a result.
 
-**garak** is a catalog of hundreds of hand-written probes. A **probe** is one named attack plus a detector, a small scorer that reads the response and decides whether the attack worked. Where a Giskard generator asks an LLM to invent a [prompt injection](/start/glossary/security/injection) attempt for your domain, garak replays attacks that are already documented to work: DAN jailbreaks (prompts that talk a model past its safety rules), encoded-payload data exfiltration, model-specific quirks. Coverage is broad and fixed, and the probes do not adapt to what your agent does.
+**garak** is a flat list of hand-written probes. A **probe** is one named attack that carries its own prompts and its own detector, a small scorer that reads the response and decides whether the attack worked. You select probes by name, and that is the only axis. Its catalog covers DAN jailbreaks (prompts that talk a model past its safety rules), encoded-payload data exfiltration, [prompt injection](/start/glossary/security/injection), and model-specific quirks. The prompts do not adapt to what your agent does.
 
-**deepteam** is attack-technique-driven. You pick *vulnerabilities* (what you are testing for, such as [information disclosure](/start/glossary/security/information-disclosure) or [harmful content](/start/glossary/security/harmful-content)) and *attacks* (how the prompt is obfuscated or escalated), and it produces the cross-product: `Toxicity` attempted via `Leetspeak`, `PIILeakage` via `CrescendoJailbreaking`, and so on. That hits the same target risk through several encodings and multi-turn escalations, an axis the built-in generators do not expose separately.
+**deepteam** has two independent axes. A *vulnerability* is what harm you test for, such as [information disclosure](/start/glossary/security/information-disclosure) or [harmful content](/start/glossary/security/harmful-content). An *attack* is how the prompt is delivered: an encoding, a framing, or a multi-turn escalation. The two do not overlap and neither implies the other. deepteam runs the cross-product internally: `Toxicity` attempted via `Leetspeak`, `PIILeakage` via `CrescendoJailbreaking`, and so on.
 
-Neither replaces the built-in scan: only Giskard's own generators use your `description` and knowledge base to build attacks specific to what your agent is for.
+That cross-product is also the cost model. Each vulnerability fans out into subtypes (`Bias` covers race, gender, politics, religion), and the run size is subtypes × `attacks_per_vulnerability_type` × attacks.
+
+garak has no equivalent split, so do not read `probes=` as the counterpart of `vulnerabilities=` and `attacks=`. A garak probe already fixes both what it tests for and how it asks.
+
+Neither replaces the built-in scan: Giskard's own generators use your `description` and knowledge base and its own threat taxonomy.
 
 ## Discover what you can select
 
@@ -49,6 +54,14 @@ list_scan_items("deepteam")  # supported vulnerability and attack names
 ```
 
 `"garak"` and `"deepteam"` raise `ImportError` when the extra is missing; any other tool name raises `ValueError`. For garak, only *active, loadable* probes are listed by default. `include_inactive=True` adds catalog entries garak marks inactive, which are skipped anyway if you request them explicitly. The argument is ignored for the other tools.
+
+Treat `list_scan_items` as the authority rather than the upstream READMEs. For garak it enumerates the probes of the garak version you actually installed, so it never drifts. For deepteam it matters more: Giskard supports a fixed subset of deepteam's catalog, and names outside that subset are silently skipped instead of raising.
+
+:::caution[Unknown deepteam names are skipped, not rejected]
+Copy a vulnerability or attack name out of deepteam's own documentation and the scan will run without it, log a warning, and return a skip result. Nothing fails loudly. Check names against `list_scan_items("deepteam")` first, and read the skip count before you conclude the agent resisted anything.
+:::
+
+Read [NVIDIA/garak](https://github.com/NVIDIA/garak) ↗ and [confident-ai/deepteam](https://github.com/confident-ai/deepteam) ↗ for background on what each probe or technique actually does.
 
 The deepteam names come from a fixed map inside the adapter, not from deepteam's full catalog:
 
@@ -80,6 +93,23 @@ Encoding attacks like `Leetspeak` and `ROT13` are trivial to decode. They work b
 
 ## Run garak
 
+Both tools go through the same entry point:
+
+```python
+async def third_party_scan(
+    target,
+    tool: Literal["garak", "deepteam"],
+    *,
+    description: str,
+    languages: list[str] | None = None,
+    **kwargs,
+) -> SuiteResult: ...
+```
+
+`third_party_scan` is the only dispatcher for garak and deepteam. `vulnerability_scan` cannot reach them: its suite is built from Giskard's own scenario generators, and the third-party scanners are a deliberate opt-in. The remaining keyword arguments are per tool: `probes` and `target_mode` for garak, `vulnerabilities`, `attacks`, `attacks_per_vulnerability_type` and `target_mode` for deepteam.
+
+Await it, as you await `vulnerability_scan`. Every scan entry point in the library is `async def`.
+
 ```python
 from giskard.scan import third_party_scan
 
@@ -95,8 +125,8 @@ suite_result = await third_party_scan(
 
 `probes` has three modes:
 
-- `None`: a curated default set of six probes, chosen to be small and to work without extra API keys. They cover slur usage, quack medicine, two `goodside` probes for made-up facts and output-format compliance, cached DAN jailbreaks, and data exfiltration through an assembled string.
-- `"all"`: every active loadable probe. That is on the order of a hundred conversations against your agent, so treat it as a nightly job, not a pull-request check.
+- `None`: a curated default set of six probes, chosen to be small and to work without extra API keys: `lmrc.SlurUsage`, `goodside.WhoIsRiley`, `lmrc.QuackMedicine`, `goodside.ThreatenJSON`, `dan.AutoDANCached`, and `web_injection.StringAssemblyDataExfil`.
+- `"all"`: every active loadable probe garak ships. This is heavy and expensive: many probes, each with its own prompt set, all of them hitting your agent and your LLM bill.
 - An explicit list: names as `list_scan_items("garak")` returns them.
 
 `description` is accepted for signature symmetry, but garak has no target-profile concept and ignores it, as does `languages`. `target_mode` defaults to `"multiturn"`, which lets garak's iterative probes run their full search.
@@ -121,7 +151,7 @@ suite_result = await third_party_scan(
 )
 ```
 
-Here `description` matters: it becomes deepteam's `target_purpose`, the thing its simulator uses to make the attacks plausible for your agent. `languages` is ignored.
+Here `description` matters: it becomes deepteam's `target_purpose`, the thing its simulator uses to make the attacks realistic for your agent. `languages` is ignored.
 
 `vulnerabilities` and `attacks` default to a curated set each (all five vulnerabilities; `PromptInjection`, `Roleplay`, `Leetspeak`, `LinearJailbreaking`, `CrescendoJailbreaking`). Unknown names are skipped with a logged warning and a skip result, exactly as in the garak adapter. `target_mode="singleturn"` drops every multi-turn attack the same way, with a skip result per dropped attack rather than an error.
 
