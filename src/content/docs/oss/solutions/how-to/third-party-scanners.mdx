@@ -5,7 +5,11 @@ sidebar:
   order: 5
 ---
 
-`third_party_scan` runs the garak and deepteam red-teaming tools against the same target you already scan with, and returns their findings as an ordinary `SuiteResult`: same shape, same `failed_count` and `failures_and_errors`, same CI export path.
+**garak** and **deepteam** are open-source red-teaming tools: they send attack prompts to an LLM app and report which ones got through. Both ship libraries of published attacks, so they test your agent against attacks other people have already found. Giskard's own generators do something different: they write attacks from your `description`, specific to what your agent is for.
+
+Reach for one of these when you want the known-attack catalog too. `third_party_scan` runs either tool against the same target you already scan with, and returns its findings as an ordinary `SuiteResult`: same shape, same `failed_count` and `failures_and_errors`, same CI export path.
+
+Neither tool is exhaustive either. Each covers the attacks its own maintainers have written, and a clean result from both still only means these attacks did not work.
 
 :::note[Experimental]
 The library marks the third-party integrations package experimental. The adapters are thin translation layers over each tool's own runner, so their behavior tracks upstream releases. This applies to these two integrations only, not to the rest of Giskard.
@@ -26,9 +30,9 @@ Calling `third_party_scan` without the matching extra raises `ImportError` with 
 
 The built-in generators produce scenarios from your `description` and a curated threat taxonomy. The two external scanners work differently:
 
-**garak** is a catalog of hundreds of hand-written probes, each with a specific known attack and a detector that scores the response. Where a Giskard generator asks an LLM to invent a prompt-injection attempt for your domain, garak replays attacks that are already documented to work: DAN jailbreaks, encoded-payload data exfiltration, model-specific quirks. Coverage is broad and fixed, and the probes do not adapt to what your agent does.
+**garak** is a catalog of hundreds of hand-written probes. A **probe** is one named attack plus a detector, a small scorer that reads the response and decides whether the attack worked. Where a Giskard generator asks an LLM to invent a [prompt injection](/start/glossary/security/injection) attempt for your domain, garak replays attacks that are already documented to work: DAN jailbreaks (prompts that talk a model past its safety rules), encoded-payload data exfiltration, model-specific quirks. Coverage is broad and fixed, and the probes do not adapt to what your agent does.
 
-**deepteam** is attack-technique-driven. You pick *vulnerabilities* (what you are testing for) and *attacks* (how the prompt is obfuscated or escalated), and it produces the cross-product: `Toxicity` attempted via `Leetspeak`, `PIILeakage` via `CrescendoJailbreaking`, and so on. That hits the same target risk through several encodings and multi-turn escalations, an axis the built-in generators do not expose separately.
+**deepteam** is attack-technique-driven. You pick *vulnerabilities* (what you are testing for, such as [information disclosure](/start/glossary/security/information-disclosure) or [harmful content](/start/glossary/security/harmful-content)) and *attacks* (how the prompt is obfuscated or escalated), and it produces the cross-product: `Toxicity` attempted via `Leetspeak`, `PIILeakage` via `CrescendoJailbreaking`, and so on. That hits the same target risk through several encodings and multi-turn escalations, an axis the built-in generators do not expose separately.
 
 Neither replaces the built-in scan: only Giskard's own generators use your `description` and knowledge base to build attacks specific to what your agent is for.
 
@@ -77,7 +81,7 @@ suite_result = await third_party_scan(
 
 Adapter behavior to know before you read the results:
 
-- A requested probe that is unknown, inactive, or fails to load does **not** raise. It becomes a skipped `ScenarioResult` in the suite, with the reason in the check message. A probe that raises mid-run becomes an error result. Neither aborts the scan, so check the skips before reading a clean run as a clean bill of health.
+- A requested probe that is unknown, inactive, or fails to load does **not** raise. It becomes a skipped `ScenarioResult` in the suite, with the reason in the check message. A probe that raises mid-run becomes an error result. Neither aborts the scan. A run with zero failures may simply be a run where the probes never loaded, so read the skip and error counts before you conclude anything.
 - Detector scores are in `[0, 1]` and anything strictly above `0.5` counts as a hit. An exact `0.5` is read as "uncertain", not a finding.
 - The adapter pins garak's `generations` to `1`, so one prompt yields one response rather than garak's default fan-out of five.
 - Probes run at most 8 at a time, which caps how hard the run hammers the agent under test.
@@ -120,10 +124,10 @@ for result in suite_result.failures_and_errors:
 
 garak scenarios are named after the probe with the `garak.probes.` prefix stripped; deepteam checks are labelled `vulnerability/vulnerability_type`. Skipped items carry `(skipped)` in the scenario name, errored ones `(error)`.
 
-From there the [CI guide](/oss/solutions/how-to/scan-in-ci) applies as written — the export step does not care which scanner produced the result.
+From there the [CI guide](/oss/solutions/how-to/scan-in-ci) applies as written. The export step does not care which scanner produced the result.
 
 ## Next Steps
 
 - [Scan API reference](/oss/solutions/reference/scan-api) — the full `third_party_scan` and `list_scan_items` signatures
-- [Write a Custom Scenario Generator](/oss/solutions/tutorials/custom-scenario-generator) — the in-house alternative when neither tool covers your risk
+- [Write a Custom Scenario Generator](/oss/solutions/tutorials/custom-scenario-generator) for the in-house alternative when neither tool covers your risk
 - [What the Scan Looks For](/oss/solutions/explanation/threat-taxonomy) — how the built-in threat coverage compares
