@@ -263,6 +263,8 @@ In your pipeline, load the saved suite and run it against your agent. Scenarios 
 
 ```python
 from pathlib import Path
+
+import giskard.scan  # noqa: F401  # registers the scan check types before deserialization
 from giskard.checks import Suite
 
 suite = Suite.model_validate_json(Path("scan_suite.json").read_text())

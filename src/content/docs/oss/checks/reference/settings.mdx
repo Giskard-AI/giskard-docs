@@ -8,8 +8,9 @@ sidebar:
 import Property from "../../../../../components/api/Property.astro";
 import MethodCard from "../../../../../components/api/MethodCard.astro";
 
-Which model backs LLM checks by default, which embedding model the semantic
-checks use, and how much of a suite report gets printed.
+Complete configuration reference for Giskard Checks: the default LLM model
+behind LLM checks, the embedding model used by semantic checks, and how much of
+a suite report gets printed.
 
 ---
 
@@ -60,7 +61,7 @@ Set it in the environment or `.env` before the import for it to take effect.
 ## Default generator
 
 The default generator is what LLM-backed checks (`LLMJudge`, `Groundedness`,
-`Toxicity`, and friends) use when you do not pass a generator explicitly. A
+`Toxicity`, and the other LLM-backed checks) use when you do not pass a generator explicitly. A
 runtime override set with `set_default_generator` takes precedence over
 `GISKARD_CHECKS_DEFAULT_MODEL`.
 
@@ -100,8 +101,9 @@ every test module -- see [CI/CD Integration](/oss/checks/how-to/ci-cd).
 
 ## Imports
 
-`get_settings`, `set_default_generator`, and `get_default_generator` are
-re-exported at package level:
+`set_default_generator` and `get_default_generator` are part of the public
+`giskard.checks` API. `get_settings` is importable from the same package, but
+it is not listed in `__all__`:
 
 ```python
 from giskard.checks import (
