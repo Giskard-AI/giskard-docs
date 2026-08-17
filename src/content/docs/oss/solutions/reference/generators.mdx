@@ -1,6 +1,6 @@
 ---
 title: Generators
-description: "The giskard-scan scenario generator catalog — adversarial, Crescendo, GCG, GOAT, prompt injection, dataset-backed, and knowledge-base generators."
+description: "The giskard-scan scenario generator catalog: adversarial, Crescendo, GCG, GOAT, prompt injection, dataset-backed, and knowledge-base generators."
 sidebar:
   order: 2
 ---
@@ -10,7 +10,7 @@ import MethodCard from "../../../../../components/api/MethodCard.astro";
 import ResourceSection from "../../../../../components/api/ResourceSection.astro";
 import TypeTable from "../../../../../components/api/TypeTable.astro";
 
-Scenario generators turn a plain-language description of your agent into runnable scenarios. Every scan is just a set of generators plus a target — pick them yourself with [`generate_suite`](/oss/solutions/reference/scan-api#generate_suite), or take the curated sets used by `vulnerability_scan` and `quality_scan`.
+Scenario generators turn a plain-language description of your agent into runnable scenarios. Every scan is a set of generators plus a target. Pick them yourself with [`generate_suite`](/oss/solutions/reference/scan-api#generate_suite), or take the curated sets used by `vulnerability_scan` and `quality_scan`.
 
 | Generator | Family | Multi-turn | Used by |
 | --------- | ------ | ---------- | ------- |
@@ -20,7 +20,7 @@ Scenario generators turn a plain-language description of your agent into runnabl
 | [`PromptInjectionScenarioGenerator`](#promptinjectionscenariogenerator) | Bundled dataset | No | `vulnerability_scan` |
 | [`GCGInjectionScenarioGenerator`](#gcginjectionscenariogenerator) | Hugging Face dataset | No | `vulnerability_scan` |
 | [`HuggingFaceDatasetScenarioGenerator`](#huggingfacedatasetscenariogenerator) | Hugging Face dataset | No | `vulnerability_scan` |
-| [`LocalDatasetScenarioGenerator`](#localdatasetscenariogenerator) | Bundled dataset | No | — |
+| [`LocalDatasetScenarioGenerator`](#localdatasetscenariogenerator) | Bundled dataset | No | n/a |
 | [`HallucinationScenarioGenerator`](#hallucinationscenariogenerator) | Knowledge base | Yes | `quality_scan` |
 | [`SycophancyScenarioGenerator`](#sycophancyscenariogenerator) | Knowledge base | Yes | `quality_scan` |
 | [`SplitQuestionsScenarioGenerator`](#splitquestionsscenariogenerator) | Knowledge base | Yes (exactly 2 turns) | `quality_scan` |
@@ -90,9 +90,9 @@ These generators call an LLM to build attacks tailored to your agent's descripti
   Maximum conversation turns per scenario (`>= 1`). Capped to `1` automatically when `target_mode="singleturn"`.
 </Property>
 
-Categories in `ADVERSARIAL_CATEGORIES`: Stereotypes and Discrimination, Politics, Religion, Chemical, Biological, Radiological and Nuclear materials, Copyright Violations, Misinformation & Disinformation, Illegal Activities, and Unauthorized Advice. Each carries its own tags — `threat-type:harmful-content-generation` for all but Unauthorized Advice, which uses `threat-type:misguidance-and-unauthorized-advice`.
+Categories in `ADVERSARIAL_CATEGORIES`: Stereotypes and Discrimination, Politics, Religion, Chemical, Biological, Radiological and Nuclear materials, Copyright Violations, Misinformation & Disinformation, Illegal Activities, and Unauthorized Advice. Each carries its own tags: `threat-type:harmful-content-generation` for all but Unauthorized Advice, which uses `threat-type:misguidance-and-unauthorized-advice`.
 
-When `max_scenarios` is set, the budget is distributed across categories with a multinomial draw and each category is additionally capped at `MAX_RULES_PER_CATEGORY` (10), so the output count can be lower than requested. Without a budget each category produces `DEFAULT_RULES_PER_CATEGORY` (5) rules. Categories allocated zero budget are skipped entirely — no LLM call.
+When `max_scenarios` is set, the budget is distributed across categories with a multinomial draw and each category is additionally capped at `MAX_RULES_PER_CATEGORY` (10), so the output count can be lower than requested. Without a budget each category produces `DEFAULT_RULES_PER_CATEGORY` (5) rules. Categories allocated zero budget are skipped entirely, with no LLM call.
 
 ```python
 from giskard.scan import AdversarialScenarioGenerator
@@ -176,7 +176,7 @@ generator = LocalDatasetScenarioGenerator(
 
 ### `PromptInjectionScenarioGenerator`
 
-<ResourceSection description="Loads the bundled prompt_injection.jsonl dataset and tags every scenario as OWASP LLM Top-10 2025 LLM01 (prompt injection). Sampling behaviour is inherited from LocalDatasetScenarioGenerator.">
+<ResourceSection description="Loads the bundled prompt_injection.jsonl dataset and tags every scenario as OWASP LLM Top-10 2025 LLM01 (prompt injection). Sampling behavior is inherited from LocalDatasetScenarioGenerator.">
 
 **Module:** `giskard.scan.generators.prompt_injection`
 
@@ -205,7 +205,7 @@ generator = PromptInjectionScenarioGenerator()
   Hugging Face dataset repository id, e.g. `"giskardai/do-not-answer-scenarios"`.
 </Property>
 <Property name="repo_allow_commercial_use" type="bool" defaultValue="True">
-  Whether the dataset's license permits commercial use. Set it explicitly per repo — the license recorded on the Hub card is not always authoritative. This value backs `allow_commercial_use`, which is what `commercial_use=True` filters on.
+  Whether the dataset's license permits commercial use. Set it explicitly per repo, because the license recorded on the Hub card is not always authoritative. This value backs `allow_commercial_use`, which is what `commercial_use=True` filters on.
 </Property>
 <Property name="tags" type="list[str]" defaultValue="[]">
   Tags applied to every loaded scenario.
@@ -311,7 +311,7 @@ generator = SycophancyScenarioGenerator()
 **Module:** `giskard.scan.generators.knowledge_base.split_questions`
 
 <Property name="max_turns" type="int" defaultValue="2">
-  Fixed at exactly `2` (`ge=2, le=2`) — the scenario shape needs both messages.
+  Fixed at exactly `2` (`ge=2, le=2`); the scenario shape needs both messages.
 </Property>
 
 Scenario name prefix: `"Knowledge Base Split Questions"`.
@@ -331,7 +331,7 @@ generator = SplitQuestionsScenarioGenerator()
 **Module:** `giskard.scan.generators.knowledge_base.multi_topic`
 
 <Property name="max_turns" type="int" defaultValue="3">
-  Maximum user-simulator turns per scenario. Requires `>= 2` — a single turn cannot cover several topics.
+  Maximum user-simulator turns per scenario. Requires `>= 2`, because a single turn cannot cover several topics.
 </Property>
 
 Scenario name prefix: `"Knowledge Base Multi Topic Questions"`.
@@ -386,13 +386,13 @@ suite = await generate_suite(
 )
 ```
 
-Pass classes instead of instances when the defaults are fine — `generate_suite` and `SuiteGeneratorRegistry.register` both instantiate them for you.
+Pass classes instead of instances when the defaults are fine. `generate_suite` and `SuiteGeneratorRegistry.register` both instantiate them for you.
 
 ---
 
-## See also
+## Next Steps
 
-- [Scan API](/oss/solutions/reference/scan-api) -- `generate_suite`, the built-in scans, and `SuiteGeneratorRegistry`
-- [Knowledge Base](/oss/solutions/reference/knowledge-base) -- `KnowledgeBase` and `Document`
-- [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) -- Guided walkthrough of the vulnerability scan
-- [Checks: Generators](/oss/checks/reference/generators) -- `UserSimulator` and custom input generators
+- [Scan API](/oss/solutions/reference/scan-api) for `generate_suite`, the built-in scans, and `SuiteGeneratorRegistry`
+- [Knowledge Base](/oss/solutions/reference/knowledge-base) for `KnowledgeBase` and `Document`
+- [Customize a scan](/oss/solutions/how-to/customize-a-scan) to pick generators for a run
+- [Checks: Generators](/oss/checks/reference/generators) for `UserSimulator` and custom input generators

@@ -1,6 +1,6 @@
 ---
 title: Scan API
-description: "Entry points for the Giskard scan — vulnerability_scan, quality_scan, generate_suite, third_party_scan, list_scan_items, ScanOptions, and SuiteGeneratorRegistry."
+description: "Entry points for the Giskard scan: vulnerability_scan, quality_scan, generate_suite, third_party_scan, list_scan_items, ScanTool, ScanOptions, and SuiteGeneratorRegistry."
 sidebar:
   order: 1
 ---
@@ -18,6 +18,7 @@ from giskard.scan import (
     generate_suite,
     third_party_scan,
     list_scan_items,
+    ScanTool,
     ScanOptions,
     SuiteGeneratorRegistry,
     vulnerability_suite_generator_registry,
@@ -32,7 +33,7 @@ from giskard.scan import (
 
 **Module:** `giskard.scan.vulnerability`
 
-Build a suite from the vulnerability generator registry, run it against the target, print the grouped report, and return the result. Coroutine — `await` it.
+Build a suite from the vulnerability generator registry, run it against the target, print the grouped report, and return the result. Coroutine: `await` it.
 
 <MethodCard name="vulnerability_scan()" returnType="SuiteResult">
   <Property name="target" type="Target" required>
@@ -91,7 +92,7 @@ result = await vulnerability_scan(
 
 **Module:** `giskard.scan.quality`
 
-Build a suite from the quality generator registry, run it against the target, print the grouped report with an LLM-generated recommendation, and return the result. Coroutine — `await` it.
+Build a suite from the quality generator registry, run it against the target, print the grouped report with an LLM-generated recommendation, and return the result. Coroutine: `await` it.
 
 All quality generators are knowledge-base driven: without a `knowledge_base` the scan emits a `RuntimeWarning` and produces no scenarios.
 
@@ -152,7 +153,7 @@ print(result.recommendation)
 
 **Module:** `giskard.scan.catalog`
 
-Lower-level builder: resolve the supplied generators, build one run-wide context, distribute the scenario budget, run every generator concurrently, and wrap the output in a `Suite`. Use it when you want to pick generators yourself instead of taking a registry as-is. Coroutine — `await` it.
+Lower-level builder: resolve the supplied generators, build one run-wide context, distribute the scenario budget, run every generator concurrently, and wrap the output in a `Suite`. Use it when you want to pick generators yourself instead of taking a registry as-is. Coroutine: `await` it.
 
 Concurrency here is *generation* only; whether the resulting scenarios later run in parallel is decided by `Suite.run(parallel=...)`.
 
@@ -208,9 +209,9 @@ The returned suite is named `"Scenarios"`.
 
 **Module:** `giskard.scan.integrations`
 
-Run an external security scanner against a Giskard target and return its results as a standard `SuiteResult`. Coroutine — `await` it. Experimental.
+Run an external security scanner against a Giskard target and return its results as a standard `SuiteResult`. Coroutine: `await` it. Experimental.
 
-Requires the scanner's optional extra: `pip install --pre "giskard-scan[garak]"` or `pip install --pre "giskard-scan[deepteam]"`.
+The adapters are imported lazily and run in-process, so the scanner's optional extra must be installed: `pip install "giskard-scan[garak]"` or `pip install "giskard-scan[deepteam]"`.
 
 <MethodCard name="third_party_scan()" returnType="SuiteResult">
   <Property name="target" type="Target" required>
@@ -265,14 +266,14 @@ Raises `ImportError` when the extra is missing and `ValueError` for an unknown t
 
 **Module:** `giskard.scan.integrations`
 
-List the selectable item names for a scan tool — useful to discover what you can pass to `generators`, `probes`, `vulnerabilities`, or `attacks`.
+List the selectable item names for a scan tool. Use it to discover what you can pass to `generators`, `probes`, `vulnerabilities`, or `attacks`.
 
 <MethodCard name="list_scan_items()" returnType="list[str]">
-  <Property name="tool" type="str" required>
+  <Property name="tool" type="ScanTool" required>
     `"giskard"` returns scenario generator class names, `"garak"` returns probe plugin names, `"deepteam"` returns supported vulnerability and attack names. Any other value raises `ValueError`.
   </Property>
   <Property name="include_inactive" type="bool" defaultValue="False">
-    Garak only — also include inactive catalog probes. Ignored for other tools.
+    Garak only: also include inactive catalog probes. Ignored for other tools.
   </Property>
 </MethodCard>
 
@@ -291,7 +292,7 @@ Raises `ImportError` when the selected tool's optional dependency is not install
 
 **Module:** `giskard.scan.types`
 
-`TypedDict` (`total=False`) describing the optional execution settings a scan accepts. Prefer passing these as explicit keyword arguments to `vulnerability_scan` — the type exists so callers can build and type-check an options dict of their own.
+`TypedDict` (`total=False`) describing the optional execution settings a scan accepts. Prefer passing these as explicit keyword arguments to `vulnerability_scan`. The type exists so callers can build and type-check an options dict of their own.
 
 <TypeTable name="ScanOptions">
   <Property name="max_scenarios" type="int | None">
@@ -383,6 +384,20 @@ vulnerability_suite_generator_registry.register(
 
 ---
 
+## `ScanTool`
+
+**Module:** `giskard.scan.integrations`
+
+Type alias naming the scanners `third_party_scan` and `list_scan_items` accept:
+
+```python
+type ScanTool = Literal["giskard", "garak", "deepteam"]
+```
+
+`"giskard"` is valid only for `list_scan_items`; `third_party_scan` accepts `"garak"` and `"deepteam"`.
+
+---
+
 ## `DEFAULT_TARGET_MODE`
 
 **Module:** `giskard.scan.generators.base`
@@ -397,9 +412,9 @@ assert DEFAULT_TARGET_MODE == "multiturn"
 
 ---
 
-## See also
+## Next Steps
 
-- [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) -- Guided walkthrough of the vulnerability scan
-- [Generators](/oss/solutions/reference/generators) -- The full scenario generator catalog
-- [Knowledge Base](/oss/solutions/reference/knowledge-base) -- Document grounding for the quality scan
-- [Checks: Scenarios](/oss/checks/reference/scenarios) -- `Suite`, `Scenario`, and `SuiteResult`
+- [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) for a guided walkthrough of the vulnerability scan
+- [Generators](/oss/solutions/reference/generators) for the full scenario generator catalog
+- [Knowledge Base](/oss/solutions/reference/knowledge-base) for document grounding in the quality scan
+- [Checks: Scenarios](/oss/checks/reference/scenarios) for `Suite`, `Scenario`, and `SuiteResult`
