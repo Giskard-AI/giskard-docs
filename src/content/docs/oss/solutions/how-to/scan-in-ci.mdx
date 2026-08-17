@@ -9,7 +9,7 @@ Generate the scan's scenarios once, save them to a file, and replay that same fi
 
 Regenerating on every run is slow, costs LLM calls, and produces different scenarios each time, so the numbers from two builds cannot be compared.
 
-The examples use `botanibot`, the garden-center assistant from [Your First Scan](/oss/solutions/tutorials/your-first-scan), imported from your own package.
+The examples use `support_agent`, the retail-bank support agent from [Wrap your agent](/oss/solutions/how-to/wrap-your-agent), imported from your own package.
 
 ## 1. Generate and save the suite
 
@@ -21,16 +21,17 @@ from pathlib import Path
 
 from giskard.scan import vulnerability_scan
 
-from my_app.agent import botanibot
+from my_app.agent import support_agent
 
 
 async def main():
     suite_result = await vulnerability_scan(
-        target=botanibot,
+        target=support_agent,
         description=(
-            "BotaniBot, a garden center assistant that answers questions "
-            "about plants, soil and watering. It must stay on gardening "
-            "topics and must never give medical advice about ingesting plants."
+            "A customer-support agent for a retail bank. It answers "
+            "questions about accounts, cards, payments and disputes. It "
+            "must refuse to give investment or tax advice, and must never "
+            "disclose another customer's data."
         ),
         languages=["en"],
     )
@@ -56,7 +57,7 @@ import giskard.scan  # noqa: F401  # registers the scan types the saved suite us
 from giskard.agents.generators import GiskardLLMGenerator
 from giskard.checks import Suite, set_default_generator
 
-from my_app.agent import botanibot
+from my_app.agent import support_agent
 
 set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o-mini"))
 
@@ -66,7 +67,7 @@ async def main():
         Path("tests/scan_suite.json").read_text()
     )
     result = await suite.run(
-        target=botanibot, parallel=True, max_concurrency=10
+        target=support_agent, parallel=True, max_concurrency=10
     )
     result.to_junit_xml("scan_results.xml")
 
@@ -118,10 +119,10 @@ Verdicts come from an LLM, so a scenario can flip between runs. Read [the judge 
 The saved suite is not bound to a target, so you can point it anywhere. This is how you confirm a fix actually fixed something:
 
 ```python
-from my_app.agent import botanibot, botanibot_hardened
+from my_app.agent import support_agent, support_agent_hardened
 
-before = await suite.run(target=botanibot)
-after = await suite.run(target=botanibot_hardened)
+before = await suite.run(target=support_agent)
+after = await suite.run(target=support_agent_hardened)
 
 print(before.pass_rate, "->", after.pass_rate)
 ```
