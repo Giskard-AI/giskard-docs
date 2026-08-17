@@ -78,7 +78,7 @@ async def main():
 asyncio.run(main())
 ```
 
-The `import giskard.scan` line is load-bearing. Without it, `Suite.model_validate_json` cannot resolve the scan's scenario types and raises `KeyError: 'giskard.scan'`.
+The `import giskard.scan` line is load-bearing, and it fails late. Importing the package registers the prompt templates the scan's scenarios render from. Without it, `Suite.model_validate_json` still succeeds, so the suite looks fine; the run then dies part-way through with `jinja2.exceptions.TemplateNotFound: giskard.scan::scenarios/llm01_indirect_injection.j2`. In CI that reads as a flaky job rather than a missing import, so keep the import next to the load.
 
 `Suite.run` is serial by default, so pass `parallel=True` and bound the fan-out with `max_concurrency` to keep CI from hammering your provider.
 

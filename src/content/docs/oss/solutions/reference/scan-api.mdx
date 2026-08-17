@@ -56,7 +56,7 @@ Build a suite from the vulnerability generator registry, run it against the targ
     Integer seed used for reproducible scenario generation. Two runs with different seeds generate different scenarios, so their pass rates are not comparable.
   </Property>
   <Property name="group_by" type="str | None" defaultValue='"threat-type"'>
-    Result annotation key used to group the printed report. `None` prints the ungrouped report. Grouping only changes the printed layout, never which scenarios ran: `"threat-type"` groups by kind of failure, `"component"` by which generator and checks produced the result.
+    Result annotation key used to group the printed report. `None` prints the ungrouped report. Grouping only changes the printed layout, never which scenarios ran: `"threat-type"` groups by kind of failure, `"component"` by which part of the agent pipeline was exercised (`component:llm`, `component:retrieval`, `component:history`). Only the knowledge-base quality generators emit a `component:` tag, so `group_by="component"` on a vulnerability scan puts every result in one unnamed bucket.
   </Property>
   <Property name="parallel" type="bool" defaultValue="True">
     Run generated scenarios concurrently against the target. Pass `False` for serial execution, which is slower but easier to debug and gentler on provider rate limits. `True` requires an agent that tolerates concurrent calls. This controls suite *execution*; scenario *generation* is always concurrent.
@@ -129,7 +129,7 @@ All quality generators are knowledge-base driven: without a `knowledge_base` the
     Integer seed used for reproducible scenario generation.
   </Property>
   <Property name="group_by" type="str | None" defaultValue='"component"'>
-    Result annotation key used to group the printed report.
+    Result annotation key used to group the printed report. Quality generators tag scenarios `component:llm`, `component:retrieval`, or `component:history`, naming the part of the pipeline under test.
   </Property>
   <Property name="parallel" type="bool" defaultValue="True">
     Run generated scenarios concurrently against the target.
@@ -400,7 +400,15 @@ generators = registry.generators()
 
 # Or extend the built-in vulnerability scan
 vulnerability_suite_generator_registry.register(
-    PromptInjectionScenarioGenerator(tags=["team:security"])
+    PromptInjectionScenarioGenerator(
+        # tags replaces the defaults, it does not add to them, so repeat the
+        # threat-type and owasp tags or group_by="threat-type" loses its buckets.
+        tags=[
+            "threat-type:prompt-injection",
+            "owasp:llm-top-10-2025:LLM01",
+            "team:security",
+        ]
+    )
 )
 ```
 
