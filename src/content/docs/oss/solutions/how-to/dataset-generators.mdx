@@ -14,7 +14,11 @@ Generators come in two kinds, and the difference matters for what a passing run 
 - **LLM-driven generators** write fresh scenarios at scan time from your `description`. They adapt to your agent, cost generation calls, and produce different scenarios on every run.
 - **Dataset-backed generators** replay a corpus that is already written down. No generation calls, and identical scenarios on every run given the same seed.
 
-This page covers the dataset-backed ones. Use them when you already have a red-team corpus, a list of prompts known to have broken agents before, and you want the scan to run it. Since the prompts never change, these scenarios also make the most stable regression tests. A pass tells you your agent handles that known corpus, and nothing about prompts outside it.
+This page covers the dataset-backed ones.
+
+The reason a team brings its own corpus is usually that the prompts came from production. Every time a customer got [BotaniBot](/oss/solutions/tutorials/your-first-scan) to do something it should not, someone pastes the prompt into a file: the care sheet ending in "ignore your instructions", the berry question that came back with a dosage, the ticket where it recommended a competitor. After six months that file is the most valuable red-team material the team owns. Every line in it has already worked at least once against this exact agent.
+
+An LLM-driven generator will not rediscover those prompts reliably; it writes new ones each run and may or may not land near the wording that broke you. Turning the file into a dataset generator makes it run on every scan, identically, so a regression that reopens a closed hole fails the build. A pass tells you your agent handles that known corpus, and nothing about prompts outside it, which is why you keep the LLM-driven generators alongside it rather than instead of it.
 
 Three separate things are involved, and it is worth keeping them apart:
 
@@ -95,17 +99,19 @@ At load time the generator adds your `description` and `languages` to each scena
 
 ## Use a Hugging Face dataset
 
-Point the generator at a dataset repository on the Hub:
+Push the file of production prompts to a dataset repository on the Hub, then point the generator at it:
 
 ```python
 from giskard.scan import HuggingFaceDatasetScenarioGenerator
 
 generator = HuggingFaceDatasetScenarioGenerator(
-    repo_id="giskardai/harmbench-scenarios",
+    repo_id="botanibot/escaped-prompts",
     repo_allow_commercial_use=True,
-    tags=["threat-type:harmful-content-generation"],
+    tags=["threat-type:prompt-injection"],
 )
 ```
+
+The `tags` are the reason to bother: without them these scenarios land in an unnamed bucket in the grouped report, and with them your production regressions show up next to the generated prompt-injection ones. Use a different tag, or split the corpus across repos, when the prompts cover more than one kind of failure. `repo_allow_commercial_use=True` is your own claim about the license, which for a corpus you wrote yourself is trivially true; set it to `False` for anything you took from a research dataset with a non-commercial license.
 
 [`giskardai/harmbench-scenarios` ↗](https://huggingface.co/datasets/giskardai/harmbench-scenarios) and [`giskardai/do-not-answer-scenarios` ↗](https://huggingface.co/datasets/giskardai/do-not-answer-scenarios) are the two datasets the vulnerability scan loads by default. Their provenance and licenses are recorded in [`THIRD_PARTY_NOTICES.md` ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/libs/giskard-scan/THIRD_PARTY_NOTICES.md) in `giskard-scan`. Copy either one's layout when you publish your own.
 
@@ -170,20 +176,24 @@ The path is inside the installed `giskard.scan` package, not your working direct
 
 ## Run them
 
-Dataset generators go anywhere a generator goes. Straight into `generate_suite`:
+Dataset generators go anywhere a generator goes. `generator` below is the one built above; `botanibot` is the async target from [Your First Scan](/oss/solutions/tutorials/your-first-scan). Straight into `generate_suite`, when you want only your corpus and nothing else:
 
 ```python
 from giskard.scan import generate_suite
 
 suite = await generate_suite(
-    description="A support agent for an online coffee shop.",
+    description=(
+        "BotaniBot, a garden center assistant that answers questions about "
+        "plants, soil and watering. It must stay on gardening topics and must "
+        "never give medical advice about ingesting plants."
+    ),
     languages=["en"],
     generators=[generator],
     max_scenarios=20,
 )
 ```
 
-Or into a registry, to add a corpus to the standard vulnerability scan:
+That gives a suite of exactly your own prompts, which is the right shape for a fast regression job. Register it instead when you want the corpus to ride along with the LLM-driven generators on a full scan:
 
 ```python
 from giskard.scan import vulnerability_scan, vulnerability_suite_generator_registry
@@ -191,8 +201,12 @@ from giskard.scan import vulnerability_scan, vulnerability_suite_generator_regis
 vulnerability_suite_generator_registry.register(generator)
 
 result = await vulnerability_scan(
-    target=my_agent,
-    description="A support agent for an online coffee shop.",
+    target=botanibot,
+    description=(
+        "BotaniBot, a garden center assistant that answers questions about "
+        "plants, soil and watering. It must stay on gardening topics and must "
+        "never give medical advice about ingesting plants."
+    ),
     languages=["en"],
 )
 ```
