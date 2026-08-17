@@ -49,6 +49,12 @@ const breadcrumbJsonLd = {
 	})),
 };
 
+// Stable node identifier for the Giskard organization, so the Organization block
+// and the SoftwareApplication `author` reference resolve to one entity instead of
+// creating a duplicate on every page. It is a schema.org node id, not a fetchable
+// URL: the fragment keeps it distinct from the page it appears on. The base is
+// giskard.ai (the org's own home, matching `url` below), not docs.giskard.ai
+// (this site, which the org merely publishes).
 const organizationId = 'https://giskard.ai/#organization';
 
 const organizationJsonLd = {

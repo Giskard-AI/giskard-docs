@@ -32,6 +32,51 @@ faq:
       takes roughly 1-10 seconds, and can return different verdicts on identical
       input, so treat its verdicts as evidence to review rather than as proof.
       Examples in Giskard are Groundedness, Conformity, and LLMJudge.
+  - question: How do you test whether an LLM answer is grounded in your documents?
+    answer: >-
+      Use the Groundedness check in Giskard. Give it the key of the answer your
+      application produced and the key of the documents it retrieved, and an LLM
+      reads both and decides whether the answer is supported by those documents.
+      This is the usual way to catch answers a retrieval system invented rather
+      than took from its sources. The verdict comes from an LLM, so read the
+      failures yourself before acting on them.
+  - question: Which check tests tone or policy compliance?
+    answer: >-
+      Use the Conformity check in Giskard. You write the requirement as one
+      sentence of plain English, such as "Response must not give medical
+      advice", and an LLM decides whether the answer meets it. Use it for
+      requirements no ordinary Python condition can express: tone, style,
+      refusal behavior, or an internal policy.
+  - question: Can you combine several checks in one test?
+    answer: >-
+      Yes. A Giskard scenario takes any number of checks, and every one of them
+      has to pass for the scenario to pass. Order them by cost: put the free
+      rule-based checks first, then semantic similarity, then the LLM judges.
+      A cheap check that fails often tells you what went wrong without paying
+      for an LLM call.
+  - question: How much do LLM-as-judge checks cost and how slow are they?
+    answer: >-
+      Budget one LLM call per judge check per scenario, taking roughly 1-10
+      seconds. Semantic similarity costs one embedding call, roughly 50-200 ms
+      and far cheaper. Rule-based checks are free and finish in under a
+      millisecond. A suite of a few hundred scenarios with several judge checks
+      each is therefore a real bill, which is the reason to use the simplest
+      check that can express your requirement.
+  - question: Are LLM-as-judge results reliable?
+    answer: >-
+      Not entirely. The judge is a language model, so it can pass an answer it
+      should have failed and fail an answer that was fine, and it can return
+      different verdicts on identical input across runs. Treat a verdict as
+      evidence to read rather than as certification, and read failing verdicts
+      before you change your application because of them. Where a rule-based or
+      similarity check can express the same requirement, it will be cheaper and
+      more consistent.
+  - question: Does a passing test suite mean an AI application is safe?
+    answer: >-
+      No. It means the cases you wrote did not break it. Checks only test the
+      behavior you thought to describe, and LLM-as-judge verdicts are themselves
+      fallible. Use a passing suite as a guard against known regressions, not as
+      proof of safety or as a compliance certificate.
 ---
 
 A check is a rule your agent's answer has to satisfy for the test to pass. Three families of check cover most use cases. Pick the simplest one that can express your requirement: an LLM judge can express anything, but it costs money, takes seconds, and is sometimes wrong.
