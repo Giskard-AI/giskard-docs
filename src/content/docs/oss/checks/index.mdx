@@ -12,6 +12,10 @@ import { LinkCard, CardGrid, Steps } from "@astrojs/starlight/components";
 
 Giskard Checks is a lightweight Python library for testing and evaluating non-deterministic applications such as LLM-based systems.
 
+An LLM answers differently every time, so `assert reply == "..."` is useless. You write two things instead. A scenario is one test case: a message, or a short conversation, to send to your agent. A check is a rule the reply has to satisfy, either plain Python (does it contain this order number?) or a rule written in English and graded by an LLM, called a judge (does it stay on topic and refuse to give legal advice?). Tests run under pytest and report pass or fail. See the [glossary](/start/glossary) for the failure types these checks look for, such as [hallucination](/start/glossary/business/hallucination) and [prompt injection](/start/glossary/security/injection).
+
+A judge is an LLM, so it is sometimes wrong in both directions. Read the failing verdicts before you act on them, and treat a passing suite as "these scenarios did not break the agent", not as proof that it is safe.
+
 ## What are Giskard Checks
 
 **Giskard Checks** provides a flexible and powerful framework for testing AI applications including RAG systems, agents, summarization models, and more. Whether you're building chatbots, question-answering systems, or complex multi-step workflows, Giskard Checks helps you ensure quality and reliability.
@@ -19,7 +23,7 @@ Giskard Checks is a lightweight Python library for testing and evaluating non-de
 ### Key Features
 
 - **Built-in Check Library**: Ready-to-use checks including LLM-as-a-judge evaluations, string matching, equality assertions, and more
-- **Flexible Testing Framework**: Support for both single-turn and multi-turn scenarios with stateful trace management
+- **Flexible Testing Framework**: Support for single-turn scenarios (one message, one reply) and multi-turn scenarios (a conversation, where the agent has to keep track of what was said earlier)
 - **Type-Safe & Modern**: Built on Pydantic for full type safety and validation
 - **Async-First**: Native async/await support for efficient concurrent testing
 - **Highly Customizable**: Easy extension points for custom checks and interaction patterns
@@ -37,11 +41,11 @@ To see the whole thing working first, the [Quickstart](/oss/checks/quickstart) r
 
 <Steps>
 
-1. [Install & Configure](/oss/checks/installation) (~5 min): get the library installed and an LLM provider configured.
-2. [Your First Test](/oss/checks/tutorials/your-first-test) (~10 min): write a scenario that passes. No API key or LLM needed.
-3. [Your First LLM Call](/oss/checks/tutorials/single-turn) (~15 min): call a real model and evaluate the response with `LLMJudge`.
-4. [Test Suites](/oss/checks/tutorials/test-suites) (~20 min): group scenarios into a suite you run with a single await.
-5. [CI/CD Integration](/oss/checks/how-to/ci-cd) (~20 min): run that suite automatically on every pull request.
+1. [Install & Configure](/oss/checks/installation) (~5 min): get the library installed and an LLM provider configured. After this you can import `giskard.checks` and run judged checks.
+2. [Your First Test](/oss/checks/tutorials/your-first-test) (~10 min): write a scenario that passes. No API key or LLM needed. After this you can write a test case and read its result.
+3. [Your First LLM Call](/oss/checks/tutorials/single-turn) (~15 min): call a real model and evaluate the response with `LLMJudge`. After this you can grade an answer against a rule written in English.
+4. [Test Suites](/oss/checks/tutorials/test-suites) (~20 min): group scenarios into a suite you run with a single await. After this you can rerun the same set of tests after every change to your prompt or model.
+5. [CI/CD Integration](/oss/checks/how-to/ci-cd) (~20 min): run that suite automatically on every pull request, so a change that breaks the agent's behavior fails the build.
 
 </Steps>
 
