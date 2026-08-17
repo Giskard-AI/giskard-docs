@@ -177,22 +177,22 @@ A single exchange between inputs and outputs.
   </Property>
 </TypeTable>
 
-Examples on this page use BotaniBot, an assistant for a garden centre.
+Examples on this page use a customer-support agent for a retail bank, the same agent used across the checks reference.
 
 ```python
 from giskard.checks import Interaction
 
 # Plain text in, plain text out
 interaction = Interaction(
-    inputs="How often should I water a Monstera deliciosa?",
-    outputs="Let the top 2 cm of soil dry out before watering again.",
+    inputs="How long does a SEPA transfer take?",
+    outputs="A SEPA transfer arrives within one working day and is free.",
     metadata={"model": "gpt-5", "tokens": 15},
 )
 
 # Structured, so checks can address individual fields
 interaction = Interaction(
-    inputs={"question": "Do you stock Monstera deliciosa?", "store": "ghent"},
-    outputs={"availability": "in_stock", "price_eur": 24.99},
+    inputs={"question": "What is my current balance?", "customer_id": "C-8841"},
+    outputs={"intent": "balance_enquiry", "authenticated": True},
     metadata={"retrieval_score": 0.91, "latency_ms": 320},
 )
 ```
@@ -265,21 +265,21 @@ Declarative specification for generating interactions. Supports static values or
 from giskard.checks import Scenario
 
 
-def botanibot(inputs: str) -> str:
+def bank_support_agent(inputs: str) -> str:
     """Stand-in for the agent under test. Replace with your own call."""
-    return "Let the top 2 cm of soil dry out before watering again."
+    return "A SEPA transfer arrives within one working day and is free."
 
 
 # Static values: a recorded exchange, no agent called
 scenario = Scenario("recorded").interact(
-    inputs="How often should I water a Monstera?",
-    outputs="Let the top 2 cm of soil dry out before watering again.",
+    inputs="How long does a SEPA transfer take?",
+    outputs="A SEPA transfer arrives within one working day and is free.",
 )
 
 # Callable outputs: the agent runs
 scenario = Scenario("live").interact(
-    inputs="How often should I water a Monstera?",
-    outputs=lambda inputs: botanibot(inputs),
+    inputs="How long does a SEPA transfer take?",
+    outputs=lambda inputs: bank_support_agent(inputs),
 )
 
 # Callable inputs: the next message depends on the last reply.
@@ -287,12 +287,12 @@ scenario = Scenario("live").interact(
 scenario = (
     Scenario("follow_up")
     .interact(
-        inputs="How often should I water a Monstera?",
-        outputs=lambda inputs: botanibot(inputs),
+        inputs="How long does a SEPA transfer take?",
+        outputs=lambda inputs: bank_support_agent(inputs),
     )
     .interact(
-        inputs=lambda trace: f"You said: {trace.last.outputs} Does that change in winter?",
-        outputs=lambda inputs: botanibot(inputs),
+        inputs=lambda trace: f"You said: {trace.last.outputs} Is it the same at a weekend?",
+        outputs=lambda inputs: bank_support_agent(inputs),
     )
 )
 ```
@@ -327,10 +327,10 @@ Ordered sequence of interaction specs and checks with shared trace. Provides a f
 from giskard.checks import Scenario, FnCheck, StringMatching
 
 result = await (
-    Scenario("botanibot_repotting_advice")
+    Scenario("bank_agent_dispute_advice")
     .interact(
-        inputs="I bought a Monstera from you last week.",
-        outputs="Lovely choice. How can I help with it?",
+        inputs="There is a payment on my card I don't recognise.",
+        outputs="I can help with that. Can you tell me the date and amount?",
     )
     .check(
         FnCheck(
@@ -339,11 +339,13 @@ result = await (
         )
     )
     .interact(
-        inputs="Should I repot it now?",
-        outputs="Wait until roots show through the drainage holes, usually in spring.",
+        inputs="89.00 EUR on 4 March, to Rail Europe.",
+        outputs="I've raised a dispute. Investigations take up to 15 working days.",
     )
     .check(
-        StringMatching(keyword="spring", text_key="trace.last.outputs")
+        StringMatching(
+            keyword="15 working days", text_key="trace.last.outputs"
+        )
     )
     .run()
 )
@@ -372,7 +374,7 @@ A scenario step: a sequence of interaction specs followed by checks. Each step m
 from giskard.checks import Scenario, Step, Interact, StringMatching
 
 scenario = Scenario(
-    name="botanibot_greeting",
+    name="bank_agent_greeting",
     steps=[
         Step(
             interacts=[Interact(inputs="Hello", outputs="Hi")],
@@ -408,16 +410,16 @@ from giskard.checks.core.extraction import resolve, NoMatch
 trace = Trace(
     interactions=[
         Interaction(
-            inputs="Do you stock Monstera deliciosa?",
-            outputs={"availability": "in_stock", "price_eur": 24.99},
+            inputs="What is the monthly fee on my current account?",
+            outputs={"intent": "fee_enquiry", "fee_eur": 3.00},
             metadata={"model": "gpt-5"},
         )
     ]
 )
 
-availability = resolve(trace, "trace.last.outputs.availability")  # "in_stock"
+intent = resolve(trace, "trace.last.outputs.intent")  # "fee_enquiry"
 
-missing = resolve(trace, "trace.last.outputs.pot_size_cm")
+missing = resolve(trace, "trace.last.outputs.account_number")
 if isinstance(missing, NoMatch):
     pass  # the field is absent; comparison checks report ERROR, not FAIL
 

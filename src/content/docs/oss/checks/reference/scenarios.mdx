@@ -63,26 +63,26 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 
 ### Multi-step example
 
-Examples on this page test BotaniBot, an assistant for a garden centre.
+Examples on this page test a customer-support agent for a retail bank, the same agent used across the checks reference.
 
-A customer asks about a plant, then about an order. The second step depends on the first having happened:
+A customer reports a payment, then identifies it. The second step depends on the first having happened:
 
 ```python
 from giskard.checks import Scenario, FnCheck, Equals
 
 result = await (
-    Scenario("botanibot_order_lookup")
+    Scenario("bank_agent_payment_lookup")
     .interact(
-        inputs="I ordered a Monstera last week and it hasn't arrived.",
+        inputs="There is a card payment on my account I don't recognise.",
         outputs={
-            "answer": "Sorry about that. What's your order number?",
-            "order_found": False,
+            "answer": "Sorry about that. What date and amount was it?",
+            "payment_found": False,
         },
     )
     .check(
         FnCheck(
             fn=lambda trace: "?" in trace.last.outputs["answer"],
-            name="asks_for_order_number",
+            name="asks_for_payment_details",
         )
     )
     .interact(inputs="12345", outputs="Thank you! I've found your account.")
@@ -99,15 +99,15 @@ Pass a callable as `outputs` to run the agent instead of replaying a recorded re
 from giskard.checks import Scenario
 
 
-def botanibot(inputs: str) -> str:
+def bank_support_agent(inputs: str) -> str:
     """Stand-in for the agent under test. Replace with your own call."""
-    if "water" in inputs.lower():
-        return "Let the top 2 cm of soil dry out before watering again."
-    return "Could you tell me a bit more about the plant?"
+    if "transfer" in inputs.lower():
+        return "A SEPA transfer arrives within one working day and is free."
+    return "Could you tell me a bit more about what you need?"
 
 
-scenario = Scenario("watering_advice").interact(
-    inputs="How often should I water a Monstera?", outputs=botanibot
+scenario = Scenario("transfer_timing").interact(
+    inputs="How long does a SEPA transfer take?", outputs=bank_support_agent
 )
 ```
 
@@ -117,13 +117,14 @@ Pass a callable as `inputs` when the next message depends on what the agent said
 
 ```python
 scenario = (
-    Scenario("botanibot_follow_up")
+    Scenario("bank_agent_follow_up")
     .interact(
-        inputs="How often should I water a Monstera?", outputs=botanibot
+        inputs="How long does a SEPA transfer take?",
+        outputs=bank_support_agent,
     )
     .interact(
-        inputs=lambda trace: f"You said: {trace.last.outputs} Is that the same in winter?",
-        outputs=botanibot,
+        inputs=lambda trace: f"You said: {trace.last.outputs} Is that the same at a weekend?",
+        outputs=bank_support_agent,
     )
 )
 ```
@@ -219,10 +220,13 @@ Group multiple scenarios and run them together.
 </MethodCard>
 
 <MethodCard name=".run()" returnType="SuiteResult">
-  Run all scenarios serially.
+  Run every scenario in the suite.
 
-  <Property name="target" type="Callable">Override target for this run.</Property>
+  <Property name="target" type="Callable">Override target for this run. Overrides both the suite-level target and any scenario-level target.</Property>
   <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
+  <Property name="parallel" type="bool" defaultValue="False">Run scenarios concurrently while preserving result order. The scan helpers pass `parallel=True`; `Suite.run` on its own is serial.</Property>
+  <Property name="max_concurrency" type="int | None" defaultValue="None">Cap on concurrent scenarios when `parallel=True`. `None` starts them all at once, so your provider's rate limit becomes the real cap.</Property>
+  <Property name="verbose" type="bool" defaultValue="True">Show a progress bar naming the running scenario. Set to `False` in CI.</Property>
 </MethodCard>
 
 Set the target once on the suite and leave `outputs` off each interaction:
@@ -230,14 +234,18 @@ Set the target once on the suite and leave `outputs` off each interaction:
 ```python
 from giskard.checks import Scenario, StringMatching, Suite
 
-suite = Suite(name="botanibot_care_advice", target=botanibot)
+suite = Suite(name="bank_agent_transfers", target=bank_support_agent)
 suite.append(
-    Scenario("watering").interact(
-        inputs="How often should I water a Monstera?"
-    ).check(StringMatching(keyword="soil", text_key="trace.last.outputs"))
+    Scenario("transfer_timing").interact(
+        inputs="How long does a SEPA transfer take?"
+    ).check(
+        StringMatching(
+            keyword="working day", text_key="trace.last.outputs"
+        )
+    )
 )
 suite.append(
-    Scenario("vague_question").interact(inputs="My plant looks sad.")
+    Scenario("vague_question").interact(inputs="Something is wrong with my account.")
 )
 
 result = await suite.run()

@@ -33,7 +33,7 @@ Input generators for creating dynamic test data and simulating user interactions
   LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
 </Property>
 
-Examples on this page drive BotaniBot, an assistant for a garden centre. Write the persona as a goal the simulated customer is pursuing, not as a list of messages:
+Examples on this page drive a customer-support agent for a retail bank, the same agent used across the checks reference. Write the persona as a goal the simulated customer is pursuing, not as a list of messages:
 
 ```python
 from giskard.checks.generators.user import UserSimulator
@@ -41,10 +41,10 @@ from giskard.agents.generators import Generator
 
 user_sim = UserSimulator(
     persona="""
-    You are a customer whose Monstera has yellowing leaves.
-    - Describe the symptom without naming a cause
-    - Push back once if the advice is generic
-    - Ask what to buy to fix it
+    You are a customer who has been charged twice for the same card payment.
+    - Describe the two charges without saying the word "dispute"
+    - Push back once if the answer is generic
+    - Ask how long you will wait for the money
     """,
     max_steps=3,
     generator=Generator(model="openai/gpt-5"),
@@ -57,14 +57,14 @@ user_sim = UserSimulator(
 from giskard.checks import Scenario, FnCheck
 
 
-def botanibot(inputs: str) -> str:
+def bank_support_agent(inputs: str) -> str:
     """Stand-in for the agent under test. Replace with your own call."""
-    return "Yellow leaves usually mean overwatering. Let the soil dry out first."
+    return "I can raise a dispute for the duplicate charge. It takes up to 15 working days."
 
 
 test_scenario = (
-    Scenario("yellow_leaves_conversation")
-    .interact(inputs=user_sim, outputs=botanibot)
+    Scenario("duplicate_charge_conversation")
+    .interact(inputs=user_sim, outputs=bank_support_agent)
     .check(
         FnCheck(
             fn=lambda trace: len(trace.last.outputs) > 0,
@@ -121,7 +121,7 @@ Exactly one of `prompt` or `prompt_path` must be provided.
 from giskard.checks import LLMGenerator
 
 gen = LLMGenerator(
-    prompt="You are a customer at a garden centre. Ask about caring for a plant you just bought."
+    prompt="You are a retail bank customer. Ask about a payment that left your account twice."
 )
 gen = LLMGenerator(prompt_path="giskard.checks::scenarios/llm01.j2")
 ```
@@ -177,9 +177,9 @@ from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-def botanibot(inputs: str) -> str:
+def bank_support_agent(inputs: str) -> str:
     """Stand-in for the agent under test. Replace with your own call."""
-    return "Let the top 2 cm of soil dry out before watering again."
+    return "A SEPA transfer arrives within one working day and is free."
 
 
 class SequentialInputGenerator(InputGenerator[Trace]):
@@ -194,14 +194,14 @@ class SequentialInputGenerator(InputGenerator[Trace]):
 
 gen = SequentialInputGenerator(
     inputs_list=[
-        "Do you stock Monstera deliciosa?",
-        "How often should I water it?",
-        "Does that change in winter?",
+        "Can I send 2,000 EUR to an account in Spain?",
+        "How long does that take?",
+        "Is it any faster at the weekend?",
     ]
 )
 
-scenario = Scenario("monstera_walkthrough").interact(
-    inputs=gen, outputs=botanibot
+scenario = Scenario("sepa_transfer_walkthrough").interact(
+    inputs=gen, outputs=bank_support_agent
 )
 ```
 
@@ -222,7 +222,7 @@ class ContextAwareGenerator(InputGenerator[Trace]):
         self, trace: Trace, input_type: type | None = None
     ) -> AsyncGenerator[str, Trace]:
         # First message: no prior interactions yet.
-        trace = yield "My Monstera looks unhappy."
+        trace = yield "Something is wrong with my account."
 
         for _ in range(self.max_steps - 1):
             if not trace.last:
@@ -231,10 +231,10 @@ class ContextAwareGenerator(InputGenerator[Trace]):
             last_output = trace.last.outputs.lower()
             if self.strategy == "follow_up":
                 if "?" in last_output:
-                    trace = yield "The leaves are yellow and drooping."
+                    trace = yield "A payment of 89.00 EUR was taken twice."
                     continue
-                if "water" in last_output:
-                    trace = yield "How long should I leave it before watering?"
+                if "dispute" in last_output:
+                    trace = yield "How long before I get the money back?"
                     continue
             trace = yield "Thanks, that helps."
 ```
@@ -249,7 +249,7 @@ Use a custom generator when the next message follows a rule you can write in Pyt
 
 ### A/B testing with different personas
 
-Run the same task through several kinds of customer to see which one BotaniBot handles worst:
+Run the same task through several kinds of customer to see which one the agent handles worst. `bank_support_agent` is the stand-in defined above:
 
 ```python
 from giskard.checks import Scenario
@@ -258,22 +258,24 @@ from giskard.checks.generators.user import UserSimulator
 personas = [
     {
         "name": "impatient",
-        "persona": "You want a one-line answer about watering a Monstera.",
+        "persona": "You want a one-line answer about how long a SEPA transfer takes.",
     },
     {
         "name": "novice",
-        "persona": "You have never kept a houseplant. Ask what every term means.",
+        "persona": "You have never sent money abroad. Ask what every term means.",
     },
     {
-        "name": "expert",
-        "persona": "You grow plants professionally. Challenge any advice that is too general.",
+        "name": "pushy",
+        "persona": "You want the agent to tell you which fund to put your savings in. Keep asking after it declines.",
     },
 ]
 
 results = {}
 for persona in personas:
     sim = UserSimulator(persona=persona["persona"], max_steps=3)
-    scenario = Scenario(persona["name"]).interact(inputs=sim, outputs=botanibot)
+    scenario = Scenario(persona["name"]).interact(
+        inputs=sim, outputs=bank_support_agent
+    )
     results[persona["name"]] = await scenario.run()
 
 for name, result in results.items():

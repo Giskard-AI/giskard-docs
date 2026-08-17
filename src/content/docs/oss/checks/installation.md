@@ -11,9 +11,9 @@ Giskard v3.0.0rc1 is a release candidate. APIs can still change before the stabl
 
 ## Install with a coding agent
 
-The fastest way to set up Giskard Checks. Paste a single URL into your coding agent and it handles everything — dependency installation, LLM provider configuration, and environment setup.
+Paste a single URL into your coding agent and it installs the dependencies, configures your LLM provider, and sets up the environment.
 
-:::tip[Get Started — Paste this into your coding agent:]
+:::tip[Paste this into your coding agent:]
 
 ```
 Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md and install giskard-checks in my project.
@@ -29,7 +29,7 @@ Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md 
 4. **You review** the changes and start writing checks
 
 :::tip[Want a permanent Giskard expert in your agent?]
-Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding agent a durable, opinionated workflow for generating adversarial test scenarios, red-team suites, and RAG evaluation suites, triggered automatically by prompts like _"test my agent"_, _"red-team my chatbot"_, or _"evaluate my RAG"_.
+Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding agent a workflow for generating adversarial test scenarios, red-team suites, and RAG evaluation suites, triggered by prompts like _"test my agent"_, _"red-team my chatbot"_, or _"evaluate my RAG"_.
 :::
 
 ## Install the Python package
@@ -78,7 +78,7 @@ For OpenAI, set the `OPENAI_API_KEY` environment variable:
 export OPENAI_API_KEY="your-api-key"
 ```
 
-Preferably, you should set these environment variables in your `.env` file. To load them in Python, install and use `python-dotenv`:
+Keep these in a `.env` file rather than your shell profile. To load them in Python, install `python-dotenv`:
 
 ```bash
 pip install python-dotenv

@@ -46,7 +46,7 @@ For most use cases, use the `Scenario()` fluent API instead. `TestCase` is for a
   with formatted failure messages if any check fails.
 </MethodCard>
 
-Examples on this page test BotaniBot, an assistant for a garden centre.
+Examples on this page test a customer-support agent for a retail bank, the same agent used across the checks reference.
 
 A conversation you captured in production, replayed against checks without calling the agent again:
 
@@ -56,18 +56,18 @@ from giskard.checks import TestCase, Trace, Interaction, Equals
 trace = Trace(
     interactions=[
         Interaction(
-            inputs="Do you stock Monstera deliciosa?",
-            outputs={"availability": "in_stock", "price_eur": 24.99},
+            inputs="What is the monthly fee on my current account?",
+            outputs={"intent": "fee_enquiry", "fee_eur": 3.00},
         ),
         Interaction(
-            inputs="And in a bigger pot?",
-            outputs={"availability": "available_to_order", "price_eur": 39.99},
+            inputs="And to replace a lost card?",
+            outputs={"intent": "fee_enquiry", "fee_eur": 0.00},
         ),
     ]
 )
 
 test_case = TestCase(
-    name="monstera_stock_replay",
+    name="fee_enquiry_replay",
     trace=trace,
     checks=[
         Equals(expected_value="Hi there!", target_key="trace.interactions[0].outputs"),
@@ -96,8 +96,8 @@ async def test_vague_question_gets_a_follow_up():
     trace = Trace(
         interactions=[
             Interaction(
-                inputs="My plant looks sad.",
-                outputs="Sorry to hear that. Are the leaves yellow or drooping?",
+                inputs="Something is wrong with my account.",
+                outputs="Sorry to hear that. Is it a payment, a card, or the balance?",
             )
         ]
     )
@@ -202,27 +202,27 @@ Replace a function with a `MagicMock` while the wrapped interaction spec runs, t
 
 After each interaction, the mock's call history is written to `Interaction.metadata` under the `target` string, then the mock is reset. The recorded keys are `call_count`, `call_args`, `call_args_list`, and `mock_calls`.
 
-Assert that BotaniBot looked the order up rather than inventing a delivery date:
+Assert that the agent looked the payment up rather than inventing one:
 
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 
-from botanibot.agent import order_support_agent
+from bankbot.agent import payment_support_agent
 
 interaction_spec = Interact(
-    inputs="Where is my order GC-40912?",
-    outputs=order_support_agent,
+    inputs="Was a payment of 89.00 EUR taken on 4 March?",
+    outputs=payment_support_agent,
 )
 
 spied_spec = WithSpy(
     interaction_generator=interaction_spec,
-    target="botanibot.db.fetch_orders",  # Python import path -- same as mock.patch
+    target="bankbot.db.fetch_payments",  # Python import path, same as mock.patch
 )
 
-result = await Scenario("order_lookup_hits_the_db").add_interaction(spied_spec).run()
+result = await Scenario("payment_lookup_hits_the_db").add_interaction(spied_spec).run()
 
 # Spy data is keyed by the same import path
-spy_data = result.final_trace.last.metadata.get("botanibot.db.fetch_orders")
+spy_data = result.final_trace.last.metadata.get("bankbot.db.fetch_payments")
 print(spy_data["call_count"], spy_data["call_args"])
 ```
 
@@ -243,28 +243,28 @@ from giskard.checks import TestCase, Trace, Interaction, FnCheck
 
 recorded = [
     Interaction(
-        inputs="The leaves on my Monstera are turning yellow.",
-        outputs="Yellow leaves usually mean overwatering. Let the soil dry out first.",
+        inputs="I was charged 89.00 EUR twice by the same shop.",
+        outputs="That looks like a duplicate charge. I can raise a dispute for the second one.",
     ),
     Interaction(
-        inputs="Should I add fertiliser?",
-        outputs="Not while it is stressed. Wait until new growth appears.",
+        inputs="Should I move my savings into your equity fund while I wait?",
+        outputs="I can't advise on investments. A qualified adviser can go through that with you.",
     ),
 ]
 
 trace = Trace(interactions=recorded)
 
 test_case = TestCase(
-    name="yellow_leaves_replay",
+    name="duplicate_charge_replay",
     trace=trace,
     checks=[
         FnCheck(
-            fn=lambda t: "overwatering" in t.interactions[0].outputs.lower(),
-            name="names_the_likely_cause",
+            fn=lambda t: "dispute" in t.interactions[0].outputs.lower(),
+            name="offers_the_dispute_route",
         ),
         FnCheck(
-            fn=lambda t: "wait" in t.interactions[1].outputs.lower(),
-            name="does_not_recommend_feeding",
+            fn=lambda t: "adviser" in t.interactions[1].outputs.lower(),
+            name="refuses_investment_advice",
         ),
     ],
 )
@@ -308,27 +308,29 @@ import pytest
 from giskard.checks import Interaction, StringMatching, TestCase, Trace
 
 
-def botanibot(inputs: str) -> str:
+def bank_support_agent(inputs: str) -> str:
     """Stand-in for the agent under test. Replace with your own call."""
-    if "water" in inputs.lower():
-        return "Let the top 2 cm of soil dry out before watering again."
-    return "Ferns want bright, indirect light and no midday sun."
+    if "transfer" in inputs.lower():
+        return "A SEPA transfer arrives within one working day."
+    return "A card dispute is investigated within 15 working days."
 
 
 test_data = [
-    ("How often should I water a Monstera?", "soil"),
-    ("How much light does a fern need?", "light"),
+    ("How long does a SEPA transfer take?", "working day"),
+    ("How long does a card dispute take?", "15 working days"),
 ]
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("question,required_keyword", test_data)
-async def test_care_answers_mention_the_condition(question, required_keyword):
+async def test_answers_state_the_timescale(question, required_keyword):
     trace = Trace(
-        interactions=[Interaction(inputs=question, outputs=botanibot(question))]
+        interactions=[
+            Interaction(inputs=question, outputs=bank_support_agent(question))
+        ]
     )
     test_case = TestCase(
-        name=f"care_answer_{required_keyword}",
+        name=f"timescale_{required_keyword.replace(' ', '_')}",
         trace=trace,
         checks=[
             Equals(expected_value=expected_output, target_key="trace.last.outputs")
