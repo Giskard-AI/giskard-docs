@@ -73,6 +73,7 @@ from giskard.checks import (
     AnyOf,
     Not,
     RegoPolicy,
+    Readability,
     # Configuration
     set_default_generator,
     get_default_generator,
@@ -83,6 +84,7 @@ from giskard.checks import (
     BaseLLMCheck,
     LLMCheckResult,
     Groundedness,
+    Contradiction,
     AnswerRelevance,
     Toxicity,
     Conformity,
@@ -115,6 +117,7 @@ giskard.checks/
 │   ├── composition.py    # AllOf, AnyOf, Not
 │   ├── json_valid.py     # JsonValid
 │   ├── rego_policy.py    # RegoPolicy
+│   ├── nlp_metrics.py    # Readability
 │   └── semantic_similarity.py
 ├── judges/               # LLM-based checks
 │   ├── base.py           # BaseLLMCheck, LLMCheckResult
@@ -122,6 +125,7 @@ giskard.checks/
 │   ├── answer_relevance.py
 │   ├── toxicity.py
 │   ├── conformity.py     # Conformity
+│   ├── contradiction.py  # Contradiction
 │   └── judge.py          # LLMJudge
 ├── scenarios/            # Multi-step workflows
 │   ├── runner.py         # ScenarioRunner

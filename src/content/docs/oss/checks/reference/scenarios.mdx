@@ -63,19 +63,26 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 
 ### Multi-step example
 
+Examples on this page test BotaniBot, an assistant for a garden centre.
+
+A customer asks about a plant, then about an order. The second step depends on the first having happened:
+
 ```python
 from giskard.checks import Scenario, FnCheck, Equals
 
 result = await (
-    Scenario("customer_support")
+    Scenario("botanibot_order_lookup")
     .interact(
-        inputs="I need help with my account",
-        outputs="I'd be happy to help! What's your account number?",
+        inputs="I ordered a Monstera last week and it hasn't arrived.",
+        outputs={
+            "answer": "Sorry about that. What's your order number?",
+            "order_found": False,
+        },
     )
     .check(
         FnCheck(
-            fn=lambda trace: "help" in trace.last.outputs.lower(),
-            name="helpful",
+            fn=lambda trace: "?" in trace.last.outputs["answer"],
+            name="asks_for_order_number",
         )
     )
     .interact(inputs="12345", outputs="Thank you! I've found your account.")
@@ -86,28 +93,37 @@ result = await (
 
 ### Dynamic interactions
 
+Pass a callable as `outputs` to run the agent instead of replaying a recorded reply:
+
 ```python
-# Use callables for dynamic generation
-def generate_response(inputs):
-    if "weather" in inputs:
-        return "It's sunny today!"
-    return "I don't understand."
+from giskard.checks import Scenario
 
 
-scenario = Scenario("dynamic_test").interact(
-    inputs="What's the weather?", outputs=generate_response
+def botanibot(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    if "water" in inputs.lower():
+        return "Let the top 2 cm of soil dry out before watering again."
+    return "Could you tell me a bit more about the plant?"
+
+
+scenario = Scenario("watering_advice").interact(
+    inputs="How often should I water a Monstera?", outputs=botanibot
 )
 ```
 
 ### Context-aware interactions
 
+Pass a callable as `inputs` when the next message depends on what the agent said:
+
 ```python
 scenario = (
-    Scenario("context_test")
-    .interact(inputs="Hello", outputs="Hi! I'm Alice.")
+    Scenario("botanibot_follow_up")
     .interact(
-        inputs=lambda trace: f"Nice to meet you, {trace.last.outputs.split()[-1][:-1]}!",
-        outputs="Nice to meet you too!",
+        inputs="How often should I water a Monstera?", outputs=botanibot
+    )
+    .interact(
+        inputs=lambda trace: f"You said: {trace.last.outputs} Is that the same in winter?",
+        outputs=botanibot,
     )
 )
 ```
@@ -162,8 +178,10 @@ Result of scenario execution with trace and check results.
   <Property name="console" type="Console | None" defaultValue="None">Rich `Console` to print to. Defaults to a new one writing to stdout.</Property>
 </MethodCard>
 
+Using the `scenario` built above:
+
 ```python
-result = await test_scenario.run()
+result = await scenario.run()
 result.print_report()
 
 if result.passed:
@@ -207,15 +225,28 @@ Group multiple scenarios and run them together.
   <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
 </MethodCard>
 
-```python
-from giskard.checks import Suite, Scenario
+Set the target once on the suite and leave `outputs` off each interaction:
 
-suite = Suite(name="my_suite", target=my_sut)
-suite.append(scenario1)
-suite.append(scenario2)
+```python
+from giskard.checks import Scenario, StringMatching, Suite
+
+suite = Suite(name="botanibot_care_advice", target=botanibot)
+suite.append(
+    Scenario("watering").interact(
+        inputs="How often should I water a Monstera?"
+    ).check(StringMatching(keyword="soil", text_key="trace.last.outputs"))
+)
+suite.append(
+    Scenario("vague_question").interact(inputs="My plant looks sad.")
+)
+
 result = await suite.run()
-print(result.pass_rate)
+
+rate = result.pass_rate
+print("no scenarios evaluated" if rate is None else f"{rate:.0%}")
 ```
+
+A pass rate is a sample from the scenarios in this suite, not a measure of the agent's overall risk. It is only comparable between runs when the suite is fixed.
 
 ---
 

@@ -33,16 +33,18 @@ Input generators for creating dynamic test data and simulating user interactions
   LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
 </Property>
 
+Examples on this page drive BotaniBot, an assistant for a garden centre. Write the persona as a goal the simulated customer is pursuing, not as a list of messages:
+
 ```python
 from giskard.checks.generators.user import UserSimulator
 from giskard.agents.generators import Generator
 
 user_sim = UserSimulator(
     persona="""
-    You are a customer trying to book a flight.
-    - Start by asking about available flights to Paris
-    - Ask about prices
-    - Request to book if the price is reasonable
+    You are a customer whose Monstera has yellowing leaves.
+    - Describe the symptom without naming a cause
+    - Push back once if the advice is generic
+    - Ask what to buy to fix it
     """,
     max_steps=3,
     generator=Generator(model="openai/gpt-5"),
@@ -54,22 +56,27 @@ user_sim = UserSimulator(
 ```python
 from giskard.checks import Scenario, FnCheck
 
+
+def botanibot(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    return "Yellow leaves usually mean overwatering. Let the soil dry out first."
+
+
 test_scenario = (
-    Scenario("booking_flow")
-    .interact(
-        inputs=user_sim,
-        outputs=lambda inputs: booking_agent(inputs),
-    )
+    Scenario("yellow_leaves_conversation")
+    .interact(inputs=user_sim, outputs=botanibot)
     .check(
         FnCheck(
-            fn=lambda trace: "booked" in trace.last.outputs.lower(),
-            name="completed",
+            fn=lambda trace: len(trace.last.outputs) > 0,
+            name="answered_every_turn",
         )
     )
 )
 
 result = await test_scenario.run()
 ```
+
+The simulator writes the customer's messages with an LLM, so the conversation differs between runs. Use it to explore how the agent handles a kind of customer; use fixed inputs when you need a regression test that gives the same answer twice.
 
 ### Goal-oriented testing
 
@@ -113,9 +120,13 @@ Exactly one of `prompt` or `prompt_path` must be provided.
 ```python
 from giskard.checks import LLMGenerator
 
-gen = LLMGenerator(prompt="You are a user. Ask about the product.")
+gen = LLMGenerator(
+    prompt="You are a customer at a garden centre. Ask about caring for a plant you just bought."
+)
 gen = LLMGenerator(prompt_path="giskard.checks::scenarios/llm01.j2")
 ```
+
+`LLMGenerator` takes a prompt; `UserSimulator` takes a persona and manages the conversation loop for you. Start with `UserSimulator` and drop to `LLMGenerator` when you need control over the prompt itself.
 
 </ResourceSection>
 
@@ -147,10 +158,13 @@ Structured output the LLM returns on every turn of `UserSimulator` and `LLMGener
 
 **Module:** `giskard.checks.core.input_generator`
 
+`InputGenerator` takes one type parameter, the trace type: `InputGenerator[Trace]`. Passing two raises `TypeError` at class definition.
+
 <MethodCard name=".__call__()" returnType="AsyncGenerator[InputType, TraceType]">
   Yield input values one at a time. Receives the current trace via `send()` between yields, so the generator can adapt to prior interactions.
 
   <Property name="trace" type="TraceType" required>The initial trace passed in when the generator is first called.</Property>
+  <Property name="input_type" type="type | None" defaultValue="None">The type the caller wants each yielded input to have. Accept it in your signature even if you ignore it; `None` means plain `str`.</Property>
 </MethodCard>
 
 ### Sequential generator
@@ -158,22 +172,36 @@ Structured output the LLM returns on every turn of `UserSimulator` and `LLMGener
 ```python
 from collections.abc import AsyncGenerator
 
+from giskard.checks import Scenario
 from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-class SequentialInputGenerator(InputGenerator[str, Trace]):
+def botanibot(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    return "Let the top 2 cm of soil dry out before watering again."
+
+
+class SequentialInputGenerator(InputGenerator[Trace]):
     inputs_list: list[str]
 
-    async def __call__(self, trace: Trace) -> AsyncGenerator[str, Trace]:
+    async def __call__(
+        self, trace: Trace, input_type: type | None = None
+    ) -> AsyncGenerator[str, Trace]:
         for value in self.inputs_list:
             trace = yield value
 
 
-gen = SequentialInputGenerator(inputs_list=["Hello", "How are you?", "Goodbye"])
+gen = SequentialInputGenerator(
+    inputs_list=[
+        "Do you stock Monstera deliciosa?",
+        "How often should I water it?",
+        "Does that change in winter?",
+    ]
+)
 
-scenario = Scenario("sequential").interact(
-    inputs=gen, outputs=lambda inputs: chatbot(inputs)
+scenario = Scenario("monstera_walkthrough").interact(
+    inputs=gen, outputs=botanibot
 )
 ```
 
@@ -186,28 +214,32 @@ from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-class ContextAwareGenerator(InputGenerator[str, Trace]):
+class ContextAwareGenerator(InputGenerator[Trace]):
     strategy: str = "follow_up"
     max_steps: int = 5
 
-    async def __call__(self, trace: Trace) -> AsyncGenerator[str, Trace]:
-        # First message — no prior interactions yet.
-        trace = yield "Hello, I need help"
+    async def __call__(
+        self, trace: Trace, input_type: type | None = None
+    ) -> AsyncGenerator[str, Trace]:
+        # First message: no prior interactions yet.
+        trace = yield "My Monstera looks unhappy."
 
         for _ in range(self.max_steps - 1):
             if not trace.last:
                 return
 
-            last_output = trace.last.outputs
+            last_output = trace.last.outputs.lower()
             if self.strategy == "follow_up":
-                if "question" in last_output.lower():
-                    trace = yield "Yes, please tell me more"
+                if "?" in last_output:
+                    trace = yield "The leaves are yellow and drooping."
                     continue
-                if "help" in last_output.lower():
-                    trace = yield "I need assistance with my account"
+                if "water" in last_output:
+                    trace = yield "How long should I leave it before watering?"
                     continue
-            trace = yield "Thank you"
+            trace = yield "Thanks, that helps."
 ```
+
+Use a custom generator when the next message follows a rule you can write in Python. When the branching is fuzzy, a `UserSimulator` persona is less code.
 
 </ResourceSection>
 
@@ -217,35 +249,38 @@ class ContextAwareGenerator(InputGenerator[str, Trace]):
 
 ### A/B testing with different personas
 
+Run the same task through several kinds of customer to see which one BotaniBot handles worst:
+
 ```python
+from giskard.checks import Scenario
 from giskard.checks.generators.user import UserSimulator
 
 personas = [
     {
         "name": "impatient",
-        "persona": "You are impatient and want quick answers.",
+        "persona": "You want a one-line answer about watering a Monstera.",
     },
     {
-        "name": "detailed",
-        "persona": "You like detailed explanations. Ask follow-ups.",
+        "name": "novice",
+        "persona": "You have never kept a houseplant. Ask what every term means.",
     },
     {
-        "name": "confused",
-        "persona": "You are confused and need things explained simply.",
+        "name": "expert",
+        "persona": "You grow plants professionally. Challenge any advice that is too general.",
     },
 ]
 
 results = {}
 for persona in personas:
     sim = UserSimulator(persona=persona["persona"], max_steps=3)
-    scenario = Scenario(persona["name"]).interact(
-        inputs=sim, outputs=lambda inputs: agent(inputs)
-    )
+    scenario = Scenario(persona["name"]).interact(inputs=sim, outputs=botanibot)
     results[persona["name"]] = await scenario.run()
 
 for name, result in results.items():
     print(f"{name}: {result.status}")
 ```
+
+Each run generates different messages, so a difference between personas here is a hint about where to look, not a measurement.
 
 ---
 

@@ -40,12 +40,12 @@ Base class for all checks. Subclass and register with `@Check.register("kind")` 
 from giskard.checks import Check, CheckResult, Trace
 
 
-@Check.register("my_custom_check")
-class MyCustomCheck(Check):
+@Check.register("retrieval_confidence")
+class RetrievalConfidence(Check):
     threshold: float = 0.8
 
     async def run(self, trace: Trace) -> CheckResult:
-        score = self._calculate_score(trace)
+        score = trace.last.metadata.get("retrieval_score", 0.0)
 
         if score >= self.threshold:
             return CheckResult.success(
@@ -177,23 +177,27 @@ A single exchange between inputs and outputs.
   </Property>
 </TypeTable>
 
+Examples on this page use BotaniBot, an assistant for a garden centre.
+
 ```python
 from giskard.checks import Interaction
 
-# Simple text interaction
+# Plain text in, plain text out
 interaction = Interaction(
-    inputs="What is the capital of France?",
-    outputs="The capital of France is Paris.",
+    inputs="How often should I water a Monstera deliciosa?",
+    outputs="Let the top 2 cm of soil dry out before watering again.",
     metadata={"model": "gpt-5", "tokens": 15},
 )
 
-# Structured interaction
+# Structured, so checks can address individual fields
 interaction = Interaction(
-    inputs={"query": "weather", "location": "Paris"},
-    outputs={"temperature": 20, "conditions": "sunny"},
-    metadata={"api": "weather_service", "latency_ms": 120},
+    inputs={"question": "Do you stock Monstera deliciosa?", "store": "ghent"},
+    outputs={"availability": "in_stock", "price_eur": 24.99},
+    metadata={"retrieval_score": 0.91, "latency_ms": 320},
 )
 ```
+
+Structured outputs are worth the effort: they let rule-based checks assert on a field instead of parsing a sentence.
 
 :::note
 Interactions are typically created through the scenario builder's `.interact()` method rather than directly instantiated.
@@ -222,8 +226,11 @@ Immutable history of all interactions in a scenario. Passed to checks for valida
 </TypeTable>
 
 ```python
+from giskard.checks import Check, CheckResult, Trace
+
+
 # Access trace in checks
-@Check.register("trace_check")
+@Check.register("interaction_count")
 class TraceCheck(Check):
     async def run(self, trace: Trace) -> CheckResult:
         last = trace.last  # most recent interaction
@@ -257,21 +264,36 @@ Declarative specification for generating interactions. Supports static values or
 ```python
 from giskard.checks import Scenario
 
-# Static values
-scenario = Scenario("static").interact(
-    inputs="test input", outputs="test output"
+
+def botanibot(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    return "Let the top 2 cm of soil dry out before watering again."
+
+
+# Static values: a recorded exchange, no agent called
+scenario = Scenario("recorded").interact(
+    inputs="How often should I water a Monstera?",
+    outputs="Let the top 2 cm of soil dry out before watering again.",
 )
 
-# Callable outputs — dynamic generation
-scenario = Scenario("dynamic").interact(
-    inputs="test query",
-    outputs=lambda inputs: my_model(inputs),
+# Callable outputs: the agent runs
+scenario = Scenario("live").interact(
+    inputs="How often should I water a Monstera?",
+    outputs=lambda inputs: botanibot(inputs),
 )
 
-# Access trace context
-scenario = Scenario("context").interact(
-    inputs=lambda trace: f"Previous: {trace.last.outputs if trace.last else 'None'}",
-    outputs=lambda inputs: generate_response(inputs),
+# Callable inputs: the next message depends on the last reply.
+# trace.last is None on the first interaction, so guard it.
+scenario = (
+    Scenario("follow_up")
+    .interact(
+        inputs="How often should I water a Monstera?",
+        outputs=lambda inputs: botanibot(inputs),
+    )
+    .interact(
+        inputs=lambda trace: f"You said: {trace.last.outputs} Does that change in winter?",
+        outputs=lambda inputs: botanibot(inputs),
+    )
 )
 ```
 
@@ -302,16 +324,27 @@ Ordered sequence of interaction specs and checks with shared trace. Provides a f
 </MethodCard>
 
 ```python
-from giskard.checks import Scenario, FnCheck
+from giskard.checks import Scenario, FnCheck, StringMatching
 
 result = await (
-    Scenario("multi_step_flow")
-    .interact(inputs="Hello", outputs="Hi there!")
-    .check(
-        FnCheck(fn=lambda trace: "Hi" in trace.last.outputs, name="greeting")
+    Scenario("botanibot_repotting_advice")
+    .interact(
+        inputs="I bought a Monstera from you last week.",
+        outputs="Lovely choice. How can I help with it?",
     )
-    .interact(inputs="What's the weather?", outputs="It's sunny!")
-    .check(FnCheck(fn=lambda trace: len(trace.interactions) == 2, name="count"))
+    .check(
+        FnCheck(
+            fn=lambda trace: "?" in trace.last.outputs,
+            name="asks_a_follow_up",
+        )
+    )
+    .interact(
+        inputs="Should I repot it now?",
+        outputs="Wait until roots show through the drainage holes, usually in spring.",
+    )
+    .check(
+        StringMatching(keyword="spring", text_key="trace.last.outputs")
+    )
     .run()
 )
 
@@ -336,10 +369,10 @@ A scenario step: a sequence of interaction specs followed by checks. Each step m
 </TypeTable>
 
 ```python
-from giskard.checks import Scenario, Step, Interact, Equals
+from giskard.checks import Scenario, Step, Interact, StringMatching
 
 scenario = Scenario(
-    name="multi_step_test",
+    name="botanibot_greeting",
     steps=[
         Step(
             interacts=[Interact(inputs="Hello", outputs="Hi")],
@@ -369,11 +402,24 @@ Extract values using JSONPath expressions from a trace.
 </MethodCard>
 
 ```python
+from giskard.checks import Interaction, Trace
 from giskard.checks.core.extraction import resolve, NoMatch
 
-value = resolve(trace, "trace.last.outputs.answer")
-if isinstance(value, NoMatch):
-    pass  # no value found
+trace = Trace(
+    interactions=[
+        Interaction(
+            inputs="Do you stock Monstera deliciosa?",
+            outputs={"availability": "in_stock", "price_eur": 24.99},
+            metadata={"model": "gpt-5"},
+        )
+    ]
+)
+
+availability = resolve(trace, "trace.last.outputs.availability")  # "in_stock"
+
+missing = resolve(trace, "trace.last.outputs.pot_size_cm")
+if isinstance(missing, NoMatch):
+    pass  # the field is absent; comparison checks report ERROR, not FAIL
 
 model_name = resolve(trace, "trace.interactions[0].metadata.model")
 ```

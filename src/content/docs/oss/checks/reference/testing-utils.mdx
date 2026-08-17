@@ -46,18 +46,28 @@ For most use cases, use the `Scenario()` fluent API instead. `TestCase` is for a
   with formatted failure messages if any check fails.
 </MethodCard>
 
+Examples on this page test BotaniBot, an assistant for a garden centre.
+
+A conversation you captured in production, replayed against checks without calling the agent again:
+
 ```python
 from giskard.checks import TestCase, Trace, Interaction, Equals
 
 trace = Trace(
     interactions=[
-        Interaction(inputs="Hello", outputs="Hi there!"),
-        Interaction(inputs="How are you?", outputs="I'm doing well!"),
+        Interaction(
+            inputs="Do you stock Monstera deliciosa?",
+            outputs={"availability": "in_stock", "price_eur": 24.99},
+        ),
+        Interaction(
+            inputs="And in a bigger pot?",
+            outputs={"availability": "available_to_order", "price_eur": 39.99},
+        ),
     ]
 )
 
 test_case = TestCase(
-    name="greeting_test",
+    name="monstera_stock_replay",
     trace=trace,
     checks=[
         Equals(expected_value="Hi there!", target_key="trace.interactions[0].outputs"),
@@ -73,24 +83,31 @@ result = await test_case.run()
 
 ### Integration with pytest
 
+`assert_passed()` raises `AssertionError` with the check messages, so a failing check reads like any other pytest failure:
+
 ```python
 import pytest
 
+from giskard.checks import FnCheck, Interaction, TestCase, Trace
+
 
 @pytest.mark.asyncio
-async def test_greeting_response():
+async def test_vague_question_gets_a_follow_up():
     trace = Trace(
         interactions=[
-            Interaction(inputs="Hello", outputs="Hi there! How can I help?")
+            Interaction(
+                inputs="My plant looks sad.",
+                outputs="Sorry to hear that. Are the leaves yellow or drooping?",
+            )
         ]
     )
     test_case = TestCase(
-        name="greeting_politeness",
+        name="asks_a_follow_up",
         trace=trace,
         checks=[
             FnCheck(
-                fn=lambda t: "help" in t.last.outputs.lower(),
-                name="offers_help",
+                fn=lambda t: "?" in t.last.outputs,
+                name="asks_a_follow_up",
             ),
         ],
     )
@@ -185,23 +202,27 @@ Replace a function with a `MagicMock` while the wrapped interaction spec runs, t
 
 After each interaction, the mock's call history is written to `Interaction.metadata` under the `target` string, then the mock is reset. The recorded keys are `call_count`, `call_args`, `call_args_list`, and `mock_calls`.
 
+Assert that BotaniBot looked the order up rather than inventing a delivery date:
+
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 
+from botanibot.agent import order_support_agent
+
 interaction_spec = Interact(
-    inputs="What are my shipped orders?",
+    inputs="Where is my order GC-40912?",
     outputs=order_support_agent,
 )
 
 spied_spec = WithSpy(
     interaction_generator=interaction_spec,
-    target="myapp.db.fetch_orders",  # Python import path -- same as mock.patch
+    target="botanibot.db.fetch_orders",  # Python import path -- same as mock.patch
 )
 
-result = await Scenario("debug_test").add_interaction(spied_spec).run()
+result = await Scenario("order_lookup_hits_the_db").add_interaction(spied_spec).run()
 
 # Spy data is keyed by the same import path
-spy_data = result.final_trace.last.metadata.get("myapp.db.fetch_orders")
+spy_data = result.final_trace.last.metadata.get("botanibot.db.fetch_orders")
 print(spy_data["call_count"], spy_data["call_args"])
 ```
 
@@ -215,29 +236,35 @@ Use `WithSpy` when debugging complex interaction generation logic, understanding
 
 ### Replaying recorded conversations
 
+A support transcript, replayed to confirm the advice you shipped is still the advice the checks expect:
+
 ```python
 from giskard.checks import TestCase, Trace, Interaction, FnCheck
 
 recorded = [
-    Interaction(inputs="What's the weather?", outputs="It's sunny and 75F."),
     Interaction(
-        inputs="Should I bring an umbrella?", outputs="No, you won't need one."
+        inputs="The leaves on my Monstera are turning yellow.",
+        outputs="Yellow leaves usually mean overwatering. Let the soil dry out first.",
+    ),
+    Interaction(
+        inputs="Should I add fertiliser?",
+        outputs="Not while it is stressed. Wait until new growth appears.",
     ),
 ]
 
 trace = Trace(interactions=recorded)
 
 test_case = TestCase(
-    name="weather_replay",
+    name="yellow_leaves_replay",
     trace=trace,
     checks=[
         FnCheck(
-            fn=lambda t: "sunny" in t.interactions[0].outputs.lower(),
-            name="weather",
+            fn=lambda t: "overwatering" in t.interactions[0].outputs.lower(),
+            name="names_the_likely_cause",
         ),
         FnCheck(
-            fn=lambda t: "no" in t.interactions[1].outputs.lower(),
-            name="umbrella",
+            fn=lambda t: "wait" in t.interactions[1].outputs.lower(),
+            name="does_not_recommend_feeding",
         ),
     ],
 )
@@ -245,13 +272,24 @@ test_case = TestCase(
 await test_case.assert_passed()
 ```
 
+Replay is free and deterministic: no agent runs, so a failure means the checks disagree with a reply you already have.
+
 ### Batch testing
 
+Run independent test cases concurrently:
+
 ```python
+import asyncio
+
 test_cases = [
-    TestCase(name="test1", trace=trace1, checks=checks1),
-    TestCase(name="test2", trace=trace2, checks=checks2),
-    TestCase(name="test3", trace=trace3, checks=checks3),
+    TestCase(
+        name=f"replay_{i}",
+        trace=Trace(interactions=[interaction]),
+        checks=[
+            FnCheck(fn=lambda t: bool(t.last.outputs), name="answered")
+        ],
+    )
+    for i, interaction in enumerate(recorded)
 ]
 
 results = await asyncio.gather(*[tc.run() for tc in test_cases])
@@ -262,22 +300,35 @@ print(f"Passed: {passed}/{len(results)}")
 
 ### Parameterized tests
 
+One check, many recorded exchanges:
+
 ```python
 import pytest
 
-test_data = [("Hello", "Hi there!"), ("Good morning", "Good morning!")]
+from giskard.checks import Interaction, StringMatching, TestCase, Trace
+
+
+def botanibot(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    if "water" in inputs.lower():
+        return "Let the top 2 cm of soil dry out before watering again."
+    return "Ferns want bright, indirect light and no midday sun."
+
+
+test_data = [
+    ("How often should I water a Monstera?", "soil"),
+    ("How much light does a fern need?", "light"),
+]
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("greeting_input,expected_output", test_data)
-async def test_greeting_variations(greeting_input, expected_output):
+@pytest.mark.parametrize("question,required_keyword", test_data)
+async def test_care_answers_mention_the_condition(question, required_keyword):
     trace = Trace(
-        interactions=[
-            Interaction(inputs=greeting_input, outputs=expected_output)
-        ]
+        interactions=[Interaction(inputs=question, outputs=botanibot(question))]
     )
     test_case = TestCase(
-        name=f"greeting_{greeting_input}",
+        name=f"care_answer_{required_keyword}",
         trace=trace,
         checks=[
             Equals(expected_value=expected_output, target_key="trace.last.outputs")

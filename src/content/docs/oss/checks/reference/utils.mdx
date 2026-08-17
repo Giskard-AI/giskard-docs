@@ -134,22 +134,30 @@ async for value in await gen():
   <Property name="value_or_generator" type="YieldType | SyncOrAsyncGenerator" required>Value or generator to convert.</Property>
 </MethodCard>
 
+Both loops below need an async context, so they are shown inside a coroutine:
+
 ```python
+import asyncio
+
 from giskard.checks.utils.generator import a_generator
 
-# Static value -> yields once
-async for value in a_generator("hello"):
-    print(value)
 
-
-# Sync generator -> async
 def sync_gen():
     yield 1
     yield 2
 
 
-async for value in a_generator(sync_gen()):
-    print(value)
+async def main():
+    # Static value -> yields once
+    async for value in a_generator("hello"):
+        print(value)
+
+    # Sync generator -> async
+    async for value in a_generator(sync_gen()):
+        print(value)
+
+
+asyncio.run(main())
 ```
 
 ---
