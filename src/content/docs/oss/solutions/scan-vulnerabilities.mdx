@@ -276,7 +276,17 @@ suite = Suite.model_validate_json(Path("scan_suite.json").read_text())
 suite_result = await suite.run(target=my_agent)
 ```
 
-For the workflow file, secrets, cost controls, and JUnit XML reporting, see [CI/CD Integration](/oss/checks/how-to/ci-cd).
+To publish the results in your CI dashboard, export them as JUnit XML. `to_junit_xml()` always returns the XML as a string, and also writes it to disk when you pass a `path`:
+
+```python
+xml = suite_result.to_junit_xml()  # returns the XML string
+
+suite_result.to_junit_xml(path="reports/scan.xml")  # also writes the file
+```
+
+Most CI systems pick the file up from a path you configure, so pass `path` and point your reporting step at it. Missing parent directories are created for you.
+
+For the workflow file, secrets, and cost controls, see [CI/CD Integration](/oss/checks/how-to/ci-cd).
 
 ### Re-run the same scenarios on another model
 
