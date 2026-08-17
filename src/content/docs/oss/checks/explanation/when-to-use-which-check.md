@@ -6,24 +6,35 @@ sidebar:
 faq:
   - question: When should you use a rule-based check?
     answer: >-
-      Use a rule-based check when you can express the pass condition as a
-      predicate: required keywords, value ranges, exact labels. Use these first;
-      they are free, instant, and never flaky. Examples are Equals,
-      StringMatching, and FnCheck.
+      In Giskard, a check is a rule that an AI application's answer has to
+      satisfy for a test to pass. Use a rule-based check when you can write that
+      rule as ordinary Python: a required keyword, a value range, an exact
+      label. Rule-based checks are free, run in under a millisecond, and give
+      the same verdict every time, so use them wherever they can express what
+      you need. Examples in Giskard are Equals, StringMatching, and FnCheck.
   - question: When should you use semantic similarity instead of an LLM judge?
     answer: >-
-      Use semantic similarity when phrasing varies but meaning should be
-      consistent. It is cheaper and faster than an LLM judge: one embedding call
-      at roughly 50-200 ms, and near-deterministic.
+      Use semantic similarity when the wording of a correct answer can vary but
+      the meaning should not. It converts the answer and a reference text into
+      vectors and compares them, so "Paris is the capital of France" matches
+      "The capital of France is Paris". One embedding call takes roughly 50-200
+      ms and costs far less than asking an LLM to judge the answer, and the
+      result barely changes between runs. It only measures similarity of
+      meaning, so it cannot tell you whether an answer is polite, safe, or
+      supported by your documents.
   - question: When should you use an LLM-as-judge check?
     answer: >-
-      Use an LLM-as-judge check when the criterion is qualitative and hard to
-      express as a rule: tone, groundedness, policy compliance, reasoning
-      quality. It costs an LLM call, takes roughly 1-10 s, and is not
-      deterministic. Examples are Groundedness, Conformity, and LLMJudge.
+      An LLM-as-judge check asks a language model to read your application's
+      answer and decide whether it satisfies a rule you wrote in plain English.
+      Use it when the rule is qualitative and cannot be written as code: tone,
+      whether the answer is supported by the retrieved documents, whether it
+      follows a policy, whether the reasoning holds up. It costs one LLM call,
+      takes roughly 1-10 seconds, and can return different verdicts on identical
+      input, so treat its verdicts as evidence to review rather than as proof.
+      Examples in Giskard are Groundedness, Conformity, and LLMJudge.
 ---
 
-Three check families cover most use cases. Pick the simplest one that can express your requirement.
+A check is a rule your agent's answer has to satisfy for the test to pass. Three families of check cover most use cases. Pick the simplest one that can express your requirement: an LLM judge can express anything, but it costs money, takes seconds, and is sometimes wrong.
 
 ## Tradeoffs at a Glance
 
@@ -66,7 +77,7 @@ SemanticSimilarity(
 )
 ```
 
-**LLM-as-judge** — when the criterion is qualitative and hard to express as a rule: tone, groundedness, policy compliance, reasoning quality.
+**LLM-as-judge** — when the criterion is qualitative and hard to express as a rule: tone, groundedness (whether the answer is supported by the documents you retrieved), policy compliance, reasoning quality. The judge is an LLM, so read failing verdicts before you trust them.
 
 ```python
 Groundedness(
