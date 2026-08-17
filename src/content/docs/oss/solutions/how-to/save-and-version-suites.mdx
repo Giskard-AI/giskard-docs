@@ -5,7 +5,9 @@ sidebar:
   order: 4
 ---
 
-A generated suite is data. Serialize it once and every later run replays the same questions with the same judges, with no generation calls and a pass rate you can compare against last week's.
+A **suite** is the collection of scenarios a scan generated: the questions to ask your agent, plus the checks that decide whether each reply passed. It is plain data. Serialize it once and every later run replays the same questions with the same judges, with no generation calls.
+
+Do this whenever you want to compare runs. A fresh scan generates different scenarios every time, so its **pass rate**, the share of scenarios that passed, moves for reasons that have nothing to do with your agent. Replaying a saved suite with a fixed `seed` is what makes last week's number and this week's mean the same thing.
 
 [Run the Scan in CI](/oss/solutions/how-to/scan-in-ci) shows the pipeline this feeds.
 
@@ -60,7 +62,7 @@ Deserialization is otherwise strict. Every polymorphic node (checks, interaction
 
 ## Version it like test code
 
-The file holds scenarios: prompts, generator configuration, checks, and tags. It does not hold your target, the judge model, or the `KnowledgeBase` object, so a suite pins the questions, not the verdicts. Pass any target to `run`, and expect the same suite to return a different pass rate when you change what `set_default_generator` is configured with.
+The file holds scenarios: prompts, generator configuration, checks, and tags. It does not hold your target (the agent under test), the judge model (the LLM that decides pass or fail), or the `KnowledgeBase` object, so a suite pins the questions, not the verdicts. Even on a fixed suite the same agent can score differently between runs, because both your agent and the judge are LLMs. Pass any target to `run`, and expect the same suite to return a different pass rate when you change what `set_default_generator` is configured with.
 
 Commit the JSON next to your tests and treat regeneration as a deliberate, reviewable act.
 

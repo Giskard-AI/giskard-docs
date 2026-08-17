@@ -5,11 +5,13 @@ sidebar:
   order: 2
 ---
 
-Every scenario the scan generates carries tags, and those tags are what the report groups by. Knowing the vocabulary tells you what a clean report proves, and what it does not.
+A scan produces dozens or hundreds of **scenarios**, each one a test case: a message, or a short conversation, plus the checks that decide whether the agent's reply was acceptable. A flat list of failures is hard to act on. So every scenario carries tags naming what it was probing, and the report groups by those tags.
 
-[How the Scan Works](/oss/solutions/explanation/how-scan-works) covers the pipeline. This page is the catalog: which label means what, and which generator emits it.
+A **threat type** is one of those tags: the kind of harm a scenario tries to cause, such as [prompt injection](/start/glossary/security/injection) or [harmful content](/start/glossary/security/harmful-content). Grouping by threat type turns "47 failures" into "most failures are prompt injection", which points at one defense to add rather than 47 replies to read.
 
-## Three tag families
+This page is the catalog: which tag means what, which generator emits it, and how to read a grouped table without over-reading it. [How the Scan Works](/oss/solutions/explanation/how-scan-works) covers the pipeline that produces them.
+
+## Tag families
 
 | Prefix | Answers | Used by |
 | --- | --- | --- |
@@ -17,7 +19,9 @@ Every scenario the scan generates carries tags, and those tags are what the repo
 | `quality:` | What kind of mistake is this? | quality scan |
 | `component:` | Which part of my pipeline is at fault? | quality scan |
 
-Two more prefixes show up on individual scenarios. `owasp:` maps a scenario to an OWASP LLM Top-10 entry, and `probe-type:` records the attack shape (`multi-turn`). Both are groupable, neither is a default.
+A **component** is a part of your pipeline: the model, the retriever, or the conversation history.
+
+Two more prefixes show up on individual scenarios. `owasp:` maps a scenario to an OWASP LLM Top-10 entry, and `probe-type:` records the attack shape (`multi-turn`, meaning the attack is spread over several messages rather than one). Both are groupable, neither is a default.
 
 ## Threat types
 
@@ -25,7 +29,7 @@ The vulnerability scan uses three.
 
 ### `harmful-content-generation`
 
-The broadest of the three. It covers everything the adversarial generator's categories aim at: stereotypes and discrimination, politics, religion, CBRN materials, copyright violation, misinformation and disinformation, and illegal activities. It is also the tag on every multi-turn jailbreak scenario, because GOAT and Crescendo both work toward a harmful objective by different routes.
+The broadest of the three. It covers everything the adversarial generator's categories aim at: stereotypes and discrimination, politics, religion, CBRN materials, copyright violation, misinformation and disinformation, and illegal activities. It is also the tag on every multi-turn **jailbreak** scenario, where the attacker talks the agent past its own safety rules over several messages. GOAT and Crescendo both work toward a harmful objective by different routes. See [harmful content](/start/glossary/security/harmful-content) and [stereotypes](/start/glossary/security/stereotypes) in the glossary.
 
 Emitted by `AdversarialScenarioGenerator`, `GOATAttackScenarioGenerator`, and `CrescendoAttackScenarioGenerator`.
 
@@ -35,7 +39,7 @@ Financial, medical, and legal advice the agent has no business giving. It gets i
 
 ### `prompt-injection`
 
-Instructions smuggled into content the agent processes (pasted text, retrieved documents, tool output) that the agent then obeys. `PromptInjectionScenarioGenerator` emits it, paired with `owasp:llm-top-10-2025:LLM01`.
+[Prompt injection](/start/glossary/security/injection) is instructions smuggled into content the agent processes (pasted text, retrieved documents, tool output) that the agent then obeys. `PromptInjectionScenarioGenerator` emits it, paired with `owasp:llm-top-10-2025:LLM01`.
 
 ### Tags on dataset scenarios
 
@@ -56,6 +60,8 @@ Dataset-backed and token-level generators ask the same questions of every agent,
 `GCGInjectionScenarioGenerator` needs one caveat: its suffixes are English-tuned and appended verbatim regardless of the base prompt's language. Treat its results as weak evidence on non-English scans.
 
 ## Quality failure modes and components
+
+The quality scan generates questions from your **knowledge base**, the set of documents you give it, and checks the agent's answers against those documents. Its failure modes are mostly forms of [hallucination](/start/glossary/business/hallucination): an answer that is not supported by the source.
 
 The quality scan's five generators each pair a failure mode with the components that could have caused it.
 
@@ -91,11 +97,11 @@ A generator tagged with two components cannot distinguish between them from the 
 
 When reading a grouped table:
 
-1. **An empty bucket is not coverage.** `max_scenarios` is split by a multinomial draw across generators, so a small budget leaves some generators with nothing. A threat type with zero scenarios was not tested.
-2. **A bucket's pass rate is a sample.** Four scenarios passing tells you little. Read the failures instead of trending the number at low budgets.
-3. **Tags are per scenario, not per check.** A scenario can carry several checks; the grouping follows the scenario.
+- **A bucket with no failures does not mean that threat is handled.** `max_scenarios` is split by a multinomial draw across generators, so a small budget leaves some generators with nothing. A threat type with zero scenarios was never tested, and an empty bucket looks identical to a passing one.
+- **A bucket's pass rate is a sample, not a measurement of risk.** The pass rate is the share of that bucket's scenarios that passed, over whatever scenarios happened to be generated. Four scenarios passing tells you little. Pass rates are only comparable across runs when you replay a fixed saved suite with a fixed seed; otherwise each run tests different scenarios. Read the failures instead of trending the number.
+- **Tags are per scenario, not per check.** A scenario can carry several checks; the grouping follows the scenario.
 
-Verdicts themselves come from an LLM judge, with the caveats in [The judge is an LLM](/oss/solutions/explanation/how-scan-works#the-judge-is-an-llm).
+Verdicts come from an LLM judge, a model asked to decide whether a reply was acceptable. It is wrong sometimes, in both directions: it passes replies it should fail, and fails replies that were fine. Read a failure before acting on it. The scan is not exhaustive and is not an audit or a compliance certificate. See [The judge is an LLM](/oss/solutions/explanation/how-scan-works#the-judge-is-an-llm).
 
 ## The quality recommendation
 
