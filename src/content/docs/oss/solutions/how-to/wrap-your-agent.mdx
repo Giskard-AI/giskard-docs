@@ -9,17 +9,37 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 The scan talks to your agent through a single entry point: an **async function** that takes a typed input and returns a typed output. Both types are [Pydantic ↗](https://docs.pydantic.dev/) models, which makes the contract explicit and validated.
 
-Multi-turn attacks call your agent once per turn with only the new message, so the right wrapper depends on how your agent keeps track of the conversation. Pick the pattern that matches yours. A **trace** is Giskard's record of one conversation, and each **interaction** on it is one message and the reply it got, so `trace.interactions` is the history so far.
+Multi-turn attacks call your agent once per turn with only the new message, so the right wrapper depends on how your agent keeps track of the conversation. A **trace** is Giskard's record of one conversation, and each **interaction** on it is one message and the reply it got, so `trace.interactions` is the history so far.
 
 Get this wrong and the scan still runs, but every multi-turn attack collapses: the agent answers each message with no memory of the previous ones, so escalation attacks look like they failed when they were never really attempted.
+
+Find your agent in this table, then open the matching tab:
+
+| Your agent | Pattern |
+| --- | --- |
+| Answers one question at a time and forgets it. A single LLM call, a RAG endpoint, a `/ask` route. | **Basic** |
+| Keeps the conversation on its own side, keyed by a session or thread id. A LangGraph checkpointer, an Assistants-style thread, a chat API with a `conversation_id`. | **Stateful** |
+| Holds no state but expects the whole message list on every call. | **History-passing** |
+
+All three examples wrap the same BotaniBot garden-center assistant from [Your First Scan](/oss/solutions/tutorials/your-first-scan), so the only thing that changes between them is how the turn history is carried.
 
 <Tabs>
 <TabItem label="Basic">
 
-If your agent answers each message independently, wrap it directly:
+BotaniBot as the tutorial writes it: one system prompt, one user message, no memory. Wrap the call directly and ignore the trace.
 
 ```python
+import os
+
+from openai import AsyncOpenAI
 from pydantic import BaseModel
+
+client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+SYSTEM_PROMPT = (
+    "You are BotaniBot, an assistant for a garden center. "
+    "You answer questions about plants, soil and watering."
+)
 
 
 class AgentInput(BaseModel):
@@ -30,22 +50,44 @@ class AgentOutput(BaseModel):
     answer: str
 
 
-async def my_agent(inputs: AgentInput) -> AgentOutput:
-    # Call your own LLM app, chain, or agent here
-    answer = await my_llm_app(inputs.question)
-    return AgentOutput(answer=answer)
+async def botanibot(inputs: AgentInput) -> AgentOutput:
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": inputs.question},
+        ],
+    )
+    return AgentOutput(answer=response.choices[0].message.content)
 ```
 
-</TabItem>
-<TabItem label="Stateful agent">
+Run this one with `target_mode="singleturn"`. It has no memory, so a multi-turn attack would send turn two to an agent that never saw turn one.
 
-If your agent stores the conversation on its side (a LangGraph checkpointer or a session-based API, for example), it needs the same thread id on every turn. Subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
+</TabItem>
+<TabItem label="Stateful">
+
+The same assistant, but the conversation lives on the agent's side and is addressed by a thread id: a LangGraph checkpointer, a session-based HTTP API, or the in-memory store below. Giskard has to hand you the *same* id on every turn of one conversation.
+
+Subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
 
 ```python
+import os
 from uuid import uuid4
+
+from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 from giskard.checks import Trace
 
+client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+SYSTEM_PROMPT = (
+    "You are BotaniBot, an assistant for a garden center. "
+    "You answer questions about plants, soil and watering."
+)
+
+# Stands in for your checkpointer or session store
+THREADS: dict[str, list[dict[str, str]]] = {}
+
 
 class AgentInput(BaseModel):
     question: str
@@ -55,24 +97,45 @@ class AgentOutput(BaseModel):
     answer: str
 
 
-class AgentTrace(Trace[AgentInput, AgentOutput]):
+class BotaniBotTrace(Trace[AgentInput, AgentOutput]):
     thread_id: str = Field(default_factory=lambda: str(uuid4()))
 
 
-async def my_agent(inputs: AgentInput, trace: AgentTrace) -> AgentOutput:
-    # The same thread_id is kept for every turn of this conversation
-    answer = await my_llm_app(inputs.question, thread_id=trace.thread_id)
+async def botanibot(inputs: AgentInput, trace: BotaniBotTrace) -> AgentOutput:
+    # The same thread_id comes back on every turn of this conversation
+    history = THREADS.setdefault(
+        trace.thread_id, [{"role": "system", "content": SYSTEM_PROMPT}]
+    )
+    history.append({"role": "user", "content": inputs.question})
+
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini", messages=history
+    )
+    answer = response.choices[0].message.content
+    history.append({"role": "assistant", "content": answer})
     return AgentOutput(answer=answer)
 ```
 
-</TabItem>
-<TabItem label="Conversation history">
+If you forget the `Trace` subclass and generate the id inside the function, every turn opens a fresh thread. The scan still completes, and every multi-turn jailbreak in the report is a false negative.
 
-If your agent is stateless and expects the full message history on every call, declare a `trace` parameter. During the scan, `trace.interactions` holds the previous turns of the current conversation, so you can rebuild the history and append the new message:
+</TabItem>
+<TabItem label="History-passing">
+
+The same assistant with no store at all: it is a pure function of the whole conversation, which is what most self-hosted chat endpoints look like. Declare a `trace` parameter and rebuild the message list from `trace.interactions`, which holds the previous turns of the current conversation:
 
 ```python
+import os
+
+from openai import AsyncOpenAI
 from pydantic import BaseModel
 from giskard.checks import Trace
+
+client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+SYSTEM_PROMPT = (
+    "You are BotaniBot, an assistant for a garden center. "
+    "You answer questions about plants, soil and watering."
+)
 
 
 class AgentInput(BaseModel):
@@ -83,11 +146,10 @@ class AgentOutput(BaseModel):
     answer: str
 
 
-async def my_agent(
+async def botanibot(
     inputs: AgentInput, trace: Trace[AgentInput, AgentOutput]
 ) -> AgentOutput:
-    # Rebuild the conversation history from the previous turns
-    messages = []
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     for interaction in trace.interactions:
         messages.append(
             {"role": "user", "content": interaction.inputs.question}
@@ -97,9 +159,13 @@ async def my_agent(
         )
     messages.append({"role": "user", "content": inputs.question})
 
-    answer = await my_llm_app(messages)
-    return AgentOutput(answer=answer)
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini", messages=messages
+    )
+    return AgentOutput(answer=response.choices[0].message.content)
 ```
+
+`trace.interactions` is the history *before* the current message, so append `inputs.question` yourself. Drop that last line and the agent answers the previous turn twice.
 
 </TabItem>
 </Tabs>
@@ -118,13 +184,17 @@ Pass the wrapped agent, a plain-language description, and the languages it handl
 from giskard.scan import vulnerability_scan
 
 suite_result = await vulnerability_scan(
-    target=my_agent,
-    description="A Q&A agent that answers questions about our product.",
+    target=botanibot,
+    description=(
+        "BotaniBot, a garden center assistant that answers questions about "
+        "plants, soil and watering. It must stay on gardening topics and must "
+        "never give medical advice about ingesting plants."
+    ),
     languages=["en"],
 )
 ```
 
-The `description` is what the LLM uses to generate scenarios specific to your agent, so the more precisely you describe its purpose and its boundaries, the more relevant the findings. "A customer-support bot for a retail bank that answers account and card questions, and must never give investment advice" gets you attacks on that boundary. "A chatbot" gets you generic ones.
+The `description` is what the LLM uses to generate scenarios specific to your agent, so the more precisely you describe its purpose and its boundaries, the more relevant the findings. The description above names a boundary ("never give medical advice about ingesting plants") and the scan attacks it. "A chatbot" gets you generic attacks and a shallow report.
 
 ## Next Steps
 

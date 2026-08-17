@@ -9,7 +9,7 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 A **scan** happens in two phases. First it writes test cases for your agent, then it runs them. You describe your agent in a sentence, the scan turns that sentence into hostile conversations designed to make it misbehave, sends them to your agent, and reports which ones worked. That is **red teaming**: attacking your own system on purpose, so you find out how it breaks before someone else does.
 
-Run a scan when you want to see how your agent holds up under pressure, against realistic scenarios you would not have thought to write yourself. A first scan against a bank's customer-support bot typically finds that it gives investment advice it should refuse, or that it follows instructions hidden inside a pasted email.
+Run a scan when you want to see how your agent holds up under pressure, against realistic scenarios you would not have thought to write yourself. The stakes are clearest on a regulated agent, so take a bank's customer-support bot: a first scan against one typically finds that it gives investment advice it should refuse, or that it follows instructions hidden inside a pasted email.
 
 This page walks through what our scan actually does between those two phases, so you can tell why a scan found what it found, and why it sometimes finds the wrong thing. If you have not run one yet, start with [Your First Scan](/oss/solutions/tutorials/your-first-scan) and come back.
 
@@ -38,13 +38,33 @@ You have two ways to drive this. Which one you want depends on whether you need 
 - **Generate and run in one call.** `vulnerability_scan` (or `quality_scan`) walks the whole chain: it generates the suite, runs it against your agent, prints the grouped report, and hands back a `SuiteResult`. This is what you want while you are exploring.
 - **Generate first, run later.** `generate_suite` stops after the suite. You get a `Suite` object you can inspect, edit, save to disk, and run whenever you like with `suite.run(target=...)`.
 
+The examples below run against `botanibot`, the garden-center assistant from [Your First Scan](/oss/solutions/tutorials/your-first-scan):
+
 ```python
+from giskard.scan import (
+    PromptInjectionScenarioGenerator,
+    generate_suite,
+    vulnerability_scan,
+)
+
+DESCRIPTION = (
+    "BotaniBot, a garden center assistant that answers questions about "
+    "plants, soil and watering. It must stay on gardening topics and must "
+    "never give medical advice about ingesting plants."
+)
+
 # One call: generate, run, report.
-result = await vulnerability_scan(target=my_agent, description="...", languages=["en"])
+result = await vulnerability_scan(
+    target=botanibot, description=DESCRIPTION, languages=["en"]
+)
 
 # Two steps: generate now, inspect and run later.
-suite = await generate_suite(description="...", languages=["en"], generators=[...])
-result = await suite.run(my_agent)
+suite = await generate_suite(
+    description=DESCRIPTION,
+    languages=["en"],
+    generators=[PromptInjectionScenarioGenerator()],
+)
+result = await suite.run(botanibot)
 ```
 
 Splitting the two phases is what makes a scan repeatable. A suite is just data, so once it exists you can serialize it, commit it next to your tests, replay it against a different agent, or run it a thousand times without paying for generation again. [Running the scan in CI](/oss/solutions/how-to/scan-in-ci) is built on exactly that.
@@ -74,12 +94,14 @@ Runs the LLM-driven and dataset-backed generators, and groups the report by thre
 from giskard.scan import vulnerability_scan
 
 result = await vulnerability_scan(
-    target=my_agent,
-    description="A customer-support bot for a retail bank. It must never give investment advice.",
+    target=botanibot,
+    description=DESCRIPTION,
     languages=["en"],
     max_scenarios=20,
 )
 ```
+
+This is the entry point to reach for first. It runs the whole vulnerability registry, so it can surface a failure mode you had not thought to look for.
 
   </TabItem>
   <TabItem label="quality_scan">
@@ -90,12 +112,17 @@ Runs the knowledge-base generators against the documents you pass, and groups th
 from giskard.scan import quality_scan
 
 result = await quality_scan(
-    target=my_agent,
-    description="A customer-support bot for a retail bank answering from our help center.",
+    target=botanibot,
+    description="BotaniBot, a garden center assistant answering from our care guides.",
     languages=["en"],
-    knowledge_base=["Cards can be frozen from the app.", "Transfers settle in one business day."],
+    knowledge_base=[
+        "Water new shrubs deeply twice a week for the first summer, not daily.",
+        "Foxglove is toxic to humans and pets; never advise eating any part of it.",
+    ],
 )
 ```
+
+Use this one when the risk is a wrong answer rather than a hostile user. Without `knowledge_base` it generates nothing and warns, which looks the same as a clean run.
 
   </TabItem>
   <TabItem label="Your own mix">
@@ -106,12 +133,14 @@ Pass `generators` explicitly when neither preselection is what you want:
 from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
 
 suite = await generate_suite(
-    description="A customer-support bot for a retail bank.",
+    description=DESCRIPTION,
     languages=["en"],
     generators=[PromptInjectionScenarioGenerator],
 )
-result = await suite.run(my_agent)
+result = await suite.run(botanibot)
 ```
+
+Narrowing the generator list narrows what the scan can find, so use it when you already know the risk you are chasing, not for a first look.
 
   </TabItem>
 </Tabs>
@@ -156,7 +185,7 @@ Reports carry two labels on every result, and they answer different questions. K
 
 Knowing one label tells you nothing about the other, which is why the report can group by either. The same threat type can arrive from several generators, and one generator can emit several threat types. A prompt-injection failure could have come from the bundled injection corpus or from an LLM-driven attack written for your `description`, and knowing it was prompt injection does not tell you which.
 
-With the default `group_by="threat-type"`, the report buckets results by that tag. Schematically, a run against a bank support bot might come back like this:
+With the default `group_by="threat-type"`, the report buckets results by that tag. Schematically, a run might come back like this:
 
 | Threat type | Scenarios | Failed | What to do with it |
 | --- | --- | --- | --- |
