@@ -42,6 +42,8 @@ asyncio.run(main())
 
 `Suite` is a Pydantic model, so `model_dump_json` is the whole serializer. If you already ran a scan, the suite is on the result (`result.suite.model_dump_json()`) and no regeneration is needed.
 
+Save it from the result while that result is still in memory. `SuiteResult.suite` is declared `exclude=True`, so it is dropped when the result itself is serialized: dump a `SuiteResult` to JSON, load it back, and `.suite` is `None`. The suite file is the artifact worth keeping, not the result.
+
 Write it with `indent=2`. A one-line JSON file turns every regeneration into an unreviewable diff; an indented one shows you which scenarios changed.
 
 ## Load it back
