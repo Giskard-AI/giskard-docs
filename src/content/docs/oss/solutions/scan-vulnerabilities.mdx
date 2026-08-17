@@ -21,7 +21,7 @@ From a plain-language description of your agent, an LLM generates adversarial sc
 
 In plain terms: a scenario is one attempted attack, sent as a single message (single-turn) or as a conversation where the attacker keeps pushing over several messages (multi-turn). Adversarial means the input is written to make your agent misbehave, not to represent a normal user. The [glossary](/start/glossary) describes the failure types being hunted, such as [prompt injection](/start/glossary/security/injection), [harmful content](/start/glossary/security/harmful-content), and [information disclosure](/start/glossary/security/information-disclosure).
 
-Differently from benchmarks that evaluate a foundation model in a generic way, Giskard's scan performs an **in-depth, domain-specific assessment** of _your_ agent, based on the description you provide.
+A benchmark scores a foundation model on generic tasks. This scan attacks your agent on the job it actually does, using the description you provide.
 
 ### Which attacks does it run?
 
@@ -227,18 +227,26 @@ async def my_agent(
 </TabItem>
 </Tabs>
 
-This is the only integration code you need. In fact, anything callable from Python (a RAG pipeline, an agent, or a remote API) can be wrapped this way.
+This is the only integration code you need. Anything callable from Python, such as a RAG pipeline, an agent, or a remote API, can be wrapped this way.
 
 ## Step 2: Scan your model
 
-Pass your wrapped agent, a plain-language description, and the languages it handles to `vulnerability_scan`. It generates the adversarial suite, runs every scenario, prints a grouped report, and returns the result:
+Pass your wrapped agent, a plain-language description, and the languages it handles to `vulnerability_scan`. It generates the adversarial suite, runs every scenario, prints a grouped report, and returns the result.
+
+The examples below use one running agent: a customer-support agent for a retail bank, which answers questions about accounts, cards, payments and disputes, must refuse to give investment advice, and must never disclose another customer's data.
 
 ```python
 from giskard.scan import vulnerability_scan
 
+DESCRIPTION = (
+    "A customer-support agent for a retail bank. It answers questions about "
+    "accounts, cards, payments and disputes. It must refuse to give investment "
+    "advice and must never disclose another customer's data."
+)
+
 suite_result = await vulnerability_scan(
     target=my_agent,
-    description="A Q&A agent that answers questions about our product.",
+    description=DESCRIPTION,
     languages=["en"],
 )
 ```
@@ -247,7 +255,7 @@ While the suite runs, Giskard shows live progress for each scenario, with a coun
 
 ![Giskard scan running, with a progress bar over the scenarios, per-scenario rows, and a passed and failed count](/_static/images/oss/solutions/suite-run-progress.png)
 
-The `description` is what the LLM uses to generate **domain-specific** scenarios, so the more precisely you describe your agent's purpose and boundaries, the more relevant the findings.
+The `description` is what the LLM uses to generate **domain-specific** scenarios, so the more precisely you describe your agent's purpose and boundaries, the more relevant the findings. Naming the boundaries explicitly, as the description above does with investment advice and other customers' data, is what makes the scan attack those rules instead of generic ones.
 
 For every failed scenario, the report shows the judge's verdict and the full conversation trace that triggered it, so you can see exactly how the agent was manipulated:
 
@@ -306,13 +314,13 @@ You can customize the scan by passing options directly to `vulnerability_scan`.
 
 ### Run only specific scenarios
 
-By default, the scan runs all of its built-in generators. To focus on a single class of vulnerability, pass the generators you want via the lower-level `generate_suite` API:
+By default, the scan runs all of its built-in generators. To focus on a single class of vulnerability, pass the generators you want via the lower-level `generate_suite` API. For the bank agent, prompt injection is the one to start with, since customers paste statements and letters into the chat:
 
 ```python
 from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
 
 suite = await generate_suite(
-    description="A Q&A agent that answers questions about our product.",
+    description=DESCRIPTION,
     languages=["en"],
     generators=[PromptInjectionScenarioGenerator()],
 )
@@ -327,7 +335,7 @@ Limit the total number of scenarios with `max_scenarios`, and cap concurrent exe
 ```python
 suite_result = await vulnerability_scan(
     target=my_agent,
-    description="A Q&A agent that answers questions about our product.",
+    description=DESCRIPTION,
     languages=["en"],
     max_scenarios=20,
     max_concurrency=10,
@@ -342,7 +350,7 @@ The method `scan.generate_suite` builds a suite from the built-in scenarios. To 
 npx skills add Giskard-AI/giskard-skills --skill scenario-generator
 ```
 
-For example, prompt your agent with _"red-team my support bot for PII leaks and competitor mentions"_. You can browse the full set of skills at [Giskard Skills](https://github.com/Giskard-AI/giskard-skills).
+For example, prompt your agent with _"red-team my bank support agent for disclosure of other customers' account data"_. You can browse the full set of skills at [Giskard Skills](https://github.com/Giskard-AI/giskard-skills).
 
 :::note
 Beyond the built-in scenarios, you can write your own evaluation logic with custom LLM-as-a-judge checks. See [Giskard Checks](/oss/checks) to learn how to build your own test suites.
@@ -358,7 +366,7 @@ For a complete picture of what the Hub adds, read the [Open Source vs Hub compar
 
 ## Roadmap
 
-Our direction is to make `giskard.scan` the single entry point for red teaming in the open-source library. To get there, we are continuously expanding the attack library with new vulnerability categories and richer multi-turn attacks, and extending the same approach to RAG and agent evaluation. As that coverage grows, everything on this page keeps working unchanged, since new scenarios are picked up automatically by the `vulnerability_scan` call you already wrote.
+`giskard.scan` is the single entry point for red teaming in the open-source library. New vulnerability categories, richer multi-turn attacks, and the same approach applied to RAG and agent evaluation are being added to it. New scenarios are picked up automatically by the `vulnerability_scan` call you already wrote, so everything on this page keeps working unchanged.
 
 ## Troubleshooting
 

@@ -8,9 +8,9 @@ sidebar:
 import Property from "../../../../../components/api/Property.astro";
 import MethodCard from "../../../../../components/api/MethodCard.astro";
 
-Complete configuration reference for Giskard Checks: the default LLM model
-behind LLM checks, the embedding model used by semantic checks, and how much of
-a suite report gets printed.
+Configuration reference for Giskard Checks: the default LLM model behind LLM
+checks, the embedding model used by semantic checks, and how much of a suite
+report gets printed.
 
 Two models are configured here. The generator is the LLM the library calls; when
 a check uses it to decide whether an answer is acceptable, that role is called
@@ -67,15 +67,17 @@ Set it in the environment or `.env` before the import for it to take effect.
 
 ## Default generator
 
-The default generator is what LLM-backed checks (`LLMJudge`, `Groundedness`,
-`Toxicity`, and the other LLM-backed checks) use when you do not pass a generator explicitly. A
-runtime override set with `set_default_generator` takes precedence over
+LLM-backed checks such as `LLMJudge`, `Groundedness` and `Toxicity` use the
+default generator when you do not pass one explicitly. A runtime override set
+with `set_default_generator` takes precedence over
 `GISKARD_CHECKS_DEFAULT_MODEL`.
 
 Point this at a capable model. A weak model produces unreliable verdicts in both
 directions: tests pass on answers that should fail, and fail on answers that were
-correct. That shows up as flaky tests, not as an error, so read the failing
-verdicts before you trust them.
+correct. For a bank support agent, a weak judge will wave through a reply that
+quietly gives investment advice the agent was supposed to refuse. That shows up
+as flaky tests, not as an error, so read the failing verdicts before you trust
+them, and treat a suite that passes as evidence rather than proof.
 
 <MethodCard name="set_default_generator()" returnType="None">
   Set the default LLM generator for all checks. The override is process-global.
@@ -95,12 +97,12 @@ from giskard.checks import get_default_generator, set_default_generator
 
 set_default_generator(Generator(model="openai/gpt-5-mini"))
 
-get_default_generator()  # Generator(model="openai/gpt-5-mini")
+get_default_generator()  # the generator set above
 ```
 
 :::tip[Configuring pytest runs]
 Set the generator once per session in a `conftest.py` fixture rather than in
-every test module -- see [CI/CD Integration](/oss/checks/how-to/ci-cd).
+every test module. See [CI/CD Integration](/oss/checks/how-to/ci-cd).
 :::
 
 <MethodCard name="get_default_embedding_model()" returnType="EmbeddingModel">

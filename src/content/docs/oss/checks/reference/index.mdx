@@ -8,11 +8,9 @@ sidebar:
 
 import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
-Complete API documentation for Giskard Checks, the library for testing AI applications.
+These pages document every public symbol in `giskard.checks`. They assume you have written a test already. If you have not, start with [Your First Test](/oss/checks/tutorials/your-first-test); the terms used here (scenario, check, trace, judge) are introduced in [Core Concepts](/oss/checks/explanation/core-concepts).
 
-These pages assume you have written a test already. If you have not, start with [Your First Test](/oss/checks/tutorials/your-first-test); the terms used here (scenario, check, trace, judge) are introduced in [Core Concepts](/oss/checks/explanation/core-concepts).
-
-## API Modules
+## API modules
 
 <CardGrid>
   <LinkCard
@@ -61,15 +59,19 @@ from giskard.checks import (
     CheckResult,
     CheckStatus,
     Interaction,
-    Trace,
     InteractionSpec,
+    Trace,
     Scenario,
     TestCase,
+    Suite,
+    SuiteResult,
     # Built-in checks
     FnCheck,
     StringMatching,
     RegexMatching,
     JsonValid,
+    Readability,
+    SemanticSimilarity,
     Equals,
     NotEquals,
     LessThan,
@@ -93,12 +95,15 @@ from giskard.checks import (
     AnswerRelevance,
     Toxicity,
     Conformity,
+    Contradiction,
     LLMJudge,
-    SemanticSimilarity,
 )
 
 # Generators
-from giskard.checks import LLMGenerator
+from giskard.checks import LLMGenerator, DatasetInputGenerator, UserSimulator
+
+# Suite generation lives in the scan package, not in giskard.checks
+from giskard.scan import generate_suite
 ```
 
 ## Package structure
@@ -113,11 +118,12 @@ giskard.checks/
 │   ├── extraction.py     # Extractors
 │   └── interaction/      # Interaction types
 ├── builtin/              # Ready-to-use checks
-│   ├── fn.py             # FnCheck
+│   ├── fn.py             # FnCheck, from_fn
 │   ├── text_matching.py  # StringMatching, RegexMatching
-│   ├── comparison.py     # Equals, NotEquals, etc.
+│   ├── comparison.py     # Equals, NotEquals, LessThan, etc.
 │   ├── composition.py    # AllOf, AnyOf, Not
 │   ├── json_valid.py     # JsonValid
+│   ├── nlp_metrics.py    # Readability
 │   ├── rego_policy.py    # RegoPolicy
 │   └── semantic_similarity.py
 ├── judges/               # LLM-based checks
@@ -126,6 +132,7 @@ giskard.checks/
 │   ├── answer_relevance.py
 │   ├── toxicity.py
 │   ├── conformity.py     # Conformity
+│   ├── contradiction.py  # Contradiction
 │   └── judge.py          # LLMJudge
 ├── scenarios/            # Multi-step workflows
 │   ├── runner.py         # ScenarioRunner
@@ -134,7 +141,12 @@ giskard.checks/
 │   ├── runner.py         # TestCaseRunner
 │   └── spy.py            # WithSpy
 ├── generators/           # Input generators
+│   ├── base.py           # BaseLLMGenerator, LLMGenerator
+│   ├── dataset.py        # DatasetInputGenerator
 │   └── user.py           # UserSimulator
+├── export/               # Result export
+│   ├── junit.py          # to_junit_xml
+│   └── hub.py
 └── utils/                # Helper utilities
     ├── normalization.py
     ├── injectable.py     # ValueProvider, ValueGenerator
