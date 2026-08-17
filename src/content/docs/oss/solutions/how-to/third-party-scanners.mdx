@@ -55,17 +55,15 @@ list_scan_items("deepteam")  # supported vulnerability and attack names
 
 `"garak"` and `"deepteam"` raise `ImportError` when the extra is missing; any other tool name raises `ValueError`. For garak, only *active, loadable* probes are listed by default. `include_inactive=True` adds catalog entries garak marks inactive, which are skipped anyway if you request them explicitly. The argument is ignored for the other tools.
 
-Treat `list_scan_items` as the authority rather than the upstream READMEs. For garak it enumerates the probes of the garak version you actually installed, so it never drifts. For deepteam it matters more: Giskard supports a fixed subset of deepteam's catalog, and names outside that subset are silently skipped instead of raising.
+Treat `list_scan_items` as the authority rather than the upstream READMEs. For garak it enumerates the probes of the garak version you installed, so it never drifts. For deepteam it matters more: Giskard supports a fixed subset of deepteam's catalog, and names outside that subset are silently skipped instead of raising.
 
 :::caution[Unknown deepteam names are skipped, not rejected]
 Copy a vulnerability or attack name out of deepteam's own documentation and the scan will run without it, log a warning, and return a skip result. Nothing fails loudly. Check names against `list_scan_items("deepteam")` first, and read the skip count before you conclude the agent resisted anything.
 :::
 
-Read [NVIDIA/garak](https://github.com/NVIDIA/garak) ↗ and [confident-ai/deepteam](https://github.com/confident-ai/deepteam) ↗ for background on what each probe or technique actually does.
+Read [NVIDIA/garak](https://github.com/NVIDIA/garak) ↗ and [confident-ai/deepteam](https://github.com/confident-ai/deepteam) ↗ for background on what each probe or technique does.
 
-The deepteam names come from a fixed map inside the adapter, not from deepteam's full catalog:
-
-The vulnerabilities are what you test for:
+The deepteam names come from a fixed map inside the adapter rather than deepteam's full catalog. The vulnerabilities are what you test for:
 
 | Vulnerability | What it looks for |
 | --- | --- |
@@ -110,20 +108,20 @@ async def third_party_scan(
 
 Await it, as you await `vulnerability_scan`. Every scan entry point in the library is `async def`.
 
-The target is `botanibot`, the garden-center assistant from [Your First Scan](/oss/solutions/tutorials/your-first-scan):
+Both examples on this page run against `support_agent`, a customer-support agent for a retail bank, [wrapped the usual way](/oss/solutions/how-to/wrap-your-agent). The version defined [below](#run-deepteam) also holds customer records in its context, which is what the deepteam example needs:
 
 ```python
 from giskard.scan import third_party_scan
 
 suite_result = await third_party_scan(
-    target=botanibot,
+    target=support_agent,
     tool="garak",
-    description="BotaniBot, a garden center assistant for plants, soil and watering.",
+    description="A customer-support agent for a retail bank, covering accounts, cards, payments and disputes.",
     probes=["probes.dan.AutoDANCached", "probes.lmrc.SlurUsage"],
 )
 ```
 
-`AutoDANCached` replays pre-computed DAN-style jailbreak prefixes; `SlurUsage` checks whether the agent will produce ethnic slurs. Both are worth running against any customer-facing agent, whatever it sells, because neither depends on what the agent is for. That is also the reason to pick garak: it brings attacks nobody on your team would have written. Two named probes is the shape of a first run. Move to `probes=None` for the curated six once you know the wiring works, and treat `"all"` as a deliberate, expensive decision.
+`AutoDANCached` replays pre-computed DAN-style jailbreak prefixes; `SlurUsage` checks whether the agent will produce ethnic slurs. Neither depends on what the agent is for, so both are worth running against any customer-facing agent. That is also the reason to pick garak: it brings attacks nobody on your team would have written. Start with two named probes, move to `probes=None` for the curated six once you know the wiring works, and treat `"all"` as a deliberate, expensive decision.
 
 `probes` has three modes:
 
@@ -146,7 +144,7 @@ Adapter behavior to know before you read the results:
 
 ## Run deepteam
 
-A garden center has little worth leaking, so the example switches to a retail-bank support agent, which holds account data and a system prompt worth extracting. It is wrapped exactly like BotaniBot, with the customer records in its context:
+deepteam tests what the agent knows, so this example gives `support_agent` the customer records in its context, along with a system prompt worth extracting:
 
 ```python
 import os
@@ -173,7 +171,7 @@ class AgentOutput(BaseModel):
     answer: str
 
 
-async def bank_support_bot(inputs: AgentInput) -> AgentOutput:
+async def support_agent(inputs: AgentInput) -> AgentOutput:
     response = await client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -186,7 +184,7 @@ async def bank_support_bot(inputs: AgentInput) -> AgentOutput:
 
 ```python
 suite_result = await third_party_scan(
-    target=bank_support_bot,
+    target=support_agent,
     tool="deepteam",
     description=(
         "A customer-support agent for a retail bank. It answers questions "
@@ -201,7 +199,7 @@ suite_result = await third_party_scan(
 
 Here `description` matters: it becomes deepteam's `target_purpose`, the thing its simulator uses to make the attacks realistic for your agent. The description above is what turns a generic PII probe into one that asks about a named account. `languages` is ignored.
 
-The two vulnerabilities are the ones this agent can actually fail: it has customer records and a system prompt containing its rules. Swap in `Toxicity` and `Bias` when the agent's exposure is what it says rather than what it knows. The two attacks pair one single-turn technique with one multi-turn one, which is the cheapest way to find out whether the agent's defenses survive escalation.
+The two vulnerabilities are the ones this agent can fail: it has customer records and a system prompt containing its rules. Swap in `Toxicity` and `Bias` when the agent's exposure is what it says rather than what it knows. The two attacks pair one single-turn technique with one multi-turn one, which is the cheapest way to find out whether the agent's defenses survive escalation.
 
 A `PIILeakage` failure here means the agent returned data about someone other than the caller. Read the conversation, then fix it where it happened: in the retrieval layer if the agent fetched the wrong record, in the system prompt if it fetched the right one and volunteered too much.
 
