@@ -22,11 +22,24 @@ Giskard provides tools for testing, evaluating, and red-teaming LLM-based applic
 Enterprise platform for LLM agent testing with team collaboration and continuous red teaming. Available as a UI for business users and an SDK for developers.
 
 ### Giskard Checks (Open Source)
-Apache-2.0 Python library for behavioral testing of LLM agents: you write scenarios and checks that pass or fail, and run them like any other test suite.
+Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for LLM apps and agents: you write scenarios and checks that pass or fail instead of chasing metric scores, run them locally against your own LLM provider, and red-team the same agent with the same library.
 
-Tests are plain `async def test_*` functions, so they run under pytest with no separate runner or DSL. The target under test is any async callable, so it works with LangChain, LlamaIndex, raw SDK calls, or an HTTP endpoint. Everything runs locally against your own LLM provider and keys. The same library also red-teams an agent: the `giskard-scan` package provides `vulnerability_scan()`, which probes for vulnerabilities and returns a suite you can re-run as a regression test.
+- **pytest-native:** tests are plain `async def test_*` functions that run under pytest (with `pytest-asyncio`), no separate runner or DSL.
+- **Framework-agnostic:** the target under test is any async callable — an agent from any framework, a raw SDK call, or an HTTP client.
+- **Pass/fail, not scores:** checks return a verdict, so a suite gates a pull request the way unit tests do.
+- **Your provider, your keys:** checks and LLM-as-a-judge evaluations run locally against your own LLM provider.
+- **Red teaming in the same library:** the `giskard-scan` package provides `vulnerability_scan()`, which probes an agent and returns a suite you can re-run as a regression test.
+- **Licensing:** `giskard-checks` is MIT; `giskard-scan` and the umbrella `giskard` package are Apache-2.0.
 
 Use the open-source library for tests that live next to your code and run in CI. Use the Hub when business users annotate tests in a UI, datasets are shared across teams, or red teaming runs on a schedule.
+
+Typical entry points:
+
+- Install & Configure: https://docs.giskard.ai/oss/checks/installation.md
+- Quickstart: https://docs.giskard.ai/oss/checks/quickstart.md
+- Write Your First Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md
+- Run Tests with pytest: https://docs.giskard.ai/oss/checks/how-to/run-in-pytest.md
+- Scan for Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
 
 ### Giskard Research
 Open research on AI safety and security, including the Phare multilingual benchmark, RealHarm incident dataset, and RealPerformance functional issues dataset.
