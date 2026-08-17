@@ -12,7 +12,7 @@ sidebar:
 
 Giskard's own generators also write attacks from your `description`. So deepteam and Giskard overlap on approach and differ in taxonomy and technique; garak is the one that brings a published catalog you would not otherwise run.
 
-`third_party_scan` runs either tool against the same target you already scan with, and returns its findings as an ordinary `SuiteResult`: same shape, same `failed_count` and `failures_and_errors`, same CI export path.
+`third_party_scan` runs either tool against the same target you already scan with, and returns its findings as an ordinary `SuiteResult`: same shape, same `failed_count` and `failures_and_errors`, same `to_junit_xml` export. One thing does differ: a third-party result carries no reusable suite, so you cannot save and replay it. See [Read the results](#read-the-results).
 
 No tool here is exhaustive. Each covers the attacks its own maintainers wrote or its own model invented, and a clean result from all three still only means these attacks did not work.
 
@@ -125,9 +125,13 @@ suite_result = await third_party_scan(
 
 `probes` has three modes:
 
-- `None`: a curated default set of six probes, chosen to be small and to work without extra API keys: `lmrc.SlurUsage`, `goodside.WhoIsRiley`, `lmrc.QuackMedicine`, `goodside.ThreatenJSON`, `dan.AutoDANCached`, and `web_injection.StringAssemblyDataExfil`.
+- `None`: a curated default set of six probes, chosen to be small and to work without extra API keys: `probes.lmrc.SlurUsage`, `probes.goodside.WhoIsRiley`, `probes.lmrc.QuackMedicine`, `probes.goodside.ThreatenJSON`, `probes.dan.AutoDANCached`, and `probes.web_injection.StringAssemblyDataExfil`.
 - `"all"`: every active loadable probe garak ships. This is heavy and expensive: many probes, each with its own prompt set, all of them hitting your agent and your LLM bill.
 - An explicit list: names as `list_scan_items("garak")` returns them.
+
+:::caution[Probe names must be fully qualified]
+garak's catalog keys carry the `probes.` prefix, as in `probes.dan.AutoDANCached`. Drop it and the name matches nothing, and an unmatched name is skipped rather than rejected. Ask for six unqualified names and you get a scan with six skips, zero failures, and no error: a result that reads as clean because nothing ran. Copy names from `list_scan_items("garak")` and check the skip count.
+:::
 
 `description` is accepted for signature symmetry, but garak has no target-profile concept and ignores it, as does `languages`. `target_mode` defaults to `"multiturn"`, which lets garak's iterative probes run their full search.
 
@@ -160,7 +164,7 @@ Here `description` matters: it becomes deepteam's `target_purpose`, the thing it
 Both the attack simulator and the evaluator run on your Giskard default generator, so the model you set with `set_default_generator` is the model deepteam bills against.
 
 :::caution[Polarity is flipped for you]
-deepteam scores a case in `[0, 1]` where `1.0` means the model fully resisted. The adapter translates that into scan polarity: a resisted attack is a **passed** scenario, a successful attack is a **failed** one. Read a `SuiteResult` from `third_party_scan` exactly like one from `vulnerability_scan`: failures are the vulnerabilities.
+deepteam scores a case in `[0, 1]` where `1.0` means the model fully resisted. The adapter translates that into scan polarity: a resisted attack is a **passed** scenario, a successful attack is a **failed** one. Read a `SuiteResult` from `third_party_scan` exactly like one from `vulnerability_scan`: failures are the vulnerabilities. The pass bar is the full `1.0`, so any score deepteam grades below perfect resistance is a failure. Expect more failures than a partial-credit metric would report.
 :::
 
 ## Read the results
@@ -174,9 +178,14 @@ for result in suite_result.failures_and_errors:
     print("-", result.scenario_name)
 ```
 
-garak scenarios are named after the probe with the `garak.probes.` prefix stripped; deepteam checks are labelled `vulnerability/vulnerability_type`. Skipped items carry `(skipped)` in the scenario name, errored ones `(error)`.
+A garak scenario name is the probe with its `garak.probes.` or `probes.` prefix stripped, then `#N` for the attempt number, then ` · turn N` when the attempt produced more than one conversation turn: `dan.AutoDANCached #2 · turn 3`. deepteam checks are labelled `vulnerability/vulnerability_type`. Skipped items carry `(skipped)` in the scenario name, errored ones `(error)`.
 
-From there the [CI guide](/oss/solutions/how-to/scan-in-ci) applies as written. The export step does not care which scanner produced the result.
+Third-party results are report-only. The adapters build the `SuiteResult` from what the external tool ran, without a Giskard suite behind it, so `suite_result.suite` is `None`:
+
+- **Works**: `failed_count`, `pass_rate`, `failures_and_errors`, `print_report`, and `to_junit_xml`. The [CI guide](/oss/solutions/how-to/scan-in-ci)'s export and threshold steps apply unchanged.
+- **Does not work**: saving the suite and replaying it. `suite_result.suite.model_dump_json()` raises `AttributeError` on a third-party result, so the CI guide's "generate once, commit, replay" loop is for `vulnerability_scan` and `quality_scan` only.
+
+To re-run a third-party scan you call `third_party_scan` again. Give it the same explicit `probes` (or `vulnerabilities` and `attacks`) if you want the runs to be comparable: garak replays a fixed corpus, but deepteam re-generates its attacks with an LLM every time.
 
 ## Next Steps
 
