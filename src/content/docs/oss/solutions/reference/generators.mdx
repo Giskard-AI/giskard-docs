@@ -397,18 +397,27 @@ from giskard.scan import (
 )
 
 suite = await generate_suite(
-    description="A support assistant answering questions about our return policy.",
+    description=(
+        "BotaniBot, a garden center assistant that answers questions about "
+        "plants, soil and watering from our care guides. It must never give "
+        "medical advice about ingesting plants."
+    ),
     languages=["en", "fr"],
     generators=[
         AdversarialScenarioGenerator(max_turns=2),
         PromptInjectionScenarioGenerator(),
         SycophancyScenarioGenerator(),
     ],
-    knowledge_base=["Returns are accepted within 30 days of delivery."],
+    knowledge_base=[
+        "Lavender needs full sun and gritty, free-draining soil.",
+        "Foxglove is toxic to humans and pets; never advise eating any part of it.",
+    ],
     max_scenarios=15,
     seed=7,
 )
 ```
+
+This mix crosses the two families on purpose: the first two attack the agent, and `SycophancyScenarioGenerator` catches the opposite failure, where a confident customer pushes the agent off what the care guides actually say. Mixing families needs `knowledge_base`, because the knowledge-base generators produce nothing without it and would silently contribute zero scenarios.
 
 Pass classes instead of instances when the defaults are fine. `generate_suite` and `SuiteGeneratorRegistry.register` both instantiate them for you.
 

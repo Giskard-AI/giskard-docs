@@ -13,6 +13,8 @@ Entry points of the `giskard.scan` package: the two ready-made scans, the lower-
 
 This page assumes you have run a scan. If not, start with [Your First Scan](/oss/solutions/tutorials/your-first-scan), and read [How the scan works](/oss/solutions/explanation/how-scan-works) for what a generator, a suite, and the judge actually do.
 
+The examples call `botanibot`, the garden-center assistant defined in that tutorial.
+
 ```python
 from giskard.scan import (
     vulnerability_scan,
@@ -77,12 +79,18 @@ Build a suite from the vulnerability generator registry, run it against the targ
 from giskard.scan import vulnerability_scan
 
 result = await vulnerability_scan(
-    my_agent,
-    description="A customer support chatbot for an e-commerce store.",
+    botanibot,
+    description=(
+        "BotaniBot, a garden center assistant that answers questions about "
+        "plants, soil and watering. It must stay on gardening topics and must "
+        "never give medical advice about ingesting plants."
+    ),
     languages=["en"],
     max_scenarios=20,
 )
 ```
+
+The description names the boundary, so the generators write attacks against it rather than generic ones. `max_scenarios=20` is an iteration budget: it keeps the run to a few minutes and a few dollars. Drop the argument when you want the full default run, and expect several times the scenarios and the cost.
 
 ### Generators it runs
 
@@ -140,16 +148,19 @@ All quality generators are knowledge-base driven: without a `knowledge_base` the
 from giskard.scan import quality_scan
 
 result = await quality_scan(
-    my_agent,
-    description="A support assistant answering questions about our return policy.",
+    botanibot,
+    description="BotaniBot, a garden center assistant answering from our care guides.",
     languages=["en"],
     knowledge_base=[
-        "Returns are accepted within 30 days of delivery.",
-        "Refunds are issued to the original payment method.",
+        "Lavender needs full sun and gritty, free-draining soil.",
+        "Water new shrubs deeply twice a week for the first summer, not daily.",
+        "Foxglove is toxic to humans and pets; never advise eating any part of it.",
     ],
 )
 print(result.recommendation)
 ```
+
+Use `quality_scan` when the risk is a wrong answer rather than a hostile user: the generators ask questions your documents can answer and the judge checks the reply against them. A failure here reads as "the agent said to water daily, the guide says twice a week". Use `vulnerability_scan` instead when the risk is someone attacking the agent.
 
 ---
 
@@ -193,7 +204,7 @@ from giskard.scan import (
 )
 
 suite = await generate_suite(
-    description="A customer support chatbot for an e-commerce store.",
+    description="BotaniBot, a garden center assistant for plants, soil and watering.",
     languages=["en"],
     generators=[
         PromptInjectionScenarioGenerator(),
@@ -201,9 +212,11 @@ suite = await generate_suite(
     ],
     max_scenarios=10,
 )
-result = await suite.run(my_agent, parallel=True)
+result = await suite.run(botanibot, parallel=True)
 result.print_report(group_by="threat-type")
 ```
+
+Two generators instead of seven, because this run only asks one question: can a pasted care label or a five-turn conversation talk BotaniBot into medical advice. Reach for `vulnerability_scan` when you want the whole registry and do not yet know what you are looking for.
 
 The returned suite is named `"Scenarios"`.
 
@@ -255,9 +268,9 @@ The adapters are imported lazily and run in-process, so the scanner's optional e
 from giskard.scan import third_party_scan
 
 result = await third_party_scan(
-    my_agent,
+    botanibot,
     "garak",
-    description="A customer support chatbot for an e-commerce store.",
+    description="BotaniBot, a garden center assistant for plants, soil and watering.",
     probes=["probes.dan.AutoDANCached"],
 )
 ```
@@ -331,8 +344,8 @@ from giskard.scan import ScanOptions, vulnerability_scan
 
 options: ScanOptions = {"max_scenarios": 20, "seed": 7, "commercial_use": True}
 result = await vulnerability_scan(
-    my_agent,
-    description="A customer support chatbot.",
+    botanibot,
+    description="BotaniBot, a garden center assistant for plants, soil and watering.",
     languages=["en"],
     **options,
 )

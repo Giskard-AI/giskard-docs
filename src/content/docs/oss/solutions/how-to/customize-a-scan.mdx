@@ -7,6 +7,8 @@ sidebar:
 
 `vulnerability_scan` runs every built-in generator with default budgets. Use the options below when you want less, more, or something different.
 
+Every example on this page runs against `botanibot`, the garden-center assistant defined in [Your First Scan](/oss/solutions/tutorials/your-first-scan). Substitute your own target.
+
 ## Run only specific generators
 
 Pass the generators you want to the lower-level `generate_suite`, then run the suite yourself:
@@ -15,13 +17,19 @@ Pass the generators you want to the lower-level `generate_suite`, then run the s
 from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
 
 suite = await generate_suite(
-    description="A Q&A agent that answers questions about our product.",
+    description=(
+        "BotaniBot, a garden center assistant that answers questions about "
+        "plants, soil and watering. It must stay on gardening topics and must "
+        "never give medical advice about ingesting plants."
+    ),
     languages=["en"],
     generators=[PromptInjectionScenarioGenerator()],
 )
 
-suite_result = await suite.run(target=my_agent, parallel=True)
+suite_result = await suite.run(target=botanibot, parallel=True)
 ```
+
+`PromptInjectionScenarioGenerator` is the right pick here because BotaniBot pastes customer text (a plant description, a care label) straight into its prompt, and injection is the failure that text can cause. Pick `GOATAttackScenarioGenerator` instead when the risk is an attacker with several turns to talk the agent around, or `HallucinationScenarioGenerator` when the worry is invented answers rather than attacks. Narrowing to one generator narrows the report the same way: injection is the only thing that run can find.
 
 `Suite.run` defaults to `parallel=False`, unlike the scan helpers. Pass `parallel=True` when you want the same concurrency a full scan gives you. Serial runs are slow but easier to debug; parallel runs are fast but hit provider rate limits, and they need an agent that tolerates concurrent calls.
 
@@ -32,9 +40,11 @@ The full catalog is in the [generators reference](/oss/solutions/reference/gener
 `max_scenarios` caps the total number of scenarios across all generators, and `max_concurrency` caps how many run against your agent at once:
 
 ```python
+from giskard.scan import vulnerability_scan
+
 suite_result = await vulnerability_scan(
-    target=my_agent,
-    description="A Q&A agent that answers questions about our product.",
+    target=botanibot,
+    description="BotaniBot, a garden center assistant for plants, soil and watering.",
     languages=["en"],
     max_scenarios=20,
     max_concurrency=10,
@@ -53,12 +63,14 @@ Some generators are backed by datasets whose licenses do not permit commercial u
 
 ```python
 suite_result = await vulnerability_scan(
-    target=my_agent,
-    description="A Q&A agent that answers questions about our product.",
+    target=botanibot,
+    description="BotaniBot, a garden center assistant for plants, soil and watering.",
     languages=["en"],
     commercial_use=True,
 )
 ```
+
+Leave it at the default `False` while you are testing internally. Turn it on when the run is part of a commercial product and you need the licensing to hold, and expect the pass rate to rise for that reason alone.
 
 ## Go further with a coding agent
 
@@ -68,7 +80,7 @@ suite_result = await vulnerability_scan(
 npx skills add Giskard-AI/giskard-skills --skill scenario-generator
 ```
 
-Prompt it with something like _"red-team my support bot for PII leaks and competitor mentions"_. The full set of skills is at [Giskard Skills ↗](https://github.com/Giskard-AI/giskard-skills).
+Prompt it with something like _"red-team BotaniBot for medical advice about ingesting plants and for competitor mentions"_. The full set of skills is at [Giskard Skills ↗](https://github.com/Giskard-AI/giskard-skills).
 
 To write the evaluation logic yourself, see [Giskard Checks](/oss/checks).
 
