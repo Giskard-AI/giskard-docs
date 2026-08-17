@@ -22,12 +22,13 @@ A judge is an LLM, so it is sometimes wrong in both directions. Read the failing
 
 ### Key Features
 
-- **Built-in Check Library**: Ready-to-use checks including LLM-as-a-judge evaluations, string matching, equality assertions, and more
-- **Flexible Testing Framework**: Support for single-turn scenarios (one message, one reply) and multi-turn scenarios (a conversation, where the agent has to keep track of what was said earlier)
-- **Type-Safe & Modern**: Built on Pydantic for full type safety and validation
-- **Async-First**: Native async/await support for efficient concurrent testing
-- **Highly Customizable**: Easy extension points for custom checks and interaction patterns
-- **Serializable Results**: Immutable, JSON-serializable results for easy storage and analysis
+- **Checks that need no LLM call**: string and regex matching, comparisons, JSON validity, semantic similarity, and Rego policies, so deterministic rules stay fast and free
+- **LLM judges**: `LLMJudge` for any rule you write in English, plus ready-made `Groundedness`, `AnswerRelevance`, `Contradiction`, `Toxicity`, and `Conformity`
+- **Single-turn and multi-turn scenarios**: send one message, or drive a whole conversation with `UserSimulator` to see whether the agent keeps track of what was said earlier
+- **Composition**: combine checks with `AllOf`, `AnyOf`, and `Not` instead of writing a new check per combination
+- **Your own Python as a check**: wrap any function with `FnCheck`, and use `WithSpy` to assert which internal calls the agent made
+- **Async-first, pytest-native**: await a whole suite in one call, or run the same scenarios as pytest tests in CI
+- **Results you can store and compare**: every result is a frozen Pydantic model that serializes to JSON, or to JUnit XML for your CI report
 
 Looking for tests you don't have to write? [Giskard Scan](/oss/scan) generates an adversarial suite from a plain-language description of your agent, and returns it as an ordinary `Suite` you run with everything below.
 
@@ -98,8 +99,8 @@ To see the whole thing working first, the [Quickstart](/oss/checks/quickstart) r
 
 Giskard Checks is designed for:
 
-- **RAG Evaluation**: Test groundedness, relevance, and context usage in retrieval-augmented generation systems
-- **Agent Testing**: Validate multi-step agent workflows with tool calls and complex reasoning
-- **Quality Assurance**: Ensure consistent output quality across model updates and deployments
-- **LLM Guardrails**: Implement safety checks, content moderation, and compliance validation
-- **Regression Testing**: Track model behavior changes over time with reproducible test suites
+- **[RAG evaluation](/oss/checks/use-cases/rag-evaluation)**: check that an answer is supported by the retrieved documents and actually answers the question asked
+- **[Agent testing](/oss/checks/use-cases/testing-agents)**: run a multi-step workflow and assert on the trace, including which tools the agent called
+- **[Chatbot testing](/oss/checks/use-cases/chatbot-testing)**: hold a multi-turn conversation with the agent and check it stays on topic and in character
+- **[Content moderation](/oss/checks/use-cases/content-moderation)**: test refusals and unsafe outputs before you ship, with `Toxicity` and policy checks
+- **Regression testing**: rerun a saved suite after a prompt or model change and see exactly which scenarios changed
