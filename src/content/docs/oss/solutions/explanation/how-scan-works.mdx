@@ -87,6 +87,16 @@ Two orthogonal labels show up in reports, and conflating them causes confusion:
 - A **threat type** is *what kind of failure* this is: `prompt-injection`, `harmful-content-generation`, `misguidance-and-unauthorized-advice`. It is a tag on the scenario, which is why `group_by="threat-type"` (the default) produces a report organized by risk category, and why scenarios also carry OWASP tags like `owasp:llm-top-10-2025:LLM01`.
 - A **component** is *which part of your system* was exercised: the generator that produced the scenario, and the checks that judged it.
 
+With the default `group_by="threat-type"`, the report buckets results by that tag. Schematically, a run against a bank support bot might come back like this:
+
+| Threat type | Scenarios | Failed | What to do with it |
+| --- | --- | --- | --- |
+| `prompt-injection` | 12 | 3 | Read all three conversations. This is your highest-signal bucket. |
+| `harmful-content-generation` | 20 | 0 | Nothing broke here. It does not mean nothing can. |
+| `misguidance-and-unauthorized-advice` | 0 | 0 | Nothing ran. The budget allocated no scenarios; rerun with more. |
+
+Read the scenario count before the failure count. A zero in the failed column means something different when the scenario count is also zero.
+
 One generator can emit several threat types (`AdversarialScenarioGenerator` covers most of the harmful-content categories plus unauthorized advice), and one threat type can come from several generators (prompt injection arrives from both the dataset and the LLM-driven attacks). Grouping by threat type answers *"how exposed am I?"*. Looking at generators answers *"what did we actually try?"*. You need both: a clean report for a threat type may mean the agent is robust, or it may mean the budget allocated no scenarios there.
 
 ## The judge is an LLM
