@@ -11,6 +11,8 @@ import TypeTable from "../../../../../components/api/TypeTable.astro";
 
 Entry points of the `giskard.scan` package: the two ready-made scans, the lower-level suite builder, the third-party scanner bridge, and the registry that decides which generators each scan runs.
 
+This page assumes you have run a scan. If not, start with [Your First Scan](/oss/solutions/tutorials/your-first-scan), and read [How the scan works](/oss/solutions/explanation/how-scan-works) for what a generator, a suite, and the judge actually do.
+
 ```python
 from giskard.scan import (
     vulnerability_scan,
@@ -46,16 +48,16 @@ Build a suite from the vulnerability generator registry, run it against the targ
     BCP-47 language codes the agent is expected to handle (e.g. `["en", "fr"]`).
   </Property>
   <Property name="max_scenarios" type="int | None" defaultValue="None">
-    Total upper bound on scenarios across all vulnerability generators. `None` lets each generator apply its own default.
+    Total upper bound on scenarios across all vulnerability generators. `None` lets each generator apply its own default, which is a few hundred LLM calls. Set it low and the budget is spread thin, so some attack types get no scenarios at all and go untested. Keep it small while iterating, raise it before you trust the result.
   </Property>
   <Property name="seed" type="int" defaultValue="42">
-    Integer seed used for reproducible scenario generation.
+    Integer seed used for reproducible scenario generation. Two runs with different seeds generate different scenarios, so their pass rates are not comparable.
   </Property>
   <Property name="group_by" type="str | None" defaultValue='"threat-type"'>
-    Result annotation key used to group the printed report. `None` prints the ungrouped report.
+    Result annotation key used to group the printed report. `None` prints the ungrouped report. Grouping only changes the printed layout, never which scenarios ran: `"threat-type"` groups by kind of failure, `"component"` by which generator and checks produced the result.
   </Property>
   <Property name="parallel" type="bool" defaultValue="True">
-    Run generated scenarios concurrently against the target. Pass `False` for serial execution. This controls suite *execution*; scenario *generation* is always concurrent.
+    Run generated scenarios concurrently against the target. Pass `False` for serial execution, which is slower but easier to debug and gentler on provider rate limits. `True` requires an agent that tolerates concurrent calls. This controls suite *execution*; scenario *generation* is always concurrent.
   </Property>
   <Property name="max_concurrency" type="int | None" defaultValue="None">
     Cap on concurrent scenarios when `parallel=True`. `None` runs all scenarios at once, so provider rate limits become the effective cap.
@@ -64,10 +66,10 @@ Build a suite from the vulnerability generator registry, run it against the targ
     When `True`, a scenario whose input generation fails is recorded as an errored result and the scan continues. When `False`, the failure aborts the scan.
   </Property>
   <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
-    Whether the agent supports single-turn or multi-turn conversations. `"singleturn"` skips generators that are multi-turn by design and caps turn budgets to 1 on the others.
+    Whether the agent supports single-turn or multi-turn conversations. `"singleturn"` skips generators that are multi-turn by design and caps turn budgets to 1 on the others. Choosing `"singleturn"` for an agent that does hold conversations removes multi-turn jailbreaks from the report entirely, so the run looks clean for a class of attack it never tried. Choosing `"multiturn"` for an agent with no memory makes those attacks run but never really escalate.
   </Property>
   <Property name="commercial_use" type="bool" defaultValue="False">
-    When `True`, exclude generators whose datasets do not permit commercial use.
+    When `True`, exclude generators whose datasets do not permit commercial use. This removes attacks from the run, so the same agent scores better with it on. Set it from your licensing situation, not to improve a number.
   </Property>
 </MethodCard>
 
@@ -94,7 +96,9 @@ result = await vulnerability_scan(
 
 Build a suite from the quality generator registry, run it against the target, print the grouped report with an LLM-generated recommendation, and return the result. Coroutine: `await` it.
 
-All quality generators are knowledge-base driven: without a `knowledge_base` the scan emits a `RuntimeWarning` and produces no scenarios.
+A **knowledge base** is the set of documents your agent is supposed to answer from. The quality scan asks questions about them and checks the answers against them, which is how it catches invented answers ([hallucinations](/start/glossary/business/hallucination)), [omissions](/start/glossary/business/omission), and [refusals to answer](/start/glossary/business/denial-of-answers).
+
+All quality generators are knowledge-base driven: without a `knowledge_base` the scan emits a `RuntimeWarning` and produces no scenarios. A run that reports nothing because you forgot the documents looks identical to a run that found nothing wrong.
 
 <MethodCard name="quality_scan()" returnType="SuiteResult">
   <Property name="target" type="Target" required>
@@ -128,7 +132,7 @@ All quality generators are knowledge-base driven: without a `knowledge_base` the
     Record input-generation failures as errored results instead of aborting.
   </Property>
   <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
-    Conversation mode supported by the agent under test.
+    Conversation mode supported by the agent under test. Same consequences as for [`vulnerability_scan`](#vulnerability_scan).
   </Property>
 </MethodCard>
 
@@ -168,10 +172,10 @@ Concurrency here is *generation* only; whether the resulting scenarios later run
     Generator instances or classes. Classes are instantiated with their defaults.
   </Property>
   <Property name="max_scenarios" type="int | None" defaultValue="None">
-    Total upper bound across all generators, split between them via a multinomial draw. Must be non-negative; a negative value raises `ValueError`.
+    Total upper bound across all generators, split between them via a multinomial draw, so a generator can draw zero and be skipped. Must be non-negative; a negative value raises `ValueError`.
   </Property>
   <Property name="seed" type="int" defaultValue="42">
-    Seed for the top-level RNG. Child RNGs are spawned before concurrent generation so results stay stable.
+    Seed for the top-level RNG. Child RNGs are spawned before concurrent generation so results stay stable. Keep the same seed when you want to compare two runs.
   </Property>
   <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
     Conversation mode forwarded to every generator.

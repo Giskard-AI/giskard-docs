@@ -5,6 +5,8 @@ sidebar:
   order: 1
 ---
 
+`giskard-scan` needs two things before it can run: the Python package, and an LLM provider with an API key. The scan cannot work without a model, because a model is what writes the attacks and grades the replies.
+
 ## Install with a coding agent
 
 The fastest way to set up the scan. Paste a single URL into your coding agent and it handles the install and the provider configuration for you.
@@ -31,7 +33,9 @@ uv pip install giskard-scan
 
 ## Configure a model
 
-The scan calls an LLM twice: once to invent adversarial scenarios from your description, and once to judge the answers your agent gives back. Both use the default generator, so nothing runs until you set one.
+The scan calls an LLM twice: once to invent attack scenarios from your description, and once to **judge** the answers your agent gives back, meaning to read each conversation and decide pass or fail. Both use the default generator, so nothing runs until you set one.
+
+Those calls send your agent's description and its replies to whichever provider you configure. If your agent can return customer data or internal documents, that data reaches the provider too.
 
 Install the provider extra from `giskard-agents` alongside the scan:
 
@@ -73,7 +77,7 @@ pip install "giskard-scan[garak]"
 pip install "giskard-scan[deepteam]"
 ```
 
-Install only the ones you plan to run; both pull in large dependency trees. See [`third_party_scan`](/oss/solutions/reference/scan-api) for the probe, vulnerability, and attack arguments each tool accepts.
+Install only the ones you plan to run; both pull in large dependency trees. See [`third_party_scan`](/oss/solutions/reference/scan-api) for the arguments each tool accepts. A **probe** there is one canned attack that tool knows how to run, the equivalent of a Giskard generator.
 
 ## Next Steps
 
