@@ -9,26 +9,50 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 A scan writes test cases for your agent, runs them, and reports which ones it failed. Each test case is a **scenario**: a starting message, or a short conversation, plus the checks that decide whether the reply was acceptable. Scenarios come from **generators**, one per kind of problem being probed, and the verdicts come from a **judge**, an LLM that reads the reply and decides pass or fail.
 
-This page covers the keyword arguments that control what a scan costs, how repeatable it is, and how the report is grouped. Read [How the Scan Works](/oss/solutions/explanation/how-scan-works) first if you have not run a scan yet.
+The keyword arguments below control what a scan costs, how repeatable it is, and how the report is grouped. Read [How the Scan Works](/oss/solutions/explanation/how-scan-works) first if you have not run a scan yet.
 
 A default scan lets every generator apply its own limit, runs every scenario at once, and groups the report on the axis its entry point picks. Change all of it with keyword arguments on `vulnerability_scan` and `quality_scan`.
 
 ## The two entry points
 
-There are two scans, and they differ in which generators they use, not in how you tune them:
+There are two scans. They run different generators, and both take the same tuning arguments:
 
 - `vulnerability_scan` attacks the agent. Its generators write adversarial scenarios: [prompt injection](/start/glossary/security/injection), escalating multi-turn jailbreak attempts, and [harmful content](/start/glossary/security/harmful-content) prompts drawn from public datasets.
 - `quality_scan` tests whether the agent answers well. Its generators work from a knowledge base you pass in and probe for hallucination, sycophancy, and questions that fall outside the documents.
 
 `max_scenarios`, `seed`, `parallel`, `max_concurrency`, `return_exception`, `group_by`, and `target_mode` work the same way on both. Only the defaults for `group_by` differ, and two arguments exist on one side only: `commercial_use` on `vulnerability_scan`, `knowledge_base` on `quality_scan`.
 
+The examples below scan a retail bank's support agent rather than the tutorial's garden-center assistant, because a bank agent has both the refusal rules a vulnerability scan probes and the policy documents a quality scan needs. Define the target and the documents once:
+
+```python
+from giskard.scan import KnowledgeBase, quality_scan, vulnerability_scan
+
+# An async support agent for a retail bank, wrapped as a target the same way as
+# in /oss/solutions/how-to/wrap-your-agent.
+from bank_support import bank_agent
+
+DESCRIPTION = (
+    "A support agent for a retail bank. It answers questions about accounts, "
+    "cards, payments and disputes. It must refuse to give investment or tax "
+    "advice, and must never reveal another customer's data."
+)
+
+bank_policy_docs = KnowledgeBase.from_texts(
+    [
+        "Overdraft fee: $25 per item. Waived once per year on request.",
+        "Card disputes must be raised within 60 days of the statement date.",
+        "A standard checking account has no monthly fee above a $500 balance.",
+    ]
+)
+```
+
 <Tabs>
 <TabItem label="vulnerability_scan">
 
 ```python
 result = await vulnerability_scan(
-    target=my_agent,
-    description="A support assistant answering questions about our return policy.",
+    target=bank_agent,
+    description=DESCRIPTION,
     languages=["en"],
     max_scenarios=20,
     seed=7,
@@ -41,10 +65,10 @@ result = await vulnerability_scan(
 
 ```python
 result = await quality_scan(
-    target=my_agent,
-    description="A support assistant answering questions about our return policy.",
+    target=bank_agent,
+    description=DESCRIPTION,
     languages=["en"],
-    knowledge_base=return_policy_documents,
+    knowledge_base=bank_policy_docs,
     max_scenarios=20,
     seed=7,
     max_concurrency=4,
@@ -84,8 +108,8 @@ Generation and execution are throttled separately:
 
 ```python
 result = await vulnerability_scan(
-    target=my_agent,
-    description="...",
+    target=bank_agent,
+    description=DESCRIPTION,
     languages=["en"],
     parallel=True,
     max_concurrency=4,
@@ -97,10 +121,10 @@ result = await vulnerability_scan(
 
 ```python
 result = await quality_scan(
-    target=my_agent,
-    description="...",
+    target=bank_agent,
+    description=DESCRIPTION,
     languages=["en"],
-    knowledge_base=return_policy_documents,
+    knowledge_base=bank_policy_docs,
     parallel=True,
     max_concurrency=4,
 )
