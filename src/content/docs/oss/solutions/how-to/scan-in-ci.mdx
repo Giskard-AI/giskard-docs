@@ -5,7 +5,9 @@ sidebar:
   order: 3
 ---
 
-Regenerating scenarios on every pipeline run is slow, costs LLM calls, and makes results non-comparable between builds. **Generate once, replay forever.**
+Generate the scan's scenarios once, save them to a file, and replay that same file on every pull request. This turns a scan into a **regression test**: a fixed set of cases you re-run to catch a behavior that used to work and now does not.
+
+Regenerating on every run is slow, costs LLM calls, and produces different scenarios each time, so the numbers from two builds cannot be compared.
 
 ## 1. Generate and save the suite
 
@@ -111,6 +113,8 @@ after = await suite.run(target=my_agent_v2)
 
 print(before.pass_rate, "->", after.pass_rate)
 ```
+
+The **pass rate** is the share of scenarios that passed. Comparing two numbers only means something because both runs used the same saved suite. It is still a sample of generated scenarios, not a measure of how safe either version is, and the judge can flip a borderline verdict between the two runs, so a small change is noise.
 
 ## Next Steps
 

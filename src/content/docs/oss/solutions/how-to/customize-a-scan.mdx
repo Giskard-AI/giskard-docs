@@ -23,7 +23,7 @@ suite = await generate_suite(
 suite_result = await suite.run(target=my_agent, parallel=True)
 ```
 
-`Suite.run` defaults to `parallel=False`, unlike the scan helpers. Pass `parallel=True` when you want the same concurrency a full scan gives you.
+`Suite.run` defaults to `parallel=False`, unlike the scan helpers. Pass `parallel=True` when you want the same concurrency a full scan gives you. Serial runs are slow but easier to debug; parallel runs are fast but hit provider rate limits, and they need an agent that tolerates concurrent calls.
 
 The full catalog is in the [generators reference](/oss/solutions/reference/generators).
 
@@ -41,7 +41,7 @@ suite_result = await vulnerability_scan(
 )
 ```
 
-The budget is split by a multinomial draw, so a generator that draws zero is skipped. See [the scenario budget](/oss/solutions/explanation/how-scan-works#the-scenario-budget).
+The budget is split by a multinomial draw, so a generator that draws zero is skipped. See [the scenario budget](/oss/solutions/explanation/how-scan-works#the-scenario-budget). Keep `max_scenarios` small while you are wiring things up. A small budget leaves whole attack types untested, so raise it before you trust the result.
 
 ## Generate scenarios in other languages
 
@@ -49,7 +49,7 @@ Pass BCP-47 codes through `languages` (`"en"`, `"fr"`, `"es"`) and the scenarios
 
 ## Exclude non-commercial datasets
 
-Some generators are backed by datasets whose licenses do not permit commercial use. Drop them with `commercial_use=True`:
+Some generators are backed by datasets whose licenses do not permit commercial use. Drop them with `commercial_use=True`. That removes attacks from the run, so the same agent scores better with the flag on. It is a licensing decision, not a tuning knob:
 
 ```python
 suite_result = await vulnerability_scan(

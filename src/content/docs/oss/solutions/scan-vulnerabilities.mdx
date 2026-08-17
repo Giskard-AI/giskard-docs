@@ -5,7 +5,9 @@ sidebar:
   order: 2
 ---
 
-`vulnerability_scan` detects safety and security vulnerabilities affecting your LLM-based agent. From a plain-language description, an LLM generates adversarial scenarios tailored to your agent and runs them over single-turn and multi-turn conversations. A second LLM then acts as a judge, deciding whether each response reveals a vulnerability.
+`vulnerability_scan` red teams your LLM agent: it attacks the agent on purpose to find safety and security failures. From a plain-language description, an LLM generates hostile scenarios tailored to your agent, such as [prompt injections](/start/glossary/security/injection) hidden in realistic content or requests for [harmful content](/start/glossary/security/harmful-content), and runs them as single messages and as multi-turn conversations. A second LLM then acts as a judge, reading each conversation and deciding whether the response reveals a vulnerability.
+
+The judge is an LLM, so it is sometimes wrong in both directions. Read the failing conversations. And a scan that finds nothing means these scenarios did not break your agent, not that your agent is safe.
 
 Unlike benchmarks that evaluate a foundation model generically, the scan performs an **in-depth, domain-specific assessment** of _your_ agent, based on the description you provide.
 
