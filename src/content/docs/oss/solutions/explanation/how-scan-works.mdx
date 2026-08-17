@@ -9,15 +9,13 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 A **scan** happens in two phases. First it writes test cases for your agent, then it runs them. You describe your agent in a sentence, the scan turns that sentence into hostile conversations designed to make it misbehave, sends them to your agent, and reports which ones worked. That is **red teaming**: attacking your own system on purpose, so you find out how it breaks before someone else does.
 
-Run a scan when you want to see how your agent holds up under pressure, against realistic scenarios you would not have thought to write yourself. The stakes are clearest on a regulated agent, so take a bank's customer-support bot: a first scan against one typically finds that it gives investment advice it should refuse, or that it follows instructions hidden inside a pasted email.
+Run a scan when you want to see how your agent holds up under pressure, against realistic scenarios you would not have thought to write yourself. The running example on this page is a customer-support agent for a retail bank, which answers questions about accounts, cards, payments and disputes. A first scan against an agent like that turns up the kinds of failure a bank cares about: investment advice it should have refused, another customer's balance read out to whoever asked, or an instruction hidden in a pasted statement that the agent follows.
 
-This page walks through what our scan actually does between those two phases, so you can tell why a scan found what it found, and why it sometimes finds the wrong thing. If you have not run one yet, start with [Your First Scan](/oss/solutions/tutorials/your-first-scan) and come back.
+This page describes what the scan does between those two phases, so you can tell why a scan found what it found, and why it sometimes finds the wrong thing. If you have not run one yet, start with [Your First Scan](/oss/solutions/tutorials/your-first-scan) and come back.
 
 ## What a scan is made of
 
-Four pieces do the work:
-
-- **Description**: the sentence you write about your agent, passed as the `description` argument. Say who the agent serves, what it is allowed to do, and what it must refuse. "A customer-support bot for a retail bank that answers questions about accounts and cards, and must never give investment advice" is the right level of detail. Everything else in the scan is derived from it.
+- **Description**: the sentence you write about your agent, passed as the `description` argument. Say who the agent serves, what it is allowed to do, and what it must refuse. "A customer-support agent for a retail bank that answers questions about accounts and cards, and must never give investment advice" is the right level of detail. Everything else in the scan is derived from it.
 - **Generator**: the code that turns that description into concrete test cases. The scan ships a set of them, and you can write your own by subclassing `ScenarioGenerator`. Some ask an LLM to invent attacks on the spot, others replay a fixed attack dataset.
 - **Scenario**: one test case. A starting message, or a short conversation, plus the checks that decide whether the agent's reply was acceptable. A **suite** is the collection of scenarios the generators produced.
 - **Judge**: an LLM that reads each finished conversation and decides pass or fail. No string matching is involved, and there is no ground-truth answer to compare against.
@@ -38,7 +36,7 @@ You have two ways to drive this. Which one you want depends on whether you need 
 - **Generate and run in one call.** `vulnerability_scan` (or `quality_scan`) walks the whole chain: it generates the suite, runs it against your agent, prints the grouped report, and hands back a `SuiteResult`. This is what you want while you are exploring.
 - **Generate first, run later.** `generate_suite` stops after the suite. You get a `Suite` object you can inspect, edit, save to disk, and run whenever you like with `suite.run(target=...)`.
 
-The examples below run against `botanibot`, the garden-center assistant from [Your First Scan](/oss/solutions/tutorials/your-first-scan):
+The examples below run against `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/solutions/how-to/wrap-your-agent). The tutorial uses a garden-center assistant instead, because it runs live against a model:
 
 ```python
 from giskard.scan import (
@@ -48,14 +46,15 @@ from giskard.scan import (
 )
 
 DESCRIPTION = (
-    "BotaniBot, a garden center assistant that answers questions about "
-    "plants, soil and watering. It must stay on gardening topics and must "
-    "never give medical advice about ingesting plants."
+    "A customer-support agent for a retail bank. It answers questions about "
+    "accounts, cards, payments and disputes. It must refuse to give "
+    "investment or tax advice, and must never disclose another customer's "
+    "data."
 )
 
 # One call: generate, run, report.
 result = await vulnerability_scan(
-    target=botanibot, description=DESCRIPTION, languages=["en"]
+    target=support_agent, description=DESCRIPTION, languages=["en"]
 )
 
 # Two steps: generate now, inspect and run later.
@@ -64,7 +63,7 @@ suite = await generate_suite(
     languages=["en"],
     generators=[PromptInjectionScenarioGenerator()],
 )
-result = await suite.run(botanibot)
+result = await suite.run(support_agent)
 ```
 
 Splitting the two phases is what makes a scan repeatable. A suite is just data, so once it exists you can serialize it, commit it next to your tests, replay it against a different agent, or run it a thousand times without paying for generation again. [Running the scan in CI](/oss/solutions/how-to/scan-in-ci) is built on exactly that.
@@ -94,7 +93,7 @@ Runs the LLM-driven and dataset-backed generators, and groups the report by thre
 from giskard.scan import vulnerability_scan
 
 result = await vulnerability_scan(
-    target=botanibot,
+    target=support_agent,
     description=DESCRIPTION,
     languages=["en"],
     max_scenarios=20,
@@ -112,12 +111,12 @@ Runs the knowledge-base generators against the documents you pass, and groups th
 from giskard.scan import quality_scan
 
 result = await quality_scan(
-    target=botanibot,
-    description="BotaniBot, a garden center assistant answering from our care guides.",
+    target=support_agent,
+    description="A customer-support agent for a retail bank, answering from our published policies.",
     languages=["en"],
     knowledge_base=[
-        "Water new shrubs deeply twice a week for the first summer, not daily.",
-        "Foxglove is toxic to humans and pets; never advise eating any part of it.",
+        "A disputed card transaction must be reported within 120 days of the statement date.",
+        "A card reported lost cannot be unfrozen and must be replaced.",
     ],
 )
 ```
@@ -137,7 +136,7 @@ suite = await generate_suite(
     languages=["en"],
     generators=[PromptInjectionScenarioGenerator],
 )
-result = await suite.run(botanibot)
+result = await suite.run(support_agent)
 ```
 
 Narrowing the generator list narrows what the scan can find, so use it when you already know the risk you are chasing, not for a first look.
@@ -161,7 +160,7 @@ A vulnerability scan runs more than these three. It also sends Crescendo multi-t
 
 ### The scenario budget
 
-`max_scenarios` defaults to `None`, which means every generator runs its own default budget. That is how a first scan quietly becomes a large run: seven generators each producing their own default number of scenarios, each scenario worth at least one call to your agent and one to the judge. When you set it, it is a **total** across all generators, distributed by a multinomial draw rather than split evenly. So you can get fewer scenarios than you asked for, because individual generators have their own internal caps, and a generator that draws a zero budget is skipped entirely, leaving some threat types uncovered on that run. Raise `max_scenarios` when you want breadth; keep it small only while iterating.
+`max_scenarios` defaults to `None`, which means every generator runs its own default budget. That is how a first scan becomes a large run: seven generators each producing their own default number of scenarios, each scenario worth at least one call to your agent and one to the judge. When you set it, it is a **total** across all generators, distributed by a multinomial draw rather than split evenly. So you can get fewer scenarios than you asked for, because individual generators have their own internal caps, and a generator that draws a zero budget is skipped entirely, leaving some threat types uncovered on that run. Raise `max_scenarios` when you want breadth; keep it small only while iterating.
 
 `seed` (default `42`) makes the draw and the generation reproducible. Change it and you get a different set of scenarios, so two runs with different seeds are not comparable.
 
@@ -195,13 +194,13 @@ With the default `group_by="threat-type"`, the report buckets results by that ta
 
 Read the scenario count before the failure count. A zero in the failed column means something different when the scenario count is also zero.
 
-`AdversarialScenarioGenerator`, for example, covers most of the harmful-content categories plus unauthorized advice on its own. So grouping by threat type answers *"how exposed am I?"*, while looking at the generators answers *"what did we actually try?"*. You want both, because a clean bucket for a threat type has two possible explanations: the agent handled it, or the budget allocated no scenarios there.
+`AdversarialScenarioGenerator`, for example, covers most of the harmful-content categories plus unauthorized advice on its own. So grouping by threat type answers *"how exposed am I?"*, while looking at the generators answers *"what did the run try?"*. You want both, because a clean bucket for a threat type has two possible explanations: the agent handled it, or the budget allocated no scenarios there.
 
 ## The judge is an LLM
 
 Every verdict in the report is produced by a language model reading a conversation and deciding whether it violated a rule. **LLM-as-a-judge** is the standard technique for grading free-text answers, because no string match can tell you whether a paragraph counts as financial advice. It is also imperfect, so read this section before you act on a report.
 
-- **The judge is wrong in both directions, and it helps to know why.** It is asked a question with no ground-truth answer, using a criterion written in words ("did the agent give investment advice?") that has genuinely blurry edges. So it over-flags replies that merely *discuss* a topic without helping with it, and it misses harm that is phrased indirectly or buried in an otherwise helpful answer. It is also sensitive to wording: the same behavior described politely and described bluntly can get different verdicts. Expect it to be least reliable on borderline cases, which are exactly the ones you care about. Treat a failure as a signal that a conversation is worth reading, not as proof of a vulnerability. Open the conversation before you file a bug, and open it again before you dismiss one.
+- **The judge is wrong in both directions, and it helps to know why.** It is asked a question with no ground-truth answer, using a criterion written in words ("did the agent give investment advice?") that has genuinely blurry edges. So it over-flags replies that merely *discuss* a topic without helping with it, and it misses harm that is phrased indirectly or buried in an otherwise helpful answer. It is also sensitive to wording: the same behavior described politely and described bluntly can get different verdicts. Expect it to be least reliable on borderline cases, which are exactly the ones you care about. Treat a failure as a signal that a conversation is worth reading, not as proof of a vulnerability. Read the conversation before you file a bug, and read it before you dismiss one.
 - **A scan that finds nothing does not mean the agent is safe.** It means these generated scenarios did not break it. A different seed, a longer budget, or a real attacker will try things this run did not.
 - **The scan is not exhaustive, and it is not a compliance certificate or an audit.** It samples an attack space that has no fixed size.
 - **Results move between runs.** The same scenario against the same agent can pass once and fail the next time, and a new run with a different seed produces different scenarios entirely. If you want two runs to be comparable, save the suite and replay that exact file with the same seed. Otherwise a pass-rate change tells you nothing about whether your fix worked.
@@ -209,7 +208,7 @@ Every verdict in the report is produced by a language model reading a conversati
 - **The judge model matters.** A weaker judge is cheaper but noisier, and it is the cost you pay on every replay. Generation happens once; judging happens every run.
 - **Your data reaches an LLM provider.** The generator and judge models see your agent's description and everything it replies. They never see anything you do not pass to the agent, but if your agent returns customer records or internal documents, those go to the provider you configured. Choose it accordingly.
 
-The scan is a discovery tool. Its job is to point you at conversations worth reading.
+The scan is a discovery tool. It points you at the conversations to read.
 
 ## Scan and Checks are the same runtime
 
