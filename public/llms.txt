@@ -22,7 +22,7 @@ Giskard provides tools for testing, evaluating, and red-teaming LLM-based applic
 Enterprise platform for LLM agent testing with team collaboration and continuous red teaming. Available as a UI for business users and an SDK for developers.
 
 ### Giskard Checks (Open Source)
-Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for LLM apps and agents: you write scenarios and checks that pass or fail instead of chasing metric scores, run them locally against your own LLM provider, and red-team the same agent with the same library.
+Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for LLM apps and agents: you write scenarios and checks that pass or fail instead of metric scores, run them locally against your own LLM provider, and red-team the same agent with the same library.
 
 - **pytest-native:** tests are plain `async def test_*` functions that run under pytest (with `pytest-asyncio`), no separate runner or DSL.
 - **Framework-agnostic:** the target under test is any async callable — an agent from any framework, a raw SDK call, or an HTTP client.
