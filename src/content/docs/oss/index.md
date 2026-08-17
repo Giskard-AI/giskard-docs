@@ -1,9 +1,9 @@
 ---
 title: Giskard Library
-description: "Giskard is pytest-native, async-first, framework-agnostic behavioral testing for LLM apps and agents, with scenarios and checks that pass or fail instead of metric scores."
+description: "Open-source Python library for testing and evaluating LLM applications, RAG systems, and AI agents."
 ---
 
-**Giskard Library** is a Python package for testing and evaluating AI applications: LLM-based systems, RAG applications, and AI agents.
+**Giskard Library** is a Python package for testing and evaluating AI applications. It provides a solid foundation for developers to ensure quality and reliability in LLM-based systems, RAG applications, and AI agents.
 
 An LLM gives a different answer every time, so you cannot assert on an exact string the way you would for ordinary code. Giskard lets you assert on behavior instead: "the answer stays on topic", "the answer is supported by the retrieved documents", "the agent refuses to reveal its system prompt".
 
@@ -13,7 +13,52 @@ Giskard is pytest-native, async-first, and framework-agnostic behavioral testing
 
 In practice you write two things. A scenario is one test case: a message, or a short conversation, to send to your agent. A check is a rule the reply has to satisfy, either plain Python or a rule written in English and graded by an LLM (a judge). Tests run under pytest and report pass or fail, not a score you then have to interpret. Red teaming is the other half: instead of testing that normal requests work, you send hostile ones on purpose, such as attempts to make the agent leak its instructions ([prompt injection](/start/glossary/security/injection)), produce [harmful content](/start/glossary/security/harmful-content), or [state things that are not true](/start/glossary/business/hallucination). See the [glossary](/start/glossary) for the failure types Giskard looks for.
 
+Beyond Giskard's own generators, the scan can run garak's probes and deepteam's attacks against the same agent through the optional `giskard-scan[garak]` and `giskard-scan[deepteam]` extras. See [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities).
+
 Verdicts from an LLM judge are evidence, not certification. A judge is sometimes wrong in both directions, and a suite that passes means those scenarios did not break your agent, not that the agent is safe.
+
+## A first check
+
+Write a scenario, send one message to your agent, and state the rule its reply has to satisfy:
+
+```python
+import asyncio
+
+from giskard.checks import Conformity, Scenario
+
+
+async def my_agent(inputs: str) -> str:
+    # Call your own LLM app, chain, or agent here
+    ...
+
+
+scenario = (
+    Scenario("stays_on_topic")
+    .interact(inputs="What is your refund policy?", outputs=my_agent)
+    .check(Conformity(rule="The answer only discusses the company's refund policy."))
+)
+
+result = asyncio.run(scenario.run())
+result.print_report()
+```
+
+## A first scan
+
+Describe the agent in plain language, and the scan generates hostile inputs for it, runs them, and prints a report:
+
+```python
+import asyncio
+
+from giskard.scan import vulnerability_scan
+
+suite_result = asyncio.run(
+    vulnerability_scan(
+        target=my_agent,
+        description="A customer-support agent for a bank that answers questions about accounts and cards.",
+        languages=["en"],
+    )
+)
+```
 
 v3 is a major rewrite, with new features such as [Checks](/oss/checks) and a redesigned [Scan](/oss/solutions/scan-vulnerabilities).
 
