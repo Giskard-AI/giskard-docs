@@ -8,9 +8,9 @@ sidebar:
 
 import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
-Complete API documentation for Giskard Checks -- a comprehensive testing framework for AI applications.
+These pages document every public symbol in `giskard.checks`. They assume you have written a test already. If you have not, start with [Your First Test](/oss/checks/tutorials/your-first-test); the terms used here (scenario, check, trace, judge) are introduced in [Core Concepts](/oss/checks/explanation/core-concepts).
 
-## API Modules
+## API modules
 
 <CardGrid>
   <LinkCard
@@ -43,6 +43,11 @@ Complete API documentation for Giskard Checks -- a comprehensive testing framewo
     description="Helper functions for normalization, value providers, and parameter injection"
     href="/oss/checks/reference/utils"
   />
+  <LinkCard
+    title="Settings"
+    description="Environment variables, default models, and overriding the default generator"
+    href="/oss/checks/reference/settings"
+  />
 </CardGrid>
 
 ## Quick reference
@@ -54,26 +59,29 @@ from giskard.checks import (
     CheckResult,
     CheckStatus,
     Interaction,
-    Trace,
     InteractionSpec,
+    Trace,
     Scenario,
     TestCase,
+    Suite,
+    SuiteResult,
     # Built-in checks
     FnCheck,
     StringMatching,
     RegexMatching,
     JsonValid,
+    Readability,
+    SemanticSimilarity,
     Equals,
     NotEquals,
     LessThan,
-    GreaterThan,
     LessThanEquals,
+    GreaterThan,
     GreaterThanEquals,
     AllOf,
     AnyOf,
     Not,
     RegoPolicy,
-    Readability,
     # Configuration
     set_default_generator,
     get_default_generator,
@@ -84,19 +92,18 @@ from giskard.checks import (
     BaseLLMCheck,
     LLMCheckResult,
     Groundedness,
-    Contradiction,
     AnswerRelevance,
     Toxicity,
     Conformity,
+    Contradiction,
     LLMJudge,
-    SemanticSimilarity,
 )
 
-# Scenarios
-from giskard.checks import Suite, ScenarioRunner
-
 # Generators
-from giskard.checks import LLMGenerator
+from giskard.checks import LLMGenerator, DatasetInputGenerator, UserSimulator
+
+# Suite generation lives in the scan package, not in giskard.checks
+from giskard.scan import generate_suite
 ```
 
 ## Package structure
@@ -109,15 +116,17 @@ giskard.checks/
 │   ├── scenario.py       # Scenario
 │   ├── testcase.py       # TestCase
 │   ├── extraction.py     # Extractors
+│   ├── input_generator.py # InputGenerator base class
+│   ├── mixin.py          # WithGeneratorMixin
 │   └── interaction/      # Interaction types
 ├── builtin/              # Ready-to-use checks
-│   ├── fn.py             # FnCheck
+│   ├── fn.py             # FnCheck, from_fn
 │   ├── text_matching.py  # StringMatching, RegexMatching
-│   ├── comparison.py     # Equals, NotEquals, etc.
+│   ├── comparison.py     # Equals, NotEquals, LessThan, etc.
 │   ├── composition.py    # AllOf, AnyOf, Not
 │   ├── json_valid.py     # JsonValid
-│   ├── rego_policy.py    # RegoPolicy
 │   ├── nlp_metrics.py    # Readability
+│   ├── rego_policy.py    # RegoPolicy
 │   └── semantic_similarity.py
 ├── judges/               # LLM-based checks
 │   ├── base.py           # BaseLLMCheck, LLMCheckResult
@@ -134,9 +143,17 @@ giskard.checks/
 │   ├── runner.py         # TestCaseRunner
 │   └── spy.py            # WithSpy
 ├── generators/           # Input generators
+│   ├── base.py           # BaseLLMGenerator, LLMGenerator
+│   ├── dataset.py        # DatasetInputGenerator
 │   └── user.py           # UserSimulator
-└── utils/                # Helper utilities
-    ├── normalization.py
-    ├── injectable.py     # ValueProvider, ValueGenerator
-    └── generator.py
+├── export/               # Result export
+│   ├── junit.py          # to_junit_xml
+│   └── hub.py
+├── utils/                # Helper utilities
+│   ├── normalization.py
+│   ├── injectable.py     # ValueProvider, ValueGenerator
+│   ├── inference.py      # Target signature inference
+│   ├── optional_deps.py  # Guards for optional extras
+│   └── generator.py
+└── settings.py           # get_settings, environment configuration
 ```

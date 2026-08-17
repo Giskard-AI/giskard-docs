@@ -275,11 +275,18 @@ Comparison checks are free and deterministic, so put them first in a scenario an
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath expression to extract the value to validate.
 </Property>
-<Property name="schema" type="dict[str, Any] | None" defaultValue="None">
+<Property name="parse" type="bool" defaultValue="True">
+  With `True`, the extracted value must be a serialized JSON **string**, parsed
+  with `json.loads` before validation; a non-string value returns
+  `CheckResult.error`. Set it to `False` when the target already returns a
+  parsed value such as a dict or a list.
+</Property>
+<Property name="expected_schema" type="dict[str, Any] | None" defaultValue="None">
   Optional JSON Schema for the parsed value. Serialized as `schema` in JSON.
 </Property>
 
-The agent hands its reply to the banking app as JSON. Assert the contract holds:
+The agent hands its reply to the banking app as an already-parsed dict, so turn
+parsing off and assert the contract holds:
 
 ```python
 from giskard.checks import JsonValid
@@ -306,6 +313,8 @@ check = JsonValid(
     },
 )
 ```
+
+Keep the default `parse=True` when the agent returns raw text that is supposed to be JSON, which is the case that catches a model wrapping its object in prose or a code fence.
 
 Use `JsonValid` when the agent is asked to produce machine-readable output and a downstream system will parse it. It says nothing about whether the content is correct, so pair it with a judge.
 
@@ -477,13 +486,13 @@ Validation checks powered by Large Language Models for semantic understanding. A
   Returns the prompt to send to the LLM. Subclasses must implement this method.
 </MethodCard>
 
-<MethodCard name=".get_inputs()" returnType="dict[str, Any]">
+<MethodCard name="async .get_inputs()" returnType="dict[str, Any]">
   Provides template variables for prompt rendering. Override to customize available variables. Default: `{"trace": trace}`.
 
   <Property name="trace" type="Trace" required>The trace containing interaction history.</Property>
 </MethodCard>
 
-<MethodCard name=".run()" returnType="CheckResult">
+<MethodCard name="async .run()" returnType="CheckResult">
   Execute the LLM-based check (inherited, usually doesn't need overriding).
 
   <Property name="trace" type="Trace" required>The trace to evaluate.</Property>
@@ -530,7 +539,9 @@ Default result model for LLM-based checks. This is the structured output format 
     Whether the check passed.
   </Property>
   <Property name="reason" type="str" required>
-    Non-empty explanation for the result.
+    Explanation for the verdict. Required and non-blank: it is stripped, then
+    validated with `min_length=1`. A judge that returns `None` or an empty
+    string raises a `ValidationError` instead of producing a result.
   </Property>
 </TypeTable>
 
@@ -702,8 +713,10 @@ Use `AnswerRelevance` to catch an agent that answers a question nobody asked, wh
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the output from the trace.
 </Property>
-<Property name="categories" type="list[str]" defaultValue='["hate_speech", "harassment", "threats", "self_harm", "sexual_content", "violence"]'>
+<Property name="categories" type="list[ToxicityCategory]" defaultValue='["hate_speech", "harassment", "threats", "self_harm", "sexual_content", "violence"]'>
   Toxicity categories to evaluate. Restrict the list to focus the judge.
+  `ToxicityCategory` is a `Literal` over exactly those six values; any other
+  string raises a `ValidationError` when you construct the check.
 </Property>
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation (falls back to default).

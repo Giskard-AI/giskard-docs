@@ -24,7 +24,11 @@ Input generators for creating dynamic test data and simulating user interactions
   Predefined persona name (e.g., `"frustrated_customer"`) or a custom persona description.
 </Property>
 <Property name="max_steps" type="int" defaultValue="3">
-  Maximum number of conversation turns to generate.
+  Maximum number of conversation turns to generate. Must be ≥ 0; `0` generates nothing.
+</Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Retries per turn when generation fails. Must be ≥ 0, so each turn is attempted
+  up to `max_retries + 1` times before the generator raises.
 </Property>
 <Property name="context" type="str | None" defaultValue="None">
   Optional context to customize the persona's behavior.
@@ -103,10 +107,19 @@ print(f"Last reply: {result.final_trace.last.outputs}")
   Inline prompt string. Jinja2 rendering applies only when `as_template=True`.
 </Property>
 <Property name="prompt_path" type="str | None">
-  Template reference (e.g. `"giskard.checks::scenarios/llm01.j2"`).
+  Template reference, written as `namespace::path/to/template.j2`. `giskard-scan`
+  registers the `giskard.scan` namespace and ships the attack templates there
+  (for example `"giskard.scan::scenarios/llm01_injection.j2"`); `giskard-checks`
+  registers `giskard.checks`, which holds the bundled judge and generator
+  prompts. Register your own directory with
+  `giskard.agents.add_prompts_path(path, "my_namespace")`.
 </Property>
 <Property name="max_steps" type="int" defaultValue="3">
-  Maximum conversation turns to generate.
+  Maximum conversation turns to generate. Must be ≥ 0; `0` generates nothing.
+</Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Retries per turn when generation fails. Must be ≥ 0, so each turn is attempted
+  up to `max_retries + 1` times before the generator raises.
 </Property>
 <Property name="as_template" type="bool" defaultValue="False">
   When True, render `prompt` as a Jinja2 template with trace context.
@@ -118,12 +131,13 @@ print(f"Last reply: {result.final_trace.last.outputs}")
 Exactly one of `prompt` or `prompt_path` must be provided.
 
 ```python
+import giskard.scan  # noqa: F401  — registers the "giskard.scan" prompt namespace
 from giskard.checks import LLMGenerator
 
 gen = LLMGenerator(
     prompt="You are a retail bank customer. Ask about a payment that left your account twice."
 )
-gen = LLMGenerator(prompt_path="giskard.checks::scenarios/llm01.j2")
+gen = LLMGenerator(prompt_path="giskard.scan::scenarios/llm01_injection.j2")
 ```
 
 `LLMGenerator` takes a prompt; `UserSimulator` takes a persona and manages the conversation loop for you. Start with `UserSimulator` and drop to `LLMGenerator` when you need control over the prompt itself.
