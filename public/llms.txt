@@ -24,11 +24,13 @@ Enterprise platform for LLM agent testing with team collaboration and continuous
 ### Giskard Checks (Open Source)
 Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for LLM apps and agents: you write scenarios and checks that pass or fail instead of metric scores, run them locally against your own LLM provider, and red-team the same agent with the same library.
 
+- **Scenario and check:** a scenario is one test case (a message or short conversation sent to the agent); a check is a rule its reply must satisfy, either plain Python or a rule in natural language graded by an LLM ("the judge").
 - **pytest-native:** tests are plain `async def test_*` functions that run under pytest (with `pytest-asyncio`), no separate runner or DSL.
 - **Framework-agnostic:** the target under test is any async callable — an agent from any framework, a raw SDK call, or an HTTP client.
 - **Pass/fail, not scores:** checks return a verdict, so a suite gates a pull request the way unit tests do.
-- **Your provider, your keys:** checks and LLM-as-a-judge evaluations run locally against your own LLM provider.
-- **Red teaming in the same library:** the `giskard-scan` package provides `vulnerability_scan()`, which probes an agent and returns a suite you can re-run as a regression test.
+- **Your provider, your keys:** checks and LLM-as-a-judge evaluations run locally against your own LLM provider. Judged checks and scans send test inputs and agent outputs to that provider.
+- **Red teaming in the same library:** the `giskard-scan` package provides `vulnerability_scan()`, which probes an agent with generated adversarial inputs and returns a suite you can re-run as a regression test.
+- **Limits:** scan results are a sample of generated scenarios, not exhaustive coverage and not a certification or audit. Judge verdicts are LLM output and can be wrong in either direction. Results vary between runs unless the suite is saved and reused.
 - **Licensing:** `giskard-checks` is MIT; `giskard-scan` and the umbrella `giskard` package are Apache-2.0.
 
 Use the open-source library for tests that live next to your code and run in CI. Use the Hub when business users annotate tests in a UI, datasets are shared across teams, or red teaming runs on a schedule.
