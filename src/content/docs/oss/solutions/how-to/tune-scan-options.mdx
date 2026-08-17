@@ -5,6 +5,10 @@ sidebar:
   order: 2
 ---
 
+A scan writes test cases for your agent, runs them, and reports which ones it failed. Each test case is a **scenario**: a starting message, or a short conversation, plus the checks that decide whether the reply was acceptable. Scenarios come from **generators**, one per kind of problem being probed, and the verdicts come from a **judge**, an LLM that reads the reply and decides pass or fail.
+
+This page covers the keyword arguments that control what a scan costs, how repeatable it is, and how the report is grouped. Read [How the Scan Works](/oss/solutions/explanation/how-scan-works) first if you have not run a scan yet.
+
 A default scan lets every generator apply its own limit, runs every scenario at once, and groups the report on the axis its entry point picks. Change all of it with keyword arguments on `vulnerability_scan` and `quality_scan`.
 
 ```python
@@ -20,15 +24,19 @@ result = await vulnerability_scan(
 
 ## Cap the number of scenarios
 
-Set `max_scenarios` to a total upper bound across all generators. The budget is split between them before generation starts. The default of `None` lets each generator fall back to its own limit; see [How the Scan Works](/oss/solutions/explanation/how-scan-works) for what that costs.
+Set `max_scenarios` to a total upper bound across all generators. That budget, the number of scenarios the run is allowed to spend, is split between them before generation starts. The default of `None` lets each generator fall back to its own limit; see [How the Scan Works](/oss/solutions/explanation/how-scan-works) for what that costs.
+
+Pick too low and each generator gets a handful of scenarios, so whole categories of problem go untested and the report looks cleaner than your agent is. Pick too high and you pay for LLM calls on both generation and judging, and the run takes longer.
 
 Start low. Twenty scenarios is enough to tell you whether the plumbing works and whether your `description` is specific enough. Raise it once the report stops being obviously wrong.
 
 ## Make runs reproducible
 
-`seed` defaults to `42` and feeds the top-level RNG used for scenario sampling and generation. Child RNGs are spawned before the generators run concurrently, so the same seed gives the same scenarios regardless of how the event loop schedules things.
+A **seed** fixes the random draws the scan makes, so the same seed asks for the same scenarios. `seed` defaults to `42` and feeds the top-level RNG used for scenario sampling and generation. Child RNGs are spawned before the generators run concurrently, so the same seed gives the same scenarios regardless of how the event loop schedules things.
 
-The scenarios are stable. The LLM's answers and the judge's verdicts are not. If you need results that are comparable run over run, generate the suite once with `generate_suite` and replay the saved suite. See [Run the Scan in CI](/oss/solutions/how-to/scan-in-ci).
+The scenarios are stable. The LLM's answers and the judge's verdicts are not. If you need results that are comparable run over run, generate the **suite** once with `generate_suite` (a suite is the saved collection of scenarios and their checks) and replay it. See [Run the Scan in CI](/oss/solutions/how-to/scan-in-ci).
+
+Without a fixed seed and a saved suite, two runs test different scenarios. A pass rate that moves between them tells you nothing about whether your agent changed, and a fix can look like it worked when it did not.
 
 ## Control concurrency
 
@@ -55,7 +63,7 @@ With `parallel=False` scenarios run one after another. A valid `max_concurrency`
 
 The default `return_exception=False` lets a failure during input generation, such as a malformed LLM response or a provider timeout, propagate and abort the whole scan. Pass `return_exception=True` on long scans against flaky providers: the failure is recorded as an errored result and the scan carries on.
 
-Errored results are not passes. Read the error count in the report before you read the pass rate.
+Errored results are not passes. Read the error count in the report before you read the pass rate, the share of scenarios that passed. A run with many errors has a pass rate computed over fewer scenarios than you think.
 
 ## Group the report
 
@@ -66,13 +74,15 @@ Errored results are not passes. Read the error count in the report before you re
 | `vulnerability_scan` | `"threat-type"` |
 | `quality_scan` | `"component"` |
 
+A **threat type** is the kind of attack a scenario tries, such as [prompt injection](/start/glossary/security/injection) or [harmful content](/start/glossary/security/harmful-content). A **component** is the part of your agent under test, such as retrieval or the final answer. Group by the axis you plan to act on: threat types point at a defense to add, components point at a part of the pipeline to fix.
+
 Pass `None` to print the report ungrouped. [How the Scan Works](/oss/solutions/explanation/how-scan-works#threat-types-vs-components) covers what the two axes mean and why both exist.
 
 ## Vulnerability-scan-only knobs
 
 `commercial_use=True` excludes generators whose underlying datasets are not licensed for commercial use. It defaults to `False`, so a stock scan may pull in scenarios you cannot ship results from. The quality scan has no equivalent.
 
-`target_mode` (`"singleturn"` or `"multiturn"`, default `"multiturn"`) is available on both scans and on `generate_suite`. Set `"singleturn"` when your agent has no conversation state: it skips generators that are multi-turn by design and caps turn budgets to 1 on the rest. Leaving it at `"multiturn"` for a stateless agent produces scenarios whose follow-up turns cannot land, which shows up as noise rather than a clean skip.
+`target_mode` says whether a scenario is a single message or a back-and-forth conversation. It takes `"singleturn"` or `"multiturn"` (default `"multiturn"`) and is available on both scans and on `generate_suite`. Set `"singleturn"` when your agent has no conversation state: it skips generators that are multi-turn by design and caps turn budgets to 1 on the rest. Leaving it at `"multiturn"` for a stateless agent produces scenarios whose follow-up turns cannot land, which shows up as noise rather than a clean skip.
 
 ## Pass options as a dict
 
