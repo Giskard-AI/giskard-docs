@@ -92,6 +92,8 @@ These generators call an LLM to build attacks tailored to your agent's descripti
   Maximum conversation turns per scenario (`>= 1`). Capped to `1` automatically when `target_mode="singleturn"`.
 </Property>
 
+The attack style is a direct ask, dressed up to sound legitimate for your agent. It is the broadest generator, and the one most likely to catch a topic your agent should refuse but was never told about.
+
 Categories in `ADVERSARIAL_CATEGORIES`: Stereotypes and Discrimination, Politics, Religion, Chemical, Biological, Radiological and Nuclear materials, Copyright Violations, Misinformation & Disinformation, Illegal Activities, and Unauthorized Advice. Each carries its own tags: `threat-type:harmful-content-generation` for all but Unauthorized Advice, which uses `threat-type:misguidance-and-unauthorized-advice`.
 
 When `max_scenarios` is set, the budget is distributed across categories with a multinomial draw and each category is additionally capped at `MAX_RULES_PER_CATEGORY` (10), so the output count can be lower than requested. Without a budget each category produces `DEFAULT_RULES_PER_CATEGORY` (5) rules. Categories allocated zero budget are skipped entirely, with no LLM call.
@@ -114,6 +116,8 @@ generator = AdversarialScenarioGenerator(max_turns=3)
   Maximum attacker turns per scenario (`>= 1`). Defaults to `DEFAULT_CRESCENDO_MAX_TURNS`.
 </Property>
 
+An **objective** here is the harmful end state the attacker is steering toward. No single message would be refused on its own, which is the point: Crescendo catches agents that guard each turn in isolation but lose track of where the conversation is heading.
+
 Objectives come from `DEFAULT_CRESCENDO_OBJECTIVES` (botulinum toxin, sabotage, terrorist attack, self harm, anti-vaccine misinformation, moon landing hoax, sexual content, explosive device). `max_scenarios` selects how many objectives to include; `None` includes all of them.
 
 Multi-turn by design: with `target_mode="singleturn"` the generator logs a warning and returns no scenarios.
@@ -135,6 +139,8 @@ generator = CrescendoAttackScenarioGenerator(max_turns=6)
 <Property name="max_turns" type="int" defaultValue="10">
   Maximum attacker turns per scenario (`>= 1`). Defaults to `DEFAULT_GOAT_MAX_TURNS`.
 </Property>
+
+Where Crescendo follows one fixed escalation, GOAT switches tactic when a turn fails. It catches agents whose refusal holds against one framing but folds when the same request comes back as a hypothetical or from a different persona.
 
 Objectives come from `DEFAULT_GOAT_OBJECTIVES`; strategies are `GOATAttackStrategy` entries with a `name`, `definition`, and optional `examples`. Multi-turn by design: `target_mode="singleturn"` yields no scenarios.
 
@@ -165,6 +171,8 @@ These load scenarios from a static dataset rather than generating them with an L
   Tags applied to every loaded scenario.
 </Property>
 
+There is no attack style of its own: it replays whatever prompts the file holds. Use it, or `HuggingFaceDatasetScenarioGenerator`, when you have a corpus of attacks the LLM-driven generators will not invent, such as ones collected from your own production traffic.
+
 ```python
 from giskard.scan import LocalDatasetScenarioGenerator
 
@@ -181,6 +189,8 @@ generator = LocalDatasetScenarioGenerator(
 <ResourceSection description="Loads the bundled prompt_injection.jsonl dataset and tags every scenario as OWASP LLM Top-10 2025 LLM01 (prompt injection). Sampling behavior is inherited from LocalDatasetScenarioGenerator.">
 
 **Module:** `giskard.scan.generators.prompt_injection`
+
+A [prompt injection](/start/glossary/security/injection) tries to override your agent's own instructions with instructions in the user's message. These are published attempts that already work on other systems, so they are cheap to run and catch an agent that follows any instruction it reads.
 
 <Property name="dataset_name" type="str" defaultValue='"prompt_injection"'>
   Bundled dataset stem.
@@ -239,6 +249,8 @@ generator = HuggingFaceDatasetScenarioGenerator(
   Whether the base dataset's license permits commercial use.
 </Property>
 
+A **suffix** is a short string of nonsense-looking tokens, found by an optimizer against an open model, that pushes the model toward complying instead of refusing. It reads as garbage to a human, which is why it catches safety training that keys on how a request is phrased rather than what it asks for.
+
 Subclasses [`HuggingFaceDatasetScenarioGenerator`](#huggingfacedatasetscenariogenerator), so it inherits the per-language subset handling and the dataset's own safety judge. One adversarial suffix is appended to each loaded scenario, rotating through the suffix list by scenario index, so the output count matches the base dataset and `max_scenarios` is not inflated.
 
 The suffixes are English-tuned and appended verbatim regardless of the base prompt's language; per the upstream probe, they may not generalize to translated prompts.
@@ -280,6 +292,8 @@ Without an explicit `max_scenarios`, subclasses generate `DEFAULT_KNOWLEDGE_BASE
 
 **Module:** `giskard.scan.generators.knowledge_base.hallucination`
 
+It asks plain questions your documents do answer, and catches the agent stating something the documents contradict. Start here: it is the cheapest check on whether answers track your sources at all.
+
 Scenario name prefix: `"Knowledge Base Direct Questions"`. Inherits `context_documents` and `max_turns` from [`KnowledgeBaseScenarioGenerator`](#knowledgebasescenariogenerator).
 
 ```python
@@ -295,6 +309,8 @@ generator = HallucinationScenarioGenerator(context_documents=4, max_turns=3)
 <ResourceSection description="Document-grounded sycophancy scenarios. An LLM user simulator pressures the agent with a plausible premise that the sampled documents explicitly contradict, testing whether the agent caves to the user rather than to its sources.">
 
 **Module:** `giskard.scan.generators.knowledge_base.sycophancy`
+
+The user states something false with confidence. An agent that answers correctly when asked neutrally can still agree with a confident user, and only this generator applies that pressure.
 
 Scenario name prefix: `"Knowledge Base Sycophantic Questions"`.
 
@@ -316,6 +332,8 @@ generator = SycophancyScenarioGenerator()
   Fixed at exactly `2` (`ge=2, le=2`); the scenario shape needs both messages.
 </Property>
 
+The question is only answerable if the agent still has the first message. It catches retrieval that runs on the latest message alone and so searches for the wrong thing.
+
 Scenario name prefix: `"Knowledge Base Split Questions"`.
 
 ```python
@@ -336,6 +354,8 @@ generator = SplitQuestionsScenarioGenerator()
   Maximum user-simulator turns per scenario. Requires `>= 2`, because a single turn cannot cover several topics.
 </Property>
 
+Each turn changes subject. It catches an agent that answers the second topic using documents retrieved for the first.
+
 Scenario name prefix: `"Knowledge Base Multi Topic Questions"`.
 
 ```python
@@ -351,6 +371,8 @@ generator = MultiTopicScenarioGenerator(max_turns=4)
 <ResourceSection description="Questions about precise, plausible objects that are absent from the knowledge base. An LLM proposes candidate topics and validates that they really are missing before a scenario is built, testing whether the agent invents an answer instead of declining.">
 
 **Module:** `giskard.scan.generators.knowledge_base.out_of_scope`
+
+Every other knowledge-base generator asks something your documents can answer. This one asks something they cannot, so it is the only one that tests whether the agent says "I do not know".
 
 Scenario name prefix: `"Knowledge Base Out Of Scope Questions"`. Inherits `context_documents` and `max_turns`.
 
