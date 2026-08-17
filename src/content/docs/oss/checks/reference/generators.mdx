@@ -73,13 +73,13 @@ result = await test_scenario.run()
 
 ### Goal-oriented testing
 
+The simulator stops early once the LLM reports the persona's goal as reached, or after `max_steps` turns. It does not publish that decision to the trace, so assert on the conversation itself:
+
 ```python
 result = await test_scenario.run()
 
-output = result.final_trace.last.metadata.get("simulator_output")
-if isinstance(output, UserSimulatorOutput):
-    print(f"Goal reached: {output.goal_reached}")
-    print(f"Message: {output.message}")
+print(f"Turns generated: {len(result.final_trace.interactions)}")
+print(f"Last reply: {result.final_trace.last.outputs}")
 ```
 
 </ResourceSection>
@@ -121,18 +121,21 @@ gen = LLMGenerator(prompt_path="giskard.checks::scenarios/llm01.j2")
 
 ---
 
-## `UserSimulatorOutput`
+## `LLMGeneratorOutput`
 
-**Module:** `giskard.checks.generators.user`
+**Module:** `giskard.checks.generators.base`
 
-Output format for user simulator results.
+Structured output the LLM returns on every turn of `UserSimulator` and `LLMGenerator`. It is internal to the generation loop: the loop yields `message` as the next input and stops when `goal_reached` is true or `message` is empty. It is not written to the trace, so tests do not read it.
 
-<TypeTable name="UserSimulatorOutput">
+<TypeTable name="LLMGeneratorOutput">
   <Property name="goal_reached" type="bool">
-    Whether the simulator achieved its goal.
+    Whether the goal has been reached and no further messages are needed.
   </Property>
-  <Property name="message" type="str | None">
-    Optional message about the simulation outcome.
+  <Property name="schema_issue" type="str | None" defaultValue="None">
+    Set instead of `message` when the input schema cannot produce a user message. Triggers a retry, up to `max_retries`.
+  </Property>
+  <Property name="message" type="T | None" defaultValue="None">
+    The message to send. `None` when `goal_reached` is true. Cannot be set together with `schema_issue`.
   </Property>
 </TypeTable>
 

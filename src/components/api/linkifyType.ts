@@ -134,7 +134,7 @@ export const OSS_CHECKS_TYPE_PAGES: Readonly<Record<string, string>> = {
   BaseLLMCheck: "/oss/checks/reference/checks",
   LLMCheckResult: "/oss/checks/reference/checks",
   // Generators (generators.mdx)
-  UserSimulatorOutput: "/oss/checks/reference/generators",
+  LLMGeneratorOutput: "/oss/checks/reference/generators",
   // Scenarios (scenarios.mdx)
   ScenarioResult: "/oss/checks/reference/scenarios",
   SuiteResult: "/oss/checks/reference/scenarios",

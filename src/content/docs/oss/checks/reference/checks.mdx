@@ -100,6 +100,13 @@ check = StringMatching(
 )
 ```
 
+:::caution
+The text field is `text_key`, not `key`. Comparison checks use `key`, so it is easy to
+mix them up. An unknown keyword argument is ignored rather than rejected, so a
+`StringMatching(key=...)` still runs -- it just searches the default
+`trace.last.outputs` instead of the field you meant, and passes or fails on the wrong text.
+:::
+
 </ResourceSection>
 
 ### `RegexMatching`

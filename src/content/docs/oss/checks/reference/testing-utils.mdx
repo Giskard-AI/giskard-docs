@@ -172,34 +172,37 @@ Low-level runner for executing test cases. Most users should use `test_case.run(
 
 **Module:** `giskard.checks.testing.spy`
 
-Spy on function calls during interaction generation for debugging. Wraps an interaction spec and records all function calls made during generation.
+Replace a function with a `MagicMock` while the wrapped interaction spec runs, then record what it was called with. Use it to assert that your agent passed the right arguments to an internal call.
 
 <TypeTable name="WithSpy">
   <Property name="interaction_generator" type="InteractionSpec" required>
     The interaction spec to spy on.
   </Property>
   <Property name="target" type="str" required>
-    JSONPath to the value to spy on.
+    Python import path of the function to patch, exactly as you would pass it to `unittest.mock.patch` (for example `"myapp.db.fetch_orders"`). This is not a JSONPath -- a trace expression such as `"trace.last.outputs"` raises.
   </Property>
 </TypeTable>
+
+After each interaction, the mock's call history is written to `Interaction.metadata` under the `target` string, then the mock is reset. The recorded keys are `call_count`, `call_args`, `call_args_list`, and `mock_calls`.
 
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 
 interaction_spec = Interact(
-    inputs=lambda trace: f"Context: {trace.last.outputs if trace.last else 'None'}",
-    outputs=lambda inputs: my_model(inputs),
+    inputs="What are my shipped orders?",
+    outputs=order_support_agent,
 )
 
 spied_spec = WithSpy(
-    interaction_generator=interaction_spec, target="trace.last.outputs"
+    interaction_generator=interaction_spec,
+    target="myapp.db.fetch_orders",  # Python import path -- same as mock.patch
 )
 
 result = await Scenario("debug_test").add_interaction(spied_spec).run()
 
-# Access spy data from metadata
-spy_data = result.final_trace.last.metadata.get("trace.last.outputs")
-print(spy_data)
+# Spy data is keyed by the same import path
+spy_data = result.final_trace.last.metadata.get("myapp.db.fetch_orders")
+print(spy_data["call_count"], spy_data["call_args"])
 ```
 
 :::tip

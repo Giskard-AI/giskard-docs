@@ -287,7 +287,7 @@ Ordered sequence of interaction specs and checks with shared trace. Provides a f
   Add an interaction spec to the scenario.
 
   <Property name="inputs" type="value | Callable" required>Static value or callable `(trace) -> value`.</Property>
-  <Property name="outputs" type="value | Callable" required>Static value, callable `(inputs) -> value`, or `(trace, inputs) -> value`.</Property>
+  <Property name="outputs" type="value | Callable">Static value, callable `(inputs) -> value`, or `(trace, inputs) -> value`. Optional when the scenario or suite has a `target`.</Property>
   <Property name="metadata" type="dict | None">Optional metadata dict.</Property>
 </MethodCard>
 

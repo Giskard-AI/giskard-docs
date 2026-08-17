@@ -156,8 +156,15 @@ Result of scenario execution with trace and check results.
   </Property>
 </TypeTable>
 
+<MethodCard name=".print_report()" returnType="None">
+  Print the result to the terminal with Rich, including the trace and every check verdict. Inherited from `BaseResult`, so `CheckResult`, `TestCaseResult`, and `SuiteResult` all have it.
+
+  <Property name="console" type="Console | None" defaultValue="None">Rich `Console` to print to. Defaults to a new one writing to stdout.</Property>
+</MethodCard>
+
 ```python
 result = await test_scenario.run()
+result.print_report()
 
 if result.passed:
     print("All checks passed!")
@@ -222,8 +229,8 @@ Aggregate result from suite execution.
   <Property name="results" type="list[ScenarioResult]">
     Scenario results in order.
   </Property>
-  <Property name="pass_rate" type="float">
-    Fraction of non-skipped scenarios that passed. If every scenario was skipped, this is `1.0`.
+  <Property name="pass_rate" type="float | None">
+    Fraction of non-skipped scenarios that passed. `None` when nothing was evaluated: an empty suite, or one where every scenario was skipped.
   </Property>
   <Property name="duration_ms" type="int">
     Total execution time in milliseconds.
@@ -241,6 +248,15 @@ Aggregate result from suite execution.
     Number of scenarios that were skipped.
   </Property>
 </TypeTable>
+
+:::caution
+`pass_rate` can be `None`, so formatting it unguarded raises `TypeError`. Guard it:
+
+```python
+rate = result.pass_rate
+print("no scenarios evaluated" if rate is None else f"{rate:.0%}")
+```
+:::
 
 <MethodCard name=".to_junit_xml()" returnType="str">
   Export the suite result as a JUnit XML string. Optionally write to a file.
