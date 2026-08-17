@@ -1,6 +1,6 @@
 ---
 title: Knowledge Base
-description: "Document grounding for the Giskard quality scan — the KnowledgeBase collection and its Document entries."
+description: "Document grounding for the Giskard quality scan: the KnowledgeBase collection and its Document entries."
 sidebar:
   order: 3
 ---
@@ -95,7 +95,7 @@ result = await quality_scan(
 )
 ```
 
-`quality_scan` and `generate_suite` also accept a plain `list[str]` and convert it for you. A single `str` is rejected with `TypeError` — a bare string is a valid iterable of characters, and treating it as one document per character would be silently wrong.
+`quality_scan` and `generate_suite` also accept a plain `list[str]` and convert it for you. A single `str` is rejected with `TypeError`. A bare string is a valid iterable of characters, and treating it as one document per character would be silently wrong.
 
 ### Validation rules
 
@@ -132,8 +132,8 @@ doc = Document(
 
 ---
 
-## See also
+## Next Steps
 
-- [Scan API](/oss/solutions/reference/scan-api) -- `quality_scan` and `generate_suite`
-- [Generators](/oss/solutions/reference/generators) -- The knowledge-base generator family
-- [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) -- Guided walkthrough of the scan
+- [Scan API](/oss/solutions/reference/scan-api) for `quality_scan` and `generate_suite`
+- [Generators](/oss/solutions/reference/generators) for the knowledge-base generator family
+- [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) for the vulnerability scan overview
