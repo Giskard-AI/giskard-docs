@@ -5,11 +5,25 @@ sidebar:
   order: 2
 ---
 
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
 A scan writes test cases for your agent, runs them, and reports which ones it failed. Each test case is a **scenario**: a starting message, or a short conversation, plus the checks that decide whether the reply was acceptable. Scenarios come from **generators**, one per kind of problem being probed, and the verdicts come from a **judge**, an LLM that reads the reply and decides pass or fail.
 
 This page covers the keyword arguments that control what a scan costs, how repeatable it is, and how the report is grouped. Read [How the Scan Works](/oss/solutions/explanation/how-scan-works) first if you have not run a scan yet.
 
 A default scan lets every generator apply its own limit, runs every scenario at once, and groups the report on the axis its entry point picks. Change all of it with keyword arguments on `vulnerability_scan` and `quality_scan`.
+
+## The two entry points
+
+There are two scans, and they differ in which generators they use, not in how you tune them:
+
+- `vulnerability_scan` attacks the agent. Its generators write adversarial scenarios: [prompt injection](/start/glossary/security/injection), escalating multi-turn jailbreak attempts, and [harmful content](/start/glossary/security/harmful-content) prompts drawn from public datasets.
+- `quality_scan` tests whether the agent answers well. Its generators work from a knowledge base you pass in and probe for hallucination, sycophancy, and questions that fall outside the documents.
+
+`max_scenarios`, `seed`, `parallel`, `max_concurrency`, `return_exception`, `group_by`, and `target_mode` work the same way on both. Only the defaults for `group_by` differ, and two arguments exist on one side only: `commercial_use` on `vulnerability_scan`, `knowledge_base` on `quality_scan`.
+
+<Tabs>
+<TabItem label="vulnerability_scan">
 
 ```python
 result = await vulnerability_scan(
@@ -22,6 +36,24 @@ result = await vulnerability_scan(
 )
 ```
 
+</TabItem>
+<TabItem label="quality_scan">
+
+```python
+result = await quality_scan(
+    target=my_agent,
+    description="A support assistant answering questions about our return policy.",
+    languages=["en"],
+    knowledge_base=return_policy_documents,
+    max_scenarios=20,
+    seed=7,
+    max_concurrency=4,
+)
+```
+
+</TabItem>
+</Tabs>
+
 ## Cap the number of scenarios
 
 Set `max_scenarios` to a total upper bound across all generators. That budget, the number of scenarios the run is allowed to spend, is split between them before generation starts. The default of `None` lets each generator fall back to its own limit; see [How the Scan Works](/oss/solutions/explanation/how-scan-works) for what that costs.
@@ -32,11 +64,11 @@ Start low. Twenty scenarios is enough to tell you whether the plumbing works and
 
 ## Make runs reproducible
 
-A **seed** fixes the random draws the scan makes, so the same seed asks for the same scenarios. `seed` defaults to `42` and feeds the top-level RNG used for scenario sampling and generation. Child RNGs are spawned before the generators run concurrently, so the same seed gives the same scenarios regardless of how the event loop schedules things.
+A **seed** fixes the random draws the scan makes, so the same seed asks for the same scenarios. `seed` defaults to `42` and feeds the top-level random number generator used for scenario sampling and generation. Each generator gets its own child generator, created before the generators run concurrently, so the same seed gives the same scenarios regardless of how the event loop schedules things.
 
-The scenarios are stable. The LLM's answers and the judge's verdicts are not. If you need results that are comparable run over run, generate the **suite** once with `generate_suite` (a suite is the saved collection of scenarios and their checks) and replay it. See [Run the Scan in CI](/oss/solutions/how-to/scan-in-ci).
+The scenarios are stable. The LLM's answers and the judge's verdicts are not. If you want to compare one run against another, for example to check whether a prompt change fixed a failure, generate the **suite** once with `generate_suite` (a suite is the saved collection of scenarios and their checks) and replay it. See [Run the Scan in CI](/oss/solutions/how-to/scan-in-ci) for one way to do that.
 
-Without a fixed seed and a saved suite, two runs test different scenarios. A pass rate that moves between them tells you nothing about whether your agent changed, and a fix can look like it worked when it did not.
+Without a fixed seed and a saved suite, two runs test different scenarios. A difference in pass rate then tells you nothing about whether your agent changed, and a fix can look like it worked when it did not.
 
 ## Control concurrency
 
@@ -45,10 +77,13 @@ Generation and execution are throttled separately:
 - **Generation:** generators always run concurrently. There is no flag for it.
 - **Execution:** calling your agent with each generated scenario is controlled by `parallel`, which defaults to `True` for both scans. `Suite.run` defaults its own `parallel` to `False`; the scan helpers flip it.
 
-`max_concurrency` caps how many scenarios run at once when `parallel=True`. The default of `None` fires all of them simultaneously, so your provider's rate limit becomes the real cap, usually visible as a wave of 429s halfway through a scan. Set it to something your agent and your API tier can absorb:
+`max_concurrency` caps how many scenarios run at once when `parallel=True`. The default of `None` fires all of them simultaneously, which is usually more load than you want to put on the system under test. Your agent, and whatever sits behind it, has to serve every one of those calls at the same time. If nothing else stops the run, your LLM provider's rate limit becomes the real cap, and it shows up as a wave of rate-limit errors partway through a scan. Set `max_concurrency` to something your agent and your API tier can absorb:
+
+<Tabs>
+<TabItem label="vulnerability_scan">
 
 ```python
-result = await quality_scan(
+result = await vulnerability_scan(
     target=my_agent,
     description="...",
     languages=["en"],
@@ -56,6 +91,23 @@ result = await quality_scan(
     max_concurrency=4,
 )
 ```
+
+</TabItem>
+<TabItem label="quality_scan">
+
+```python
+result = await quality_scan(
+    target=my_agent,
+    description="...",
+    languages=["en"],
+    knowledge_base=return_policy_documents,
+    parallel=True,
+    max_concurrency=4,
+)
+```
+
+</TabItem>
+</Tabs>
 
 With `parallel=False` scenarios run one after another. A valid `max_concurrency` then has no effect on scheduling, but an invalid one is still rejected, so you cannot use it as an inert placeholder.
 
