@@ -111,17 +111,17 @@ def test_changed_default_is_not_a_changed_signature(tmp_path: Path) -> None:
     still work, but prose asserting the old value is now false."""
 
     def mutate(symbols: dict) -> None:
-        key = "giskard.checks.generate_suite"
+        key = "giskard.checks.StringMatching"
         symbols[key]["signature"] = symbols[key]["signature"].replace(
-            "seed: int = 42", "seed: int = 1337"
+            "case_sensitive: bool = True", "case_sensitive: bool = False"
         )
 
     deltas = _delta_for(tmp_path, mutate)
-    (delta,) = [d for d in deltas if d["symbol"] == "giskard.checks.generate_suite"]
+    (delta,) = [d for d in deltas if d["symbol"] == "giskard.checks.StringMatching"]
 
     assert delta["kind"] == "default_changed"
     assert delta["severity"] == "warning"
-    assert delta["defaults"]["seed"] == {"old": "42", "new": "1337"}
+    assert delta["defaults"]["case_sensitive"] == {"old": "True", "new": "False"}
 
 
 def _field_deltas(tmp_path: Path, old_fields: dict, new_fields: dict) -> list[dict]:

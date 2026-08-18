@@ -343,7 +343,7 @@ scenario = Scenario(
     steps=[
         Step(
             interacts=[Interact(inputs="Hello", outputs="Hi")],
-            checks=[Equals(expected_value="Hi", key="trace.last.outputs")],
+            checks=[Equals(expected_value="Hi", target_key="trace.last.outputs")],
         ),
     ],
 )

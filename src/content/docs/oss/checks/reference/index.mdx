@@ -65,10 +65,10 @@ from giskard.checks import (
     JsonValid,
     Equals,
     NotEquals,
-    LesserThan,
+    LessThan,
     GreaterThan,
-    LesserThanEquals,
-    GreaterEquals,
+    LessThanEquals,
+    GreaterThanEquals,
     AllOf,
     AnyOf,
     Not,
@@ -89,9 +89,6 @@ from giskard.checks import (
     LLMJudge,
     SemanticSimilarity,
 )
-
-# Scenarios
-from giskard.checks import generate_suite, ScenarioCategory
 
 # Generators
 from giskard.checks import LLMGenerator
@@ -125,8 +122,7 @@ giskard.checks/
 │   └── judge.py          # LLMJudge
 ├── scenarios/            # Multi-step workflows
 │   ├── runner.py         # ScenarioRunner
-│   ├── suite.py          # Suite
-│   └── catalog.py        # generate_suite, ScenarioCategory
+│   └── suite.py          # Suite
 ├── testing/              # Testing utilities
 │   ├── runner.py         # TestCaseRunner
 │   └── spy.py            # WithSpy

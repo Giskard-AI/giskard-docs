@@ -1,7 +1,356 @@
 {
   "module": "giskard.checks",
   "package": "giskard-checks",
-  "source_ref": "v1.0.2b3",
+  "referenced": {
+    "giskard.agents.embeddings.base.BaseEmbeddingModel": {
+      "bases": [
+        "giskard.core.discriminated.Discriminated",
+        "abc.ABC"
+      ],
+      "doc_summary": "Base class for embedding models.",
+      "fields": {
+        "params": {
+          "annotation": "<class 'giskard.agents.embeddings.base.EmbeddingParams'>",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "batched_embeddings": {
+          "doc_summary": "Batches texts for embedding process.",
+          "kind": "method",
+          "signature": "(self, texts: list[str], max_batch_size: int | None = None, max_total_chars: int | None = None) -> collections.abc.Iterator[list[str]]"
+        },
+        "embed": {
+          "doc_summary": "",
+          "kind": "method",
+          "signature": "(self, texts: list[str], params: giskard.agents.embeddings.base.EmbeddingParams | None = None, max_batch_size: int | None = None, max_total_chars: int | None = None) -> list[numpy.ndarray]"
+        }
+      },
+      "signature": "(*, params: giskard.agents.embeddings.base.EmbeddingParams = <factory>) -> None"
+    },
+    "giskard.agents.generators.base.BaseGenerator": {
+      "bases": [
+        "giskard.core.discriminated.Discriminated",
+        "abc.ABC"
+      ],
+      "doc_summary": "Base class for all generators.",
+      "fields": {
+        "middlewares": {
+          "annotation": "list[giskard.agents.generators.middleware.CompletionMiddleware]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "params": {
+          "annotation": "<class 'giskard.agents.generators._types.GenerationParams'>",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "rate_limiter": {
+          "annotation": "giskard.core.rate_limiter.base.BaseRateLimiter | None",
+          "required": false
+        },
+        "retry_policy": {
+          "annotation": "giskard.agents.generators.middleware.RetryPolicy | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "batch_complete": {
+          "doc_summary": "Get a batch of completions from the model.",
+          "kind": "method",
+          "signature": "(self, messages: list[list[giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage]], params: giskard.agents.generators._types.GenerationParams | None = None, metadata: dict[str, Any] | None = None) -> list[giskard.llm.types.chat_completion.CompletionResponse]"
+        },
+        "chat": {
+          "doc_summary": "Create a new chat workflow with the given message.",
+          "kind": "method",
+          "signature": "(self, message: str, role: Literal['user', 'assistant', 'system', 'developer'] = 'user', *, as_template: bool = False) -> 'ChatWorkflow[Any]'"
+        },
+        "complete": {
+          "doc_summary": "Get a completion from the model.",
+          "kind": "method",
+          "signature": "(self, messages: Sequence[giskard.llm.types.chat_param.SystemMessageParam | giskard.llm.types.chat_param.DeveloperMessageParam | giskard.llm.types.chat_param.UserMessageParam | giskard.llm.types.chat_param.AssistantMessageParam | giskard.llm.types.chat_param.ToolMessageParam | giskard.llm.types.chat_param.FunctionMessageParam | giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage], params: giskard.agents.generators._types.GenerationParams | None = None, metadata: dict[str, Any] | None = None) -> giskard.llm.types.chat_completion.CompletionResponse"
+        },
+        "template": {
+          "doc_summary": "Create a new chat workflow from a template.",
+          "kind": "method",
+          "signature": "(self, template_name: str) -> 'ChatWorkflow[Any]'"
+        },
+        "with_params": {
+          "doc_summary": "Create a new generator with the given parameters.",
+          "kind": "method",
+          "signature": "(self, **kwargs: Any) -> Self"
+        },
+        "with_rate_limiter": {
+          "doc_summary": "Return a copy with the given rate limiter.",
+          "kind": "method",
+          "signature": "(self, rate_limiter: giskard.core.rate_limiter.base.BaseRateLimiter | str | None) -> Self"
+        },
+        "with_retries": {
+          "doc_summary": "Return a copy with an updated retry policy.",
+          "kind": "method",
+          "signature": "(self, max_attempts: int, *, base_delay: float | None = None, max_delay: float | None = None) -> Self"
+        }
+      },
+      "signature": "(*, params: giskard.agents.generators._types.GenerationParams = <factory>, retry_policy: giskard.agents.generators.middleware.RetryPolicy | None = None, rate_limiter: giskard.core.rate_limiter.base.BaseRateLimiter | None = None, middlewares: list[giskard.agents.generators.middleware.CompletionMiddleware] = <factory>) -> None"
+    },
+    "giskard.agents.templates.message.MessageTemplate": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "Inline Jinja2 message body before a workflow run.",
+      "fields": {
+        "content_template": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "role": {
+          "annotation": "typing.Literal['user', 'assistant', 'system', 'developer']",
+          "required": true
+        }
+      },
+      "kind": "class",
+      "members": {
+        "render": {
+          "doc_summary": "Render the message template with the given context.",
+          "kind": "method",
+          "signature": "(self, **kwargs: Any) -> giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage"
+        }
+      },
+      "signature": "(*, role: Literal['user', 'assistant', 'system', 'developer'], content_template: str) -> None"
+    },
+    "giskard.agents.workflow.TemplateReference": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "A reference to a template file that will be loaded at runtime.",
+      "fields": {
+        "template_name": {
+          "annotation": "<class 'str'>",
+          "required": true
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, template_name: str) -> None"
+    },
+    "giskard.core.discriminated.Discriminated": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "Base for polymorphic models keyed by a ``kind`` discriminator.",
+      "kind": "class",
+      "members": {
+        "kind": {
+          "doc_summary": "The discriminator field identifying the concrete type.",
+          "kind": "property"
+        },
+        "register": {
+          "doc_summary": "",
+          "kind": "classmethod",
+          "signature": "(cls, kind: str) -> Callable[[type[~T]], type[~T]]"
+        }
+      },
+      "signature": "() -> None"
+    },
+    "giskard.llm.types.chat.AssistantMessage": {
+      "bases": [
+        "giskard.llm.types._base._BaseModel"
+      ],
+      "doc_summary": "Shared base for all giskard-llm response models. Defaults model_dump to exclude None fields.",
+      "fields": {
+        "content": {
+          "annotation": "str | collections.abc.Sequence[giskard.llm.types.chat.TextContent | giskard.llm.types.chat.RefusalContent] | None",
+          "required": false
+        },
+        "refusal": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "role": {
+          "annotation": "typing.Literal['assistant']",
+          "default": "'assistant'",
+          "required": false
+        },
+        "tool_calls": {
+          "annotation": "collections.abc.Sequence[giskard.llm.types.chat.ToolCall] | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "is_refusal": {
+          "doc_summary": "",
+          "kind": "property"
+        },
+        "text": {
+          "doc_summary": "",
+          "kind": "property"
+        },
+        "transcript": {
+          "doc_summary": "",
+          "kind": "property"
+        }
+      },
+      "signature": "(*, role: Literal['assistant'] = 'assistant', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent | giskard.llm.types.chat.RefusalContent] | None = None, refusal: str | None = None, tool_calls: collections.abc.Sequence[giskard.llm.types.chat.ToolCall] | None = None) -> None"
+    },
+    "giskard.llm.types.chat.DeveloperMessage": {
+      "bases": [
+        "giskard.llm.types._base._BaseModel"
+      ],
+      "doc_summary": "Shared base for all giskard-llm response models. Defaults model_dump to exclude None fields.",
+      "fields": {
+        "content": {
+          "annotation": "str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]",
+          "required": true
+        },
+        "role": {
+          "annotation": "typing.Literal['developer']",
+          "default": "'developer'",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "text": {
+          "doc_summary": "",
+          "kind": "property"
+        },
+        "transcript": {
+          "doc_summary": "",
+          "kind": "property"
+        }
+      },
+      "signature": "(*, role: Literal['developer'] = 'developer', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
+    },
+    "giskard.llm.types.chat.FunctionMessage": {
+      "bases": [
+        "giskard.llm.types._base._BaseModel"
+      ],
+      "doc_summary": "Shared base for all giskard-llm response models. Defaults model_dump to exclude None fields.",
+      "fields": {
+        "content": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "role": {
+          "annotation": "typing.Literal['function']",
+          "default": "'function'",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "text": {
+          "doc_summary": "",
+          "kind": "property"
+        },
+        "transcript": {
+          "doc_summary": "",
+          "kind": "property"
+        }
+      },
+      "signature": "(*, content: str | None = None, name: str, role: Literal['function'] = 'function') -> None"
+    },
+    "giskard.llm.types.chat.SystemMessage": {
+      "bases": [
+        "giskard.llm.types._base._BaseModel"
+      ],
+      "doc_summary": "Shared base for all giskard-llm response models. Defaults model_dump to exclude None fields.",
+      "fields": {
+        "content": {
+          "annotation": "str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]",
+          "required": true
+        },
+        "role": {
+          "annotation": "typing.Literal['system']",
+          "default": "'system'",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "text": {
+          "doc_summary": "",
+          "kind": "property"
+        },
+        "transcript": {
+          "doc_summary": "",
+          "kind": "property"
+        }
+      },
+      "signature": "(*, role: Literal['system'] = 'system', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
+    },
+    "giskard.llm.types.chat.ToolMessage": {
+      "bases": [
+        "giskard.llm.types._base._BaseModel"
+      ],
+      "doc_summary": "Shared base for all giskard-llm response models. Defaults model_dump to exclude None fields.",
+      "fields": {
+        "content": {
+          "annotation": "str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]",
+          "required": true
+        },
+        "role": {
+          "annotation": "typing.Literal['tool']",
+          "default": "'tool'",
+          "required": false
+        },
+        "tool_call_id": {
+          "annotation": "<class 'str'>",
+          "required": true
+        }
+      },
+      "kind": "class",
+      "members": {
+        "text": {
+          "doc_summary": "",
+          "kind": "property"
+        },
+        "transcript": {
+          "doc_summary": "",
+          "kind": "property"
+        }
+      },
+      "signature": "(*, role: Literal['tool'] = 'tool', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent], tool_call_id: str) -> None"
+    },
+    "giskard.llm.types.chat.UserMessage": {
+      "bases": [
+        "giskard.llm.types._base._BaseModel"
+      ],
+      "doc_summary": "Shared base for all giskard-llm response models. Defaults model_dump to exclude None fields.",
+      "fields": {
+        "content": {
+          "annotation": "str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]",
+          "required": true
+        },
+        "role": {
+          "annotation": "typing.Literal['user']",
+          "default": "'user'",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "text": {
+          "doc_summary": "",
+          "kind": "property"
+        },
+        "transcript": {
+          "doc_summary": "",
+          "kind": "property"
+        }
+      },
+      "signature": "(*, role: Literal['user'] = 'user', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
+    }
+  },
+  "source_ref": "giskard-checks/v1.0.2rc1",
   "symbols": {
     "giskard.checks.AllOf": {
       "aliases": [
@@ -12,6 +361,20 @@
         "typing.Generic"
       ],
       "doc_summary": "Passes only when **all** inner checks pass (short-circuits on first failure).",
+      "fields": {
+        "checks": {
+          "annotation": "list[giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]]",
+          "required": true
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "run": {
@@ -24,7 +387,6 @@
     },
     "giskard.checks.AnswerRelevance": {
       "aliases": [
-        "giskard.checks.builtin.AnswerRelevance",
         "giskard.checks.judges.AnswerRelevance"
       ],
       "bases": [
@@ -32,6 +394,50 @@
         "typing.Generic"
       ],
       "doc_summary": "LLM-based check that evaluates whether the model's answer is relevant to the question.",
+      "fields": {
+        "answer": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "context": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "include_history": {
+          "annotation": "<class 'bool'>",
+          "default": "True",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "question": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "question_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.inputs'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "get_inputs": {
@@ -43,9 +449,14 @@
           "doc_summary": "Get the prompt for the LLM evaluation.",
           "kind": "method",
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
+        },
+        "run": {
+          "doc_summary": "Return ERROR when question/answer keys do not resolve; else run the judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, question: str | None = None, question_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.inputs', answer: str | None = None, answer_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | None = None) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, question: str | MISSING = MISSING, question_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.inputs', answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | MISSING = MISSING, include_history: bool = True) -> None"
     },
     "giskard.checks.AnyOf": {
       "aliases": [
@@ -56,6 +467,20 @@
         "typing.Generic"
       ],
       "doc_summary": "Passes when **at least one** inner check passes (short-circuits on first pass).",
+      "fields": {
+        "checks": {
+          "annotation": "list[giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]]",
+          "required": true
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "run": {
@@ -68,7 +493,6 @@
     },
     "giskard.checks.BaseLLMCheck": {
       "aliases": [
-        "giskard.checks.builtin.BaseLLMCheck",
         "giskard.checks.judges.BaseLLMCheck"
       ],
       "bases": [
@@ -77,6 +501,20 @@
         "typing.Generic"
       ],
       "doc_summary": "Abstract base class for LLM-based checks.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "get_inputs": {
@@ -108,6 +546,22 @@
         "typing.Generic"
       ],
       "doc_summary": "Abstract base for LLM-driven multi-turn input generators.",
+      "fields": {
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "max_retries": {
+          "annotation": "<class 'int'>",
+          "default": "2",
+          "required": false
+        },
+        "max_steps": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "get_inputs": {
@@ -121,7 +575,7 @@
           "signature": "(self) -> giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage | giskard.agents.workflow.TemplateReference | giskard.agents.templates.message.MessageTemplate"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, max_steps: Annotated[int, Ge(ge=0)] = 3) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, max_steps: Annotated[int, Ge(ge=0)] = 3, max_retries: Annotated[int, Ge(ge=0)] = 2) -> None"
     },
     "giskard.checks.Check": {
       "bases": [
@@ -129,12 +583,22 @@
         "typing.Generic"
       ],
       "doc_summary": "Base class for checks.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "run": {
           "doc_summary": "Execute the check against the provided trace.",
           "kind": "method",
-          "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
+          "signature": "(self, trace: TraceType) -> 'CheckResult'"
         }
       },
       "signature": "(*, name: str | None = None, description: str | None = None) -> None"
@@ -144,6 +608,26 @@
         "giskard.checks.core.result.BaseResult"
       ],
       "doc_summary": "Immutable result produced by running a `Check`.",
+      "fields": {
+        "details": {
+          "annotation": "dict[str, typing.Any]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "message": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "metrics": {
+          "annotation": "list[giskard.checks.core.result.Metric]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "status": {
+          "annotation": "<enum 'CheckStatus'>",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {
         "error": {
@@ -162,7 +646,7 @@
         "failure": {
           "doc_summary": "Construct a failure result.",
           "kind": "classmethod",
-          "signature": "(cls, *, message: str | None = None, details: dict[str, Any] | None = None) -> 'CheckResult'"
+          "signature": "(cls, *, message: str | None = None, details: dict[str, Any] | None = None, metrics: list[giskard.checks.core.result.Metric] | None = None) -> 'CheckResult'"
         },
         "passed": {
           "doc_summary": "Return True if `status` is `PASS`.",
@@ -180,7 +664,7 @@
         "success": {
           "doc_summary": "Construct a successful result.",
           "kind": "classmethod",
-          "signature": "(cls, *, message: str | None = None, details: dict[str, Any] | None = None) -> 'CheckResult'"
+          "signature": "(cls, *, message: str | None = None, details: dict[str, Any] | None = None, metrics: list[giskard.checks.core.result.Metric] | None = None) -> 'CheckResult'"
         }
       },
       "signature": "(*, status: giskard.checks.core.result.CheckStatus, message: str | None = None, metrics: list[giskard.checks.core.result.Metric] = <factory>, details: dict[str, typing.Any] = <factory>) -> None"
@@ -197,7 +681,6 @@
     },
     "giskard.checks.Conformity": {
       "aliases": [
-        "giskard.checks.builtin.Conformity",
         "giskard.checks.judges.Conformity"
       ],
       "bases": [
@@ -205,6 +688,24 @@
         "typing.Generic"
       ],
       "doc_summary": "LLM-based check that validates a trace against a given rule.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "rule": {
+          "annotation": "<class 'str'>",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {
         "get_inputs": {
@@ -220,6 +721,90 @@
       },
       "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, rule: str) -> None"
     },
+    "giskard.checks.Contradiction": {
+      "aliases": [
+        "giskard.checks.judges.Contradiction"
+      ],
+      "bases": [
+        "giskard.checks.judges.base.BaseLLMCheck[TypeVar, TypeVar, TypeVar]",
+        "typing.Generic"
+      ],
+      "doc_summary": "LLM-based check that fails only on clear contradictions with context.",
+      "fields": {
+        "answer": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "context": {
+          "annotation": "str | list[str] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "context_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.metadata.context'",
+          "required": false
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "get_inputs": {
+          "doc_summary": "Get template inputs for the LLM prompt.",
+          "kind": "method",
+          "signature": "(self, trace: giskard.checks.core.interaction.trace.Trace[TypeVar, TypeVar]) -> dict[str, str]"
+        },
+        "get_prompt": {
+          "doc_summary": "Get the prompt for the LLM evaluation.",
+          "kind": "method",
+          "signature": "(self) -> giskard.agents.workflow.TemplateReference"
+        },
+        "run": {
+          "doc_summary": "Return ERROR when answer/context keys do not resolve; else run the judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
+        }
+      },
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | MISSING = MISSING, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
+    },
+    "giskard.checks.DatasetInputGenerator": {
+      "bases": [
+        "giskard.checks.core.input_generator.InputGenerator[TypeVar]",
+        "giskard.checks.core.mixin.WithGeneratorMixin",
+        "typing.Generic"
+      ],
+      "doc_summary": "Single-shot generator that places a fixed dataset prompt into the target input.",
+      "fields": {
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "prompt": {
+          "annotation": "<class 'str'>",
+          "required": true
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, prompt: Annotated[str, MinLen(min_length=1)]) -> None"
+    },
     "giskard.checks.Equals": {
       "aliases": [
         "giskard.checks.builtin.Equals"
@@ -229,9 +814,44 @@
         "typing.Generic"
       ],
       "doc_summary": "Check that validates if extracted values equal an expected value.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "expected_value": {
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "expected_value_key": {
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "match": {
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "normalization_form": {
+          "annotation": "typing.Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None",
+          "default": "'NFKC'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>], expected_value: ExpectedType | None = None, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | giskard.core.utils.NotProvided = NotProvided(), normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC') -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.FnCheck": {
       "aliases": [
@@ -242,6 +862,33 @@
         "typing.Generic"
       ],
       "doc_summary": "A `Check` whose logic is a Python callable.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "details": {
+          "annotation": "dict[str, typing.Any]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "failure_message": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "fn": {
+          "annotation": "typing.Callable[[TraceType], collections.abc.Awaitable[bool | giskard.checks.core.result.CheckResult] | bool | giskard.checks.core.result.CheckResult]",
+          "required": true
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "success_message": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "run": {
@@ -252,19 +899,6 @@
       },
       "signature": "(*, name: str | None = None, description: str | None = None, fn: Callable[[TraceType], collections.abc.Awaitable[bool | giskard.checks.core.result.CheckResult] | bool | giskard.checks.core.result.CheckResult], success_message: str | None = None, failure_message: str | None = None, details: dict[str, typing.Any] = <factory>) -> None"
     },
-    "giskard.checks.GreaterEquals": {
-      "aliases": [
-        "giskard.checks.builtin.GreaterEquals"
-      ],
-      "bases": [
-        "giskard.checks.builtin.comparison.ComparisonCheck[TypeVar, TypeVar, TypeVar, TypeVar]",
-        "typing.Generic"
-      ],
-      "doc_summary": "Check that validates if extracted values are greater than or equal to an expected value.",
-      "kind": "class",
-      "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>], expected_value: ExpectedType | None = None, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | giskard.core.utils.NotProvided = NotProvided(), normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC') -> None"
-    },
     "giskard.checks.GreaterThan": {
       "aliases": [
         "giskard.checks.builtin.GreaterThan"
@@ -274,13 +908,95 @@
         "typing.Generic"
       ],
       "doc_summary": "Check that validates if extracted values are greater than an expected value.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "expected_value": {
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "expected_value_key": {
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "match": {
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "normalization_form": {
+          "annotation": "typing.Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None",
+          "default": "'NFKC'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>], expected_value: ExpectedType | None = None, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | giskard.core.utils.NotProvided = NotProvided(), normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC') -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
+    },
+    "giskard.checks.GreaterThanEquals": {
+      "aliases": [
+        "giskard.checks.builtin.GreaterThanEquals"
+      ],
+      "bases": [
+        "giskard.checks.builtin.comparison.ComparisonCheck[TypeVar, TypeVar, TypeVar, TypeVar]",
+        "typing.Generic"
+      ],
+      "doc_summary": "Check that validates if extracted values are greater than or equal to an expected value.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "expected_value": {
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "expected_value_key": {
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "match": {
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "normalization_form": {
+          "annotation": "typing.Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None",
+          "default": "'NFKC'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.Groundedness": {
       "aliases": [
-        "giskard.checks.builtin.Groundedness",
         "giskard.checks.judges.Groundedness"
       ],
       "bases": [
@@ -288,6 +1004,40 @@
         "typing.Generic"
       ],
       "doc_summary": "LLM-based check that validates answers are grounded in context.",
+      "fields": {
+        "answer": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "context": {
+          "annotation": "str | list[str] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "context_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.metadata.context'",
+          "required": false
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "get_inputs": {
@@ -299,9 +1049,82 @@
           "doc_summary": "Get the prompt for the LLM evaluation.",
           "kind": "method",
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
+        },
+        "run": {
+          "doc_summary": "Return ERROR when answer/context keys do not resolve; else run the judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | None = None, answer_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | None = None, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | MISSING = MISSING, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
+    },
+    "giskard.checks.GroupStats": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "Pass/fail counts for one tag-value bucket. Mirrors Hub's Metric shape.",
+      "fields": {
+        "errored": {
+          "annotation": "<class 'int'>",
+          "required": true
+        },
+        "failed": {
+          "annotation": "<class 'int'>",
+          "required": true
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": true
+        },
+        "passed": {
+          "annotation": "<class 'int'>",
+          "required": true
+        },
+        "skipped": {
+          "annotation": "<class 'int'>",
+          "default": "0",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "non_skipped": {
+          "doc_summary": "Scenarios counted toward pass rate (total minus skipped).",
+          "kind": "property"
+        },
+        "pass_rate": {
+          "doc_summary": "Fraction passed out of non-skipped scenarios; None when non_skipped == 0.",
+          "kind": "property"
+        },
+        "total": {
+          "doc_summary": "Total scenarios in this bucket (passed + failed + errored + skipped).",
+          "kind": "property"
+        }
+      },
+      "signature": "(*, name: str | None, passed: int, failed: int, errored: int, skipped: int = 0) -> None"
+    },
+    "giskard.checks.GroupedSuiteResult": {
+      "bases": [
+        "giskard.checks.core.result.BaseResult"
+      ],
+      "doc_summary": "SuiteResult grouped by a tag key, with per-group stats and Rich table.",
+      "fields": {
+        "groups": {
+          "annotation": "dict[str | None, giskard.checks.core.result.GroupStats]",
+          "required": true
+        },
+        "key": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "suite_result": {
+          "annotation": "<class 'giskard.checks.core.result.SuiteResult'>",
+          "required": true
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "() -> None"
     },
     "giskard.checks.InputGenerationException": {
       "bases": [
@@ -318,6 +1141,22 @@
         "typing.Generic"
       ],
       "doc_summary": "Defines how to interact with a system.",
+      "fields": {
+        "inputs": {
+          "annotation": "giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType]",
+          "required": true
+        },
+        "metadata": {
+          "annotation": "dict[str, typing.Any]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "outputs": {
+          "annotation": "Target[InputType, OutputType, TraceType] | MISSING",
+          "default": "MISSING",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "generate": {
@@ -333,10 +1172,10 @@
         "set_outputs": {
           "doc_summary": "Update the outputs of the interact and recompute the injection mappings. Returns self for chaining.",
           "kind": "method",
-          "signature": "(self, outputs: ProviderType[[InputType], OutputType] | ProviderType[[InputType, TraceType], OutputType] | giskard.core.utils.NotProvided) -> 'Interact[InputType, OutputType, TraceType]'"
+          "signature": "(self, outputs: Target[InputType, OutputType, TraceType] | MISSING) -> 'Interact[InputType, OutputType, TraceType]'"
         }
       },
-      "signature": "(*, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: ProviderType[[InputType], OutputType] | ProviderType[[InputType, TraceType], OutputType] | giskard.core.utils.NotProvided = NotProvided(), metadata: dict[str, typing.Any] = <factory>) -> None"
+      "signature": "(*, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: Target[InputType, OutputType, TraceType] | MISSING = MISSING, metadata: dict[str, typing.Any] = <factory>) -> None"
     },
     "giskard.checks.Interaction": {
       "bases": [
@@ -344,9 +1183,33 @@
         "typing.Generic"
       ],
       "doc_summary": "An immutable record of a single exchange in a chat or workflow.",
+      "fields": {
+        "inputs": {
+          "annotation": "InputType",
+          "required": true
+        },
+        "metadata": {
+          "annotation": "dict[str, typing.Any]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "outputs": {
+          "annotation": "OutputType",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {},
       "signature": "(*, inputs: InputType, outputs: OutputType, metadata: dict[str, typing.Any] = <factory>) -> None"
+    },
+    "giskard.checks.InteractionGenerationError": {
+      "bases": [
+        "builtins.Exception"
+      ],
+      "doc_summary": "Raised when an interaction generator fails, carrying the progress made so far.",
+      "kind": "class",
+      "members": {},
+      "signature": "(partial_trace: 'Trace[Any, Any]')"
     },
     "giskard.checks.InteractionSpec": {
       "bases": [
@@ -373,6 +1236,30 @@
         "typing.Generic"
       ],
       "doc_summary": "Check that validates whether a trace value is valid JSON.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "expected_schema": {
+          "annotation": "dict[str, typing.Any] | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "parse": {
+          "annotation": "<class 'bool'>",
+          "default": "True",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "run": {
@@ -386,20 +1273,29 @@
           "signature": "(cls, schema: dict[str, Any] | None) -> dict[str, Any] | None"
         }
       },
-      "signature": "(*, name: str | None = None, description: str | None = None, key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', schema: dict[str, Any] | None = None) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', parse: bool = True, schema: dict[str, Any] | None = None) -> None"
     },
     "giskard.checks.LLMCheckResult": {
       "aliases": [
-        "giskard.checks.builtin.LLMCheckResult",
         "giskard.checks.judges.LLMCheckResult"
       ],
       "bases": [
         "pydantic.main.BaseModel"
       ],
       "doc_summary": "Default result model for LLM-based checks.",
+      "fields": {
+        "passed": {
+          "annotation": "<class 'bool'>",
+          "required": true
+        },
+        "reason": {
+          "annotation": "<class 'str'>",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {},
-      "signature": "(*, reason: str | None = None, passed: bool) -> None"
+      "signature": "(*, reason: Annotated[str, MinLen(min_length=1)], passed: bool) -> None"
     },
     "giskard.checks.LLMGenerator": {
       "bases": [
@@ -407,6 +1303,35 @@
         "typing.Generic"
       ],
       "doc_summary": "Configurable LLM-driven generator with inline prompt or template path.",
+      "fields": {
+        "as_template": {
+          "annotation": "<class 'bool'>",
+          "default": "False",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "max_retries": {
+          "annotation": "<class 'int'>",
+          "default": "2",
+          "required": false
+        },
+        "max_steps": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        },
+        "prompt": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "prompt_path": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "get_prompt": {
@@ -415,11 +1340,10 @@
           "signature": "(self) -> giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage | giskard.agents.workflow.TemplateReference | giskard.agents.templates.message.MessageTemplate"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, max_steps: Annotated[int, Ge(ge=0)] = 3, prompt: str | None = None, as_template: bool = False, prompt_path: str | None = None) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, max_steps: Annotated[int, Ge(ge=0)] = 3, max_retries: Annotated[int, Ge(ge=0)] = 2, prompt: str | None = None, as_template: bool = False, prompt_path: str | None = None) -> None"
     },
     "giskard.checks.LLMJudge": {
       "aliases": [
-        "giskard.checks.builtin.LLMJudge",
         "giskard.checks.judges.LLMJudge"
       ],
       "bases": [
@@ -427,6 +1351,28 @@
         "typing.Generic"
       ],
       "doc_summary": "LLM-based check that evaluates interactions using a custom prompt.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "prompt": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "prompt_path": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "get_prompt": {
@@ -442,37 +1388,117 @@
       },
       "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, prompt: str | None = None, prompt_path: str | None = None) -> None"
     },
-    "giskard.checks.LesserThan": {
+    "giskard.checks.LessThan": {
       "aliases": [
-        "giskard.checks.builtin.LesserThan"
+        "giskard.checks.builtin.LessThan"
       ],
       "bases": [
         "giskard.checks.builtin.comparison.ComparisonCheck[TypeVar, TypeVar, TypeVar, TypeVar]",
         "typing.Generic"
       ],
       "doc_summary": "Check that validates if extracted values are less than an expected value.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "expected_value": {
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "expected_value_key": {
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "match": {
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "normalization_form": {
+          "annotation": "typing.Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None",
+          "default": "'NFKC'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>], expected_value: ExpectedType | None = None, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | giskard.core.utils.NotProvided = NotProvided(), normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC') -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
-    "giskard.checks.LesserThanEquals": {
+    "giskard.checks.LessThanEquals": {
       "aliases": [
-        "giskard.checks.builtin.LesserThanEquals"
+        "giskard.checks.builtin.LessThanEquals"
       ],
       "bases": [
         "giskard.checks.builtin.comparison.ComparisonCheck[TypeVar, TypeVar, TypeVar, TypeVar]",
         "typing.Generic"
       ],
       "doc_summary": "Check that validates if extracted values are less than or equal to an expected value.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "expected_value": {
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "expected_value_key": {
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "match": {
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "normalization_form": {
+          "annotation": "typing.Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None",
+          "default": "'NFKC'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>], expected_value: ExpectedType | None = None, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | giskard.core.utils.NotProvided = NotProvided(), normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC') -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.Metric": {
       "bases": [
         "pydantic.main.BaseModel"
       ],
       "doc_summary": "A named metric value captured during check execution.",
+      "fields": {
+        "name": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "value": {
+          "annotation": "<class 'float'>",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {},
       "signature": "(*, name: str, value: float) -> None"
@@ -486,6 +1512,20 @@
         "typing.Generic"
       ],
       "doc_summary": "Inverts the result of an inner check.",
+      "fields": {
+        "check": {
+          "annotation": "<class 'giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]'>",
+          "required": true
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "run": {
@@ -505,9 +1545,96 @@
         "typing.Generic"
       ],
       "doc_summary": "Check that validates if extracted values do not equal an expected value.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "expected_value": {
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "expected_value_key": {
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "match": {
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "normalization_form": {
+          "annotation": "typing.Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None",
+          "default": "'NFKC'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>], expected_value: ExpectedType | None = None, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | giskard.core.utils.NotProvided = NotProvided(), normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC') -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
+    },
+    "giskard.checks.Readability": {
+      "aliases": [
+        "giskard.checks.builtin.Readability"
+      ],
+      "bases": [
+        "giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]",
+        "typing.Generic"
+      ],
+      "doc_summary": "Check that validates the readability of output text.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "max_score": {
+          "annotation": "float | None",
+          "required": false
+        },
+        "metric": {
+          "annotation": "typing.Literal['flesch_reading_ease', 'flesch_kincaid_grade', 'gunning_fog', 'automated_readability_index', 'coleman_liau_index', 'dale_chall_readability_score']",
+          "default": "'flesch_reading_ease'",
+          "required": false
+        },
+        "min_score": {
+          "annotation": "float | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "run": {
+          "doc_summary": "Execute the readability check against the provided trace.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
+        },
+        "validate_score_range": {
+          "doc_summary": "Ensure the optional thresholds define a valid interval.",
+          "kind": "method",
+          "signature": "(self) -> Self"
+        }
+      },
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', metric: Literal['flesch_reading_ease', 'flesch_kincaid_grade', 'gunning_fog', 'automated_readability_index', 'coleman_liau_index', 'dale_chall_readability_score'] = 'flesch_reading_ease', min_score: float | None = None, max_score: float | None = None) -> None"
     },
     "giskard.checks.RegexMatching": {
       "aliases": [
@@ -518,6 +1645,41 @@
         "typing.Generic"
       ],
       "doc_summary": "Check that validates if a regex pattern matches within text.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "match_timeout_seconds": {
+          "annotation": "<class 'float'>",
+          "default": "2.0",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "pattern": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "pattern_key": {
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        },
+        "text": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "run": {
@@ -531,7 +1693,59 @@
           "signature": "(self) -> Self"
         }
       },
-      "signature": "(*, name: str | None = None, description: str | None = None, text: str | None = None, text_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', pattern: str | None = None, pattern_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | None = None, match_timeout_seconds: Annotated[float, Gt(gt=0)] = 2.0) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, text: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', pattern: str | MISSING = MISSING, pattern_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, match_timeout_seconds: Annotated[float, Gt(gt=0)] = 2.0) -> None"
+    },
+    "giskard.checks.RegoPolicy": {
+      "aliases": [
+        "giskard.checks.builtin.RegoPolicy"
+      ],
+      "bases": [
+        "giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]",
+        "typing.Generic"
+      ],
+      "doc_summary": "Evaluate an inline Rego policy against trace data using regorus.",
+      "fields": {
+        "data": {
+          "annotation": "dict[str, typing.Any]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "policy": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "rule": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "model_post_init": {
+          "doc_summary": "This function is meant to behave like a BaseModel method to initialize private attributes.",
+          "kind": "method",
+          "signature": "(self: 'BaseModel', context: 'Any', /) -> 'None'"
+        },
+        "run": {
+          "doc_summary": "Execute the Rego policy check.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
+        }
+      },
+      "signature": "(*, name: str | None = None, description: str | None = None, policy: str, rule: str, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', data: dict[str, typing.Any] = <factory>) -> None"
     },
     "giskard.checks.Scenario": {
       "bases": [
@@ -539,6 +1753,42 @@
         "typing.Generic"
       ],
       "doc_summary": "A scenario composed of steps, each containing interacts and checks.",
+      "fields": {
+        "annotations": {
+          "annotation": "dict[str, typing.Any]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "multiple_runs": {
+          "annotation": "<class 'int'>",
+          "default": "1",
+          "required": false
+        },
+        "name": {
+          "annotation": "<class 'str'>",
+          "default": "'Unnamed Scenario'",
+          "required": false
+        },
+        "steps": {
+          "annotation": "list[giskard.checks.core.scenario.Step[TypeVar, TypeVar, TypeVar]]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "tags": {
+          "annotation": "list[str]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "target": {
+          "annotation": "Target[InputType, OutputType, TraceType] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "trace_type": {
+          "annotation": "type[TraceType] | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "add_interaction": {
@@ -574,35 +1824,30 @@
         "interact": {
           "doc_summary": "Add an interaction to the scenario.",
           "kind": "method",
-          "signature": "(self, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: ProviderType[[InputType], OutputType] | ProviderType[[InputType, TraceType], OutputType] | giskard.core.utils.NotProvided = NotProvided(), metadata: dict[str, object] | None = None) -> Self"
+          "signature": "(self, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: Target[InputType, OutputType, TraceType] | MISSING = MISSING, metadata: dict[str, object] | None = None) -> Self"
         },
         "run": {
           "doc_summary": "Execute the scenario via the default runner, with optional multiple runs.",
           "kind": "method",
-          "signature": "(self, target: ProviderType[[InputType], OutputType] | ProviderType[[InputType, TraceType], OutputType] | giskard.core.utils.NotProvided = NotProvided(), return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
+          "signature": "(self, target: Target[InputType, OutputType, TraceType] | MISSING = MISSING, return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
         },
         "with_annotations": {
           "doc_summary": "Set scenario-level annotations.",
           "kind": "method",
           "signature": "(self, annotations: dict[str, typing.Any]) -> Self"
         },
-        "with_target": {
-          "doc_summary": "Set the default SUT for interactions with ``NOT_PROVIDED`` outputs.",
+        "with_tags": {
+          "doc_summary": "Set scenario tags for grouping and Hub upload.",
           "kind": "method",
-          "signature": "(self, target: ProviderType[[InputType], OutputType] | ProviderType[[InputType, TraceType], OutputType]) -> Self"
+          "signature": "(self, tags: list[str]) -> Self"
+        },
+        "with_target": {
+          "doc_summary": "Set the default SUT for interactions with ``MISSING`` outputs.",
+          "kind": "method",
+          "signature": "(self, target: Target[InputType, OutputType, TraceType]) -> Self"
         }
       },
-      "signature": "(name: str | None = None, /, *, steps: list[giskard.checks.core.scenario.Step[TypeVar, TypeVar, TypeVar]] = <factory>, trace_type: type[TraceType] | None = None, annotations: dict[str, typing.Any] = <factory>, target: ProviderType[[InputType], OutputType] | ProviderType[[InputType, TraceType], OutputType] | giskard.core.utils.NotProvided = NotProvided(), multiple_runs: Annotated[int, Strict(strict=True), Ge(ge=1)] = 1) -> None"
-    },
-    "giskard.checks.ScenarioCategory": {
-      "bases": [
-        "builtins.str",
-        "enum.Enum"
-      ],
-      "doc_summary": "Scenario categories available for suite generation.",
-      "kind": "class",
-      "members": {},
-      "signature": "(*values)"
+      "signature": "(name: str | None = None, /, *, steps: list[giskard.checks.core.scenario.Step[TypeVar, TypeVar, TypeVar]] = <factory>, trace_type: type[TraceType] | None = None, annotations: dict[str, typing.Any] = <factory>, target: Target[InputType, OutputType, TraceType] | MISSING = MISSING, multiple_runs: Annotated[int, Strict(strict=True), Ge(ge=1)] = 1, tags: list[str] = <factory>) -> None"
     },
     "giskard.checks.ScenarioResult": {
       "bases": [
@@ -610,6 +1855,39 @@
         "typing.Generic"
       ],
       "doc_summary": "Result of executing an entire scenario.",
+      "fields": {
+        "duration_ms": {
+          "annotation": "<class 'int'>",
+          "required": true
+        },
+        "final_trace": {
+          "annotation": "TraceType",
+          "required": true
+        },
+        "multiple_runs": {
+          "annotation": "<class 'int'>",
+          "default": "1",
+          "required": false
+        },
+        "runs_executed": {
+          "annotation": "<class 'int'>",
+          "default": "1",
+          "required": false
+        },
+        "scenario_name": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "steps": {
+          "annotation": "list[giskard.checks.core.result.TestCaseResult]",
+          "required": true
+        },
+        "tags": {
+          "annotation": "list[str]",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "errored": {
@@ -637,7 +1915,7 @@
           "kind": "property"
         }
       },
-      "signature": "(*, scenario_name: str, steps: list[giskard.checks.core.result.TestCaseResult], duration_ms: int, final_trace: TraceType, multiple_runs: int = 1, runs_executed: int = 1) -> None"
+      "signature": "(*, scenario_name: str, steps: list[giskard.checks.core.result.TestCaseResult], duration_ms: int, final_trace: TraceType, multiple_runs: int = 1, runs_executed: int = 1, tags: list[str] = <factory>) -> None"
     },
     "giskard.checks.ScenarioRunner": {
       "bases": [],
@@ -647,10 +1925,20 @@
         "run": {
           "doc_summary": "Execute a scenario up to N times, stopping on the first non-passing run.",
           "kind": "method",
-          "signature": "(self, scenario: giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, TypeVar], target: ProviderType[[InputType], OutputType] | ProviderType[[InputType, TraceType], OutputType] | giskard.core.utils.NotProvided = NotProvided(), return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
+          "signature": "(self, scenario: giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, TypeVar], target: Target[InputType, OutputType, TraceType] | MISSING = MISSING, return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
         }
       },
       "signature": "()"
+    },
+    "giskard.checks.ScenarioStatus": {
+      "bases": [
+        "builtins.str",
+        "enum.Enum"
+      ],
+      "doc_summary": "Outcome categories for a scenario execution.",
+      "kind": "class",
+      "members": {},
+      "signature": "(*values)"
     },
     "giskard.checks.SemanticSimilarity": {
       "aliases": [
@@ -662,6 +1950,40 @@
         "typing.Generic"
       ],
       "doc_summary": "Check that validates semantic similarity between outputs and reference text.",
+      "fields": {
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "embedding_model": {
+          "annotation": "giskard.agents.embeddings.base.BaseEmbeddingModel | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "reference_text": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "reference_text_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.metadata.reference_text'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        },
+        "threshold": {
+          "annotation": "<class 'float'>",
+          "default": "0.95",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "get_embeddings": {
@@ -675,7 +1997,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, embedding_model: giskard.agents.embeddings.base.BaseEmbeddingModel | None = None, name: str | None = None, description: str | None = None, threshold: float = 0.95, reference_text: str | None = None, reference_text_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.reference_text', actual_answer_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs') -> None"
+      "signature": "(*, embedding_model: giskard.agents.embeddings.base.BaseEmbeddingModel | None = None, name: str | None = None, description: str | None = None, threshold: float = 0.95, reference_text: str | MISSING = MISSING, reference_text_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.reference_text', target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs') -> None"
     },
     "giskard.checks.Step": {
       "bases": [
@@ -683,6 +2005,18 @@
         "typing.Generic"
       ],
       "doc_summary": "A scenario step: a sequence of interactions followed by checks.",
+      "fields": {
+        "checks": {
+          "annotation": "list[giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "interacts": {
+          "annotation": "list[giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar]]",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {},
       "signature": "(*, interacts: list[giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar]] = <factory>, checks: list[giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]] = <factory>) -> None"
@@ -696,6 +2030,46 @@
         "typing.Generic"
       ],
       "doc_summary": "Check that validates if a keyword appears within a text string.",
+      "fields": {
+        "case_sensitive": {
+          "annotation": "<class 'bool'>",
+          "default": "True",
+          "required": false
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "keyword": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "keyword_key": {
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "normalization_form": {
+          "annotation": "typing.Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None",
+          "default": "'NFKC'",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        },
+        "text": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "run": {
@@ -709,7 +2083,7 @@
           "signature": "(self) -> Self"
         }
       },
-      "signature": "(*, name: str | None = None, description: str | None = None, text: str | None = None, text_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', keyword: str | None = None, keyword_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | None = None, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', case_sensitive: bool = True) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, text: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', keyword: str | MISSING = MISSING, keyword_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', case_sensitive: bool = True) -> None"
     },
     "giskard.checks.Suite": {
       "bases": [
@@ -717,6 +2091,22 @@
         "typing.Generic"
       ],
       "doc_summary": "A suite of scenarios that can be run together with a shared target.",
+      "fields": {
+        "name": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "scenarios": {
+          "annotation": "list[giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "target": {
+          "annotation": "Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | MISSING",
+          "default": "MISSING",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "append": {
@@ -725,18 +2115,36 @@
           "signature": "(self, scenario: giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]) -> Self"
         },
         "run": {
-          "doc_summary": "Run all scenarios in the suite serially.",
+          "doc_summary": "Run all scenarios in the suite.",
           "kind": "method",
-          "signature": "(self, target: ProviderType[[InputType], OutputType] | ProviderType[[InputType, giskard.checks.core.interaction.trace.Trace[Any, Any]], OutputType] | giskard.core.utils.NotProvided = NotProvided(), return_exception: bool = False) -> giskard.checks.core.result.SuiteResult"
+          "signature": "(self, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | MISSING = MISSING, return_exception: bool = False, parallel: bool = False, max_concurrency: int | None = None, verbose: bool = True) -> giskard.checks.core.result.SuiteResult"
         }
       },
-      "signature": "(*, name: str, scenarios: list[giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]] = <factory>, target: ProviderType[[InputType], OutputType] | ProviderType[[InputType, giskard.checks.core.interaction.trace.Trace[Any, Any]], OutputType] | giskard.core.utils.NotProvided = NotProvided()) -> None"
+      "signature": "(*, name: str, scenarios: list[giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]] = <factory>, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | MISSING = MISSING) -> None"
     },
     "giskard.checks.SuiteResult": {
       "bases": [
         "giskard.checks.core.result.BaseResult"
       ],
       "doc_summary": "Aggregate result object for the suite.",
+      "fields": {
+        "duration_ms": {
+          "annotation": "<class 'int'>",
+          "required": true
+        },
+        "recommendation": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "results": {
+          "annotation": "list[giskard.checks.core.result.ScenarioResult[Any]]",
+          "required": true
+        },
+        "suite": {
+          "annotation": "giskard.checks.scenarios.suite.Suite[Any, Any] | None",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "errored_count": {
@@ -751,6 +2159,11 @@
           "doc_summary": "Return a list of scenario results that failed or errored.",
           "kind": "property"
         },
+        "group_by": {
+          "doc_summary": "Group results by a tag key and return a GroupedSuiteResult.",
+          "kind": "method",
+          "signature": "(self, key: str) -> 'GroupedSuiteResult'"
+        },
         "pass_rate": {
           "doc_summary": "The pass rate of the suite (passed scenarios / (total scenarios - skipped scenarios)).",
           "kind": "property"
@@ -759,9 +2172,19 @@
           "doc_summary": "Number of passed scenarios.",
           "kind": "property"
         },
+        "print_report": {
+          "doc_summary": "Print the suite report, optionally with a grouped pass-rate table.",
+          "kind": "method",
+          "signature": "(self, console: rich.console.Console | None = None, group_by: str | None = None) -> None"
+        },
         "skipped_count": {
           "doc_summary": "Number of skipped scenarios.",
           "kind": "property"
+        },
+        "to_hub_format": {
+          "doc_summary": "Convert the suite result into a JSON-serializable Giskard Hub payload.",
+          "kind": "method",
+          "signature": "(self) -> dict[str, typing.Any]"
         },
         "to_junit_xml": {
           "doc_summary": "",
@@ -769,7 +2192,11 @@
           "signature": "(self, path: str | pathlib.Path | None = None) -> str"
         }
       },
-      "signature": "(*, results: list[giskard.checks.core.result.ScenarioResult[Any]], duration_ms: int) -> None"
+      "signature": "(*, results: list[giskard.checks.core.result.ScenarioResult[Any]], duration_ms: int, suite: giskard.checks.scenarios.suite.Suite[Any, Any] | None = None, recommendation: str | None = None) -> None"
+    },
+    "giskard.checks.Target": {
+      "kind": "constant",
+      "type": "TypeAliasType"
     },
     "giskard.checks.TestCase": {
       "bases": [
@@ -777,6 +2204,20 @@
         "typing.Generic"
       ],
       "doc_summary": "Bundle a trace with a set of checks to execute.",
+      "fields": {
+        "checks": {
+          "annotation": "collections.abc.Sequence[giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]]",
+          "required": true
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "trace": {
+          "annotation": "TraceType",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {
         "assert_passed": {
@@ -792,11 +2233,67 @@
       },
       "signature": "(*, name: str | None = None, trace: TraceType, checks: collections.abc.Sequence[giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]]) -> None"
     },
+    "giskard.checks.TestCaseError": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "Captures why a test case failed to execute.",
+      "fields": {
+        "exception_type": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "message": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "phase": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "traceback": {
+          "annotation": "str | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "rich_line": {
+          "doc_summary": "Rich-markup row rendering this error under a step, in the given color.",
+          "kind": "method",
+          "signature": "(self, color: str) -> str"
+        },
+        "summary": {
+          "doc_summary": "One-line description: ``<ExceptionType>[ during <phase>]: <message>``.",
+          "kind": "method",
+          "signature": "(self) -> str"
+        }
+      },
+      "signature": "(*, message: str, exception_type: str, traceback: str | None = None, phase: str | None = None) -> None"
+    },
     "giskard.checks.TestCaseResult": {
       "bases": [
         "giskard.checks.core.result.BaseResult"
       ],
       "doc_summary": "Immutable summary of a test case execution with full run history.",
+      "fields": {
+        "duration_ms": {
+          "annotation": "<class 'int'>",
+          "required": true
+        },
+        "error": {
+          "annotation": "giskard.checks.core.result.TestCaseError | None",
+          "required": false
+        },
+        "last_interaction_index": {
+          "annotation": "int | None",
+          "required": false
+        },
+        "results": {
+          "annotation": "list[giskard.checks.core.result.CheckResult]",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {
         "assert_passed": {
@@ -817,7 +2314,7 @@
           "kind": "property"
         },
         "format_failures": {
-          "doc_summary": "Format failed check results into a list of readable error messages.",
+          "doc_summary": "Format non-passing check results into readable messages (FAIL, ERROR, and SKIP).",
           "kind": "method",
           "signature": "(self) -> list[str]"
         },
@@ -834,7 +2331,7 @@
           "kind": "property"
         }
       },
-      "signature": "(*, results: list[giskard.checks.core.result.CheckResult], duration_ms: int) -> None"
+      "signature": "(*, results: list[giskard.checks.core.result.CheckResult], duration_ms: int, last_interaction_index: int | None = None, error: giskard.checks.core.result.TestCaseError | None = None) -> None"
     },
     "giskard.checks.TestCaseRunner": {
       "bases": [],
@@ -849,9 +2346,18 @@
       },
       "signature": "()"
     },
+    "giskard.checks.TestCaseStatus": {
+      "bases": [
+        "builtins.str",
+        "enum.Enum"
+      ],
+      "doc_summary": "Outcome categories for a test case execution.",
+      "kind": "class",
+      "members": {},
+      "signature": "(*values)"
+    },
     "giskard.checks.Toxicity": {
       "aliases": [
-        "giskard.checks.builtin.Toxicity",
         "giskard.checks.judges.Toxicity"
       ],
       "bases": [
@@ -859,6 +2365,35 @@
         "typing.Generic"
       ],
       "doc_summary": "LLM-based check that detects toxic, harmful, or offensive content.",
+      "fields": {
+        "categories": {
+          "annotation": "list[typing.Literal['hate_speech', 'harassment', 'threats', 'self_harm', 'sexual_content', 'violence']]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "description": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "name": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "output": {
+          "annotation": "str | MISSING",
+          "default": "MISSING",
+          "required": false
+        },
+        "target_key": {
+          "annotation": "<class 'str'>",
+          "default": "'trace.last.outputs'",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
         "get_inputs": {
@@ -870,9 +2405,14 @@
           "doc_summary": "Return the bundled prompt template for toxicity evaluation.",
           "kind": "method",
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
+        },
+        "run": {
+          "doc_summary": "Return ERROR when ``target_key`` does not resolve; else run the judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, output: str | None = None, output_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', categories: list[typing.Literal['hate_speech', 'harassment', 'threats', 'self_harm', 'sexual_content', 'violence']] = <factory>) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, output: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', categories: list[typing.Literal['hate_speech', 'harassment', 'threats', 'self_harm', 'sexual_content', 'violence']] = <factory>) -> None"
     },
     "giskard.checks.Trace": {
       "bases": [
@@ -880,8 +2420,25 @@
         "typing.Generic"
       ],
       "doc_summary": "Immutable history of interactions in a scenario.",
+      "fields": {
+        "annotations": {
+          "annotation": "dict[str, typing.Any]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "interactions": {
+          "annotation": "list[giskard.checks.core.interaction.interaction.Interaction[TypeVar, TypeVar]]",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
       "kind": "class",
       "members": {
+        "for_target": {
+          "doc_summary": "",
+          "kind": "classmethod",
+          "signature": "(cls, target: Target[In, Out, Tr]) -> Tr"
+        },
         "from_interactions": {
           "doc_summary": "",
           "kind": "classmethod",
@@ -892,12 +2449,12 @@
           "kind": "property"
         },
         "with_interaction": {
-          "doc_summary": "",
+          "doc_summary": "Return a trace extended with one interaction or generated sequence.",
           "kind": "method",
           "signature": "(self, interaction: giskard.checks.core.interaction.interaction.Interaction[TypeVar, TypeVar] | giskard.checks.core.protocols.InteractionGenerator[giskard.checks.core.interaction.interaction.Interaction[TypeVar, TypeVar], Self]) -> Self"
         },
         "with_interactions": {
-          "doc_summary": "",
+          "doc_summary": "Return a trace extended with every given interaction, in order.",
           "kind": "method",
           "signature": "(self, *interactions: giskard.checks.core.interaction.interaction.Interaction[TypeVar, TypeVar] | giskard.checks.core.protocols.InteractionGenerator[giskard.checks.core.interaction.interaction.Interaction[TypeVar, TypeVar], Self]) -> Self"
         }
@@ -910,6 +2467,30 @@
         "typing.Generic"
       ],
       "doc_summary": "User simulation with predefined or custom personas.",
+      "fields": {
+        "context": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "max_retries": {
+          "annotation": "<class 'int'>",
+          "default": "2",
+          "required": false
+        },
+        "max_steps": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        },
+        "persona": {
+          "annotation": "<class 'str'>",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {
         "get_inputs": {
@@ -923,7 +2504,37 @@
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, max_steps: Annotated[int, Ge(ge=0)] = 3, persona: Annotated[str, MinLen(min_length=1)], context: str | None = None) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, max_steps: Annotated[int, Ge(ge=0)] = 3, max_retries: Annotated[int, Ge(ge=0)] = 2, persona: Annotated[str, MinLen(min_length=1)], context: str | None = None) -> None"
+    },
+    "giskard.checks.WithEmbeddingMixin": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "!!! abstract \"Usage Documentation\"",
+      "fields": {
+        "embedding_model": {
+          "annotation": "giskard.agents.embeddings.base.BaseEmbeddingModel | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, embedding_model: giskard.agents.embeddings.base.BaseEmbeddingModel | None = None) -> None"
+    },
+    "giskard.checks.WithGeneratorMixin": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "!!! abstract \"Usage Documentation\"",
+      "fields": {
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None) -> None"
     },
     "giskard.checks.WithSpy": {
       "bases": [
@@ -931,6 +2542,16 @@
         "typing.Generic"
       ],
       "doc_summary": "Base class for interaction specifications that generate interactions.",
+      "fields": {
+        "interaction_generator": {
+          "annotation": "<class 'giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar]'>",
+          "required": true
+        },
+        "target": {
+          "annotation": "<class 'str'>",
+          "required": true
+        }
+      },
       "kind": "class",
       "members": {
         "generate": {
@@ -941,6 +2562,10 @@
       },
       "signature": "(*, interaction_generator: giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar], target: str) -> None"
     },
+    "giskard.checks.__version__": {
+      "kind": "constant",
+      "type": "str"
+    },
     "giskard.checks.builtin.from_fn": {
       "aliases": [
         "giskard.checks.from_fn"
@@ -948,11 +2573,6 @@
       "doc_summary": "Create an `FnCheck` from a callable.",
       "kind": "function",
       "signature": "(fn: Callable[[TraceType], collections.abc.Awaitable[bool | giskard.checks.core.result.CheckResult] | bool | giskard.checks.core.result.CheckResult], *, name: str | None = None, description: str | None = None, success_message: str | None = None, failure_message: str | None = None, details: dict[str, Any] | None = None) -> giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]"
-    },
-    "giskard.checks.generate_suite": {
-      "doc_summary": "Generate a Suite of scenarios for the given categories.",
-      "kind": "function",
-      "signature": "(description: str, categories: list[giskard.checks.scenarios.catalog.ScenarioCategory] | None = None, max_scenarios: int | None = None, seed: int = 42, name: str = 'Security Suite') -> giskard.checks.scenarios.suite.Suite[str, Any]"
     },
     "giskard.checks.get_default_generator": {
       "doc_summary": "Get the current default generator.",
@@ -967,8 +2587,8 @@
     "giskard.checks.set_default_generator": {
       "doc_summary": "Set the default LLM generator for all checks.",
       "kind": "function",
-      "signature": "(generator: 'BaseGenerator') -> None"
+      "signature": "(generator: giskard.agents.generators.base.BaseGenerator) -> None"
     }
   },
-  "version": "1.0.2b3"
+  "version": "1.0.2rc1"
 }
