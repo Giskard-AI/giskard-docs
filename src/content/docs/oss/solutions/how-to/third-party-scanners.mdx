@@ -22,8 +22,8 @@ Neither scanner ships with `giskard-scan`. Each is an optional extra, pinned in 
 
 | Extra | Installs | Command |
 | --- | --- | --- |
-| `garak` | `garak>=0.15,<1` | `pip install "giskard-scan[garak]"` |
-| `deepteam` | `deepteam>=1.0.7,<2` | `pip install "giskard-scan[deepteam]"` |
+| `garak` | `garak>=0.15,<1` | `pip install --pre "giskard[scan,garak]"` |
+| `deepteam` | `deepteam>=1.0.7,<2` | `pip install --pre "giskard[scan,deepteam]"` |
 
 Calling `third_party_scan` without the matching extra raises `ImportError` with the install command in the message. The import is lazy, so the package stays installable without either.
 
@@ -96,7 +96,7 @@ Both tools go through the same entry point:
 ```python
 async def third_party_scan(
     target,
-    tool: Literal["garak", "deepteam"],
+    tool: Literal['garak', 'lidar', 'deepteam'],
     *,
     description: str,
     languages: list[str] | None = None,
@@ -104,9 +104,11 @@ async def third_party_scan(
 ) -> SuiteResult: ...
 ```
 
+The literal also accepts `'lidar'`, which routes to a private Giskard package rather than a supported public integration; use `'garak'` or `'deepteam'`.
+
 `third_party_scan` is the only dispatcher for garak and deepteam. `vulnerability_scan` cannot reach them: its suite is built from Giskard's own scenario generators, and the third-party scanners are a deliberate opt-in. The remaining keyword arguments are per tool: `probes` and `target_mode` for garak, `vulnerabilities`, `attacks`, `attacks_per_vulnerability_type` and `target_mode` for deepteam.
 
-Await it, as you await `vulnerability_scan`. Every scan entry point in the library is `async def`.
+Await it, as you await `vulnerability_scan`. Every scan function on this page is `async def`.
 
 Both examples on this page run against the same agent: a customer-support assistant for a retail bank, wrapped the way [Wrap your agent](/oss/solutions/how-to/wrap-your-agent) describes. It holds the caller's own records in its context and a system prompt stating its rules, which is what gives deepteam's `PIILeakage` and `PromptLeakage` something to go after later on this page:
 
@@ -235,7 +237,7 @@ Third-party results are report-only. The adapters build the `SuiteResult` from w
 
 To re-run a third-party scan you call `third_party_scan` again. Give it the same explicit `probes` (or `vulnerabilities` and `attacks`) if you want the runs to be comparable: garak replays a fixed corpus, but deepteam re-generates its attacks with an LLM every time.
 
-## Next Steps
+## Next steps
 
 - [Scan API reference](/oss/solutions/reference/scan-api) — the full `third_party_scan` and `list_scan_items` signatures
 - [Write a Custom Scenario Generator](/oss/solutions/tutorials/custom-scenario-generator) for the in-house alternative when neither tool covers your risk
