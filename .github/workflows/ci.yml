@@ -70,7 +70,7 @@ jobs:
             exit 0
           fi
           files=$(gh api "repos/$REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename')
-          if echo "$files" | grep -Eq '\.ipynb$|^tests/test_docs_nb\.py$|^pyproject\.toml$|^uv\.lock$|^\.github/workflows/ci\.yml$|^scripts/convert-notebooks\.mjs$'; then
+          if echo "$files" | grep -Eq '\.ipynb$|^tests/(conftest|test_docs_nb)\.py$|^pyproject\.toml$|^uv\.lock$|^\.github/workflows/ci\.yml$|^scripts/convert-notebooks\.mjs$'; then
             echo "relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "relevant=false" >> "$GITHUB_OUTPUT"
