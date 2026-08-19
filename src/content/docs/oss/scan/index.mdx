@@ -6,7 +6,7 @@ sidebar:
   label: Overview
 ---
 
-import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+import { LinkCard, CardGrid, Steps } from "@astrojs/starlight/components";
 
 The Giskard scan writes the tests for you. Describe your agent in a sentence, and it builds test cases tailored to that description, runs them against your agent, and reports which ones broke it.
 
@@ -22,6 +22,21 @@ pip install --pre "giskard[scan,openai]"
 
 ## Start here
 
+To see the whole thing working first, the [Quickstart](/oss/solutions/scan-vulnerabilities) runs one end-to-end example. Otherwise, work through these in order.
+
+<Steps>
+
+1. [Install & Configure](/oss/scan/installation) (~5 min): install the `scan` extra and register an LLM provider as the default generator. Giskard v3 requires Python 3.12 or newer. The scan calls your own provider with your own key for both generation and judging, so a run costs tokens. After this you can import `giskard.scan`.
+2. [Your First Scan](/oss/scan/tutorials/your-first-scan) (~15 min): wrap a toy agent as an async function, run `vulnerability_scan` with a small `max_scenarios` budget, and read the report. After this you have a real finding in front of you.
+3. [How the Scan Works](/oss/scan/explanation/how-scan-works) (~10 min): what a generator, a suite, and the judge actually do, and why a clean report is not a clean bill of health. After this you can tell an untested threat from a handled one, which is the difference between the two mistakes this tool makes easy.
+4. [Run the Scan in CI](/oss/scan/how-to/scan-in-ci) (~20 min): save the generated suite to JSON, replay it on every pull request, and export JUnit XML. After this two runs' pass rates mean the same thing, because they tested the same scenarios.
+5. [Tune a Scan Run](/oss/scan/how-to/tune-scan-options) (~10 min): control `max_scenarios`, `seed`, concurrency, and how the report is grouped. After this you can set what a scan costs instead of accepting the defaults.
+6. [Find Hallucinations and Sycophancy](/oss/scan/how-to/quality-scan) (~15 min): point `quality_scan` at your own documents to catch wrong answers rather than attacks. After this you have covered both scans the library ships.
+
+</Steps>
+
+## Browse the docs
+
 <CardGrid>
   <LinkCard
     title="Install & Configure"
@@ -29,49 +44,29 @@ pip install --pre "giskard[scan,openai]"
     href="/oss/scan/installation"
   />
   <LinkCard
-    title="Tutorial: Your First Scan"
-    description="Run a scan against a toy agent, read the findings, and save the suite."
-    href="/oss/scan/tutorials/your-first-scan"
+    title="Tutorials"
+    description="Four runnable notebooks: a first scan, red-team then regression-test, scanning a RAG agent, and writing your own generator."
+    href="/oss/scan/tutorials"
   />
   <LinkCard
-    title="Tutorial: Red-team, then regression-test"
-    description="Scan a weak agent, fix it, and freeze the finding into a permanent regression check."
-    href="/oss/scan/tutorials/redteam-to-regression"
+    title="How-to Guides"
+    description="Wrap your agent, pick generators, tune the run, save suites, scan in CI, bring your own dataset, and run garak or deepteam."
+    href="/oss/scan/how-to"
   />
   <LinkCard
-    title="How-to: Wrap your agent"
-    description="Connect the scan to a basic, stateful, or history-passing agent."
-    href="/oss/scan/how-to/wrap-your-agent"
+    title="API Reference"
+    description="Every argument of vulnerability_scan, quality_scan, generate_suite and third_party_scan, plus the generator catalog and KnowledgeBase."
+    href="/oss/scan/reference"
   />
   <LinkCard
-    title="How-to: Run in CI"
-    description="Save the generated suite, replay it in your pipeline, and export JUnit XML."
-    href="/oss/scan/how-to/scan-in-ci"
+    title="Explanation"
+    description="How the scan generates, runs and judges scenarios, and what the threat-type, quality and component tags in a report mean."
+    href="/oss/scan/explanation"
   />
   <LinkCard
-    title="How-to: Tune a scan run"
-    description="Cap the scenario budget, fix the seed, throttle concurrency, and regroup the report."
-    href="/oss/scan/how-to/tune-scan-options"
-  />
-  <LinkCard
-    title="Quickstart: Scan Vulnerabilities"
-    description="The shortest runnable path: install, wrap your agent, run a vulnerability scan, read the report."
-    href="/oss/solutions/scan-vulnerabilities"
-  />
-  <LinkCard
-    title="Quality scanning"
-    description="Hallucination, sycophancy, and out-of-scope scenarios generated from your own documents."
-    href="/oss/scan/how-to/quality-scan"
-  />
-  <LinkCard
-    title="Reference: Scan API"
-    description="Every argument of vulnerability_scan, quality_scan, generate_suite, and the generator catalog."
-    href="/oss/scan/reference/scan-api"
-  />
-  <LinkCard
-    title="Explanation: How the scan works"
-    description="Generators, target modes, threat types, and why the LLM judge is sometimes wrong."
-    href="/oss/scan/explanation/how-scan-works"
+    title="Agent Skills"
+    description="Drop-in skills that turn Claude Code and other coding agents into Giskard specialists."
+    href="/oss/agent-skills"
   />
 </CardGrid>
 
