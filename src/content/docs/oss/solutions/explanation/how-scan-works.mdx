@@ -70,7 +70,7 @@ Splitting the two phases is what makes a scan repeatable. A suite is just data, 
 
 ## Generators
 
-A scenario generator turns your `description` into concrete **adversarial** scenarios, meaning messages written to make the agent fail rather than to use it normally. All the generators below ship with `giskard-scan`, and you can add your own by subclassing `ScenarioGenerator`. They come in three kinds, which differ in where the attack comes from:
+A scenario generator turns your `description` into concrete **adversarial** scenarios, meaning messages written to make the agent fail rather than to use it normally. All the generators below ship with `giskard.scan`, and you can add your own by subclassing `ScenarioGenerator`. They come in three kinds, which differ in where the attack comes from:
 
 | Kind | Where scenarios come from | Used by | Examples |
 | --- | --- | --- | --- |
@@ -214,7 +214,7 @@ The scan is a discovery tool. It points you at the conversations to read.
 
 ## Scan and Checks are the same runtime
 
-`giskard-scan` is built on top of [Giskard Checks](/oss/checks). A scan returns an ordinary `Suite` of ordinary `Scenario` objects containing ordinary `Check` objects. Nothing about the result is special:
+`giskard.scan` is built on top of [Giskard Checks](/oss/checks). A scan returns an ordinary `Suite` of ordinary `Scenario` objects containing ordinary `Check` objects. Nothing about the result is special:
 
 - `suite.run(target=...)` is the same method you call on a hand-written suite
 - `SuiteResult` exposes the same `pass_rate`, `failures_and_errors`, and `to_junit_xml`

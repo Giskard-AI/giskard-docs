@@ -127,12 +127,12 @@ Keep alongside it, because none of it survives in the file:
 
 - the `description` and `languages` you generated from, since a reworded description produces a materially different suite;
 - `seed` and `max_scenarios`;
-- the `giskard-scan` version, since generator defaults and prompts change between releases;
+- the `giskard.scan` version, since generator defaults and prompts change between releases;
 - for a quality suite, the documents the knowledge base was built from.
 
 Checking in the generation script next to the suites records all of it in runnable form.
 
-Regenerate when the agent's scope changes, when you bump `giskard-scan`, or on a slow cadence to widen coverage, not on every build. Bump the filename (`scan-v2.json`) rather than overwriting, so an unexpected pass-rate jump can be traced to the suite that caused it. Keep the old file until you have run both against the same agent and know what moved.
+Regenerate when the agent's scope changes, when you bump `giskard.scan`, or on a slow cadence to widen coverage, not on every build. Bump the filename (`scan-v2.json`) rather than overwriting, so an unexpected pass-rate jump can be traced to the suite that caused it. Keep the old file until you have run both against the same agent and know what moved.
 
 ## Export results for CI
 
