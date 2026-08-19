@@ -1,0 +1,27 @@
+# Snippet parser fixture
+
+```python
+first = 1
+```
+
+<!-- pyright-skip: demo API is unavailable -->
+```py
+second = 2
+```
+
+<!-- pyright-skip: this marker is not immediate -->
+
+Text between the marker and the fence.
+
+```python title="third.py"
+third = 3
+```
+
+```javascript
+const ignored = true;
+```
+
+<!-- pyright-skip: no reason -->
+```python
+fourth = 4
+```

@@ -12,13 +12,15 @@
  */
 
 import { execSync, spawnSync } from "child_process";
-import { readFileSync, writeFileSync, readdirSync, statSync } from "fs";
-import { join, extname } from "path";
+import { readFileSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { randomUUID } from "crypto";
+import {
+  replacePythonFenceCode,
+  walkMarkdownFiles,
+} from "./markdown-python-fences.mjs";
 
 const LINE_LENGTH = 80;
-const PYTHON_BLOCK_RE = /(?<=```\s*python\n)([\s\S]*?)(?=```)/g;
 
 // ── Ensure black is available ────────────────────────────────────────────────
 
@@ -55,32 +57,13 @@ function formatPython(code) {
   return readFileSync(tmp, "utf8");
 }
 
-// ── Walk directory for .md / .mdx files ─────────────────────────────────────
-
-function* walkFiles(dir) {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      yield* walkFiles(full);
-    } else if ([".md", ".mdx"].includes(extname(entry.name))) {
-      yield full;
-    }
-  }
-}
-
 // ── Process a single file ────────────────────────────────────────────────────
 
 function processFile(filepath) {
   const original = readFileSync(filepath, "utf8");
-  let changed = false;
+  const result = replacePythonFenceCode(original, formatPython);
 
-  const result = original.replace(PYTHON_BLOCK_RE, (code) => {
-    const formatted = formatPython(code);
-    if (formatted !== code) changed = true;
-    return formatted;
-  });
-
-  if (changed) {
+  if (result !== original) {
     writeFileSync(filepath, result, "utf8");
     return true;
   }
@@ -94,7 +77,7 @@ const root = process.argv[2] ?? "src/content/docs";
 if (!ensureBlack()) process.exit(0);
 
 let count = 0;
-for (const file of walkFiles(root)) {
+for (const file of walkMarkdownFiles(root)) {
   if (processFile(file)) {
     console.log(`  reformatted ${file}`);
     count++;
