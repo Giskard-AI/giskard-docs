@@ -98,7 +98,7 @@ you want at a merge gate.
 
 - **You want the canonical RAG metrics.** Ragas' implementations are the ones
   papers and platforms cite. If you need a faithfulness number that reviewers
-  and other teams will recognise, use the reference implementation.
+  and other teams will recognize, use the reference implementation.
 - **You need synthetic test set generation.** Ragas can build an evaluation set
   from your documents using a knowledge-graph-based generator. Giskard Checks
   has nothing equivalent; `giskard.scan` generates *adversarial* scenarios,
@@ -115,7 +115,7 @@ you want at a merge gate.
 - **You want regression tests, not a report.** Checks have pass/fail semantics
   and run in pytest, so a quality regression fails CI like any other bug.
 - **You are testing more than retrieval quality.** Tone, format compliance,
-  refusal behaviour, tool-call correctness, structured-output validity, and
+  refusal behavior, tool-call correctness, structured-output validity, and
   safety all live in the same suite.
 - **Your system is conversational.** Multi-turn state does not fit a row-oriented
   dataset well.
