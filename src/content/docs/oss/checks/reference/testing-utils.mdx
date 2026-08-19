@@ -70,7 +70,6 @@ test_case = TestCase(
     name="fee_enquiry_replay",
     trace=trace,
     checks=[
-        Equals(expected_value="Hi there!", target_key="trace.interactions[0].outputs"),
         Equals(
             expected_value=3.00,
             target_key="trace.interactions[0].outputs.fee_eur",

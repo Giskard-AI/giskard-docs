@@ -179,14 +179,12 @@ from giskard.checks import Scenario, Conformity
 test_scenario = (
     Scenario("conversation_flow")
     .interact(inputs="Hello", outputs=generate_answer)
-    .check(Conformity(rule="The response should be a friendly greeting."))
-    .interact(inputs="Who invented HTML?", outputs=generate_answer)
     .check(
         Conformity(
             rule="response should be a friendly greeting",
         )
     )
-    .interact(inputs="Who invented the HTML?", outputs=generate_answer)
+    .interact(inputs="Who invented HTML?", outputs=generate_answer)
     .check(
         Conformity(
             rule="response should mention Tim Berners-Lee as the inventor of HTML",
