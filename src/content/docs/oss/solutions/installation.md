@@ -1,11 +1,11 @@
 ---
 title: Install & Configure
-description: "Install giskard-scan, pick a provider for the generator and judge model, and add the optional third-party scanner extras."
+description: "Install the Giskard scan, pick a provider for the generator and judge model, and add the optional third-party scanner extras."
 sidebar:
   order: 1
 ---
 
-`giskard-scan` needs two things before it can run: the Python package, and an LLM provider with an API key. The scan cannot work without a model, because a model is what writes the attacks and grades the replies.
+The Giskard scan needs two things before it can run: the Python package, and an LLM provider with an API key. The scan cannot work without a model, because a model is what writes the attacks and grades the replies.
 
 ## Install with a coding agent
 
@@ -14,21 +14,21 @@ The fastest way to set up the scan. Paste a single URL into your coding agent an
 :::tip[Paste this into your coding agent]
 
 ```
-Follow the instructions from https://docs.giskard.ai/oss/solutions/installation.md and install giskard-scan in my project.
+Follow the instructions from https://docs.giskard.ai/oss/solutions/installation.md and install the Giskard scan in my project.
 ```
 
 :::
 
 ## Install the Python package
 
-`giskard-scan` requires **Python 3.12 or higher**:
+The scan requires **Python 3.12 or higher**:
 
 ```bash
-pip install giskard-scan
+pip install --pre "giskard[scan]"
 ```
 
 ```bash
-uv pip install giskard-scan
+uv pip install --prerelease=allow "giskard[scan]"
 ```
 
 ## Configure a model
@@ -37,10 +37,10 @@ The scan calls an LLM twice: once to invent attack scenarios from your descripti
 
 Those calls send your agent's description and its replies to whichever provider you configure. If your agent can return customer data or internal documents, that data reaches the provider too.
 
-Install the provider extra from `giskard-agents` alongside the scan:
+Install the provider extra alongside the scan:
 
 ```bash
-pip install giskard-scan "giskard-agents[openai]"
+pip install --pre "giskard[scan,openai]"
 ```
 
 Then register the model as the default:
@@ -52,7 +52,7 @@ from giskard.checks import set_default_generator
 set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o"))
 ```
 
-`openai`, `anthropic`, and `google` are the first-party extras. For anything else, install `giskard-agents[litellm]` and pass any [LiteLLM-supported ↗](https://docs.litellm.ai/docs/providers) model string, such as `"mistral/mistral-large-latest"`, `"azure/gpt-4o"`, or `"ollama/llama3"`.
+`openai`, `anthropic`, and `google` are the first-party extras. For anything else, install the `litellm` extra and pass any [LiteLLM-supported ↗](https://docs.litellm.ai/docs/providers) model string, such as `"mistral/mistral-large-latest"`, `"azure/gpt-4o"`, or `"ollama/llama3"`.
 
 Each provider reads its own API key from the environment (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`). Keep them in a `.env` file and load it before you build the generator:
 
@@ -73,8 +73,8 @@ Pick a capable model here. The generator writes the attacks and the judge decide
 `third_party_scan` runs external red-teaming tools in-process through lazily imported adapters. They are not installed by default:
 
 ```bash
-pip install "giskard-scan[garak]"
-pip install "giskard-scan[deepteam]"
+pip install --pre "giskard[garak]"
+pip install --pre "giskard[deepteam]"
 ```
 
 Install only the ones you plan to run; both pull in large dependency trees. See [`third_party_scan`](/oss/solutions/reference/scan-api) for the arguments each tool accepts. A **probe** there is one canned attack that tool knows how to run, the equivalent of a Giskard generator.

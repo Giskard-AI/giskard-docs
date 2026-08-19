@@ -101,7 +101,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - run: pip install giskard-scan "giskard-agents[openai]" -e .
+      - run: pip install --pre "giskard[scan,openai]" -e .
       - run: python scripts/run_scan.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
