@@ -9,9 +9,9 @@ import Property from "../../../../../components/api/Property.astro";
 import MethodCard from "../../../../../components/api/MethodCard.astro";
 import TypeTable from "../../../../../components/api/TypeTable.astro";
 
-A **knowledge base** is the set of documents your agent is supposed to answer from, such as the published policies behind `support_agent`, the retail-bank support agent from [Wrap your agent](/oss/solutions/how-to/wrap-your-agent). The quality scan writes questions from those documents and checks the agent's answers against them, which is how it catches answers the agent invented ([hallucinations](/start/glossary/business/hallucination)).
+A **knowledge base** is the set of documents your agent is supposed to answer from, such as the published policies behind `support_agent`, the retail-bank support agent from [Wrap your agent](/oss/scan/how-to/wrap-your-agent). The quality scan writes questions from those documents and checks the agent's answers against them, which is how it catches answers the agent invented ([hallucinations](/start/glossary/business/hallucination)).
 
-Knowledge base primitives for document-grounded scan generators. [`quality_scan`](/oss/solutions/reference/scan-api#quality_scan) and every [knowledge-base generator](/oss/solutions/reference/generators#knowledge-base-generators) build their scenarios from these documents and judge the agent's answers against them.
+Knowledge base primitives for document-grounded scan generators. [`quality_scan`](/oss/scan/reference/scan-api#quality_scan) and every [knowledge-base generator](/oss/scan/reference/generators#knowledge-base-generators) build their scenarios from these documents and judge the agent's answers against them.
 
 ```python
 from giskard.scan import Document, KnowledgeBase
@@ -149,6 +149,6 @@ doc = Document(
 
 ## See also
 
-- [Scan API](/oss/solutions/reference/scan-api) for `quality_scan` and `generate_suite`
-- [Generators](/oss/solutions/reference/generators) for the knowledge-base generator family
+- [Scan API](/oss/scan/reference/scan-api) for `quality_scan` and `generate_suite`
+- [Generators](/oss/scan/reference/generators) for the knowledge-base generator family
 - [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) for the vulnerability scan overview

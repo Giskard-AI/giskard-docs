@@ -13,7 +13,7 @@ Multi-turn attacks call your agent once per turn with only the new message, so t
 
 Get this wrong and the scan still runs, but every multi-turn attack collapses: the agent answers each message with no memory of the previous ones, so escalation attacks look like they failed when they were never really attempted.
 
-Before you start, run `pip install --pre "giskard[scan,openai]"`, which brings in the `openai` client and Pydantic used below. See [Install & Configure](/oss/solutions/installation) for the provider setup.
+Before you start, run `pip install --pre "giskard[scan,openai]"`, which brings in the `openai` client and Pydantic used below. See [Install & Configure](/oss/scan/installation) for the provider setup.
 
 Find your agent in this table, then open the matching tab:
 
@@ -209,6 +209,6 @@ The `description` is what the LLM uses to generate scenarios specific to your ag
 
 ## Next Steps
 
-- [Customize a scan](/oss/solutions/how-to/customize-a-scan) to pick generators and bound the run
-- [Run the scan in CI](/oss/solutions/how-to/scan-in-ci) to replay a saved suite on every pull request
-- [Scan API reference](/oss/solutions/reference/scan-api) for every argument
+- [Customize a scan](/oss/scan/how-to/customize-a-scan) to pick generators and bound the run
+- [Run the scan in CI](/oss/scan/how-to/scan-in-ci) to replay a saved suite on every pull request
+- [Scan API reference](/oss/scan/reference/scan-api) for every argument

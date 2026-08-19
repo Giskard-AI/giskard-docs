@@ -95,9 +95,9 @@ and check these by hand on every refresh:
 
 | Page | Table | Source of truth in `giskard-oss` |
 | --- | --- | --- |
-| `oss/solutions/explanation/threat-taxonomy.mdx` | tag families, threat types, generator families, `quality:`/`component:` tags per generator | `libs/giskard-scan/src/giskard/scan/generators/` (each generator's `tags` default) and `libs/giskard-scan/src/giskard/scan/vulnerability.py` (`VULNERABILITY_GENERATORS`) |
+| `oss/scan/explanation/threat-taxonomy.mdx` | tag families, threat types, generator families, `quality:`/`component:` tags per generator | `libs/giskard-scan/src/giskard/scan/generators/` (each generator's `tags` default) and `libs/giskard-scan/src/giskard/scan/vulnerability.py` (`VULNERABILITY_GENERATORS`) |
 
-Pages typed `other` (e.g. `oss/solutions/`, `oss/agent-skills.mdx`) have no owning
+Pages typed `other` (e.g. `oss/solutions/`, `oss/scan/`, `oss/agent-skills.mdx`) have no owning
 editor. Do not edit them; list them in the PR body for a human.
 
 ## Phase 4 — Edit

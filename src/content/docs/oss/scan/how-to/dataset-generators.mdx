@@ -176,7 +176,7 @@ The path is inside the installed `giskard.scan` package, not your working direct
 
 ## Run them
 
-Dataset generators go anywhere a generator goes. `generator` below is the one built above, and `bank_agent` is the async target wrapped in [Wrap Your Agent](/oss/solutions/how-to/wrap-your-agent). Pass it straight to `generate_suite` when you want only your corpus:
+Dataset generators go anywhere a generator goes. `generator` below is the one built above, and `bank_agent` is the async target wrapped in [Wrap Your Agent](/oss/scan/how-to/wrap-your-agent). Pass it straight to `generate_suite` when you want only your corpus:
 
 ```python
 from giskard.scan import generate_suite
@@ -209,7 +209,7 @@ result = await vulnerability_scan(
 )
 ```
 
-The registry is module-level mutable state and rejects duplicate registrations. See [`SuiteGeneratorRegistry`](/oss/solutions/reference/scan-api#suitegeneratorregistry) for the exact rules.
+The registry is module-level mutable state and rejects duplicate registrations. See [`SuiteGeneratorRegistry`](/oss/scan/reference/scan-api#suitegeneratorregistry) for the exact rules.
 
 ## How much of your corpus runs
 
@@ -219,12 +219,12 @@ The registry is module-level mutable state and rejects duplicate registrations. 
 - Share larger than the corpus: the whole corpus.
 - No `max_scenarios` on the run at all: each dataset generator falls back to its own default of 20, sampled the same way.
 
-The draw uses the seeded RNG the scan hands each generator, so `seed` fixes exactly which lines you get. Pin it when you compare two runs, and change it when you want to widen coverage across runs. [The scenario budget](/oss/solutions/explanation/how-scan-works#the-scenario-budget) explains the split.
+The draw uses the seeded RNG the scan hands each generator, so `seed` fixes exactly which lines you get. Pin it when you compare two runs, and change it when you want to widen coverage across runs. [The scenario budget](/oss/scan/explanation/how-scan-works#the-scenario-budget) explains the split.
 
 `target_mode="singleturn"` clamps every LLM input generator in a loaded scenario to `max_steps=1`, in place. Dataset scenarios that encode a multi-step conversation still run, but only their first turn does.
 
 ## Next Steps
 
-- [Generators reference](/oss/solutions/reference/generators) for every generator with its parameters
-- [Tune a Scan Run](/oss/solutions/how-to/tune-scan-options) for `max_scenarios`, `seed`, and `commercial_use` in full
-- [What the Scan Looks For](/oss/solutions/explanation/threat-taxonomy) for how tags reach the grouped report
+- [Generators reference](/oss/scan/reference/generators) for every generator with its parameters
+- [Tune a Scan Run](/oss/scan/how-to/tune-scan-options) for `max_scenarios`, `seed`, and `commercial_use` in full
+- [What the Scan Looks For](/oss/scan/explanation/threat-taxonomy) for how tags reach the grouped report

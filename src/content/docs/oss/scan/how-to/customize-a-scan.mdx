@@ -7,7 +7,7 @@ sidebar:
 
 `vulnerability_scan` runs every built-in generator with default budgets. Use the options below when you want less, more, or something different.
 
-Every example on this page runs against `support_agent`, the retail-bank support agent defined in [Wrap your agent](/oss/solutions/how-to/wrap-your-agent). Substitute your own target.
+Every example on this page runs against `support_agent`, the retail-bank support agent defined in [Wrap your agent](/oss/scan/how-to/wrap-your-agent). Substitute your own target.
 
 ## Run only specific generators
 
@@ -34,7 +34,7 @@ suite_result = await suite.run(target=support_agent, parallel=True)
 
 `Suite.run` defaults to `parallel=False`, unlike the scan helpers. Pass `parallel=True` when you want the same concurrency a full scan gives you. Serial runs are slow but easier to debug; parallel runs are fast but hit provider rate limits, and they need an agent that tolerates concurrent calls.
 
-The full catalog is in the [generators reference](/oss/solutions/reference/generators).
+The full catalog is in the [generators reference](/oss/scan/reference/generators).
 
 ## Bound the run
 
@@ -52,7 +52,7 @@ suite_result = await vulnerability_scan(
 )
 ```
 
-The budget is split by a multinomial draw, so a generator that draws zero is skipped. See [the scenario budget](/oss/solutions/explanation/how-scan-works#the-scenario-budget). Keep `max_scenarios` small while you are wiring things up. A small budget leaves whole attack types untested, so raise it before you trust the result.
+The budget is split by a multinomial draw, so a generator that draws zero is skipped. See [the scenario budget](/oss/scan/explanation/how-scan-works#the-scenario-budget). Keep `max_scenarios` small while you are wiring things up. A small budget leaves whole attack types untested, so raise it before you trust the result.
 
 ## Generate scenarios in other languages
 
@@ -87,6 +87,6 @@ To write the evaluation logic yourself, see [Giskard Checks](/oss/checks).
 
 ## Next Steps
 
-- [Run the scan in CI](/oss/solutions/how-to/scan-in-ci) to replay a saved suite
-- [Scan API reference](/oss/solutions/reference/scan-api) for every argument
-- [How the scan works](/oss/solutions/explanation/how-scan-works) for why the budget behaves the way it does
+- [Run the scan in CI](/oss/scan/how-to/scan-in-ci) to replay a saved suite
+- [Scan API reference](/oss/scan/reference/scan-api) for every argument
+- [How the scan works](/oss/scan/explanation/how-scan-works) for why the budget behaves the way it does

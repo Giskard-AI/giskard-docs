@@ -11,7 +11,7 @@ A **scan** happens in two phases. First it writes test cases for your agent, the
 
 Run a scan when you want to see how your agent holds up under pressure, against realistic scenarios you would not have thought to write yourself. The running example on this page is a customer-support agent for a retail bank, which answers questions about accounts, cards, payments and disputes. A first scan against an agent like that turns up the kinds of failure a bank cares about: investment advice it should have refused, another customer's balance read out to whoever asked, or an instruction hidden in a pasted statement that the agent follows.
 
-This page describes what the scan does between those two phases, so you can tell why a scan found what it found, and why it sometimes finds the wrong thing. If you have not run one yet, start with [Your First Scan](/oss/solutions/tutorials/your-first-scan) and come back.
+This page describes what the scan does between those two phases, so you can tell why a scan found what it found, and why it sometimes finds the wrong thing. If you have not run one yet, start with [Your First Scan](/oss/scan/tutorials/your-first-scan) and come back.
 
 ## What a scan is made of
 
@@ -36,7 +36,7 @@ You have two ways to drive this. Which one you want depends on whether you need 
 - **Generate and run in one call.** `vulnerability_scan` (or `quality_scan`) walks the whole chain: it generates the suite, runs it against your agent, prints the grouped report, and hands back a `SuiteResult`. This is what you want while you are exploring.
 - **Generate first, run later.** `generate_suite` stops after the suite. You get a `Suite` object you can inspect, edit, save to disk, and run whenever you like with `suite.run(target=...)`.
 
-The examples below run against `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/solutions/how-to/wrap-your-agent). The tutorial uses a garden-center assistant instead, because it runs live against a model:
+The examples below run against `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/scan/how-to/wrap-your-agent). The tutorial uses a garden-center assistant instead, because it runs live against a model:
 
 ```python
 from giskard.scan import (
@@ -66,7 +66,7 @@ suite = await generate_suite(
 result = await suite.run(support_agent)
 ```
 
-Splitting the two phases is what makes a scan repeatable. A suite is just data, so once it exists you can serialize it, commit it next to your tests, replay it against a different agent, or run it a thousand times without paying for generation again. [Running the scan in CI](/oss/solutions/how-to/scan-in-ci) is built on exactly that.
+Splitting the two phases is what makes a scan repeatable. A suite is just data, so once it exists you can serialize it, commit it next to your tests, replay it against a different agent, or run it a thousand times without paying for generation again. [Running the scan in CI](/oss/scan/how-to/scan-in-ci) is built on exactly that.
 
 ## Generators
 
@@ -144,7 +144,7 @@ Narrowing the generator list narrows what the scan can find, so use it when you 
   </TabItem>
 </Tabs>
 
-The full catalog, with every parameter, is in the [generators reference](/oss/solutions/reference/generators).
+The full catalog, with every parameter, is in the [generators reference](/oss/scan/reference/generators).
 
 ### The attack families you will see
 
@@ -156,7 +156,7 @@ These three are examples, not the full list. They are the families that show up 
 | **Direct adversarial** | Sends direct requests that test for [harmful](/start/glossary/security/harmful-content) or unauthorized content: [stereotypes and discrimination](/start/glossary/security/stereotypes), illegal activities, CBRN material, copyright, misinformation, and unqualified financial, medical, or legal advice. It runs up to three turns by default, and only one when `target_mode="singleturn"`. | Harmful Content Generation, Misguidance & Unauthorized Advice |
 | **GOAT multi-turn jailbreak** | A **jailbreak** is a conversation that talks the agent out of its own rules. GOAT uses an attacker LLM that adapts over several turns, chaining refusal suppression, persona modification, and hypothetical framing to push the agent toward objectives it should refuse. | Harmful Content Generation |
 
-A vulnerability scan runs more than these three. It also sends Crescendo multi-turn attacks, which escalate gradually instead of adapting turn by turn, GCG suffix injections, which append a string of meaningless tokens tuned to push a model into complying, and two Hugging Face attack datasets. For the complete picture, the [generators reference](/oss/solutions/reference/generators) lists every generator the scan can run, and the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) lists every category a finding can be filed under.
+A vulnerability scan runs more than these three. It also sends Crescendo multi-turn attacks, which escalate gradually instead of adapting turn by turn, GCG suffix injections, which append a string of meaningless tokens tuned to push a model into complying, and two Hugging Face attack datasets. For the complete picture, the [generators reference](/oss/scan/reference/generators) lists every generator the scan can run, and the [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) lists every category a finding can be filed under.
 
 ### The scenario budget
 
@@ -173,7 +173,7 @@ A vulnerability scan runs more than these three. It also sends Crescendo multi-t
 
 `target_mode="singleturn"` therefore removes a whole class of vulnerability from the report. Use it only when your agent genuinely cannot hold a conversation.
 
-Multi-turn mode calls your agent once per turn with only the new message, so your wrapper has to handle continuity itself, either by carrying a thread id on a `Trace` subclass or by rebuilding the history from `trace.interactions`. Both patterns are in [Wrap your agent](/oss/solutions/how-to/wrap-your-agent).
+Multi-turn mode calls your agent once per turn with only the new message, so your wrapper has to handle continuity itself, either by carrying a thread id on a `Trace` subclass or by rebuilding the history from `trace.interactions`. Both patterns are in [Wrap your agent](/oss/scan/how-to/wrap-your-agent).
 
 ## Threat types vs. components
 
@@ -224,6 +224,6 @@ What separates the two is who writes the tests. The scan writes them for you fro
 
 ## Next Steps
 
-- [Your First Scan](/oss/solutions/tutorials/your-first-scan) to run the pipeline end to end
-- [Generators reference](/oss/solutions/reference/generators) for the full catalog with every parameter
+- [Your First Scan](/oss/scan/tutorials/your-first-scan) to run the pipeline end to end
+- [Generators reference](/oss/scan/reference/generators) for the full catalog with every parameter
 - [When to use which check](/oss/checks/explanation/when-to-use-which-check) for the same judge tradeoffs from the Checks side

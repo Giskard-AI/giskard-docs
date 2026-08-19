@@ -10,7 +10,7 @@ import MethodCard from "../../../../../components/api/MethodCard.astro";
 import ResourceSection from "../../../../../components/api/ResourceSection.astro";
 import TypeTable from "../../../../../components/api/TypeTable.astro";
 
-Scenario generators turn a plain-language description of your agent into runnable scenarios, where a scenario is one test case: a message or short conversation, plus the checks that judge the reply. Every scan is a set of generators plus a target. Pick them yourself with [`generate_suite`](/oss/solutions/reference/scan-api#generate_suite), or take the curated sets used by `vulnerability_scan` and `quality_scan`.
+Scenario generators turn a plain-language description of your agent into runnable scenarios, where a scenario is one test case: a message or short conversation, plus the checks that judge the reply. Every scan is a set of generators plus a target. Pick them yourself with [`generate_suite`](/oss/scan/reference/scan-api#generate_suite), or take the curated sets used by `vulnerability_scan` and `quality_scan`.
 
 Which generators you run decides what the scan can find. Drop one and the failures it would have found never appear in the report. The table below lists every generator that produces scenarios, so it is also the limit of what a scan covers. Two more classes exist as bases you subclass rather than run: `KnowledgeBaseScenarioGenerator` (documented [below](#knowledgebasescenariogenerator)) and `BaseDatasetScenarioGenerator` in `giskard.scan.generators.base`.
 
@@ -271,7 +271,7 @@ generator = GCGInjectionScenarioGenerator()
 
 ## Knowledge-base generators
 
-Document-grounded quality generators. They sample seed documents from the run's [`KnowledgeBase`](/oss/solutions/reference/knowledge-base), retrieve nearest neighbors as private reference context, and build scenarios whose checks compare the agent's answers to that context. With no knowledge base in the run context they return an empty list.
+Document-grounded quality generators. They sample seed documents from the run's [`KnowledgeBase`](/oss/scan/reference/knowledge-base), retrieve nearest neighbors as private reference context, and build scenarios whose checks compare the agent's answers to that context. With no knowledge base in the run context they return an empty list.
 
 Two of the five are multi-turn by design. `SplitQuestionsScenarioGenerator` and `MultiTopicScenarioGenerator` log a warning and return no scenarios under `target_mode="singleturn"`, so `quality_scan(target_mode="singleturn")` runs three generators, not five, and produces no `component:history` results. Check the warnings if a single-turn quality report looks thinner than you expected.
 
@@ -435,7 +435,7 @@ Pass classes instead of instances when the defaults are fine. `generate_suite` a
 
 ## See also
 
-- [Scan API](/oss/solutions/reference/scan-api) for `generate_suite`, the built-in scans, and `SuiteGeneratorRegistry`
-- [Knowledge Base](/oss/solutions/reference/knowledge-base) for `KnowledgeBase` and `Document`
-- [Customize a scan](/oss/solutions/how-to/customize-a-scan) to pick generators for a run
+- [Scan API](/oss/scan/reference/scan-api) for `generate_suite`, the built-in scans, and `SuiteGeneratorRegistry`
+- [Knowledge Base](/oss/scan/reference/knowledge-base) for `KnowledgeBase` and `Document`
+- [Customize a scan](/oss/scan/how-to/customize-a-scan) to pick generators for a run
 - [Checks: Generators](/oss/checks/reference/generators) for `UserSimulator` and custom input generators

@@ -9,7 +9,7 @@ A scan produces dozens or hundreds of **scenarios**, each one a test case: a mes
 
 A **threat type** is one of those tags: the kind of harm a scenario tries to cause, such as [prompt injection](/start/glossary/security/injection) or [harmful content](/start/glossary/security/harmful-content). Grouping by it turns a flat list of 47 failures into "most failures are prompt injection", which points at one defense to add rather than 47 replies to read.
 
-This page is the catalog: which tag means what, which generator emits it, and how to read a grouped table without over-reading it. [How the Scan Works](/oss/solutions/explanation/how-scan-works) covers the pipeline that produces them.
+This page is the catalog: which tag means what, which generator emits it, and how to read a grouped table without over-reading it. [How the Scan Works](/oss/scan/explanation/how-scan-works) covers the pipeline that produces them.
 
 ## Tag families
 
@@ -108,7 +108,7 @@ When reading a grouped table:
 - **A bucket's pass rate is a sample, not a measurement of risk.** The pass rate is the share of that bucket's scenarios that passed, over whatever scenarios happened to be generated. Four scenarios passing tells you little. Pass rates are only comparable across runs when you replay a fixed saved suite with a fixed seed; otherwise each run tests different scenarios. Read the failures instead of trending the number.
 - **Tags are per scenario, not per check.** A scenario can carry several checks; the grouping follows the scenario.
 
-Verdicts come from an LLM judge, a model asked to decide whether a reply was acceptable. It is wrong sometimes, in both directions: it passes replies it should fail, and fails replies that were fine. Read a failure before acting on it. The scan is not exhaustive and is not an audit or a compliance certificate. See [The judge is an LLM](/oss/solutions/explanation/how-scan-works#the-judge-is-an-llm).
+Verdicts come from an LLM judge, a model asked to decide whether a reply was acceptable. It is wrong sometimes, in both directions: it passes replies it should fail, and fails replies that were fine. Read a failure before acting on it. The scan is not exhaustive and is not an audit or a compliance certificate. See [The judge is an LLM](/oss/scan/explanation/how-scan-works#the-judge-is-an-llm).
 
 ## The quality recommendation
 
@@ -116,6 +116,6 @@ The quality scan ends with a written recommendation generated from the grouped r
 
 ## Next Steps
 
-- [How the Scan Works](/oss/solutions/explanation/how-scan-works) for the pipeline these tags travel through
-- [Generators reference](/oss/solutions/reference/generators) for every generator with its parameters
-- [Scan a RAG Agent](/oss/solutions/tutorials/scan-a-rag-agent) for the quality tags on a real report
+- [How the Scan Works](/oss/scan/explanation/how-scan-works) for the pipeline these tags travel through
+- [Generators reference](/oss/scan/reference/generators) for every generator with its parameters
+- [Scan a RAG Agent](/oss/scan/tutorials/scan-a-rag-agent) for the quality tags on a real report

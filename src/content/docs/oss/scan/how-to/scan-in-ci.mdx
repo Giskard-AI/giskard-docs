@@ -9,7 +9,7 @@ Generate the scan's scenarios once, save them to a file, and replay that same fi
 
 Regenerating on every run is slow, costs LLM calls, and produces different scenarios each time, so the numbers from two builds cannot be compared.
 
-The examples use `support_agent`, the retail-bank support agent from [Wrap your agent](/oss/solutions/how-to/wrap-your-agent), imported from your own package.
+The examples use `support_agent`, the retail-bank support agent from [Wrap your agent](/oss/scan/how-to/wrap-your-agent), imported from your own package.
 
 ## 1. Generate and save the suite
 
@@ -112,7 +112,7 @@ jobs:
           path: scan_results.xml
 ```
 
-Verdicts come from an LLM, so a scenario can flip between runs. Read [the judge is an LLM](/oss/solutions/explanation/how-scan-works#the-judge-is-an-llm) before you treat a single new failure as a regression.
+Verdicts come from an LLM, so a scenario can flip between runs. Read [the judge is an LLM](/oss/scan/explanation/how-scan-works#the-judge-is-an-llm) before you treat a single new failure as a regression.
 
 ## Compare two versions of your agent
 
@@ -131,6 +131,6 @@ The **pass rate** is the share of scenarios that passed. Comparing two numbers o
 
 ## Next Steps
 
-- [Your First Scan](/oss/solutions/tutorials/your-first-scan) for the guided first run
+- [Your First Scan](/oss/scan/tutorials/your-first-scan) for the guided first run
 - [Run checks in pytest](/oss/checks/how-to/run-in-pytest): a scan suite is an ordinary `Suite`, so the same pytest patterns apply
-- [Scan API reference](/oss/solutions/reference/scan-api) for every argument in full
+- [Scan API reference](/oss/scan/reference/scan-api) for every argument in full

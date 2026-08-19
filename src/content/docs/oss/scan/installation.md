@@ -14,7 +14,7 @@ The fastest way to set up the scan. Paste a single URL into your coding agent an
 :::tip[Paste this into your coding agent]
 
 ```
-Follow the instructions from https://docs.giskard.ai/oss/solutions/installation.md and install the Giskard scan in my project.
+Follow the instructions from https://docs.giskard.ai/oss/scan/installation.md and install the Giskard scan in my project.
 ```
 
 :::
@@ -77,8 +77,8 @@ pip install --pre "giskard[garak]"
 pip install --pre "giskard[deepteam]"
 ```
 
-Install only the ones you plan to run; both pull in large dependency trees. See [`third_party_scan`](/oss/solutions/reference/scan-api) for the arguments each tool accepts. A **probe** there is one canned attack that tool knows how to run, the equivalent of a Giskard generator.
+Install only the ones you plan to run; both pull in large dependency trees. See [`third_party_scan`](/oss/scan/reference/scan-api) for the arguments each tool accepts. A **probe** there is one canned attack that tool knows how to run, the equivalent of a Giskard generator.
 
 ## Next Steps
 
-Start with [Your First Scan](/oss/solutions/tutorials/your-first-scan) for a guided run against a toy agent, or go straight to [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) to point the scan at your own.
+Start with [Your First Scan](/oss/scan/tutorials/your-first-scan) for a guided run against a toy agent, or go straight to [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) to point the scan at your own.

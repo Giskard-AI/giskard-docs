@@ -110,7 +110,7 @@ The literal also accepts `'lidar'`, which routes to a private Giskard package ra
 
 Await it, as you await `vulnerability_scan`. Every scan function on this page is `async def`.
 
-Both examples on this page run against the same agent: a customer-support assistant for a retail bank, wrapped the way [Wrap your agent](/oss/solutions/how-to/wrap-your-agent) describes. It holds the caller's own records in its context and a system prompt stating its rules, which is what gives deepteam's `PIILeakage` and `PromptLeakage` something to go after later on this page:
+Both examples on this page run against the same agent: a customer-support assistant for a retail bank, wrapped the way [Wrap your agent](/oss/scan/how-to/wrap-your-agent) describes. It holds the caller's own records in its context and a system prompt stating its rules, which is what gives deepteam's `PIILeakage` and `PromptLeakage` something to go after later on this page:
 
 ```python
 import os
@@ -232,13 +232,13 @@ A garak scenario name is the probe with its `garak.probes.` or `probes.` prefix 
 
 Third-party results are report-only. The adapters build the `SuiteResult` from what the external tool ran, without a Giskard suite behind it, so `suite_result.suite` is `None`:
 
-- **Works**: `failed_count`, `pass_rate`, `failures_and_errors`, `print_report`, and `to_junit_xml`. The [CI guide](/oss/solutions/how-to/scan-in-ci)'s export and threshold steps apply unchanged.
+- **Works**: `failed_count`, `pass_rate`, `failures_and_errors`, `print_report`, and `to_junit_xml`. The [CI guide](/oss/scan/how-to/scan-in-ci)'s export and threshold steps apply unchanged.
 - **Does not work**: saving the suite and replaying it. `suite_result.suite.model_dump_json()` raises `AttributeError` on a third-party result, so the CI guide's "generate once, commit, replay" loop is for `vulnerability_scan` and `quality_scan` only.
 
 To re-run a third-party scan you call `third_party_scan` again. Give it the same explicit `probes` (or `vulnerabilities` and `attacks`) if you want the runs to be comparable: garak replays a fixed corpus, but deepteam re-generates its attacks with an LLM every time.
 
 ## Next steps
 
-- [Scan API reference](/oss/solutions/reference/scan-api) — the full `third_party_scan` and `list_scan_items` signatures
-- [Write a Custom Scenario Generator](/oss/solutions/tutorials/custom-scenario-generator) for the in-house alternative when neither tool covers your risk
-- [What the Scan Looks For](/oss/solutions/explanation/threat-taxonomy) — how the built-in threat coverage compares
+- [Scan API reference](/oss/scan/reference/scan-api) — the full `third_party_scan` and `list_scan_items` signatures
+- [Write a Custom Scenario Generator](/oss/scan/tutorials/custom-scenario-generator) for the in-house alternative when neither tool covers your risk
+- [What the Scan Looks For](/oss/scan/explanation/threat-taxonomy) — how the built-in threat coverage compares

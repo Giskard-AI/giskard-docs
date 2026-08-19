@@ -9,7 +9,7 @@ A **suite** is the collection of scenarios a scan generated: the questions to as
 
 Do this whenever you want to compare runs. A fresh scan generates different scenarios every time, so its **pass rate**, the share of scenarios that passed, moves for reasons that have nothing to do with your agent. Replaying a saved suite with a fixed `seed` is what makes last week's number and this week's mean the same thing.
 
-[Run the Scan in CI](/oss/solutions/how-to/scan-in-ci) shows the pipeline this feeds.
+[Run the Scan in CI](/oss/scan/how-to/scan-in-ci) shows the pipeline this feeds.
 
 ## Generate once, write JSON
 
@@ -49,7 +49,7 @@ Write it with `indent=2`. A one-line JSON file turns every regeneration into an 
 
 ## Load it back
 
-This assumes `bank_agent`, an async target function wrapped the same way as the tutorial's BotaniBot in [Wrap Your Agent](/oss/solutions/how-to/wrap-your-agent), is importable from `agent.py`:
+This assumes `bank_agent`, an async target function wrapped the same way as the tutorial's BotaniBot in [Wrap Your Agent](/oss/scan/how-to/wrap-your-agent), is importable from `agent.py`:
 
 ```python
 import asyncio
@@ -148,6 +148,6 @@ Pair it with the raw result when you want the full conversations. `result.model_
 
 ## Next Steps
 
-- [Run the Scan in CI](/oss/solutions/how-to/scan-in-ci) for the GitHub Actions job around this
-- [Scan a RAG Agent](/oss/solutions/tutorials/scan-a-rag-agent) for replaying a suite against a fixed agent
-- [Scan API reference](/oss/solutions/reference/scan-api) for `generate_suite` in full
+- [Run the Scan in CI](/oss/scan/how-to/scan-in-ci) for the GitHub Actions job around this
+- [Scan a RAG Agent](/oss/scan/tutorials/scan-a-rag-agent) for replaying a suite against a fixed agent
+- [Scan API reference](/oss/scan/reference/scan-api) for `generate_suite` in full
