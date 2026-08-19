@@ -50,11 +50,11 @@ Think **Giskard Hub** might be a good fit for your products? [Talk to our team â
 The library provides a set of tools for testing and evaluating LLMs, including:
 
 - Behavioral tests written as scenarios and checks that pass or fail under pytest. A scenario is one test case: a message (or short conversation) to send to your agent. A check is a rule its reply has to satisfy.
-- Automated detection of security vulnerabilities using `vulnerability_scan`, which generates hostile inputs and reports the ones your agent handled badly.
+- Automated detection of security vulnerabilities using `vulnerability_scan`, which generates hostile inputs and reports the inputs your agent answered when it should have refused.
 - Automated detection of RAG quality failures using `quality_scan`.
-- Beyond Giskard's own generators, the scan can run garak's probes and deepteam's attacks against the same agent through the optional `giskard-scan[garak]` and `giskard-scan[deepteam]` extras.
+- Beyond Giskard's own generators, the scan can run garak's probes and deepteam's attacks against the same agent through the optional `giskard[garak]` and `giskard[deepteam]` extras.
 
-A scan that finds nothing means the generated scenarios did not break your agent. It is not proof that the agent is safe, and it is not a compliance audit.
+The scan is not installed by default: add the `scan` extra (`pip install --pre "giskard[scan]"`). A scan that finds nothing means the generated scenarios did not break your agent. It is not a safety proof or a compliance audit.
 
 <CardGrid>
   <LinkCard
