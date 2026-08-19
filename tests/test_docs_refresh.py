@@ -16,6 +16,7 @@ refresh PR if it regressed:
 
 from __future__ import annotations
 
+import importlib.metadata
 import importlib.util
 import json
 import subprocess
@@ -28,6 +29,15 @@ import pytest
 REPO = Path(__file__).resolve().parent.parent
 SCRIPTS = REPO / "scripts"
 BASELINE = REPO / "docs" / "api-baseline" / "giskard-checks.json"
+SCAN_BASELINE = REPO / "docs" / "api-baseline" / "giskard-scan.json"
+
+# These files are committed contracts.  Keep their module, installed wheel and
+# source ref together so a refresh cannot accidentally snapshot a different
+# package while leaving plausible-looking JSON behind.
+API_BASELINES = (
+    (BASELINE, "giskard.checks", "giskard-checks", "giskard-checks/v1.0.2rc1"),
+    (SCAN_BASELINE, "giskard.scan", "giskard-scan", "giskard-scan/v1.0.0rc1"),
+)
 
 
 def load_script(filename: str) -> ModuleType:
@@ -55,24 +65,52 @@ def baseline() -> dict:
     return json.loads(BASELINE.read_text())
 
 
-def test_snapshot_is_stable_across_processes(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("baseline_path", "module", "distribution", "source_ref"), API_BASELINES
+)
+def test_snapshot_is_stable_across_processes(
+    tmp_path: Path,
+    baseline_path: Path,
+    module: str,
+    distribution: str,
+    source_ref: str,
+) -> None:
     """An unchanged API must snapshot byte-identically, or every refresh run
     reports phantom deltas and reviewers learn to ignore the diff."""
+    assert baseline_path.is_file()
     first = tmp_path / "a.json"
     second = tmp_path / "b.json"
 
     for out in (first, second):
         result = run_script(
             "snapshot-api.py",
-            "giskard.checks",
+            module,
             "--distribution",
-            "giskard-checks",
+            distribution,
+            "--ref",
+            source_ref,
+            "--follow-referenced",
             "-o",
             str(out),
         )
         assert result.returncode == 0, result.stderr
 
     assert first.read_bytes() == second.read_bytes()
+
+
+@pytest.mark.parametrize(
+    ("baseline_path", "module", "distribution", "source_ref"), API_BASELINES
+)
+def test_baseline_metadata(
+    baseline_path: Path, module: str, distribution: str, source_ref: str
+) -> None:
+    """Each committed API contract identifies the exact package it describes."""
+    snapshot = json.loads(baseline_path.read_text())
+
+    assert snapshot["module"] == module
+    assert snapshot["package"] == distribution
+    assert snapshot["source_ref"] == source_ref
+    assert snapshot["version"] == importlib.metadata.version(distribution)
 
 
 def test_snapshot_has_no_memory_addresses(baseline: dict) -> None:
