@@ -5,6 +5,7 @@ End-to-end tests for Jupyter notebooks.
 Cells tagged skip-execution (the colab-install cells) are skipped automatically.
 
 - No OPENAI_API_KEY / OPENAI_BASE_URL → only NO_API_NOTEBOOKS run; the rest skip.
+- NB_ONLY="a.ipynb b.ipynb" → run only those notebooks (repo-relative paths).
 - OVERWRITE_NB=0    → skip writing outputs back (default is to overwrite).
                       After the run, regenerate .mdx files:
                       node scripts/convert-notebooks.mjs
@@ -28,7 +29,18 @@ NO_API_NOTEBOOKS = {
 }
 
 
+REPO_ROOT = Path(__file__).parent.parent
+
+
 def _nb_files():
+    """All docs notebooks, or just the ones named in NB_ONLY.
+
+    CI sets NB_ONLY to the repo-relative notebooks a pull request touches, so a
+    one-notebook change does not pay for executing every notebook in the docs.
+    """
+    only = os.environ.get("NB_ONLY", "").split()
+    if only:
+        return sorted(p for p in (REPO_ROOT / name for name in only) if p.is_file())
     return sorted(DOCS_ROOT.rglob("*.ipynb"))
 
 

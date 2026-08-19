@@ -70,8 +70,18 @@ jobs:
             exit 0
           fi
           files=$(gh api "repos/$REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename')
-          if echo "$files" | grep -Eq '\.ipynb$|^tests/(conftest|test_docs_nb)\.py$|^pyproject\.toml$|^uv\.lock$|^\.github/workflows/ci\.yml$|^scripts/convert-notebooks\.mjs$'; then
+          # A change to the harness itself can break any notebook, so it runs all
+          # of them. A change to notebooks alone runs only those notebooks.
+          if echo "$files" | grep -Eq '^tests/(conftest|test_docs_nb)\.py$|^pyproject\.toml$|^uv\.lock$|^\.github/workflows/ci\.yml$|^scripts/convert-notebooks\.mjs$'; then
             echo "relevant=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Deleted notebooks have nothing to execute, so ask for the surviving ones.
+          nbs=$(gh api "repos/$REPO/pulls/$PR_NUMBER/files" --paginate \
+            --jq '.[] | select(.status != "removed") | .filename | select(endswith(".ipynb"))' | tr '\n' ' ')
+          if [ -n "${nbs// /}" ]; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+            echo "notebooks=$nbs" >> "$GITHUB_OUTPUT"
           else
             echo "relevant=false" >> "$GITHUB_OUTPUT"
           fi
@@ -113,6 +123,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.AZURE_AI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.AZURE_AI_API_BASE }}
           OVERWRITE_NB: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
+          NB_ONLY: ${{ steps.nbchanges.outputs.notebooks }}
         run: uv run pytest tests/test_docs_nb.py -v --tb=short
 
       - name: Regenerate .mdx from updated notebooks (main only)
