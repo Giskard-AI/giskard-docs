@@ -9,15 +9,33 @@ import { Aside } from "@astrojs/starlight/components";
 
 If you already have an LLM test suite in [DeepEval](https://github.com/confident-ai/deepeval)
 or [promptfoo](https://github.com/promptfoo/promptfoo), most of it maps onto
-Giskard Checks mechanically. This page gives the translation tables, the concept
-mapping, and — just as importantly — the cases where migrating buys you nothing.
+Giskard Checks mechanically. This page gives the translation tables and the cases
+where migrating buys you nothing.
 
 <Aside type="note" title="Versions">
-Giskard snippets are verified against `giskard-checks==1.0.2b6`. DeepEval
-snippets follow the 3.x API (`deepeval.metrics`, `LLMTestCase`); promptfoo
+DeepEval snippets follow the 3.x API (`deepeval.metrics`, `LLMTestCase`); promptfoo
 snippets follow the 0.1x `promptfooconfig.yaml` schema. Both of those projects
 move fast — re-check their current docs before assuming a snippet still parses.
 </Aside>
+
+## Setup
+
+Every Giskard snippet on this page assumes the library is installed and that
+`my_agent` is your own agent, wrapped as an async callable:
+
+```bash
+pip install --pre "giskard[openai]"
+```
+
+```python
+async def my_agent(inputs: str) -> str:
+    """Your agent. Return its reply for one user message."""
+    ...
+```
+
+The pytest snippets need `pytest-asyncio` (`pip install pytest-asyncio`); either
+mark each test with `@pytest.mark.asyncio` as shown, or set
+`asyncio_mode = auto` in your pytest config.
 
 ## Concept mapping
 
@@ -34,7 +52,7 @@ move fast — re-check their current docs before assuming a snippet still parses
 | `ConversationSimulator` | *(no equivalent)* | `UserSimulator` |
 | custom `BaseMetric` subclass | `python:` / `javascript:` assert | `FnCheck`, or a `Check` subclass |
 
-The one structural difference worth internalising: DeepEval and promptfoo both
+The structural difference: DeepEval and promptfoo both
 evaluate a **flat record** (input, output, context). Giskard evaluates a
 **trace** — an ordered list of interactions — and every check addresses it with
 a JSONPath such as `trace.last.outputs`. Single-turn tests are just traces of
@@ -80,7 +98,7 @@ def test_rag_answer():
     )
 ```
 
-```python title="Giskard Checks 1.0.2b6"
+```python title="Giskard Checks"
 import pytest
 from giskard.checks import AnswerRelevance, Groundedness, Scenario
 
@@ -132,7 +150,7 @@ class LatencyMetric(BaseMetric):
         return "Latency"
 ```
 
-```python title="Giskard Checks 1.0.2b6"
+```python title="Giskard Checks"
 from giskard.checks import FnCheck
 
 under_200ms = FnCheck(
@@ -161,8 +179,12 @@ dataset = EvaluationDataset(
 evaluate(dataset, [AnswerRelevancyMetric()])
 ```
 
-```python title="Giskard Checks 1.0.2b6"
+```python title="Giskard Checks"
+import asyncio
+
 from giskard.checks import AnswerRelevance, Scenario, Suite
+
+QUESTIONS = ["What is the capital of France?", "What is the capital of Spain?"]
 
 suite = Suite(
     name="qa-regression",
@@ -174,7 +196,7 @@ suite = Suite(
     ],
 )
 
-result = await suite.run(parallel=True)
+result = asyncio.run(suite.run(parallel=True))
 print(result.passed_count, result.failed_count, result.pass_rate)
 ```
 
@@ -191,7 +213,7 @@ LLM call.
 | --- | --- |
 | `contains` | `StringMatching(keyword=…)` |
 | `icontains` | `StringMatching(keyword=…, case_sensitive=False)` |
-| `equals` | `Equals(key="trace.last.outputs", expected_value=…)` |
+| `equals` | `Equals(target_key="trace.last.outputs", expected_value=…)` |
 | `regex` | `RegexMatching(pattern=…)` |
 | `is-json` | `JsonValid()` |
 | `is-json` with `value:` schema | `JsonValid(schema={…})` |
@@ -203,7 +225,7 @@ LLM call.
 | `not-` prefix (`not-contains`, …) | `Not(check=…)` |
 | `assert-set` with `type: any-of` | `AnyOf(checks=[…])` |
 | `assert-set` with `type: all-of` | `AllOf(checks=[…])` |
-| `latency` / `cost` | `LessThan(key="trace.last.metadata.latency_ms", …)` — you populate the metadata |
+| `latency` / `cost` | `LessThan(target_key="trace.last.metadata.latency_ms", …)` — you populate the metadata |
 | `moderation` | `Toxicity` |
 | `is-valid-openai-function-call` | `FnCheck` over the trace, or a custom `Trace` subclass |
 | `perplexity`, `rouge-n`, `bleu`, `levenshtein` | *(no equivalent)* — see [keep using promptfoo when…](#keep-using-promptfoo-when) |
@@ -231,7 +253,9 @@ tests:
         value: The response must not speculate about delivery dates.
 ```
 
-```python title="Giskard Checks 1.0.2b6"
+```python title="Giskard Checks"
+import asyncio
+
 from giskard.checks import (
     Conformity,
     JsonValid,
@@ -264,7 +288,7 @@ order_status = (
     )
 )
 
-result = await order_status.run()
+result = asyncio.run(order_status.run())
 ```
 
 ### Templated `vars` and CSV test files
@@ -282,7 +306,7 @@ defaultTest:
       value: "{{expected}}"
 ```
 
-```python title="Giskard Checks 1.0.2b6"
+```python title="Giskard Checks"
 import csv
 
 from giskard.checks import Scenario, StringMatching, Suite
@@ -313,7 +337,7 @@ If you would rather generate the inputs than curate them, swap the CSV for a
 promptfoo has no first-class conversation type; the usual workaround is to bake
 the history into the prompt. In Giskard, turns are the primitive:
 
-```python title="Giskard Checks 1.0.2b6"
+```python title="Giskard Checks"
 conversation = (
     Scenario("escalation")
     .interact(inputs="My order never arrived.", outputs=lambda i: my_agent(i))
@@ -348,14 +372,11 @@ turn via `trace.interactions[0].outputs`.
 - **Your tests must be config, not code.** promptfoo suites are YAML that
   non-engineers can edit. Giskard scenarios are Python.
 - **You rely on reference-based text metrics** (`bleu`, `rouge-n`,
-  `levenshtein`, `perplexity`) or on the red-team generators. Giskard has
-  `SemanticSimilarity` for the fuzzy-match case, but no n-gram overlap metrics.
+  `levenshtein`, `perplexity`). Giskard has `SemanticSimilarity` for the
+  fuzzy-match case, but no n-gram overlap metrics.
 
-The two are not mutually exclusive, and the usual endpoint of a migration is not
-a total one: keep promptfoo for prompt selection, move the behavioural
-regression suite — the part that runs on every PR and must stay green — into
-Giskard, where multi-turn traces, stateful checks, and real agent invocation are
-first-class.
+Most teams end up running both: promptfoo for prompt selection, Giskard for the
+regression suite that runs on every PR.
 
 ## Next steps
 
