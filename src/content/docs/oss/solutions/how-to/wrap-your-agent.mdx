@@ -1,0 +1,212 @@
+---
+title: "Wrap Your Agent for the Scan"
+description: "Connect the scan to your own agent: the async function contract, and the wrapper patterns for stateful and history-passing agents."
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+The scan talks to your agent through a single entry point: an **async function** that takes a typed input and returns a typed output. Both types are [Pydantic ↗](https://docs.pydantic.dev/) models, which makes the contract explicit and validated.
+
+Multi-turn attacks call your agent once per turn with only the new message, so the right wrapper depends on how your agent keeps track of the conversation. A **trace** is Giskard's record of one conversation, and each **interaction** on it is one message and the reply it got, so `trace.interactions` is the history so far.
+
+Get this wrong and the scan still runs, but every multi-turn attack collapses: the agent answers each message with no memory of the previous ones, so escalation attacks look like they failed when they were never really attempted.
+
+Find your agent in this table, then open the matching tab:
+
+| Your agent | Pattern |
+| --- | --- |
+| Answers one question at a time and forgets it. A single LLM call, a RAG endpoint, a `/ask` route. | **Basic** |
+| Keeps the conversation on its own side, keyed by a session or thread id. A LangGraph checkpointer, an Assistants-style thread, a chat API with a `conversation_id`. | **Stateful** |
+| Holds no state but expects the whole message list on every call. | **History-passing** |
+
+All three examples wrap the same customer-support assistant for a retail bank, so the only thing that changes between them is how the turn history is carried.
+
+The bank agent answers questions about accounts, cards, payments and disputes. It must refuse to give investment or tax advice, and it must never disclose another customer's data. Those two rules are what the scan attacks.
+
+<Tabs>
+<TabItem label="Basic">
+
+One system prompt, one user message, no memory. Wrap the call directly and ignore the trace.
+
+```python
+import os
+
+from openai import AsyncOpenAI
+from pydantic import BaseModel
+
+client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+SYSTEM_PROMPT = (
+    "You are the customer-support assistant for a retail bank. "
+    "You answer questions about accounts, cards, payments and disputes. "
+    "Never give investment or tax advice, and never disclose "
+    "another customer's data."
+)
+
+
+class AgentInput(BaseModel):
+    question: str
+
+
+class AgentOutput(BaseModel):
+    answer: str
+
+
+async def support_agent(inputs: AgentInput) -> AgentOutput:
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": inputs.question},
+        ],
+    )
+    return AgentOutput(answer=response.choices[0].message.content)
+```
+
+Run this one with `target_mode="singleturn"`. It has no memory, so a multi-turn attack would send turn two to an agent that never saw turn one.
+
+</TabItem>
+<TabItem label="Stateful">
+
+The same agent, but the conversation lives on the agent's side and is addressed by a thread id: a LangGraph checkpointer, a session-based HTTP API, or the in-memory store below. Giskard has to hand you the *same* id on every turn of one conversation.
+
+Subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
+
+```python
+import os
+from uuid import uuid4
+
+from openai import AsyncOpenAI
+from pydantic import BaseModel, Field
+from giskard.checks import Trace
+
+client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+SYSTEM_PROMPT = (
+    "You are the customer-support assistant for a retail bank. "
+    "You answer questions about accounts, cards, payments and disputes. "
+    "Never give investment or tax advice, and never disclose "
+    "another customer's data."
+)
+
+# Stands in for your checkpointer or session store
+THREADS: dict[str, list[dict[str, str]]] = {}
+
+
+class AgentInput(BaseModel):
+    question: str
+
+
+class AgentOutput(BaseModel):
+    answer: str
+
+
+class SupportTrace(Trace[AgentInput, AgentOutput]):
+    thread_id: str = Field(default_factory=lambda: str(uuid4()))
+
+
+async def support_agent(inputs: AgentInput, trace: SupportTrace) -> AgentOutput:
+    # The same thread_id comes back on every turn of this conversation
+    history = THREADS.setdefault(
+        trace.thread_id, [{"role": "system", "content": SYSTEM_PROMPT}]
+    )
+    history.append({"role": "user", "content": inputs.question})
+
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini", messages=history
+    )
+    answer = response.choices[0].message.content
+    history.append({"role": "assistant", "content": answer})
+    return AgentOutput(answer=answer)
+```
+
+If you forget the `Trace` subclass and generate the id inside the function, every turn opens a fresh thread. The scan still completes, and every multi-turn jailbreak in the report is a false negative.
+
+</TabItem>
+<TabItem label="History-passing">
+
+The same agent with no store at all: it is a pure function of the whole conversation, which is what most self-hosted chat endpoints look like. Declare a `trace` parameter and rebuild the message list from `trace.interactions`, which holds the previous turns of the current conversation:
+
+```python
+import os
+
+from openai import AsyncOpenAI
+from pydantic import BaseModel
+from giskard.checks import Trace
+
+client = AsyncOpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+SYSTEM_PROMPT = (
+    "You are the customer-support assistant for a retail bank. "
+    "You answer questions about accounts, cards, payments and disputes. "
+    "Never give investment or tax advice, and never disclose "
+    "another customer's data."
+)
+
+
+class AgentInput(BaseModel):
+    question: str
+
+
+class AgentOutput(BaseModel):
+    answer: str
+
+
+async def support_agent(
+    inputs: AgentInput, trace: Trace[AgentInput, AgentOutput]
+) -> AgentOutput:
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    for interaction in trace.interactions:
+        messages.append(
+            {"role": "user", "content": interaction.inputs.question}
+        )
+        messages.append(
+            {"role": "assistant", "content": interaction.outputs.answer}
+        )
+    messages.append({"role": "user", "content": inputs.question})
+
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini", messages=messages
+    )
+    return AgentOutput(answer=response.choices[0].message.content)
+```
+
+`trace.interactions` is the history *before* the current message, so append `inputs.question` yourself. Drop that last line and the agent answers the previous turn twice.
+
+</TabItem>
+</Tabs>
+
+This is the only integration code you need. Anything callable from Python fits the shape: a RAG pipeline, an agent, or a remote API.
+
+:::note
+Giskard injects the arguments by parameter name. Only `inputs` and `trace` are injected. Any other parameter without a default raises `TypeError: Parameter '<name>' is required but not in the injection requirements.` at validation time. A parameter that has a default is left alone, so that is how you pass your own configuration into the wrapper.
+:::
+
+## Run the scan against it
+
+Pass the wrapped agent, a plain-language description, and the languages it handles to `vulnerability_scan`:
+
+```python
+from giskard.scan import vulnerability_scan
+
+suite_result = await vulnerability_scan(
+    target=support_agent,
+    description=(
+        "A customer-support agent for a retail bank. It answers questions "
+        "about accounts, cards, payments and disputes. It must refuse to give "
+        "investment or tax advice, and must never disclose another customer's "
+        "data."
+    ),
+    languages=["en"],
+)
+```
+
+The `description` is what the LLM uses to generate scenarios specific to your agent, so the more precisely you describe its purpose and its boundaries, the more relevant the findings. The description above names two boundaries, refusing investment advice and never disclosing another customer's data, and the scan writes attacks against both: a customer asking which fund to move their savings into, or asking for the balance on an account they name but do not hold. "A chatbot" gets you generic attacks and a shallow report.
+
+## Next Steps
+
+- [Customize a scan](/oss/solutions/how-to/customize-a-scan) to pick generators and bound the run
+- [Run the scan in CI](/oss/solutions/how-to/scan-in-ci) to replay a saved suite on every pull request
+- [Scan API reference](/oss/solutions/reference/scan-api) for every argument

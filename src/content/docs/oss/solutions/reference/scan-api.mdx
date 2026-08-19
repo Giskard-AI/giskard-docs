@@ -1,0 +1,459 @@
+---
+title: Scan API
+description: "Entry points for the Giskard scan: vulnerability_scan, quality_scan, generate_suite, third_party_scan, list_scan_items, ScanTool, ScanOptions, and SuiteGeneratorRegistry."
+sidebar:
+  order: 1
+---
+
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
+
+Entry points of the `giskard.scan` package: the two ready-made scans, the lower-level suite builder, the third-party scanner bridge, and the registry that decides which generators each scan runs.
+
+This page assumes you have run a scan. If not, start with [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities), and read [How the scan works](/oss/solutions/explanation/how-scan-works) for what a generator, a suite, and the judge actually do.
+
+The examples call `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/solutions/how-to/wrap-your-agent).
+
+```python
+from giskard.scan import (
+    vulnerability_scan,
+    quality_scan,
+    generate_suite,
+    third_party_scan,
+    list_scan_items,
+    ScanTool,
+    ScanOptions,
+    SuiteGeneratorRegistry,
+    vulnerability_suite_generator_registry,
+    quality_suite_generator_registry,
+    DEFAULT_TARGET_MODE,
+)
+```
+
+---
+
+## `vulnerability_scan`
+
+**Module:** `giskard.scan.vulnerability`
+
+Build a suite from the vulnerability generator registry, run it against the target, print the grouped report, and return the result. Coroutine: `await` it.
+
+<MethodCard name="vulnerability_scan()" returnType="SuiteResult">
+  <Property name="target" type="Target" required>
+    Agent or provider target to evaluate.
+  </Property>
+  <Property name="description" type="str" required>
+    Natural-language description of the agent under test.
+  </Property>
+  <Property name="languages" type="list[str]" required>
+    BCP-47 language codes the agent is expected to handle (e.g. `["en", "fr"]`).
+  </Property>
+  <Property name="max_scenarios" type="int | None" defaultValue="None">
+    Total upper bound on scenarios across all vulnerability generators. `None` lets each generator apply its own default, so seven generators each contribute scenarios and the run is large. Set it low and the budget is spread thin, so some attack types get no scenarios at all and go untested. Keep it small while iterating, raise it before you trust the result.
+  </Property>
+  <Property name="seed" type="int" defaultValue="42">
+    Integer seed used for reproducible scenario generation. Two runs with different seeds generate different scenarios, so their pass rates are not comparable.
+  </Property>
+  <Property name="group_by" type="str | None" defaultValue='"threat-type"'>
+    Result annotation key used to group the printed report. `None` prints the ungrouped report. Grouping only changes the printed layout, never which scenarios ran: `"threat-type"` groups by kind of failure, `"component"` by which part of the agent pipeline was exercised (`component:llm`, `component:retrieval`, `component:history`). Only the knowledge-base quality generators emit a `component:` tag, so `group_by="component"` on a vulnerability scan puts every result in one unnamed bucket.
+  </Property>
+  <Property name="parallel" type="bool" defaultValue="True">
+    Run generated scenarios concurrently against the target. Pass `False` for serial execution, which is slower but easier to debug and gentler on provider rate limits. `True` requires an agent that tolerates concurrent calls. This controls suite *execution*; scenario *generation* is always concurrent.
+  </Property>
+  <Property name="max_concurrency" type="int | None" defaultValue="None">
+    Cap on concurrent scenarios when `parallel=True`. `None` runs all scenarios at once, so provider rate limits become the effective cap.
+  </Property>
+  <Property name="return_exception" type="bool" defaultValue="False">
+    When `True`, a scenario whose input generation fails is recorded as an errored result and the scan continues. When `False`, the failure aborts the scan.
+  </Property>
+  <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
+    Whether the agent supports single-turn or multi-turn conversations. `"singleturn"` skips generators that are multi-turn by design and caps turn budgets to 1 on the others. Choosing `"singleturn"` for an agent that does hold conversations removes multi-turn jailbreaks from the report entirely, so the run looks clean for a class of attack it never tried. Choosing `"multiturn"` for an agent with no memory makes those attacks run but never really escalate.
+  </Property>
+  <Property name="commercial_use" type="bool" defaultValue="False">
+    When `True`, exclude generators whose datasets do not permit commercial use. This removes attacks from the run, so the same agent scores better with it on. Set it from your licensing situation, not to improve a number.
+  </Property>
+</MethodCard>
+
+```python
+from giskard.scan import vulnerability_scan
+
+result = await vulnerability_scan(
+    support_agent,
+    description=(
+        "A customer-support agent for a retail bank. It answers questions "
+        "about accounts, cards, payments and disputes. It must refuse to give "
+        "investment or tax advice, and must never disclose another customer's "
+        "data."
+    ),
+    languages=["en"],
+    max_scenarios=20,
+)
+```
+
+The description names the two boundaries, so the generators write attacks against them rather than generic ones: a customer pressing for a fund recommendation, or asking about an account they do not hold. `max_scenarios=20` is an iteration budget: it keeps the run to a few minutes and a few dollars. Drop the argument when you want the full default run, and expect several times the scenarios and the cost.
+
+### Generators it runs
+
+`AdversarialScenarioGenerator`, `CrescendoAttackScenarioGenerator`, `GOATAttackScenarioGenerator`, `PromptInjectionScenarioGenerator`, `GCGInjectionScenarioGenerator`, and two `HuggingFaceDatasetScenarioGenerator` instances (`giskardai/do-not-answer-scenarios`, non-commercial, and `giskardai/harmbench-scenarios`, commercial-friendly). See [Generators](/oss/solutions/reference/generators).
+
+---
+
+## `quality_scan`
+
+**Module:** `giskard.scan.quality`
+
+Build a suite from the quality generator registry, run it against the target, print the grouped report with an LLM-generated recommendation, and return the result. Coroutine: `await` it.
+
+A **knowledge base** is the set of documents your agent is supposed to answer from. The quality scan asks questions about them and checks the answers against them, which is how it catches invented answers ([hallucinations](/start/glossary/business/hallucination)), [omissions](/start/glossary/business/omission), and [refusals to answer](/start/glossary/business/denial-of-answers).
+
+All quality generators are knowledge-base driven: without a `knowledge_base` the scan emits a `RuntimeWarning` and produces no scenarios. A run that reports nothing because you forgot the documents looks identical to a run that found nothing wrong.
+
+<MethodCard name="quality_scan()" returnType="SuiteResult">
+  <Property name="target" type="Target" required>
+    Agent or provider target to evaluate.
+  </Property>
+  <Property name="description" type="str" required>
+    Natural-language description of the agent under test.
+  </Property>
+  <Property name="languages" type="list[str]" required>
+    BCP-47 language codes the agent is expected to handle.
+  </Property>
+  <Property name="knowledge_base" type="KnowledgeBase | list[str] | None" defaultValue="None">
+    Documents used by the knowledge-base quality generators. A plain list of strings is converted to a [`KnowledgeBase`](/oss/solutions/reference/knowledge-base). A single `str` is rejected.
+  </Property>
+  <Property name="max_scenarios" type="int | None" defaultValue="None">
+    Total upper bound on scenarios across all quality generators.
+  </Property>
+  <Property name="seed" type="int" defaultValue="42">
+    Integer seed used for reproducible scenario generation.
+  </Property>
+  <Property name="group_by" type="str | None" defaultValue='"component"'>
+    Result annotation key used to group the printed report. Quality generators tag scenarios `component:llm`, `component:retrieval`, or `component:history`, naming the part of the pipeline under test.
+  </Property>
+  <Property name="parallel" type="bool" defaultValue="True">
+    Run generated scenarios concurrently against the target.
+  </Property>
+  <Property name="max_concurrency" type="int | None" defaultValue="None">
+    Cap on concurrent scenarios when `parallel=True`.
+  </Property>
+  <Property name="return_exception" type="bool" defaultValue="False">
+    Record input-generation failures as errored results instead of aborting.
+  </Property>
+  <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
+    Conversation mode supported by the agent under test. Same consequences as for [`vulnerability_scan`](#vulnerability_scan).
+  </Property>
+</MethodCard>
+
+```python
+from giskard.scan import quality_scan
+
+result = await quality_scan(
+    support_agent,
+    description="A customer-support agent for a retail bank, answering from our published policies.",
+    languages=["en"],
+    knowledge_base=[
+        "A disputed card transaction must be reported within 120 days of the statement date.",
+        "A card reported lost cannot be unfrozen and must be replaced.",
+        "We do not give investment or tax advice; refer the customer to an independent adviser.",
+    ],
+)
+print(result.recommendation)
+```
+
+Use `quality_scan` when the risk is a wrong answer rather than a hostile user: the generators ask questions your documents can answer and the judge checks the reply against them. A failure here reads as "the agent said the customer had 60 days to dispute the charge, the policy says 120". Use `vulnerability_scan` instead when the risk is someone attacking the agent.
+
+---
+
+## `generate_suite`
+
+**Module:** `giskard.scan.catalog`
+
+Lower-level builder: resolve the supplied generators, build one run-wide context, distribute the scenario budget, run every generator concurrently, and wrap the output in a `Suite`. Use it when you want to pick generators yourself instead of taking a registry as-is. Coroutine: `await` it.
+
+Concurrency here is *generation* only; whether the resulting scenarios later run in parallel is decided by `Suite.run(parallel=...)`.
+
+<MethodCard name="generate_suite()" returnType="Suite">
+  <Property name="description" type="str" required>
+    Natural-language description of the agent under test.
+  </Property>
+  <Property name="languages" type="list[str]" required>
+    BCP-47 language codes the agent is expected to handle.
+  </Property>
+  <Property name="generators" type="Sequence[ScenarioGenerator | type[ScenarioGenerator]]" required>
+    Generator instances or classes. Classes are instantiated with their defaults.
+  </Property>
+  <Property name="max_scenarios" type="int | None" defaultValue="None">
+    Total upper bound across all generators, split between them via a multinomial draw, so a generator can draw zero and be skipped. Must be non-negative; a negative value raises `ValueError`.
+  </Property>
+  <Property name="seed" type="int" defaultValue="42">
+    Seed for the top-level RNG. Child RNGs are spawned before concurrent generation so results stay stable. Keep the same seed when you want to compare two runs.
+  </Property>
+  <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
+    Conversation mode forwarded to every generator.
+  </Property>
+  <Property name="knowledge_base" type="KnowledgeBase | list[str] | None" defaultValue="None">
+    Documents forwarded through the context to generators that use knowledge-base context.
+  </Property>
+</MethodCard>
+
+```python
+from giskard.scan import (
+    generate_suite,
+    PromptInjectionScenarioGenerator,
+    GOATAttackScenarioGenerator,
+)
+
+suite = await generate_suite(
+    description="A customer-support agent for a retail bank, covering accounts, cards, payments and disputes.",
+    languages=["en"],
+    generators=[
+        PromptInjectionScenarioGenerator(),
+        GOATAttackScenarioGenerator(max_turns=5),
+    ],
+    max_scenarios=10,
+)
+result = await suite.run(support_agent, parallel=True)
+result.print_report(group_by="threat-type")
+```
+
+Two generators instead of seven, because this run only asks one question: can a pasted bank statement or a five-turn conversation talk the agent into investment advice. Reach for `vulnerability_scan` when you want the whole registry and do not yet know what you are looking for.
+
+The returned suite is named `"Scenarios"`.
+
+---
+
+## `third_party_scan`
+
+**Module:** `giskard.scan.integrations`
+
+Run an external security scanner against a Giskard target and return its results as a standard `SuiteResult`. Coroutine: `await` it. Experimental.
+
+The adapters are imported lazily and run in-process, so the scanner's optional extra must be installed: `pip install "giskard[scan,garak]==3.0.0rc1"` or `pip install "giskard[scan,deepteam]==3.0.0rc1"`.
+
+<MethodCard name="third_party_scan()" returnType="SuiteResult">
+  <Property name="target" type="Target" required>
+    Agent or provider target to evaluate.
+  </Property>
+  <Property name="tool" type='"garak" | "deepteam"' required>
+    Scanner to use.
+  </Property>
+  <Property name="description" type="str" required>
+    Natural-language description of the agent under test. Deepteam uses it as `red_team`'s `target_purpose`; garak has no target-profile concept and ignores it.
+  </Property>
+  <Property name="languages" type="list[str] | None" defaultValue="None">
+    BCP-47 language codes. Reserved for scanners that support language filtering; ignored by garak and deepteam.
+  </Property>
+  <Property name="**kwargs" type="Any">
+    Tool-specific options, listed below. Passing a keyword the selected tool does not accept raises `TypeError`.
+  </Property>
+</MethodCard>
+
+**Garak options**
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `probes` | `list[str] \| "all" \| None` | `None` | `None` runs a curated default set, `"all"` runs every active probe, or pass explicit probe names. |
+| `target_mode` | `"singleturn" \| "multiturn"` | `"multiturn"` | `"multiturn"` keeps garak's iterative probes. |
+
+**Deepteam options**
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `vulnerabilities` | `list[str] \| None` | `None` | Vulnerability names; `None` runs a curated default set. |
+| `attacks` | `list[str] \| None` | `None` | Attack names; `None` runs a curated default set. |
+| `attacks_per_vulnerability_type` | `int` | `1` | Number of attacks generated per vulnerability type. |
+| `target_mode` | `"singleturn" \| "multiturn"` | `"multiturn"` | `"singleturn"` drops multi-turn attacks. |
+
+```python
+from giskard.scan import third_party_scan
+
+result = await third_party_scan(
+    support_agent,
+    "garak",
+    description="A customer-support agent for a retail bank, covering accounts, cards, payments and disputes.",
+    probes=["probes.dan.AutoDANCached"],
+)
+```
+
+Probe names are garak's own catalog keys and carry the `probes.` prefix. An unqualified name matches nothing and is skipped rather than rejected, so the scan returns clean with nothing run. Read the names from `list_scan_items("garak")`.
+
+Raises `ImportError` when the extra is missing and `ValueError` for an unknown tool.
+
+The returned `SuiteResult` has no `suite`: third-party results export with `to_junit_xml` but cannot be saved and replayed. See [the installation extras](/oss/solutions/installation#optional-third-party-scanners).
+
+---
+
+## `list_scan_items`
+
+**Module:** `giskard.scan.integrations`
+
+List the selectable item names for a scan tool. Use it to discover what you can pass to `generators`, `probes`, `vulnerabilities`, or `attacks`.
+
+<MethodCard name="list_scan_items()" returnType="list[str]">
+  <Property name="tool" type="ScanTool" required>
+    `"giskard"` returns scenario generator class names, `"garak"` returns probe plugin names, `"deepteam"` returns supported vulnerability and attack names. Any other value raises `ValueError`.
+  </Property>
+  <Property name="include_inactive" type="bool" defaultValue="False">
+    Garak only: also include inactive catalog probes. Ignored for other tools.
+  </Property>
+</MethodCard>
+
+```python
+from giskard.scan import list_scan_items
+
+list_scan_items("giskard")
+list_scan_items("garak", include_inactive=True)
+```
+
+Raises `ImportError` when the selected tool's optional dependency is not installed.
+
+---
+
+## `ScanOptions`
+
+**Module:** `giskard.scan.types`
+
+`TypedDict` (`total=False`) describing the optional execution settings a scan accepts. Prefer passing these as explicit keyword arguments to `vulnerability_scan`. The type exists so callers can build and type-check an options dict of their own.
+
+<TypeTable name="ScanOptions">
+  <Property name="max_scenarios" type="int | None">
+    Total upper bound on scenarios across all generators. `None` lets each generator apply its own default.
+  </Property>
+  <Property name="seed" type="int">
+    Integer seed used for reproducible scenario generation.
+  </Property>
+  <Property name="group_by" type="str | None">
+    Result annotation key used to group the printed report.
+  </Property>
+  <Property name="parallel" type="bool">
+    Run generated scenarios concurrently against the target (suite execution).
+  </Property>
+  <Property name="max_concurrency" type="int | None">
+    Cap on concurrent scenarios when `parallel=True`.
+  </Property>
+  <Property name="return_exception" type="bool">
+    Record input-generation failures as errored results instead of aborting the scan.
+  </Property>
+  <Property name="commercial_use" type="bool">
+    Exclude generators whose datasets do not permit commercial use. Vulnerability scan only.
+  </Property>
+</TypeTable>
+
+```python
+from giskard.scan import ScanOptions, vulnerability_scan
+
+options: ScanOptions = {"max_scenarios": 20, "seed": 7, "commercial_use": True}
+result = await vulnerability_scan(
+    support_agent,
+    description="A customer-support agent for a retail bank, covering accounts, cards, payments and disputes.",
+    languages=["en"],
+    **options,
+)
+```
+
+`ScanOptions` extends `SharedScanOptions`, which holds every key except `commercial_use` and is what `quality_scan` accepts. `quality_scan` has no `commercial_use` parameter: its generators are all knowledge-base driven and read your documents, not a licensed dataset. `SharedScanOptions` is not re-exported from `giskard.scan`, so import it from `giskard.scan.types` if you need to annotate with it.
+
+---
+
+## `SuiteGeneratorRegistry`
+
+**Module:** `giskard.scan.registry`
+
+Mutable registry of scenario generator instances. Both built-in scans read from one: `vulnerability_suite_generator_registry` and `quality_suite_generator_registry`. Mutate those to change what a built-in scan runs, or build your own registry for a custom scan.
+
+<MethodCard name=".register()" returnType="None">
+  Add a generator. Classes are instantiated with their defaults.
+
+  <Property name="generator" type="ScenarioGenerator | type[ScenarioGenerator]" required>Generator instance or subclass.</Property>
+</MethodCard>
+
+<MethodCard name=".unregister()" returnType="None">
+  Remove a previously registered generator. Raises `ValueError` when it is not registered.
+
+  <Property name="generator" type="ScenarioGenerator | type[ScenarioGenerator]" required>Generator instance or subclass.</Property>
+</MethodCard>
+
+<MethodCard name=".clear()" returnType="None">
+  Remove every registered generator.
+</MethodCard>
+
+<MethodCard name=".generators()" returnType="list[ScenarioGenerator]">
+  Return the registered generators.
+
+  <Property name="commercial_use" type="bool" defaultValue="False">When `True`, return only generators whose `allow_commercial_use` is `True`.</Property>
+</MethodCard>
+
+Registration is by value: generators are Pydantic models, so registering a second generator of the same type with an equivalent configuration raises `ValueError`. Registering something that is not a `ScenarioGenerator` raises `TypeError`.
+
+```python
+from giskard.scan import (
+    SuiteGeneratorRegistry,
+    PromptInjectionScenarioGenerator,
+    vulnerability_suite_generator_registry,
+)
+
+# Custom registry
+registry = SuiteGeneratorRegistry()
+registry.register(PromptInjectionScenarioGenerator)
+generators = registry.generators()
+
+# Or extend the built-in vulnerability scan
+vulnerability_suite_generator_registry.register(
+    PromptInjectionScenarioGenerator(
+        # tags replaces the defaults, it does not add to them, so repeat the
+        # threat-type and owasp tags or group_by="threat-type" loses its buckets.
+        tags=[
+            "threat-type:prompt-injection",
+            "owasp:llm-top-10-2025:LLM01",
+            "team:security",
+        ]
+    )
+)
+```
+
+The quality scan reads its own registry the same way. Drop a generator from it and the next `quality_scan` call stops producing those scenarios:
+
+```python
+from giskard.scan import quality_suite_generator_registry
+from giskard.scan.generators import SycophancyScenarioGenerator
+
+quality_suite_generator_registry.unregister(SycophancyScenarioGenerator)
+```
+
+---
+
+## `ScanTool`
+
+**Module:** `giskard.scan.integrations`
+
+Type alias naming the scanners `third_party_scan` and `list_scan_items` accept:
+
+```python
+type ScanTool = Literal["giskard", "garak", "deepteam"]
+```
+
+`"giskard"` is valid only for `list_scan_items`; `third_party_scan` accepts `"garak"` and `"deepteam"`.
+
+---
+
+## `DEFAULT_TARGET_MODE`
+
+**Module:** `giskard.scan.generators.base`
+
+Shared product default for `target_mode` across `generate_suite`, both built-in scans, and the third-party adapters. Its value is `"multiturn"`.
+
+```python
+from giskard.scan import DEFAULT_TARGET_MODE
+
+assert DEFAULT_TARGET_MODE == "multiturn"
+```
+
+---
+
+## See also
+
+- [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) for a guided walkthrough of the vulnerability scan
+- [Generators](/oss/solutions/reference/generators) for the full scenario generator catalog
+- [Knowledge Base](/oss/solutions/reference/knowledge-base) for document grounding in the quality scan
+- [Checks: Scenarios](/oss/checks/reference/scenarios) for `Suite`, `Scenario`, and `SuiteResult`
