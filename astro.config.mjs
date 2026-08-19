@@ -67,8 +67,8 @@ export default defineConfig({
                     ]
                 },
                 {
-                    label: 'Solutions',
-                    items: [{ autogenerate: { directory: 'oss/solutions', collapsed: false } }],
+                    label: 'Scan',
+                    items: [{ autogenerate: { directory: 'oss/scan', collapsed: false } }],
                 },
                 {
                     label: 'Checks',

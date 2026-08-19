@@ -1,0 +1,151 @@
+---
+title: Knowledge Base
+description: "Document grounding for the Giskard quality scan: the KnowledgeBase collection and its Document entries."
+sidebar:
+  order: 3
+---
+
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
+
+A **knowledge base** is the set of documents your agent is supposed to answer from, such as the published policies behind `support_agent`, the retail-bank support agent from [Wrap your agent](/oss/scan/how-to/wrap-your-agent). The quality scan writes questions from those documents and checks the agent's answers against them, which is how it catches answers the agent invented ([hallucinations](/start/glossary/business/hallucination)).
+
+Knowledge base primitives for document-grounded scan generators. [`quality_scan`](/oss/scan/reference/scan-api#quality_scan) and every [knowledge-base generator](/oss/scan/reference/generators#knowledge-base-generators) build their scenarios from these documents and judge the agent's answers against them.
+
+```python
+from giskard.scan import Document, KnowledgeBase
+```
+
+---
+
+## `KnowledgeBase`
+
+**Module:** `giskard.scan.utils.knowledge_base`
+
+Immutable collection of documents used by knowledge-base scenario generators. Embeddings are **not** computed at construction time: they are filled lazily, in one batch, the first time nearest-neighbor retrieval needs them. The document collection is frozen so documents cannot be added after embeddings exist.
+
+<TypeTable name="KnowledgeBase">
+  <Property name="documents" type="tuple[Document, ...]" required>
+    The documents. Entries whose `content` is blank are dropped on validation; a knowledge base with no non-empty document raises `ValueError`.
+  </Property>
+</TypeTable>
+
+<MethodCard name=".from_texts()" returnType="KnowledgeBase">
+  Class method. Create a knowledge base from raw text documents, one `Document` per text.
+
+  <Property name="texts" type="list[str]" required>Text chunks to wrap as documents.</Property>
+</MethodCard>
+
+<MethodCard name=".ensure_embeddings()" returnType="None">
+  Coroutine. Ensure every document has embeddings from the same model. If any document is missing them, all embeddings are recomputed in one batch so vectors from different embedding models are never mixed. Called automatically by the retrieval methods.
+</MethodCard>
+
+<MethodCard name=".closest_documents()" returnType="list[Document]">
+  Coroutine. Return the documents closest to a seed document by cosine similarity, sorted from highest to lowest.
+
+  <Property name="seed_index" type="int" required>Index of the seed document in `documents`. Out-of-range values raise `IndexError`.</Property>
+  <Property name="max_documents" type="int" required>Maximum number of documents to return, including the seed document itself. Values `<= 0` return an empty list.</Property>
+</MethodCard>
+
+<MethodCard name=".closest_documents_to_text()" returnType="list[Document]">
+  Coroutine. Return the documents closest to arbitrary query text by cosine similarity.
+
+  <Property name="text" type="str" required>Query text to embed and compare against the knowledge base. Blank text raises `ValueError`.</Property>
+  <Property name="max_documents" type="int" required>Maximum number of documents to return. Values `<= 0` return an empty list.</Property>
+</MethodCard>
+
+`KnowledgeBase` extends `WithEmbeddingMixin`, so the embedding model follows the framework's embedding configuration.
+
+### Creating a knowledge base
+
+```python
+from giskard.scan import KnowledgeBase
+
+kb = KnowledgeBase.from_texts(
+    [
+        "A disputed card transaction must be reported within 120 days of the statement date.",
+        "A card reported lost cannot be unfrozen and must be replaced.",
+        "We do not give investment or tax advice; refer the customer to an independent adviser.",
+    ]
+)
+```
+
+One fact per document. The generators sample a document and write questions from it, so a page-long document produces vague questions and vague verdicts.
+
+Or build it from documents directly when you want tags or precomputed vectors:
+
+```python
+from giskard.scan import Document, KnowledgeBase
+
+kb = KnowledgeBase(
+    documents=(
+        Document(
+            content="A disputed card transaction must be reported within 120 days of the statement date.",
+            tags=["disputes"],
+        ),
+        Document(
+            content="A card reported lost cannot be unfrozen and must be replaced.",
+            tags=["cards"],
+        ),
+    )
+)
+```
+
+### Using it in a scan
+
+```python
+from giskard.scan import quality_scan
+
+result = await quality_scan(
+    support_agent,
+    description="A customer-support agent for a retail bank, answering from our published policies.",
+    languages=["en"],
+    knowledge_base=kb,
+)
+```
+
+Pass a `KnowledgeBase` rather than a `list[str]` when you want tags on the documents or want to reuse one embedded knowledge base across several runs. The plain list is fine for a first pass.
+
+`quality_scan` and `generate_suite` also accept a plain `list[str]` and convert it for you. A single `str` is rejected with `TypeError`. A bare string is a valid iterable of characters, and treating it as one document per character would be silently wrong.
+
+### Validation rules
+
+The embedding matrix is validated once and reused across every retrieval call. It must be a 2D matrix, free of `NaN`/`Inf` values, with no zero vectors; any of these raise `ValueError`. Documents with incomplete embeddings raise `ValueError` too.
+
+---
+
+## `Document`
+
+**Module:** `giskard.scan.utils.knowledge_base`
+
+A single document stored in a knowledge base.
+
+<TypeTable name="Document">
+  <Property name="content" type="str" required>
+    Text content used for question generation and grounding.
+  </Property>
+  <Property name="embeddings" type="list[float] | None" defaultValue="None">
+    Optional embedding vector. Missing vectors are computed lazily when nearest-neighbor retrieval is requested.
+  </Property>
+  <Property name="tags" type="list[str] | None" defaultValue="None">
+    Optional document labels carried by the caller.
+  </Property>
+</TypeTable>
+
+```python
+from giskard.scan import Document
+
+doc = Document(
+    content="A card reported lost cannot be unfrozen and must be replaced.",
+    tags=["policy", "cards"],
+)
+```
+
+---
+
+## See also
+
+- [Scan API](/oss/scan/reference/scan-api) for `quality_scan` and `generate_suite`
+- [Generators](/oss/scan/reference/generators) for the knowledge-base generator family
+- [Scan Vulnerabilities](/oss/scan/scan-vulnerabilities) for the vulnerability scan overview

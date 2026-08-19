@@ -145,16 +145,16 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Quickstart: https://docs.giskard.ai/oss/checks/quickstart.md
 
 ### Giskard Scan (Open Source)
-- Overview: https://docs.giskard.ai/oss/solutions.md
-- Install & Configure: https://docs.giskard.ai/oss/solutions/installation.md
-- Scan Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
-- Wrap your agent: https://docs.giskard.ai/oss/solutions/how-to/wrap-your-agent.md
-- Scan in CI: https://docs.giskard.ai/oss/solutions/how-to/scan-in-ci.md
-- Customize a Scan: https://docs.giskard.ai/oss/solutions/how-to/customize-a-scan.md
-- How Scan Works: https://docs.giskard.ai/oss/solutions/explanation/how-scan-works.md
-- Scan API: https://docs.giskard.ai/oss/solutions/reference/scan-api.md
-- Generator Reference: https://docs.giskard.ai/oss/solutions/reference/generators.md
-- Knowledge Base Reference: https://docs.giskard.ai/oss/solutions/reference/knowledge-base.md
+- Overview: https://docs.giskard.ai/oss/scan.md
+- Install & Configure: https://docs.giskard.ai/oss/scan/installation.md
+- Scan Vulnerabilities: https://docs.giskard.ai/oss/scan/scan-vulnerabilities.md
+- Wrap your agent: https://docs.giskard.ai/oss/scan/how-to/wrap-your-agent.md
+- Scan in CI: https://docs.giskard.ai/oss/scan/how-to/scan-in-ci.md
+- Customize a Scan: https://docs.giskard.ai/oss/scan/how-to/customize-a-scan.md
+- How Scan Works: https://docs.giskard.ai/oss/scan/explanation/how-scan-works.md
+- Scan API: https://docs.giskard.ai/oss/scan/reference/scan-api.md
+- Generator Reference: https://docs.giskard.ai/oss/scan/reference/generators.md
+- Knowledge Base Reference: https://docs.giskard.ai/oss/scan/reference/knowledge-base.md
 
 ### Checks Tutorials
 - Your First Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md

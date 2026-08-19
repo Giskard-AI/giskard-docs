@@ -11,7 +11,7 @@ The library is available on [GitHub](https://github.com/Giskard-AI/giskard) and 
 Giskard v3 is currently in Pre-release (Beta). We are actively refining the APIs and welcome early adopters to provide feedback and report issues as we move toward a stable 3.0.0 release.
 :::
 
-The third version of the library is available as a pre-release (Beta). This version is a major rewrite and includes [Checks](/oss/checks) and [Scan](/oss/solutions).
+The third version of the library is available as a pre-release (Beta). This version is a major rewrite and includes [Checks](/oss/checks) and [Scan](/oss/scan).
 
 :::note
 Looking for Giskard v2 features such as **RAGET**? It is not available yet in Giskard v3. If you still need it, check the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai).
@@ -19,7 +19,7 @@ Looking for Giskard v2 features such as **RAGET**? It is not available yet in Gi
 
 ## Resources and support
 
-- **Documentation**: Explore [Checks](/oss/checks) for test authoring and [Scan](/oss/solutions) for automated red teaming
+- **Documentation**: Explore [Checks](/oss/checks) for test authoring and [Scan](/oss/scan) for automated red teaming
 - **Agent Skills**: Install [Giskard Agent Skills](/oss/agent-skills) to give Claude Code, Cursor, and other coding agents drop-in workflows for Giskard tasks
 - **Contributing**: See [Contribute to Giskard](/oss/contributing) for the official guide, AI-agent notes, and repos to star
 - **Examples**: Check our [GitHub repository ↗](https://github.com/Giskard-AI/giskard-oss) for more examples
