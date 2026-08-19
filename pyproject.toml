@@ -8,7 +8,7 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13,<4.0"
 dependencies = [
-    "giskard[openai]==3.0.0rc1",
+    "giskard[openai,scan]==3.0.0rc1",
 ]
 
 [dependency-groups]
@@ -30,3 +30,5 @@ Documentation = "https://docs.giskard.ai/"
 # Block compromised litellm versions — supply chain attack (CVE-2026-PENDING)
 # https://github.com/BerriAI/litellm/issues/24512
 constraint-dependencies = ["litellm!=1.82.7,!=1.82.8"]
+# giskard v3 ships as a pre-release; its giskard-* deps carry rc markers.
+prerelease = "allow"
