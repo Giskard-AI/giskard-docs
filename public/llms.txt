@@ -205,32 +205,37 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Chatbot Testing: https://docs.giskard.ai/oss/checks/use-cases/chatbot-testing.md
 - Content Moderation: https://docs.giskard.ai/oss/checks/use-cases/content-moderation.md
 
-### Giskard Scan (Open Source)
-- Giskard Scan: https://docs.giskard.ai/oss/solutions.md
-- Install & Configure: https://docs.giskard.ai/oss/solutions/installation.md
+### Solutions (Open Source)
+Task-shaped quickstarts that sit above the Checks and Scan sections.
+- Solutions: https://docs.giskard.ai/oss/solutions.md
 - Scan Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
+- Check Agentic Systems: https://docs.giskard.ai/oss/solutions/check-agentic-systems.md
+
+### Giskard Scan (Open Source)
+- Giskard Scan: https://docs.giskard.ai/oss/scan.md
+- Install & Configure: https://docs.giskard.ai/oss/scan/installation.md
 
 ### Scan Tutorials
-- Your First Scan: https://docs.giskard.ai/oss/solutions/tutorials/your-first-scan.md
-- From Red-Team Finding to Regression Test: https://docs.giskard.ai/oss/solutions/tutorials/redteam-to-regression.md
-- Scan a RAG Agent: https://docs.giskard.ai/oss/solutions/tutorials/scan-a-rag-agent.md
-- Write a Custom Scenario Generator: https://docs.giskard.ai/oss/solutions/tutorials/custom-scenario-generator.md
+- Your First Scan: https://docs.giskard.ai/oss/scan/tutorials/your-first-scan.md
+- From Red-Team Finding to Regression Test: https://docs.giskard.ai/oss/scan/tutorials/redteam-to-regression.md
+- Scan a RAG Agent: https://docs.giskard.ai/oss/scan/tutorials/scan-a-rag-agent.md
+- Write a Custom Scenario Generator: https://docs.giskard.ai/oss/scan/tutorials/custom-scenario-generator.md
 
 ### Scan How-to Guides
-- Wrap Your Agent for the Scan: https://docs.giskard.ai/oss/solutions/how-to/wrap-your-agent.md
-- Customize a Scan: https://docs.giskard.ai/oss/solutions/how-to/customize-a-scan.md
-- Tune a Scan Run: https://docs.giskard.ai/oss/solutions/how-to/tune-scan-options.md
-- Run the Scan in CI: https://docs.giskard.ai/oss/solutions/how-to/scan-in-ci.md
-- Dataset-Backed Generators: https://docs.giskard.ai/oss/solutions/how-to/dataset-generators.md
-- Save and Version a Scan Suite: https://docs.giskard.ai/oss/solutions/how-to/save-and-version-suites.md
-- Find Hallucinations and Sycophancy with a Quality Scan: https://docs.giskard.ai/oss/solutions/how-to/quality-scan.md
-- Run Garak and DeepTeam Scanners: https://docs.giskard.ai/oss/solutions/how-to/third-party-scanners.md
+- Wrap Your Agent for the Scan: https://docs.giskard.ai/oss/scan/how-to/wrap-your-agent.md
+- Customize a Scan: https://docs.giskard.ai/oss/scan/how-to/customize-a-scan.md
+- Tune a Scan Run: https://docs.giskard.ai/oss/scan/how-to/tune-scan-options.md
+- Run the Scan in CI: https://docs.giskard.ai/oss/scan/how-to/scan-in-ci.md
+- Dataset-Backed Generators: https://docs.giskard.ai/oss/scan/how-to/dataset-generators.md
+- Save and Version a Scan Suite: https://docs.giskard.ai/oss/scan/how-to/save-and-version-suites.md
+- Find Hallucinations and Sycophancy with a Quality Scan: https://docs.giskard.ai/oss/scan/how-to/quality-scan.md
+- Run Garak and DeepTeam Scanners: https://docs.giskard.ai/oss/scan/how-to/third-party-scanners.md
 
 ### Scan API Reference
-- Scan API: https://docs.giskard.ai/oss/solutions/reference/scan-api.md
-- Generators: https://docs.giskard.ai/oss/solutions/reference/generators.md
-- Knowledge Base: https://docs.giskard.ai/oss/solutions/reference/knowledge-base.md
+- Scan API: https://docs.giskard.ai/oss/scan/reference/scan-api.md
+- Generators: https://docs.giskard.ai/oss/scan/reference/generators.md
+- Knowledge Base: https://docs.giskard.ai/oss/scan/reference/knowledge-base.md
 
 ### Scan Explanation
-- How the Scan Works: https://docs.giskard.ai/oss/solutions/explanation/how-scan-works.md
-- What the Scan Looks For: https://docs.giskard.ai/oss/solutions/explanation/threat-taxonomy.md
+- How the Scan Works: https://docs.giskard.ai/oss/scan/explanation/how-scan-works.md
+- What the Scan Looks For: https://docs.giskard.ai/oss/scan/explanation/threat-taxonomy.md
