@@ -14,7 +14,8 @@
     "format:prose": "prettier --write 'src/**/*.{md,mdx}'",
     "format:code": "node scripts/format-code-blocks.mjs",
     "test:tables": "node scripts/check-mdx-tables.mjs",
-    "test:redirects": "node scripts/check-redirects.mjs"
+    "test:redirects": "node scripts/check-redirects.mjs",
+    "test:python-snippets": "node scripts/check-python-snippets.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "13.6.0",
@@ -29,6 +30,7 @@
     "tailwindcss": "4.3.0"
   },
   "devDependencies": {
+    "pyright": "1.1.408",
     "prettier": "3.8.3",
     "wrangler": "4.95.0"
   }

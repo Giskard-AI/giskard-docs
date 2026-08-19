@@ -39,6 +39,9 @@ importers:
         specifier: 4.3.0
         version: 4.3.0
     devDependencies:
+      pyright:
+        specifier: 1.1.408
+        version: 1.1.408
       prettier:
         specifier: 3.8.3
         version: 3.8.3
@@ -2406,6 +2409,13 @@ packages:
     resolution: {integrity: sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==}
     engines: {node: '>=14'}
     hasBin: true
+
+  pyright@1.1.408:
+    resolution: {integrity: sha512-N61pxaLLCsPcUuPPHMNIrGoZgGBgrbjBX5UqkaT5UV8NVZdL7ExsO6N3ectv1DzAUsLOzdlyqoYtX76u8eF4YA==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
+    optionalDependencies:
+      fsevents: ~2.3.3
 
   prismjs@1.30.0:
     resolution: {integrity: sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==}
@@ -5585,6 +5595,10 @@ snapshots:
       source-map-js: 1.2.1
 
   prettier@3.8.3: {}
+
+  pyright@1.1.408:
+    optionalDependencies:
+      fsevents: 2.3.3
 
   prismjs@1.30.0: {}
 
