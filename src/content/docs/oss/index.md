@@ -89,12 +89,13 @@ suite_result = asyncio.run(
             " advice and must never disclose another customer's data."
         ),
         languages=["en"],
+        max_scenarios=10,
     )
 )
 suite_result.print_report()
 ```
 
-The description is what the generators work from, so the constraints you write into it are the ones the scan will attack.
+The description is what the generators work from, so the constraints you write into it are the ones the scan will attack. `max_scenarios` caps how many the generators produce — leave it off and the scan runs a full budget, which is more thorough but costs more provider calls than you want on a first run.
 
 v3 is a major rewrite, with new features such as [Checks](/oss/checks) and a redesigned [Scan](/oss/solutions/scan-vulnerabilities).
 
