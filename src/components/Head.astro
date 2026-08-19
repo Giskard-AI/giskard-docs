@@ -107,28 +107,14 @@ const softwareJsonLd = {
 	url: `${siteUrl}/oss`,
 	description:
 		'Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for LLM apps and agents: you write scenarios and checks that pass or fail instead of metric scores, run them locally against your own LLM provider, and red-team the same agent with the same library.',
-	softwareVersion: '3.0.0',
 	applicationCategory: 'DeveloperApplication',
 	operatingSystem: 'Cross-platform',
 	license: 'https://www.apache.org/licenses/LICENSE-2.0',
 	sameAs: 'https://github.com/Giskard-AI/giskard-oss',
 	author: { '@id': organizationId },
-	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', url: `${siteUrl}/oss` },
 };
 
-const faq = route.entry.data.faq as { question: string; answer: string }[] | undefined;
-const faqJsonLd = faq?.length
-	? {
-			'@context': 'https://schema.org',
-			'@type': 'FAQPage',
-			'@id': `${pageUrl}#faq`,
-			mainEntity: faq.map((item) => ({
-				'@type': 'Question',
-				name: item.question,
-				acceptedAnswer: { '@type': 'Answer', text: item.answer },
-			})),
-		}
-	: undefined;
 ---
 
 <link rel="preload" href="/fonts/osmose-regular.woff2" as="font" type="font/woff2" crossorigin />
@@ -168,7 +154,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 {isOssLanding
 	? <script type="application/ld+json" set:html={JSON.stringify(softwareJsonLd)} />
 	: <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />}
-{faqJsonLd && <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />}
 </>
 )}
 
