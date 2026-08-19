@@ -21,27 +21,21 @@
  * Pure Node.js – no Python / Jupyter required.
  */
 
-import {
-  readFileSync,
-  writeFileSync,
-  readdirSync,
-  existsSync,
-  unlinkSync,
-} from "node:fs";
-import { join, relative, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-import { execSync } from "node:child_process";
+import { readFileSync, writeFileSync, readdirSync, existsSync, unlinkSync } from 'node:fs';
+import { join, relative, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, "..");
+const ROOT = join(__dirname, '..');
 
 let GIT_ROOT = ROOT;
-let GITHUB_SLUG = "Giskard-AI/giskard-docs"; // fallback
+let GITHUB_SLUG = 'Giskard-AI/giskard-docs'; // fallback
 try {
-  GIT_ROOT = execSync("git rev-parse --show-toplevel", { cwd: ROOT })
+  GIT_ROOT = execSync('git rev-parse --show-toplevel', { cwd: ROOT })
     .toString()
     .trim();
-  const remoteUrl = execSync("git remote get-url origin", { cwd: ROOT })
+  const remoteUrl = execSync('git remote get-url origin', { cwd: ROOT })
     .toString()
     .trim();
   const match = remoteUrl.match(/github\.com[/:](.+?)(?:\.git)?$/);
@@ -75,7 +69,7 @@ function* walkSync(dir) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
       yield* walkSync(fullPath);
-    } else if (entry.isFile() && entry.name.endsWith(".ipynb")) {
+    } else if (entry.isFile() && entry.name.endsWith('.ipynb')) {
       yield fullPath;
     }
   }
@@ -87,19 +81,19 @@ function* walkSync(dir) {
 
 function cellSource(cell) {
   const src = cell.source;
-  if (Array.isArray(src)) return src.join("");
-  return src ?? "";
+  if (Array.isArray(src)) return src.join('');
+  return src ?? '';
 }
 
 function normalizeText(t) {
-  return String(t ?? "")
-    .replace(/\r\n/g, "\n")
-    .replace(/\n$/, "");
+  return String(t ?? '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n$/, '');
 }
 
 /** Inner HTML of top-level Rich/HTML repr (<pre style=…>…</pre>) or whole fragment. */
 function htmlDisplayFragment(html) {
-  const s = Array.isArray(html) ? html.join("") : String(html ?? "");
+  const s = Array.isArray(html) ? html.join('') : String(html ?? '');
   const m = s.match(/^<pre[^>]*>([\s\S]*)<\/pre>\s*$/i);
   if (m) return m[1].trimEnd();
   return s.trim();
@@ -107,10 +101,10 @@ function htmlDisplayFragment(html) {
 
 function escapeHtml(s) {
   return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 /**
@@ -142,46 +136,32 @@ function outputSegments(outputs) {
 
   const chunks = [];
   for (const out of outputs) {
-    if (out.output_type === "stream") {
-      const text = normalizeText(
-        Array.isArray(out.text) ? out.text.join("") : (out.text ?? ""),
-      );
-      if (text)
-        chunks.push({ kind: "stream", name: out.name || "stdout", text });
-    } else if (
-      out.output_type === "execute_result" ||
-      out.output_type === "display_data"
-    ) {
+    if (out.output_type === 'stream') {
+      const text = normalizeText(Array.isArray(out.text) ? out.text.join('') : (out.text ?? ''));
+      if (text) chunks.push({ kind: 'stream', name: out.name || 'stdout', text });
+    } else if (out.output_type === 'execute_result' || out.output_type === 'display_data') {
       const data = out.data || {};
-      const html = data["text/html"];
+      const html = data['text/html'];
       if (html) {
-        chunks.push({ kind: "html", inner: htmlDisplayFragment(html) });
+        chunks.push({ kind: 'html', inner: htmlDisplayFragment(html) });
         continue;
       }
-      const plain = data["text/plain"];
+      const plain = data['text/plain'];
       if (plain) {
-        const text = normalizeText(
-          Array.isArray(plain) ? plain.join("") : plain,
-        );
-        if (text) chunks.push({ kind: "stream", name: "result", text });
+        const text = normalizeText(Array.isArray(plain) ? plain.join('') : plain);
+        if (text) chunks.push({ kind: 'stream', name: 'result', text });
       }
-    } else if (out.output_type === "error") {
-      const tb = Array.isArray(out.traceback) ? out.traceback.join("\n") : "";
-      const msg = normalizeText(
-        `${out.ename || "Error"}: ${out.evalue || ""}${tb ? "\n" + tb : ""}`,
-      );
-      if (msg) chunks.push({ kind: "stream", name: "stderr", text: msg });
+    } else if (out.output_type === 'error') {
+      const tb = Array.isArray(out.traceback) ? out.traceback.join('\n') : '';
+      const msg = normalizeText(`${out.ename || 'Error'}: ${out.evalue || ''}${tb ? '\n' + tb : ''}`);
+      if (msg) chunks.push({ kind: 'stream', name: 'stderr', text: msg });
     }
   }
 
   // Merge consecutive stream chunks (stdout often splits across stream messages).
   const merged = [];
   for (const c of chunks) {
-    if (
-      c.kind === "stream" &&
-      merged.length &&
-      merged[merged.length - 1].kind === "stream"
-    ) {
+    if (c.kind === 'stream' && merged.length && merged[merged.length - 1].kind === 'stream') {
       merged[merged.length - 1].text += `\n${c.text}`;
     } else {
       merged.push({ ...c });
@@ -192,11 +172,11 @@ function outputSegments(outputs) {
 
 function cellOutputsMdx(outputs) {
   const segments = outputSegments(outputs);
-  if (segments.length === 0) return { mdx: "", usesCard: false };
+  if (segments.length === 0) return { mdx: '', usesCard: false };
 
   const bodyParts = [];
   for (const seg of segments) {
-    if (seg.kind === "html") {
+    if (seg.kind === 'html') {
       bodyParts.push(preSetHtml(seg.inner));
     } else {
       const t = normalizeText(seg.text);
@@ -208,21 +188,21 @@ function cellOutputsMdx(outputs) {
     }
   }
 
-  const mdx = `<Card title="Output">\n\n${bodyParts.join("\n\n")}\n\n</Card>`;
+  const mdx = `<Card title="Output">\n\n${bodyParts.join('\n\n')}\n\n</Card>`;
   return { mdx, usesCard: true };
 }
 
 function convertNotebook(notebookPath) {
-  const nb = JSON.parse(readFileSync(notebookPath, "utf8"));
+  const nb = JSON.parse(readFileSync(notebookPath, 'utf8'));
   const cells = nb.cells ?? [];
 
-  let frontmatter = "";
+  let frontmatter = '';
   let startIdx = 0;
 
   for (let i = 0; i < cells.length; i++) {
-    if (cells[i].cell_type === "raw") {
+    if (cells[i].cell_type === 'raw') {
       const src = cellSource(cells[i]).trim();
-      if (src.startsWith("---")) {
+      if (src.startsWith('---')) {
         frontmatter = src;
         startIdx = i + 1;
       }
@@ -230,7 +210,7 @@ function convertNotebook(notebookPath) {
     }
   }
 
-  const relPath = relative(GIT_ROOT, notebookPath).replace(/\\/g, "/");
+  const relPath = relative(GIT_ROOT, notebookPath).replace(/\\/g, '/');
 
   if (frontmatter && !/^description:\s/m.test(frontmatter)) {
     console.warn(`  ⚠  missing description: ${relPath}`);
@@ -246,11 +226,11 @@ function convertNotebook(notebookPath) {
     const cell = cells[i];
     const src = cellSource(cell);
 
-    if (cell.cell_type === "markdown") {
+    if (cell.cell_type === 'markdown') {
       parts.push(src);
-    } else if (cell.cell_type === "code") {
-      if (src.trimStart().startsWith("# colab-only")) continue;
-      parts.push("```python\n" + src + "\n```");
+    } else if (cell.cell_type === 'code') {
+      if (src.trimStart().startsWith('# colab-only')) continue;
+      parts.push('```python\n' + src + '\n```');
       const { mdx: outMdx, usesCard } = cellOutputsMdx(cell.outputs);
       if (outMdx) {
         parts.push(outMdx);
@@ -259,17 +239,17 @@ function convertNotebook(notebookPath) {
     }
   }
 
-  const body = parts.join("\n\n");
+  const body = parts.join('\n\n');
 
-  const importBlock = needsCardImport ? `${CARD_IMPORT}\n\n` : "";
+  const importBlock = needsCardImport ? `${CARD_IMPORT}\n\n` : '';
   const afterFm = frontmatter
     ? `${frontmatter}\n\n${importBlock}${colabBadge}\n\n${body}`
     : `${importBlock}${colabBadge}\n\n${body}`;
 
-  const outPath = notebookPath.replace(/\.ipynb$/, ".mdx");
-  writeFileSync(outPath, afterFm, "utf8");
+  const outPath = notebookPath.replace(/\.ipynb$/, '.mdx');
+  writeFileSync(outPath, afterFm, 'utf8');
 
-  const legacyMd = notebookPath.replace(/\.ipynb$/, ".md");
+  const legacyMd = notebookPath.replace(/\.ipynb$/, '.md');
   if (existsSync(legacyMd)) {
     unlinkSync(legacyMd);
     console.log(`  removed legacy: ${relative(GIT_ROOT, legacyMd)}`);
@@ -285,7 +265,7 @@ function convertNotebook(notebookPath) {
 
 // Skipped when imported (scripts/check-notebook-output.mjs imports the helpers).
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const contentDir = join(ROOT, "src", "content", "docs");
+  const contentDir = join(ROOT, 'src', 'content', 'docs');
   const notebooks = [...walkSync(contentDir)];
 
   if (notebooks.length === 0) {
@@ -296,5 +276,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   for (const nb of notebooks) {
     convertNotebook(nb);
   }
-  console.log("Done.");
+  console.log('Done.');
 }
