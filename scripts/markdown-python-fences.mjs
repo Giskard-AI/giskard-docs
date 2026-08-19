@@ -2,7 +2,7 @@ import { readdirSync } from "fs";
 import { extname, join } from "path";
 
 const MARKDOWN_EXTENSIONS = new Set([".md", ".mdx"]);
-const PYTHON_FENCE_RE = /^ {0,3}(`{3,}|~{3,})[ \t]*(python|py)(?:[ \t]+.*)?[ \t]*$/i;
+const PYTHON_FENCE_RE = /^(?:\s*(?:>\s*)?)(`{3,}|~{3,})[ \t]*(python|py)(?:[ \t]+.*)?[ \t]*$/i;
 const PYRIGHT_SKIP_RE =
   /^\s*<!--\s*pyright-skip\s*:\s*(.+?)\s*-->\s*$/i;
 
@@ -44,7 +44,7 @@ function sourceLines(source) {
 
 function closingFencePattern(openingFence) {
   const character = openingFence[0] === "`" ? "`" : "~";
-  return new RegExp(`^ {0,3}${character}{${openingFence.length},}[ \\t]*$`);
+  return new RegExp(`^(?:\\s*(?:>\\s*)?)${character}{${openingFence.length},}[ \\t]*$`);
 }
 
 /**

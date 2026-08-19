@@ -22,7 +22,7 @@ test("preparePythonSnippetFiles maps generated Pyright paths back to source fenc
   assert.equal(snippet.pagePath, pagePath);
   assert.equal(snippet.codeStartLine, 4);
   assert.equal(snippet.codeEndLine, 4);
-  assert.match(snippet.generatedPath, /guide\.mdx\.0\.py$/);
+  assert.match(snippet.generatedPath, /[a-f0-9]{64}\.0\.py$/);
 });
 
 test("formatDiagnostic reports the Markdown source location", () => {

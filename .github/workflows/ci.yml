@@ -47,6 +47,9 @@ jobs:
       - name: Check Python snippets
         run: pnpm run test:python-snippets
 
+      - name: Check API baselines
+        run: uv run pytest tests/test_docs_refresh.py
+
   docs_build:
     name: Build docs
     runs-on: ubuntu-latest

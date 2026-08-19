@@ -6,6 +6,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, relative, resolve } from "node:path";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 
 import {
@@ -16,10 +17,9 @@ import {
 const DEFAULT_DOCS_ROOT = "src/content/docs/oss";
 
 function generatedSnippetPath(generatedRoot, docsRoot, pagePath, index) {
-  const relativePagePath = relative(docsRoot, pagePath)
-    .replaceAll("/", "__")
-    .replaceAll("\\", "__");
-  return join(generatedRoot, `${relativePagePath}.${index}.py`);
+  const relativePagePath = relative(docsRoot, pagePath);
+  const digest = createHash("sha256").update(relativePagePath).digest("hex");
+  return join(generatedRoot, `${digest}.${index}.py`);
 }
 
 /**
