@@ -70,7 +70,7 @@ a separate test-case class.
 | `GEval` with a custom prompt | `LLMJudge(prompt=…)` | Full control of the judge prompt (Jinja over the trace) |
 | `ToxicityMetric` | `Toxicity` | Optional `categories=[…]` narrowing |
 | `BiasMetric` | `Conformity(rule=…)` or `LLMJudge` | No dedicated bias check; express it as a rule |
-| `JsonCorrectnessMetric` | `JsonValid(schema=…)` | Deterministic, no LLM call |
+| `JsonCorrectnessMetric` | `JsonValid(expected_schema=…)` | Deterministic, no LLM call |
 | `SummarizationMetric` | `Groundedness` + `Conformity` | No single equivalent; compose the two |
 | `ContextualPrecision/Recall/Relevancy` | *(no equivalent)* | Retriever-scoring metrics; see [keep using DeepEval when…](#keep-using-deepeval-when) |
 | custom `BaseMetric` | `FnCheck(fn=…)` | Sync or async callable over the trace |
@@ -216,7 +216,7 @@ LLM call.
 | `equals` | `Equals(target_key="trace.last.outputs", expected_value=…)` |
 | `regex` | `RegexMatching(pattern=…)` |
 | `is-json` | `JsonValid()` |
-| `is-json` with `value:` schema | `JsonValid(schema={…})` |
+| `is-json` with `value:` schema | `JsonValid(expected_schema={…})` |
 | `similar` (+ `threshold`) | `SemanticSimilarity(reference_text=…, threshold=…)` |
 | `llm-rubric` | `LLMJudge(prompt=…)` or `Conformity(rule=…)` |
 | `context-faithfulness` | `Groundedness` |
@@ -273,7 +273,7 @@ order_status = (
     .checks(
         JsonValid(
             name="valid json",
-            schema={
+            expected_schema={
                 "type": "object",
                 "properties": {
                     "order_id": {"type": "string"},
