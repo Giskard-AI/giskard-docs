@@ -229,14 +229,14 @@ The returned suite is named `"Scenarios"`.
 
 Run an external security scanner against a Giskard target and return its results as a standard `SuiteResult`. Coroutine: `await` it. Experimental.
 
-The adapters are imported lazily and run in-process, so the scanner's optional extra must be installed: `pip install "giskard-scan[garak]"` or `pip install "giskard-scan[deepteam]"`.
+The adapters are imported lazily and run in-process, so the scanner's optional extra must be installed: `pip install --pre "giskard[garak]"` or `pip install --pre "giskard[deepteam]"`.
 
 <MethodCard name="third_party_scan()" returnType="SuiteResult">
   <Property name="target" type="Target" required>
     Agent or provider target to evaluate.
   </Property>
   <Property name="tool" type='"garak" | "deepteam"' required>
-    Scanner to use.
+    Scanner to use. The parameter's type annotation also accepts `"lidar"`, which resolves to a private Giskard package and is not a supported public integration.
   </Property>
   <Property name="description" type="str" required>
     Natural-language description of the agent under test. Deepteam uses it as `red_team`'s `target_purpose`; garak has no target-profile concept and ignores it.
@@ -434,6 +434,8 @@ type ScanTool = Literal["giskard", "garak", "deepteam"]
 ```
 
 `"giskard"` is valid only for `list_scan_items`; `third_party_scan` accepts `"garak"` and `"deepteam"`.
+
+The `third_party_scan` annotation also lists `"lidar"`, a private Giskard package that is not a supported public integration.
 
 ---
 

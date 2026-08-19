@@ -29,6 +29,9 @@ Immutable collection of documents used by knowledge-base scenario generators. Em
   <Property name="documents" type="tuple[Document, ...]" required>
     The documents. Entries whose `content` is blank are dropped on validation; a knowledge base with no non-empty document raises `ValueError`.
   </Property>
+  <Property name="embedding_model" type="BaseEmbeddingModel | None" defaultValue="None">
+    Embedding model used to embed the documents. Falls back to the global default when `None`.
+  </Property>
 </TypeTable>
 
 <MethodCard name=".from_texts()" returnType="KnowledgeBase">
