@@ -15,13 +15,20 @@ You write scenarios and checks. A scenario is one test case: a message, or a sho
 
 Red teaming is the other half. Instead of testing that normal requests work, you send hostile ones on purpose: attempts to make the agent leak its instructions ([prompt injection](/start/glossary/security/injection)), produce [harmful content](/start/glossary/security/harmful-content), or [state things that are not true](/start/glossary/business/hallucination). See the [glossary](/start/glossary) for the failure types Giskard looks for.
 
-Beyond Giskard's own generators, the scan can run garak's probes and deepteam's attacks against the same agent through the optional `giskard-scan[garak]` and `giskard-scan[deepteam]` extras. See [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities).
+Beyond Giskard's own generators, `third_party_scan(target, tool="garak")` and `third_party_scan(target, tool="deepteam")` run garak's probes and deepteam's attacks against the same agent. They ship in the optional `garak` and `deepteam` extras. See [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities).
 
-Verdicts from an LLM judge are evidence, not certification. A judge is sometimes wrong in both directions, and a suite that passes means those scenarios did not break your agent, not that the agent is safe.
+A judge is an LLM and is sometimes wrong in both directions. A passing suite means those scenarios did not break your agent.
 
 The examples below test a support agent for a retail bank. It answers questions about accounts, cards, payments, and disputes, and it is not allowed to give investment advice.
 
 ## A first check
+
+Install the library and point it at your LLM provider — `Conformity` is graded by a judge, so it needs a key:
+
+```bash
+pip install --pre "giskard[scan,openai]"
+export OPENAI_API_KEY=...
+```
 
 Write a scenario, send one message to your agent, and state the rule its reply has to satisfy:
 
@@ -33,7 +40,7 @@ from giskard.checks import Conformity, Scenario
 
 async def bank_support_agent(inputs: str) -> str:
     # Call your own LLM app, chain, or agent here
-    ...
+    return "I can't recommend a specific investment. Please speak to a qualified financial adviser."
 
 
 scenario = (
@@ -67,6 +74,12 @@ import asyncio
 
 from giskard.scan import vulnerability_scan
 
+
+async def bank_support_agent(inputs: str) -> str:
+    # Call your own LLM app, chain, or agent here
+    return "I can't recommend a specific investment. Please speak to a qualified financial adviser."
+
+
 suite_result = asyncio.run(
     vulnerability_scan(
         target=bank_support_agent,
@@ -78,6 +91,7 @@ suite_result = asyncio.run(
         languages=["en"],
     )
 )
+suite_result.print_report()
 ```
 
 The description is what the generators work from, so the constraints you write into it are the ones the scan will attack.
@@ -85,7 +99,7 @@ The description is what the generators work from, so the constraints you write i
 v3 is a major rewrite, with new features such as [Checks](/oss/checks) and a redesigned [Scan](/oss/solutions/scan-vulnerabilities).
 
 :::note
-Coming from Giskard v2? Scan has shipped in v3 with a new design, see [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities). RAGET is not part of v3; for it, use the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai).
+Coming from Giskard v2? Scan has shipped in v3 with a new design, see [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities). RAGET is not part of v3; in v3 the equivalent route is a `KnowledgeBase` with `KnowledgeBaseScenarioGenerator` and `quality_scan`, and for RAGET itself use the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai).
 :::
 
 ## Resources and support
@@ -97,7 +111,7 @@ Coming from Giskard v2? Scan has shipped in v3 with a new design, see [Scan for 
 - **Examples**: Check our [GitHub repository ↗](https://github.com/Giskard-AI/giskard-oss) for more examples
 - **Community**: Join our [Discord ↗](https://discord.com/invite/ABvfpbu69R) for support and discussions
 
-## Next Steps
+## Next steps
 
 - **Install & Configure**: Set up the packages and your LLM provider in [Install & Configure](/oss/checks/installation)
 - **Your First Test**: Write your first scenario in [Your First Test](/oss/checks/tutorials/your-first-test)
