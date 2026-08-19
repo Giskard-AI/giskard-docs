@@ -32,15 +32,13 @@ def bank_support_agent(inputs: str) -> dict:
     }
 ```
 
-The tutorial notebooks use a different agent, BotaniBot, an assistant for a garden centre. The reference uses the bank agent because its failure modes are the ones most of these checks exist to catch.
-
 ---
 
 ## Function-based Checks
 
 ### `FnCheck`
 
-<ResourceSection description="Create a check from a callable function. Perfect for quick prototyping and simple validation logic. Not reliably serializable — intended for programmatic/test use only.">
+<ResourceSection description="Create a check from a callable function. Use it for quick prototyping and one-off validation logic. Not reliably serializable — intended for programmatic/test use only.">
 
 **Module:** `giskard.checks.builtin.fn`
 
@@ -130,17 +128,17 @@ check = StringMatching(keyword="success", target_key="trace.last.outputs")
 
 # Case-insensitive
 check = StringMatching(
-    keyword="error", target_key="trace.last.outputs", case_sensitive=False
+    keyword="this is not financial advice",
+    target_key="trace.last.outputs.answer",
+    case_sensitive=False,
 )
 ```
 
 Use `StringMatching` when a specific phrase is required, such as a disclaimer your legal team wrote. If the agent is free to paraphrase, this check fails on correct answers; use [`Conformity`](#conformity) or [`SemanticSimilarity`](#semanticsimilarity) instead.
 
 :::caution
-The text field is `text_key`, not `key`. Comparison checks use `key`, so it is easy to
-mix them up. An unknown keyword argument is ignored rather than rejected, so a
-`StringMatching(key=...)` still runs. It just searches the default
-`trace.last.outputs` instead of the field you meant, and passes or fails on the wrong text.
+The path field is `target_key` on every built-in check. Passing `key`, `text_key`, or
+`answer_key` raises a `ValidationError` — the models reject unknown keyword arguments.
 :::
 
 </ResourceSection>
@@ -165,9 +163,14 @@ mix them up. An unknown keyword argument is ignored rather than rejected, so a
 
 The agent's reply must never contain a full card number. Wrap the matcher in [`Not`](#not) so a match is a failure:
 
-check = RegexMatching(
-    pattern=r"\d{3}-\d{3}-\d{4}",
-    target_key="trace.last.outputs.phone",
+```python
+from giskard.checks import Not, RegexMatching
+
+check = Not(
+    check=RegexMatching(
+        pattern=r"\b(?:\d[ -]?){13,16}\b",
+        target_key="trace.last.outputs.answer",
+    )
 )
 ```
 
@@ -219,8 +222,18 @@ check = Equals(expected_value="success", target_key="trace.last.outputs.status")
 
 # Compare against another trace value
 check = Equals(
-    expected_value_key="trace.interactions[0].outputs.baseline",
-    target_key="trace.last.outputs.result",
+    expected_value="balance_enquiry", target_key="trace.last.outputs.intent"
+)
+```
+
+Use `Equals` on values your agent produces as data: labels, enums, identifiers, numbers. On free text it fails on any rewording, so compare meaning with [`SemanticSimilarity`](#semanticsimilarity) instead.
+
+`expected_value_key` compares two points in the same trace. Ask the same question twice and require the same classification:
+
+```python
+check = Equals(
+    expected_value_key="trace.interactions[0].outputs.intent",
+    target_key="trace.last.outputs.intent",
 )
 ```
 
@@ -231,7 +244,9 @@ Check that extracted values do **not** equal an expected value.
 ```python
 from giskard.checks import NotEquals
 
-check = NotEquals(expected_value="error", target_key="trace.last.outputs.status")
+check = NotEquals(
+    expected_value="investment_advice", target_key="trace.last.outputs.intent"
+)
 ```
 
 Use `NotEquals` for a single forbidden value. To forbid a condition expressed by another check, wrap that check in [`Not`](#not).
@@ -244,7 +259,10 @@ Guard the retrieval quality and the sourcing of the agent's answers:
 from giskard.checks import GreaterThan, GreaterThanEquals
 
 check = GreaterThan(
-    expected_value=0.8, target_key="trace.last.metadata.confidence_score"
+    expected_value=0.8, target_key="trace.last.metadata.retrieval_score"
+)
+check = GreaterThanEquals(
+    expected_value=1, target_key="trace.last.metadata.citation_count"
 )
 check = GreaterThanEquals(expected_value=100, target_key="trace.last.outputs.user_count")
 ```
@@ -258,9 +276,9 @@ check = GreaterThanEquals(expected_value=100, target_key="trace.last.outputs.use
 ```python
 from giskard.checks import LessThan, LessThanEquals
 
-check = LessThan(expected_value=500, target_key="trace.last.metadata.latency_ms")
+check = LessThan(expected_value=2000, target_key="trace.last.metadata.latency_ms")
 check = LessThanEquals(
-    expected_value=1000, target_key="trace.last.metadata.token_count"
+    expected_value=400, target_key="trace.last.metadata.output_tokens"
 )
 ```
 
@@ -299,7 +317,8 @@ check = JsonValid(target_key="trace.last.outputs")
 
 check = JsonValid(
     target_key="trace.last.outputs",
-    schema={
+    parse=False,
+    expected_schema={
         "type": "object",
         "required": ["answer", "intent", "authenticated"],
         "properties": {
@@ -372,7 +391,7 @@ allow if {
 }
 """,
     rule="data.giskard.allow",
-    key="trace.last.metadata",
+    target_key="trace.last.metadata",
 )
 ```
 
@@ -401,8 +420,12 @@ from giskard.checks import AllOf, Equals, GreaterThanEquals
 
 check = AllOf(
     checks=[
-        LessThan(expected_value=10, target_key="trace.last.outputs"),
-        Equals(expected_value=5, target_key="trace.last.outputs"),
+        Equals(
+            expected_value=True, target_key="trace.last.outputs.authenticated"
+        ),
+        GreaterThanEquals(
+            expected_value=1, target_key="trace.last.metadata.citation_count"
+        ),
     ]
 )
 ```
@@ -426,8 +449,13 @@ from giskard.checks import AnyOf, Equals
 
 check = AnyOf(
     checks=[
-        StringMatching(keyword="yes", target_key="trace.last.outputs"),
-        StringMatching(keyword="approved", target_key="trace.last.outputs"),
+        Equals(
+            expected_value="opened", target_key="trace.last.outputs.dispute_status"
+        ),
+        Equals(
+            expected_value="information_requested",
+            target_key="trace.last.outputs.dispute_status",
+        ),
     ]
 )
 ```
@@ -450,7 +478,11 @@ The agent is not allowed to promise a refund timeline the bank does not offer:
 from giskard.checks import Not, StringMatching
 
 check = Not(
-    check=StringMatching(keyword="forbidden", target_key="trace.last.outputs")
+    check=StringMatching(
+        keyword="instant refund",
+        target_key="trace.last.outputs.answer",
+        case_sensitive=False,
+    )
 )
 ```
 
@@ -615,7 +647,7 @@ Use `Groundedness` when the agent retrieves documents and must not go beyond the
 <Property name="answer" type="str | MISSING">
   The answer text to evaluate (static).
 </Property>
-<Property name="answer_key" type="str" defaultValue='"trace.last.outputs"'>
+<Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the answer from the trace.
 </Property>
 <Property name="context" type="str | list[str] | MISSING">
@@ -636,7 +668,7 @@ Use `Groundedness` when the agent retrieves documents and must not go beyond the
 from giskard.checks import Contradiction
 
 check = Contradiction(
-    answer_key="trace.last.outputs.answer",
+    target_key="trace.last.outputs.answer",
     context_key="trace.last.metadata.retrieved_docs",
 )
 ```
@@ -789,7 +821,7 @@ Use `Conformity` for a policy you can state as a rule. If the rule keeps growing
 
 ### `LLMJudge`
 
-<ResourceSection description="General-purpose LLM-based validation with custom prompts. The most flexible LLM check — use when specialized checks (Groundedness, Conformity) don't fit your needs.">
+<ResourceSection description="General-purpose LLM-based validation with custom prompts. The most flexible LLM check — use it when Groundedness or Conformity do not fit.">
 
 **Module:** `giskard.checks.judges.judge`
 
@@ -892,7 +924,7 @@ from giskard.checks import SemanticSimilarity
 
 check = SemanticSimilarity(
     reference_text="Card disputes are investigated within 15 working days, and any provisional refund is returned if the claim is rejected.",
-    target_key="trace.last.outputs",
+    target_key="trace.last.outputs.answer",
     threshold=0.8,
 )
 ```
@@ -913,7 +945,7 @@ Use it when phrasing varies but meaning must not. The default `threshold` of 0.9
 Requires the `readability` extra: `pip install 'giskard-checks[readability]'`.
 :::
 
-<Property name="key" type="str" defaultValue='"trace.last.outputs"'>
+<Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to the text to score.
 </Property>
 <Property name="metric" type='ReadabilityMetric' defaultValue='"flesch_reading_ease"'>
@@ -934,7 +966,7 @@ The agent writes for retail customers, not for the compliance team, so its answe
 from giskard.checks import Readability
 
 check = Readability(
-    key="trace.last.outputs.answer",
+    target_key="trace.last.outputs.answer",
     metric="flesch_reading_ease",
     min_score=60,
 )
@@ -975,7 +1007,7 @@ scenario = (
     )
     .check(
         Equals(
-            expected_value=True, key="trace.last.outputs.authenticated"
+            expected_value=True, target_key="trace.last.outputs.authenticated"
         )
     )
     .check(
@@ -1004,7 +1036,7 @@ from giskard.checks import Conformity, Groundedness, set_default_generator
 
 set_default_generator(Generator(model="openai/gpt-5", temperature=0.1))
 
-check = Groundedness(answer_key="trace.last.outputs.answer")
+check = Groundedness(target_key="trace.last.outputs.answer")
 check = Conformity(
     rule="The reply must cite the fee schedule whenever it quotes a fee."
 )

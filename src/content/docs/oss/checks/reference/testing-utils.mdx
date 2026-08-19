@@ -72,8 +72,12 @@ test_case = TestCase(
     checks=[
         Equals(expected_value="Hi there!", target_key="trace.interactions[0].outputs"),
         Equals(
-            expected_value="I'm doing well!",
-            target_key="trace.interactions[1].outputs",
+            expected_value=3.00,
+            target_key="trace.interactions[0].outputs.fee_eur",
+        ),
+        Equals(
+            expected_value=0.00,
+            target_key="trace.interactions[1].outputs.fee_eur",
         ),
     ],
 )
@@ -333,7 +337,11 @@ async def test_answers_state_the_timescale(question, required_keyword):
         name=f"timescale_{required_keyword.replace(' ', '_')}",
         trace=trace,
         checks=[
-            Equals(expected_value=expected_output, target_key="trace.last.outputs")
+            StringMatching(
+                keyword=required_keyword,
+                target_key="trace.last.outputs",
+                case_sensitive=False,
+            )
         ],
     )
     await test_case.assert_passed()

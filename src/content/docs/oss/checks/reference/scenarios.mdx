@@ -17,7 +17,7 @@ Multi-step workflow testing with scenario builders and runners.
 
 **Module:** `giskard.checks.core.scenario`
 
-The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Internally, the runner executes **steps**: each step runs one or more interactions against the shared trace, then runs that step’s checks. Call `.run()` to execute against the SUT. You can also use `Scenario.extend(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
+The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Internally, the runner executes **steps**: each step runs one or more interactions against the shared trace, then runs that step’s checks. Call `.run()` to execute against the SUT. You can also use `scenario.extend(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
 
 <MethodCard name="Scenario()" returnType="Scenario">
   Create a new scenario.
@@ -85,8 +85,14 @@ result = await (
             name="asks_for_payment_details",
         )
     )
-    .interact(inputs="12345", outputs="Thank you! I've found your account.")
-    .check(Equals(expected_value=True, target_key="trace.last.metadata.account_found"))
+    .interact(
+        inputs="89.00 EUR on 4 March.",
+        outputs={
+            "answer": "Found it, to Rail Europe. I can raise a dispute.",
+            "payment_found": True,
+        },
+    )
+    .check(Equals(expected_value=True, target_key="trace.last.outputs.payment_found"))
     .run()
 )
 ```
@@ -240,7 +246,7 @@ suite.append(
         inputs="How long does a SEPA transfer take?"
     ).check(
         StringMatching(
-            keyword="working day", text_key="trace.last.outputs"
+            keyword="working day", target_key="trace.last.outputs"
         )
     )
 )

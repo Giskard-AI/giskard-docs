@@ -24,9 +24,9 @@ Groundedness(target_key="last.outputs.answer", ...)
 `trace.last` is shorthand for `trace.interactions[-1]` — the most recent interaction. Use an explicit index to reference earlier turns in multi-turn scenarios:
 
 ```python
-key = "trace.last.outputs"  # most recent
-key = "trace.interactions[0].outputs"  # first interaction
-key = "trace.interactions[-1].outputs"  # same as trace.last.outputs
+target_key = "trace.last.outputs"  # most recent
+target_key = "trace.interactions[0].outputs"  # first interaction
+target_key = "trace.interactions[-1].outputs"  # same as trace.last.outputs
 ```
 
 ## Common Patterns

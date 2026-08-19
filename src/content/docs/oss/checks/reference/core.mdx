@@ -344,7 +344,7 @@ result = await (
     )
     .check(
         StringMatching(
-            keyword="15 working days", text_key="trace.last.outputs"
+            keyword="15 working days", target_key="trace.last.outputs"
         )
     )
     .run()
@@ -377,8 +377,15 @@ scenario = Scenario(
     name="bank_agent_greeting",
     steps=[
         Step(
-            interacts=[Interact(inputs="Hello", outputs="Hi")],
-            checks=[Equals(expected_value="Hi", target_key="trace.last.outputs")],
+            interacts=[
+                Interact(
+                    inputs="Hi, can you help me with a card problem?",
+                    outputs="Of course. Is the card lost, blocked, or showing a payment you don't recognise?",
+                )
+            ],
+            checks=[
+                StringMatching(keyword="?", target_key="trace.last.outputs")
+            ],
         ),
     ],
 )

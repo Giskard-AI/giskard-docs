@@ -16,7 +16,7 @@ Paste a single URL into your coding agent and it installs the dependencies, conf
 :::tip[Paste this into your coding agent:]
 
 ```
-Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md and install giskard-checks in my project.
+Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md and install Giskard in my project.
 ```
 
 :::
@@ -34,28 +34,28 @@ Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding age
 
 ## Install the Python package
 
-Giskard Checks requires **Python 3.12 or higher**. Install it together with the SDK for the LLM provider you will use as a judge -- an LLM the library calls to grade your agent's replies:
+Giskard requires **Python 3.12 or higher**. Install it together with the SDK for the LLM provider you will use as a judge: an LLM the library calls to grade your agent's replies.
 
 ```bash
 pip install "giskard[openai]==3.0.0rc1"
 ```
 
-No provider SDK ships with `giskard-checks` itself, so installing it alone leaves LLM-based checks unable to reach a model.
+No provider SDK ships with `giskard` itself, so installing it without a provider extra leaves LLM-based checks unable to reach a model.
 
 Pick the extra that matches your provider:
 
 | Provider prefix | Install | SDK |
 | --- | --- | --- |
-| `openai/` | `"giskard-agents[openai]"` | `openai` |
-| `google/` or `gemini/` | `"giskard-agents[google]"` | `google-genai` |
-| `anthropic/` | `"giskard-agents[anthropic]"` | `anthropic` |
-| `azure/` | `"giskard-llm[azure]"` | `openai` |
-| `azure_ai/` | `"giskard-llm[azure]"` | `openai` |
+| `openai/` | `pip install --pre "giskard[openai]"` | `openai` |
+| `google/` or `gemini/` | `pip install --pre "giskard[google]"` | `google-genai` |
+| `anthropic/` | `pip install --pre "giskard[anthropic]"` | `anthropic` |
+| `azure/` | `pip install --pre "giskard[azure]"` | `openai` |
+| `azure_ai/` | `pip install --pre "giskard[azure]"` | `openai` |
 
-Use `"giskard-agents[all]"` for all three native SDKs at once.
+Use `pip install --pre "giskard[all-llms]"` for all the native SDKs at once.
 
 :::note[Using LiteLLM instead]
-LiteLLM is supported as an opt-in escape hatch for providers with no native route. Install `"giskard-agents[litellm]"` and pass `LiteLLMGenerator` explicitly:
+LiteLLM is supported as an opt-in escape hatch for providers with no native route. Install `pip install --pre "giskard[litellm]"` and pass `LiteLLMGenerator` explicitly:
 
 ```python
 from giskard.agents.generators import LiteLLMGenerator
