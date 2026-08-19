@@ -1,6 +1,6 @@
 ---
 title: Giskard vs LangSmith evaluations
-description: "An honest comparison of Giskard Checks and LangSmith's evaluation features — a local open-source library versus a hosted observability and evaluation platform."
+description: "Giskard Checks and LangSmith's evaluation features compared — a local open-source library versus a hosted observability and evaluation platform."
 sidebar:
   order: 5
 ---
@@ -17,19 +17,30 @@ jobs, and "LangSmith or Giskard" is usually the wrong question.
 
 | | Giskard Checks | LangSmith evaluations |
 | --- | --- | --- |
-| License | Apache 2.0 (open source) | Closed source (hosted SaaS) |
+| License | MIT (`giskard-checks`); Apache 2.0 (`giskard`, `giskard-scan`) | Closed source (hosted SaaS) |
 | Deployment | Local library, runs anywhere Python runs | Hosted cloud; self-hosting is Enterprise-only |
 | Account required | No | Yes |
 | Data location | Your machine, plus whichever LLM provider you configure | Traces and datasets stored in LangSmith |
 | Cost | Free | Free tier, then from ~$39/user/month with per-trace overages |
 | Production tracing | No | Yes — the core strength |
-| Dataset & experiment UI | No | Yes, and it is good |
+| Dataset & experiment UI | No | Yes |
 | Human annotation queues | No | Yes |
 | Test authoring | pytest tests in your repo | Python/TS SDK evaluators against hosted datasets |
-| LangChain coupling | None | Works without LangChain, but the ecosystem pull is real |
+| LangChain coupling | None | Works without LangChain, but the ecosystem pulls you toward it |
 | Multi-turn / stateful | First-class scenarios | Supported via traces and datasets |
-| Red teaming | `giskard-scan`, same primitives | Not a focus |
+| Red teaming | `giskard.scan` (the `scan` extra), same primitives | Not a focus |
 | Offline / air-gapped CI | Yes | Not without an Enterprise self-hosted deployment |
+
+## Setup
+
+```bash
+pip install --pre "giskard[scan,openai]" pytest-asyncio
+```
+
+`my_agent` below is your own agent: a callable taking the user message and
+returning the reply. The tests are marked with `@pytest.mark.asyncio`; set
+`asyncio_mode = auto` in your pytest config if you would rather not mark each
+one.
 
 ## Side by side
 
@@ -37,9 +48,11 @@ jobs, and "LangSmith or Giskard" is usually the wrong question.
 
 ```python
 # test_agent.py
+import pytest
 from giskard.checks import Scenario, RegexMatching
 
 
+@pytest.mark.asyncio
 async def test_capital_of_france():
     scenario = (
         Scenario("capital_of_france")
@@ -79,20 +92,19 @@ account mandatory.
 
 ## Pick LangSmith when…
 
-- **You need production observability.** This is the honest headline. Giskard has
-  no answer here at all. If you want to trace live traffic, debug a bad
+- **You need production observability.** Giskard has no answer here at all. If you want to trace live traffic, debug a bad
   production response, and track latency and cost, LangSmith does that well and
   Giskard does not do it.
 - **You want experiment history and a comparison UI.** Tracking scores across
   runs, diffing two versions of a prompt, and sharing results with non-engineers
-  is genuinely valuable and genuinely absent from a pure library.
+  is valuable, and absent from a pure library.
 - **You want human annotation in the loop.** Annotation queues and feedback
   collection are first-class in LangSmith.
 - **You are deep in the LangChain / LangGraph ecosystem.** The integration is
-  close to zero-effort, and that convenience is real.
-- **You want production traces to become test datasets.** Turning a real bad
-  response into a dataset example is a strong workflow that a local library
-  cannot replicate on its own.
+  close to zero-effort.
+- **You want production traces to become test datasets.** Turning a bad production
+  response into a dataset example is a workflow a local library cannot
+  replicate on its own.
 
 ## Pick Giskard when…
 
