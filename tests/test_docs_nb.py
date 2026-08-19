@@ -40,7 +40,11 @@ def _nb_files():
     """
     only = os.environ.get("NB_ONLY", "").split()
     if only:
-        return sorted(p for p in (REPO_ROOT / name for name in only) if p.is_file())
+        return sorted(
+            p
+            for p in (REPO_ROOT / name for name in only)
+            if p.is_file() and p.is_relative_to(DOCS_ROOT)
+        )
     return sorted(DOCS_ROOT.rglob("*.ipynb"))
 
 
