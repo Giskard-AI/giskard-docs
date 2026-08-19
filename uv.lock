@@ -245,6 +245,23 @@ wheels = [
 ]
 
 [[package]]
+name = "giskard"
+version = "3.0.0rc1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "giskard-checks" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f6/f1/91ebc617a511b1f2d0d248564200aca93df4252b2e210657f31a5c37fb5d/giskard-3.0.0rc1.tar.gz", hash = "sha256:f0e147b633496e6b56a230418eb11a8e950bab1edad34d727b04ee36720befad", size = 12144, upload-time = "2026-08-18T03:50:42.803Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fe/c9/96adf6289ef0f701789f6e64a360d9720f1deebe75a06d37e5395969b0db/giskard-3.0.0rc1-py3-none-any.whl", hash = "sha256:8c003dc84c6d365b3afcfaee604cf8ec909810dd160ee915cf1744e73573d8c7", size = 10485, upload-time = "2026-08-18T03:50:41.595Z" },
+]
+
+[package.optional-dependencies]
+openai = [
+    { name = "giskard-llm", extra = ["openai"] },
+]
+
+[[package]]
 name = "giskard-agents"
 version = "1.0.2rc1"
 source = { registry = "https://pypi.org/simple" }
@@ -262,11 +279,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/16/23/b15174d43d93896ce7ef6aa3ae30ea6d824e4a130dbabad022483667ed5f/giskard_agents-1.0.2rc1.tar.gz", hash = "sha256:0b5b854384ba45aedf8f3664c5755093d11136e4c26e1518b5cd3b491f143dbf", size = 53706, upload-time = "2026-08-18T03:33:01.745Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/73/89/e762b9f80b9fe0e3713f583d688bfe9331e7c1b33473ef6f10de437f568c/giskard_agents-1.0.2rc1-py3-none-any.whl", hash = "sha256:d8b742da4ad53653c3c0d15066eb814cc4faecfed0c8776fc02d133023e858ab", size = 38790, upload-time = "2026-08-18T03:33:00.723Z" },
-]
-
-[package.optional-dependencies]
-openai = [
-    { name = "giskard-llm", extra = ["openai"] },
 ]
 
 [[package]]
@@ -308,9 +320,7 @@ name = "giskard-docs"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "giskard-agents", extra = ["openai"] },
-    { name = "giskard-checks" },
-    { name = "giskard-core" },
+    { name = "giskard", extra = ["openai"] },
 ]
 
 [package.dev-dependencies]
@@ -321,11 +331,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "giskard-agents", extras = ["openai"], specifier = "==1.0.2rc1" },
-    { name = "giskard-checks", specifier = "==1.0.2rc1" },
-    { name = "giskard-core", specifier = "==1.0.1rc1" },
-]
+requires-dist = [{ name = "giskard", extras = ["openai"], specifier = "==3.0.0rc1" }]
 
 [package.metadata.requires-dev]
 dev = [

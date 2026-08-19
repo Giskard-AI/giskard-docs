@@ -25,7 +25,7 @@ Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md 
 
 1. **Paste the URL** into any coding agent (Claude Code, Cursor, Windsurf, Copilot, etc.)
 2. **The agent reads** the installation instructions from this page
-3. **The agent installs** `giskard-checks` and configures your LLM provider
+3. **The agent installs** `giskard` and configures your LLM provider
 4. **You review** the changes and start writing checks
 
 :::tip[Want a permanent Giskard expert in your agent?]
@@ -37,12 +37,12 @@ Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding age
 Giskard Checks requires **Python 3.12 or higher**. Install using pip:
 
 ```bash
-pip install "giskard-checks==1.0.2rc1" "giskard-agents[openai]==1.0.2rc1"
+pip install "giskard[openai]==3.0.0rc1"
 ```
 
 ## Configure the default LLM judge model
 
-Some checks require calling an LLM (`LLMJudge`, `Groundedness`, `Conformity`). To use them, configure a provider SDK. The default `Generator` uses Giskard's native provider SDK integrations; install the matching `giskard-agents` extra, such as `openai` above. LiteLLM is optional through `giskard-agents[litellm]`.
+Some checks require calling an LLM (`LLMJudge`, `Groundedness`, `Conformity`). To use them, configure a provider SDK. The default `Generator` uses Giskard's native provider SDK integrations; install the matching `giskard` extra, such as `openai` above. LiteLLM is optional through `giskard[litellm]`.
 
 When a judge runs, its prompt includes the test inputs and agent outputs. Those values are sent to the configured LLM provider, so use a provider and model that meet your data-handling requirements. A weak judge model can produce unreliable verdicts.
 
