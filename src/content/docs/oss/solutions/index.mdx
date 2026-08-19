@@ -1,16 +1,16 @@
 ---
 title: "Giskard Solutions"
-description: "End-to-end solutions built on Giskard: automated vulnerability scanning and red teaming for LLM-based agents."
+description: "End-to-end solutions built on Giskard: automated vulnerability scanning and red teaming for LLM-based agents, without writing test scenarios by hand."
 sidebar:
   order: 0
   label: Overview
 ---
 
-import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+import { LinkCard, CardGrid, Steps } from "@astrojs/starlight/components";
 
-Ready-made workflows built on top of [Giskard Checks](/oss/checks). Each solution
-wraps the primitives into a single entry point you can run against your agent
-without writing scenarios by hand.
+A **solution** is a ready-made workflow built on top of [Giskard Checks](/oss/checks). Checks give you the primitives — a scenario, a target, an assertion. A solution wraps them into a single entry point you point at your agent, so you get a test suite without writing scenarios by hand.
+
+## Available solutions
 
 <CardGrid>
   <LinkCard
@@ -20,8 +20,42 @@ without writing scenarios by hand.
   />
 </CardGrid>
 
+## How a scan works
+
+<Steps>
+
+1. **You describe your agent** in a sentence or two — what it does, who it serves, what it must refuse.
+
+2. **An LLM writes the attacks.** From that description it generates adversarial scenarios tailored to your agent: prompt injections hidden in realistic content, direct requests for harmful or unauthorized content, and multi-turn jailbreaks that adapt over several turns.
+
+3. **The scenarios run against your agent**, single-turn and multi-turn.
+
+4. **A second LLM judges each reply** and decides whether it reveals a vulnerability. That model is a **judge**, and it is sometimes wrong — read the failing conversations rather than trusting the count.
+
+5. **The generated suite is yours to keep.** Save it, replay it in CI, and re-run it against a new model or prompt to see whether a fix held.
+
+</Steps>
+
+## When to use a solution
+
+| You want to | Start with |
+| --- | --- |
+| Find out how your agent fails, without knowing what to look for | [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) |
+| Assert a specific rule your agent must follow | [Your First Test](/oss/checks/tutorials/your-first-test) |
+| Freeze a bug you already found so it cannot come back | Scan, then save the suite and [replay it in CI](/oss/checks/how-to/ci-cd) |
+
+The two compose: a scan tells you where your agent is weak, and Checks let you write the permanent assertion that keeps it fixed.
+
+## What you need
+
+A scan calls an LLM twice per scenario — once to write the attack, once to judge the reply — so it needs a provider and an API key. See [Before starting](/oss/solutions/scan-vulnerabilities#before-starting) for the provider options and the generator setup.
+
+Your test inputs and your agent's outputs are sent to that provider. Use a provider and model that meet your data-handling requirements, and keep in mind that a weak judge model produces unreliable verdicts.
+
+:::note[A clean scan is not a safety certificate]
+A scan that finds nothing means *these* scenarios did not break your agent, not that your agent is safe.
+:::
+
 ## Building your own
 
-If none of the solutions above matches your use case, compose one from the
-library directly: start with [Your First Test](/oss/checks/tutorials/your-first-test),
-then browse the [How-to Guides](/oss/checks/how-to) for task-oriented recipes.
+If no solution matches your use case, compose one from the library directly: start with [Your First Test](/oss/checks/tutorials/your-first-test), then browse the [How-to Guides](/oss/checks/how-to) for task-oriented recipes.
