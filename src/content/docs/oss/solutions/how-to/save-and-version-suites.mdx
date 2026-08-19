@@ -65,7 +65,7 @@ result = asyncio.run(suite.run(target=bank_agent))
 ```
 
 :::danger[Import `giskard.scan` before you run a loaded suite]
-That unused-looking import is load-bearing. Scan scenarios reference their prompt templates by namespace (`prompt_path: "giskard.scan::scenarios/llm01_indirect_injection.j2"`), and the namespace is registered as a side effect of importing `giskard.scan`. Without the import, `Suite.model_validate_json` succeeds and the run then fails with `KeyError: 'giskard.scan'` wrapped in a `WorkflowError: Step processing failed`.
+That import looks unused. It is not: delete it and the replay fails. Scan scenarios reference their prompt templates by namespace (`prompt_path: "giskard.scan::scenarios/llm01_indirect_injection.j2"`), and the namespace is registered as a side effect of importing `giskard.scan`. Without the import, `Suite.model_validate_json` succeeds and the run then dies part-way through with `jinja2.exceptions.TemplateNotFound: giskard.scan::scenarios/llm01_indirect_injection.j2`.
 
 A replay script only needs `giskard.checks` to load and run a suite, so this is the easiest line to drop when tidying imports. Keep it, with the `noqa` comment explaining why.
 :::

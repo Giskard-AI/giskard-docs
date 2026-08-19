@@ -8,10 +8,10 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13,<4.0"
 dependencies = [
-    "giskard-core==1.0.1b6",
-    "giskard-agents[openai]==1.0.2b6",
-    "giskard-checks==1.0.2b6",
-    "giskard-scan==1.0.0b4",
+    "giskard-core==1.0.1rc1",
+    "giskard-agents[openai]==1.0.2rc1",
+    "giskard-checks==1.0.2rc1",
+    "giskard-scan==1.0.0rc1",
 ]
 
 [dependency-groups]
