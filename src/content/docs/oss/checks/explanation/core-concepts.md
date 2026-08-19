@@ -122,7 +122,7 @@ For guidance on choosing the right check, see [When to Use Which Check](/oss/che
 from giskard.checks import Groundedness
 
 check = Groundedness(
-    answer_key="trace.last.outputs",
+    target_key="trace.last.outputs",
     context="Giskard Checks is a testing framework for AI systems.",
 )
 ```
@@ -179,14 +179,12 @@ test_scenario = (
     .interact(inputs="Hello", outputs=generate_answer)
     .check(
         Conformity(
-            key="trace.last.outputs",
             rule="response should be a friendly greeting",
         )
     )
     .interact(inputs="Who invented the HTML?", outputs=generate_answer)
     .check(
         Conformity(
-            key="trace.last.outputs",
             rule="response should mention Tim Berners-Lee as the inventor of HTML",
         )
     )

@@ -76,7 +76,7 @@ name = "cffi"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
+    { name = "pycparser" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/eb/56/b1ba7935a17738ae8453301356628e8147c79dbb825bcbc73dc7401f9846/cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529", size = 523588, upload-time = "2025-09-08T23:24:04.541Z" }
 wheels = [
@@ -245,8 +245,25 @@ wheels = [
 ]
 
 [[package]]
+name = "giskard"
+version = "3.0.0rc1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "giskard-checks" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f6/f1/91ebc617a511b1f2d0d248564200aca93df4252b2e210657f31a5c37fb5d/giskard-3.0.0rc1.tar.gz", hash = "sha256:f0e147b633496e6b56a230418eb11a8e950bab1edad34d727b04ee36720befad", size = 12144, upload-time = "2026-08-18T03:50:42.803Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fe/c9/96adf6289ef0f701789f6e64a360d9720f1deebe75a06d37e5395969b0db/giskard-3.0.0rc1-py3-none-any.whl", hash = "sha256:8c003dc84c6d365b3afcfaee604cf8ec909810dd160ee915cf1744e73573d8c7", size = 10485, upload-time = "2026-08-18T03:50:41.595Z" },
+]
+
+[package.optional-dependencies]
+openai = [
+    { name = "giskard-llm", extra = ["openai"] },
+]
+
+[[package]]
 name = "giskard-agents"
-version = "1.0.2b3"
+version = "1.0.2rc1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "giskard-core" },
@@ -259,19 +276,14 @@ dependencies = [
     { name = "tenacity" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cd/fc/a74f9ee32da0dc95e1ab4fea0d2967d0f2aa5c99a13b36587a4e8101591f/giskard_agents-1.0.2b3.tar.gz", hash = "sha256:cc05a793642d7aacb71ef32609f355d35e88065d0583cd4847ba54eb46a0b6b6", size = 46950, upload-time = "2026-05-20T10:01:34.08Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/23/b15174d43d93896ce7ef6aa3ae30ea6d824e4a130dbabad022483667ed5f/giskard_agents-1.0.2rc1.tar.gz", hash = "sha256:0b5b854384ba45aedf8f3664c5755093d11136e4c26e1518b5cd3b491f143dbf", size = 53706, upload-time = "2026-08-18T03:33:01.745Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/87/9d/884a90866e07dd2253705da70f5a4714346600162cf8f22fae4f5a22cd62/giskard_agents-1.0.2b3-py3-none-any.whl", hash = "sha256:4b12a6ba2b28bc030970fa79183e4cc46a568a6738bb8a700f36ce4cb271ad06", size = 36215, upload-time = "2026-05-20T10:01:32.937Z" },
-]
-
-[package.optional-dependencies]
-openai = [
-    { name = "giskard-llm", extra = ["openai"] },
+    { url = "https://files.pythonhosted.org/packages/73/89/e762b9f80b9fe0e3713f583d688bfe9331e7c1b33473ef6f10de437f568c/giskard_agents-1.0.2rc1-py3-none-any.whl", hash = "sha256:d8b742da4ad53653c3c0d15066eb814cc4faecfed0c8776fc02d133023e858ab", size = 38790, upload-time = "2026-08-18T03:33:00.723Z" },
 ]
 
 [[package]]
 name = "giskard-checks"
-version = "1.0.2b3"
+version = "1.0.2rc1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "giskard-agents" },
@@ -281,25 +293,26 @@ dependencies = [
     { name = "jsonschema" },
     { name = "numpy" },
     { name = "pydantic" },
+    { name = "pydantic-settings" },
     { name = "regex" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b5/79/ab86ea7d3cea8b647092f7ee4e593c8512807ccac43428827516e6657403/giskard_checks-1.0.2b3.tar.gz", hash = "sha256:3b9db7eca692e1e5bd129c955e3f9bc3c044f257ec5f754cc88006a121640eee", size = 55327, upload-time = "2026-05-20T10:04:49.077Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/c3/9c25a4ebed873fb31db57cd1c34a40c3351f5d87c58ef0e306ee0d541688/giskard_checks-1.0.2rc1.tar.gz", hash = "sha256:0615e52440fe56d0322874de3eda9dca256fbb1e6ae6bd627896f16cc458da10", size = 74746, upload-time = "2026-08-18T03:38:18.02Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0a/0c/e1f2541e3bbfd816f4517b1e727989dc8fbaa244a49fb24cae89a11235a0/giskard_checks-1.0.2b3-py3-none-any.whl", hash = "sha256:1bd2290e28d0d23a972b2f8240af806f54c554bfd750a0644d6822173b9665d4", size = 80066, upload-time = "2026-05-20T10:04:50.204Z" },
+    { url = "https://files.pythonhosted.org/packages/b6/98/bc836f38151072415b096dbd520a79dbbc5d323b062eb13f587bfaa1f82a/giskard_checks-1.0.2rc1-py3-none-any.whl", hash = "sha256:a5b560f305f098000c69f123ff0ac35a0ebcad198da08493bd07d47c6cf2642c", size = 105296, upload-time = "2026-08-18T03:38:16.85Z" },
 ]
 
 [[package]]
 name = "giskard-core"
-version = "1.0.1b3"
+version = "1.0.1rc1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "posthog" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/62/a1/dff51ccef3051bb3712c954746eb0a2d73dd3e1a80b0eba087e410b38de6/giskard_core-1.0.1b3.tar.gz", hash = "sha256:4186c9102c5e9a89652c05384f72062b679e3d8b57df1b9a489058cc7dacb6c8", size = 11254, upload-time = "2026-04-29T01:58:04.329Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fa/7c/5bddbe1d7952f6e77eb0827c72abb040d97c5cf20fdd74a6d6252dbfe61f/giskard_core-1.0.1rc1.tar.gz", hash = "sha256:221b8d25eaba7851dba6a353c581b01472896bc05e46b15d90de8480bbd5594e", size = 12673, upload-time = "2026-08-18T03:16:52.934Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/e6/b9697e21129e1f38e0b4dda7b606528f378cfa21e681871b6fb46cc83d5a/giskard_core-1.0.1b3-py3-none-any.whl", hash = "sha256:6f514d3e8628c82866cc13642322df11bc91f2002f9d78c83d0412df26445b9c", size = 13008, upload-time = "2026-04-29T01:58:03.141Z" },
+    { url = "https://files.pythonhosted.org/packages/47/c3/d9f87b57a018eb0019fffe59bf9e19fb5d5486be828372a960b16701cb7d/giskard_core-1.0.1rc1-py3-none-any.whl", hash = "sha256:ade1cbaf29ea3a7fe6fcae6cf32fbd6e652653bd20d3ee615b9ed052e97cf2cd", size = 14593, upload-time = "2026-08-18T03:16:51.847Z" },
 ]
 
 [[package]]
@@ -307,9 +320,7 @@ name = "giskard-docs"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "giskard-agents", extra = ["openai"] },
-    { name = "giskard-checks" },
-    { name = "giskard-core" },
+    { name = "giskard", extra = ["openai"] },
 ]
 
 [package.dev-dependencies]
@@ -320,11 +331,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "giskard-agents", extras = ["openai"], specifier = "==1.0.2b3" },
-    { name = "giskard-checks", specifier = "==1.0.2b3" },
-    { name = "giskard-core", specifier = "==1.0.1b3" },
-]
+requires-dist = [{ name = "giskard", extras = ["openai"], specifier = "==3.0.0rc1" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -335,14 +342,15 @@ dev = [
 
 [[package]]
 name = "giskard-llm"
-version = "1.0.0b3"
+version = "1.0.0rc1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "giskard-core" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8a/83/2eb72edefd8b7e20a81c094d2567930291371777d60182210671c040a7af/giskard_llm-1.0.0b3.tar.gz", hash = "sha256:2ce03ea629d1e808bce6e9c37646d4feb1234cf88bc130e41a5653eb616db56d", size = 54336, upload-time = "2026-05-20T09:59:52.068Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/05/e90ed8ce8dae792608d2e0a16e62f5bb04fff812ad94d8108f80f02e4afd/giskard_llm-1.0.0rc1.tar.gz", hash = "sha256:4707e911a641cc10bc92b7a2354413482943efdb3d16a9f8f209b3b27f34910d", size = 62906, upload-time = "2026-08-18T03:27:54.69Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/43/39c1240da26dc4d834255f9b80486587126e8fa414a3d050f454e2219be9/giskard_llm-1.0.0b3-py3-none-any.whl", hash = "sha256:b0aa44cfd31a123400330680665a390f6405e46dfec2bef2cbc9b9a5e1aed5fb", size = 39481, upload-time = "2026-05-20T09:59:53.274Z" },
+    { url = "https://files.pythonhosted.org/packages/41/c3/e16e109f2fb05582eb08630e0f6172dc3f3a0e2551318c16f77ac1184cc3/giskard_llm-1.0.0rc1-py3-none-any.whl", hash = "sha256:b1600d54366e643e08c17d9d2ecc5875d4cc599e191f1bb4511656e4c1f54014", size = 43152, upload-time = "2026-08-18T03:27:53.405Z" },
 ]
 
 [package.optional-dependencies]
@@ -1058,6 +1066,20 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/30/a6/9f9f380dbb301f67023bf8f707aaa75daadf84f7152d95c410fd7e81d994/pydantic_core-2.46.4-cp314-cp314t-win32.whl", hash = "sha256:e846ae7835bf0703ae43f534ab79a867146dadd59dc9ca5c8b53d5c8f7c9ef02", size = 1955575, upload-time = "2026-05-06T13:38:51.116Z" },
     { url = "https://files.pythonhosted.org/packages/40/1f/f1eb9eb350e795d1af8586289746f5c5677d16043040d63710e22abc43c9/pydantic_core-2.46.4-cp314-cp314t-win_amd64.whl", hash = "sha256:2108ba5c1c1eca18030634489dc544844144ee36357f2f9f780b93e7ddbb44b5", size = 2051624, upload-time = "2026-05-06T13:38:21.672Z" },
     { url = "https://files.pythonhosted.org/packages/f6/d2/42dd53d0a85c27606f316d3aa5d2869c4e8470a5ed6dec30e4a1abe19192/pydantic_core-2.46.4-cp314-cp314t-win_arm64.whl", hash = "sha256:4fcbe087dbc2068af7eda3aa87634eba216dbda64d1ae73c8684b621d33f6596", size = 2017325, upload-time = "2026-05-06T13:40:52.723Z" },
+]
+
+[[package]]
+name = "pydantic-settings"
+version = "2.15.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "python-dotenv" },
+    { name = "typing-inspection" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/68/ca/31c57507b13119d7d3cfa1576dad2911a4861e3be07b579395f4e9d393f9/pydantic_settings-2.15.0.tar.gz", hash = "sha256:694b793e84f766ba76a90ebdefc01d0a9a045dab0382bee70393da93712ad117", size = 261253, upload-time = "2026-08-07T09:24:57.419Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/a4/2bffa9f8e804325a09867f0e9d30795c80ea9f8d62560bd1b6ad6220eb2f/pydantic_settings-2.15.0-py3-none-any.whl", hash = "sha256:0ba092c291c94baceb5eff768aa0d56400a457585bc0175925a5a5510303da42", size = 69413, upload-time = "2026-08-07T09:24:55.839Z" },
 ]
 
 [[package]]

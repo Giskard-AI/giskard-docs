@@ -6,7 +6,7 @@ sidebar:
 ---
 
 :::caution
-Giskard v3 is currently in Pre-release (Beta). We are actively refining the APIs and welcome early adopters to provide feedback and report issues as we move toward a stable 3.0.0 release.
+Giskard v3.0.0rc1 is a release candidate. APIs can still change before the stable 3.0.0 release.
 :::
 
 ## Install with a coding agent
@@ -25,7 +25,7 @@ Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md 
 
 1. **Paste the URL** into any coding agent (Claude Code, Cursor, Windsurf, Copilot, etc.)
 2. **The agent reads** the installation instructions from this page
-3. **The agent installs** `giskard-checks` and configures your LLM provider
+3. **The agent installs** `giskard` and configures your LLM provider
 4. **You review** the changes and start writing checks
 
 :::tip[Want a permanent Giskard expert in your agent?]
@@ -37,12 +37,16 @@ Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding age
 Giskard Checks requires **Python 3.12 or higher**. Install using pip:
 
 ```bash
-pip install giskard-checks
+pip install "giskard[openai]==3.0.0rc1"
 ```
 
 ## Configure the default LLM judge model
 
-Some checks require calling an LLM (`LLMJudge`, `Groundedness`, `Conformity`). To use them, you'll need configure an LLM provider. Giskard Checks supports any LiteLLM-compatible provider (Azure, Anthropic, etc.). See the [LiteLLM documentation](https://docs.litellm.ai/docs/providers) for details. For example, to use OpenAI, you can set the `OPENAI_API_KEY` environment variable:
+Some checks require calling an LLM (`LLMJudge`, `Groundedness`, `Conformity`). To use them, configure a provider SDK. The default `Generator` uses Giskard's native provider SDK integrations; install the matching `giskard` extra, such as `openai` above. LiteLLM is optional through `giskard[litellm]`.
+
+When a judge runs, its prompt includes the test inputs and agent outputs. Those values are sent to the configured LLM provider, so use a provider and model that meet your data-handling requirements. A weak judge model can produce unreliable verdicts.
+
+For OpenAI, set the `OPENAI_API_KEY` environment variable:
 
 ```bash
 export OPENAI_API_KEY="your-api-key"

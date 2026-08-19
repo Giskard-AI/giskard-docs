@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-Built-in checks like `Groundedness`, `StringMatching`, and `LesserThan` accept path parameters (`key`, `answer_key`, `text_key`) that point into the trace. This page covers the syntax.
+Built-in checks like `Groundedness`, `StringMatching`, and `LessThan` accept path parameters such as `target_key`, `context_key`, and `question_key` that point into the trace. This page covers the syntax.
 
 ## The `trace.` Prefix
 
@@ -13,10 +13,10 @@ All paths must start with `trace.`:
 
 ```python
 # Correct
-Groundedness(answer_key="trace.last.outputs.answer", ...)
+Groundedness(target_key="trace.last.outputs.answer", ...)
 
 # Wrong — raises an error
-Groundedness(answer_key="last.outputs.answer", ...)
+Groundedness(target_key="last.outputs.answer", ...)
 ```
 
 ## trace.last

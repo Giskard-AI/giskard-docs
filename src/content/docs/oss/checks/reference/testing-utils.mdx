@@ -60,10 +60,10 @@ test_case = TestCase(
     name="greeting_test",
     trace=trace,
     checks=[
-        Equals(expected_value="Hi there!", key="trace.interactions[0].outputs"),
+        Equals(expected_value="Hi there!", target_key="trace.interactions[0].outputs"),
         Equals(
             expected_value="I'm doing well!",
-            key="trace.interactions[1].outputs",
+            target_key="trace.interactions[1].outputs",
         ),
     ],
 )
@@ -277,7 +277,7 @@ async def test_greeting_variations(greeting_input, expected_output):
         name=f"greeting_{greeting_input}",
         trace=trace,
         checks=[
-            Equals(expected_value=expected_output, key="trace.last.outputs")
+            Equals(expected_value=expected_output, target_key="trace.last.outputs")
         ],
     )
     await test_case.assert_passed()
