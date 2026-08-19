@@ -1,6 +1,6 @@
 ---
 title: "Giskard Checks Use Cases"
-description: "End-to-end worked examples applying Giskard Checks to RAG evaluation, AI agent testing, chatbot testing, and content moderation."
+description: "End-to-end worked examples applying Giskard Checks to RAG evaluation, AI agent testing, chatbot testing, content moderation, and support agent compliance."
 sidebar:
   order: 1
   label: Overview
@@ -11,6 +11,11 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 These are worked examples — not tutorials or how-to guides. They show a complete system being built and tested end-to-end, applying Giskard Checks to real AI application domains. Best read after [Tutorials](/oss/checks/tutorials) or [How-to Guides](/oss/checks/how-to).
 
 <CardGrid>
+  <LinkCard
+    title="Support Agent Compliance"
+    description="Test a customer-support agent that must refuse out-of-policy refunds, escalate to a human, and stay on policy"
+    href="/oss/checks/use-cases/support-agent-compliance"
+  />
   <LinkCard
     title="RAG Evaluation"
     description="Test retrieval quality, groundedness, and answer relevance in a Retrieval-Augmented Generation system"

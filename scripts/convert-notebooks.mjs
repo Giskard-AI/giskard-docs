@@ -107,9 +107,13 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-/** Plain stream/plain output: safe to emit as literal text inside <Card> (not inside braces). */
-function isSafeMdxCardLiteral(text) {
-  return !/[<>{}]/.test(text);
+/**
+ * Plain stream/plain output: safe to emit as literal text inside <Card> (not inside braces).
+ * A line of only - or = would be parsed as a setext heading underline, turning the
+ * line above it into an <h2>; such output has to go through the <pre> path instead.
+ */
+export function isSafeMdxCardLiteral(text) {
+  return !/[<>{}]/.test(text) && !/^[ \t]*[-=]{2,}[ \t]*$/m.test(text);
 }
 
 function preSetHtml(innerHtml) {
@@ -259,15 +263,18 @@ function convertNotebook(notebookPath) {
 // Main
 // ---------------------------------------------------------------------------
 
-const contentDir = join(ROOT, 'src', 'content', 'docs');
-const notebooks = [...walkSync(contentDir)];
+// Skipped when imported (scripts/check-notebook-output.mjs imports the helpers).
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const contentDir = join(ROOT, 'src', 'content', 'docs');
+  const notebooks = [...walkSync(contentDir)];
 
-if (notebooks.length === 0) {
-  process.exit(0);
-}
+  if (notebooks.length === 0) {
+    process.exit(0);
+  }
 
-console.log(`Converting ${notebooks.length} notebook(s)…`);
-for (const nb of notebooks) {
-  convertNotebook(nb);
+  console.log(`Converting ${notebooks.length} notebook(s)…`);
+  for (const nb of notebooks) {
+    convertNotebook(nb);
+  }
+  console.log('Done.');
 }
-console.log('Done.');
