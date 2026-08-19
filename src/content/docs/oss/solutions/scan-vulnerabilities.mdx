@@ -53,13 +53,13 @@ Yes. Pass the languages your agent is expected to handle through the `languages`
 
 ## Before starting
 
-First, install the scan and choose the model that will generate and judge the scenarios. `giskard-scan` pulls in the rest of the library; the provider extras live on `giskard-agents`, so install both. Pick your provider below:
+First, install the scan and choose the model that will generate and judge the scenarios. The scan ships in the `scan` extra, and the provider clients ship in a provider extra, so ask for both. Pick your provider below:
 
 <Tabs>
 <TabItem label="OpenAI">
 
 ```bash
-pip install giskard-scan "giskard-agents[openai]"
+pip install --pre "giskard[scan,openai]"
 ```
 
 ```python
@@ -76,7 +76,7 @@ Set `OPENAI_API_KEY` in your environment.
 <TabItem label="Anthropic">
 
 ```bash
-pip install giskard-scan "giskard-agents[anthropic]"
+pip install --pre "giskard[scan,anthropic]"
 ```
 
 ```python
@@ -93,7 +93,7 @@ Set `ANTHROPIC_API_KEY` in your environment.
 <TabItem label="Gemini">
 
 ```bash
-pip install giskard-scan "giskard-agents[google]"
+pip install --pre "giskard[scan,google]"
 ```
 
 ```python
@@ -112,7 +112,7 @@ Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment.
 LiteLLM reaches any provider through a single `"<provider>/<model-name>"` string, so it is the most flexible option.
 
 ```bash
-pip install giskard-scan "giskard-agents[litellm]"
+pip install --pre "giskard[scan,litellm]"
 ```
 
 ```python
@@ -363,10 +363,6 @@ The scan on this page runs locally and is driven by code. When you need more tha
 ![Giskard Hub scan report showing a security grade, issue counts by severity, and results broken down by vulnerability category with OWASP tags](/_static/images/oss/solutions/hub-scan-results.png)
 
 For a complete picture of what the Hub adds, read the [Open Source vs Hub comparison](/start/comparison), or [talk to our team ↗](https://www.giskard.ai/contact) to see it in action.
-
-## Roadmap
-
-`giskard.scan` is the single entry point for red teaming in the open-source library. New vulnerability categories, richer multi-turn attacks, and the same approach applied to RAG and agent evaluation are being added to it. New scenarios are picked up automatically by the `vulnerability_scan` call you already wrote, so everything on this page keeps working unchanged.
 
 ## Troubleshooting
 
