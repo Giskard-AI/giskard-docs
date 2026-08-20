@@ -15,7 +15,6 @@ The examples use `support_agent`, the retail-bank support agent from [Wrap your 
 
 Run this once, locally, whenever you want fresh scenarios:
 
-{/* pyright-skip: Imports the reader's application module. */}
 ```python
 import asyncio
 from pathlib import Path
@@ -50,7 +49,6 @@ asyncio.run(main())
 
 Loading the suite skips generation entirely. Only the judge still calls an LLM, so **CI needs an API key too**:
 
-{/* pyright-skip: Imports the reader's application module. */}
 ```python
 import asyncio
 from pathlib import Path
@@ -120,7 +118,6 @@ Verdicts come from an LLM, so a scenario can flip between runs. Read [the judge 
 
 The saved suite is not bound to a target, so you can point it anywhere. This is how you confirm a fix actually fixed something:
 
-{/* pyright-skip: Uses the suite from the previous example. */}
 ```python
 from my_app.agent import support_agent, support_agent_hardened
 

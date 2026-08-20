@@ -16,8 +16,6 @@ import {
 } from "./markdown-python-fences.mjs";
 
 const DEFAULT_DOCS_ROOT = "src/content/docs/oss";
-const EXECUTABLE_CONTEXT_RE =
-  /^(?:Uses the target from the wrapping guide|Uses the reader's application code|Imports the reader's application module|Uses the suite from the previous example|Uses the reader's configuration)\.$/;
 
 function writeApplicationFixtures(generatedRoot) {
   const fixture = "from typing import Any\n\nsupport_agent: Any\nsupport_agent_hardened: Any\nbank_agent: Any\n";
@@ -46,7 +44,7 @@ export function preparePythonSnippetFiles(docsRoot, generatedRoot) {
   for (const pagePath of walkMarkdownFiles(docsRoot)) {
     const source = readFileSync(pagePath, "utf8");
     const fences = parsePythonFences(source, { pagePath }).filter(
-      (fence) => !fence.skip || EXECUTABLE_CONTEXT_RE.test(fence.skip.reason),
+      (fence) => !fence.skip,
     );
     if (fences.length === 0) continue;
 

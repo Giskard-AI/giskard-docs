@@ -38,7 +38,6 @@ You have two ways to drive this. Which one you want depends on whether you need 
 
 The examples below run against `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/scan/how-to/wrap-your-agent). The tutorial uses a garden-center assistant instead, because it runs live against a model:
 
-{/* pyright-skip: Uses the target from the wrapping guide. */}
 ```python
 from giskard.scan import (
     PromptInjectionScenarioGenerator,
@@ -90,7 +89,6 @@ The two entry points differ only in which generators they preselect. Each one ow
 
 Runs the LLM-driven and dataset-backed generators, and groups the report by threat type:
 
-{/* pyright-skip: Uses the target from the wrapping guide. */}
 ```python
 from giskard.scan import vulnerability_scan
 
@@ -109,7 +107,6 @@ This is the entry point to reach for first. It runs the whole vulnerability regi
 
 Runs the knowledge-base generators against the documents you pass, and groups the report by component:
 
-{/* pyright-skip: Uses the target from the wrapping guide. */}
 ```python
 from giskard.scan import quality_scan
 
@@ -131,7 +128,6 @@ Use this one when the risk is a wrong answer rather than a hostile user. Without
 
 Pass `generators` explicitly when neither preselection is what you want:
 
-{/* pyright-skip: Uses the target from the wrapping guide. */}
 ```python
 from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
 

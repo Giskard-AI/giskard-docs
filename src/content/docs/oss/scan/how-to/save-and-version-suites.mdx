@@ -51,7 +51,6 @@ Write it with `indent=2`. A one-line JSON file turns every regeneration into an 
 
 This assumes `bank_agent`, an async target function wrapped the same way as the tutorial's BotaniBot in [Wrap Your Agent](/oss/scan/how-to/wrap-your-agent), is importable from `agent.py`:
 
-{/* pyright-skip: Imports the reader's application module. */}
 ```python
 import asyncio
 from pathlib import Path
@@ -91,7 +90,6 @@ SYSTEM_PROMPT = (
 
 Now replay. Same file, same scenarios, same seed, same judges:
 
-{/* pyright-skip: Imports the reader's application module. */}
 ```python
 import asyncio
 from pathlib import Path
