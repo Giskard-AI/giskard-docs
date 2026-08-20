@@ -17,7 +17,7 @@ Multi-step workflow testing with scenario builders and runners.
 
 **Module:** `giskard.checks.core.scenario`
 
-The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Internally, the runner executes **steps**: each step runs one or more interactions against the shared trace, then runs that step’s checks. Call `.run()` to execute against the SUT. You can also use `Scenario.extend(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
+Create a scenario, add interactions and checks, then call `.run()`. Each method returns the same scenario. Use `.extend()` to add existing specs or checks, or pass the scenario to `Suite.append()`.
 
 <MethodCard name="Scenario()" returnType="Scenario">
   Create a new scenario.
@@ -63,51 +63,66 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 
 ### Multi-step example
 
+Each step can add interactions and then validate the trace:
+
 ```python
 from giskard.checks import Scenario, FnCheck, Equals
 
 result = await (
-    Scenario("customer_support")
+    Scenario("two_step_example")
     .interact(
-        inputs="I need help with my account",
-        outputs="I'd be happy to help! What's your account number?",
+        inputs="Find item 42",
+        outputs={"answer": "Which collection?", "found": False},
     )
     .check(
         FnCheck(
-            fn=lambda trace: "help" in trace.last.outputs.lower(),
-            name="helpful",
+            fn=lambda trace: "?" in trace.last.outputs["answer"],
+            name="asks_follow_up",
         )
     )
-    .interact(inputs="12345", outputs="Thank you! I've found your account.")
-    .check(Equals(expected_value=True, target_key="trace.last.metadata.account_found"))
+    .interact(
+        inputs="In the archive",
+        outputs={"answer": "Item found", "found": True},
+    )
+    .check(Equals(expected_value=True, target_key="trace.last.outputs.found"))
     .run()
 )
 ```
 
 ### Dynamic interactions
 
+Pass a callable as `outputs` to run the agent instead of replaying a recorded reply:
+
 ```python
-# Use callables for dynamic generation
-def generate_response(inputs):
-    if "weather" in inputs:
-        return "It's sunny today!"
-    return "I don't understand."
+from giskard.checks import Scenario
 
 
-scenario = Scenario("dynamic_test").interact(
-    inputs="What's the weather?", outputs=generate_response
+def bank_support_agent(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    if "transfer" in inputs.lower():
+        return "A SEPA transfer arrives within one working day and is free."
+    return "Could you tell me a bit more about what you need?"
+
+
+scenario = Scenario("transfer_timing").interact(
+    inputs="How long does a SEPA transfer take?", outputs=bank_support_agent
 )
 ```
 
 ### Context-aware interactions
 
+Pass a callable as `inputs` when the next message depends on what the agent said:
+
 ```python
 scenario = (
-    Scenario("context_test")
-    .interact(inputs="Hello", outputs="Hi! I'm Alice.")
+    Scenario("bank_agent_follow_up")
     .interact(
-        inputs=lambda trace: f"Nice to meet you, {trace.last.outputs.split()[-1][:-1]}!",
-        outputs="Nice to meet you too!",
+        inputs="How long does a SEPA transfer take?",
+        outputs=bank_support_agent,
+    )
+    .interact(
+        inputs=lambda trace: f"You said: {trace.last.outputs} Is that the same at a weekend?",
+        outputs=bank_support_agent,
     )
 )
 ```
@@ -156,8 +171,17 @@ Result of scenario execution with trace and check results.
   </Property>
 </TypeTable>
 
+<MethodCard name=".print_report()" returnType="None">
+  Print the result to the terminal with Rich, including the trace and every check verdict. Inherited from `BaseResult`, so `CheckResult`, `TestCaseResult`, and `SuiteResult` all have it.
+
+  <Property name="console" type="Console | None" defaultValue="None">Rich `Console` to print to. Defaults to a new one writing to stdout.</Property>
+</MethodCard>
+
+Using the `scenario` built above:
+
 ```python
-result = await test_scenario.run()
+result = await scenario.run()
+result.print_report()
 
 if result.passed:
     print("All checks passed!")
@@ -194,21 +218,41 @@ Group multiple scenarios and run them together.
 </MethodCard>
 
 <MethodCard name=".run()" returnType="SuiteResult">
-  Run all scenarios serially.
+  Run every scenario in the suite.
 
-  <Property name="target" type="Callable">Override target for this run.</Property>
+  <Property name="target" type="Callable">Override target for this run. Overrides both the suite-level target and any scenario-level target.</Property>
   <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
+  <Property name="parallel" type="bool" defaultValue="False">Run scenarios concurrently while preserving result order. The scan helpers pass `parallel=True`; `Suite.run` on its own is serial.</Property>
+  <Property name="max_concurrency" type="int | None" defaultValue="None">Cap on concurrent scenarios when `parallel=True`. `None` starts them all at once, so your provider's rate limit becomes the real cap.</Property>
+  <Property name="verbose" type="bool" defaultValue="True">Show a progress bar naming the running scenario. Set to `False` in CI.</Property>
 </MethodCard>
 
-```python
-from giskard.checks import Suite, Scenario
+Set the target once on the suite and leave `outputs` off each interaction:
 
-suite = Suite(name="my_suite", target=my_sut)
-suite.append(scenario1)
-suite.append(scenario2)
+```python
+from giskard.checks import Scenario, StringMatching, Suite
+
+suite = Suite(name="examples", target=target)
+suite.append(
+    Scenario("contains_received").interact(
+        inputs="Hello"
+    ).check(
+        StringMatching(
+            keyword="Received", target_key="trace.last.outputs"
+        )
+    )
+)
+suite.append(
+    Scenario("another_input").interact(inputs="Goodbye")
+)
+
 result = await suite.run()
-print(result.pass_rate)
+
+rate = result.pass_rate
+print("no scenarios evaluated" if rate is None else f"{rate:.0%}")
 ```
+
+`pass_rate` is the fraction of non-skipped scenarios that passed.
 
 ---
 
@@ -222,8 +266,8 @@ Aggregate result from suite execution.
   <Property name="results" type="list[ScenarioResult]">
     Scenario results in order.
   </Property>
-  <Property name="pass_rate" type="float">
-    Fraction of non-skipped scenarios that passed. If every scenario was skipped, this is `1.0`.
+  <Property name="pass_rate" type="float | None">
+    Fraction of non-skipped scenarios that passed. `None` when nothing was evaluated: an empty suite, or one where every scenario was skipped.
   </Property>
   <Property name="duration_ms" type="int">
     Total execution time in milliseconds.

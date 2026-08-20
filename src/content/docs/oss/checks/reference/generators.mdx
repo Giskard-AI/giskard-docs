@@ -16,7 +16,7 @@ Input generators for creating dynamic test data and simulating user interactions
 
 ## `UserSimulator`
 
-<ResourceSection description="Simulate realistic user behavior in multi-turn conversations using an LLM. Particularly useful for testing conversational AI agents or chatbots with dynamic, goal-oriented interactions.">
+<ResourceSection description="Generate multi-turn user messages with an LLM.">
 
 **Module:** `giskard.checks.generators.user`
 
@@ -24,7 +24,11 @@ Input generators for creating dynamic test data and simulating user interactions
   Predefined persona name (e.g., `"frustrated_customer"`) or a custom persona description.
 </Property>
 <Property name="max_steps" type="int" defaultValue="3">
-  Maximum number of conversation turns to generate.
+  Maximum number of conversation turns to generate. Must be ≥ 0; `0` generates nothing.
+</Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Retries per turn when generation fails. Must be ≥ 0, so each turn is attempted
+  up to `max_retries + 1` times before the generator raises.
 </Property>
 <Property name="context" type="str | None" defaultValue="None">
   Optional context to customize the persona's behavior.
@@ -33,16 +37,17 @@ Input generators for creating dynamic test data and simulating user interactions
   LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
 </Property>
 
+Write the persona as a goal the simulated user is pursuing:
+
 ```python
 from giskard.checks.generators.user import UserSimulator
 from giskard.agents.generators import Generator
 
 user_sim = UserSimulator(
     persona="""
-    You are a customer trying to book a flight.
-    - Start by asking about available flights to Paris
-    - Ask about prices
-    - Request to book if the price is reasonable
+    You were charged twice for the same card payment.
+    Describe the two charges without using the word "dispute".
+    Ask how long you will wait for the money.
     """,
     max_steps=3,
     generator=Generator(model="openai/gpt-5"),
@@ -54,16 +59,21 @@ user_sim = UserSimulator(
 ```python
 from giskard.checks import Scenario, FnCheck
 
+
+def bank_support_agent(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    if "charged twice" in inputs.lower() or "duplicate" in inputs.lower():
+        return "I can help with a duplicate payment. What were the date and amount?"
+    return "Could you share the payment date and amount?"
+
+
 test_scenario = (
-    Scenario("booking_flow")
-    .interact(
-        inputs=user_sim,
-        outputs=lambda inputs: booking_agent(inputs),
-    )
+    Scenario("duplicate_charge_conversation")
+    .interact(inputs=user_sim, outputs=bank_support_agent)
     .check(
         FnCheck(
-            fn=lambda trace: "booked" in trace.last.outputs.lower(),
-            name="completed",
+            fn=lambda trace: "payment" in trace.last.outputs.lower(),
+            name="asks_about_the_payment",
         )
     )
 )
@@ -71,15 +81,17 @@ test_scenario = (
 result = await test_scenario.run()
 ```
 
+The LLM can generate different messages on each run. Use fixed inputs for repeatable tests.
+
 ### Goal-oriented testing
+
+Generation stops when the LLM reports that the goal is reached, or after `max_steps` turns:
 
 ```python
 result = await test_scenario.run()
 
-output = result.final_trace.last.metadata.get("simulator_output")
-if isinstance(output, UserSimulatorOutput):
-    print(f"Goal reached: {output.goal_reached}")
-    print(f"Message: {output.message}")
+print(f"Turns generated: {len(result.final_trace.interactions)}")
+print(f"Last reply: {result.final_trace.last.outputs}")
 ```
 
 </ResourceSection>
@@ -88,7 +100,7 @@ if isinstance(output, UserSimulatorOutput):
 
 ## `LLMGenerator`
 
-<ResourceSection description="Configurable LLM-driven input generator with an inline prompt or template path. Mirrors LLMJudge on the generator side.">
+<ResourceSection description="Generate inputs from an inline prompt or prompt template.">
 
 **Module:** `giskard.checks.generators.base`
 
@@ -96,10 +108,19 @@ if isinstance(output, UserSimulatorOutput):
   Inline prompt string. Jinja2 rendering applies only when `as_template=True`.
 </Property>
 <Property name="prompt_path" type="str | None">
-  Template reference (e.g. `"giskard.checks::scenarios/llm01.j2"`).
+  Template reference, written as `namespace::path/to/template.j2`. `giskard-scan`
+  registers the `giskard.scan` namespace and ships the attack templates there
+  (for example `"giskard.scan::scenarios/llm01_injection.j2"`); `giskard-checks`
+  registers `giskard.checks`, which holds the bundled judge and generator
+  prompts. Register your own directory with
+  `giskard.agents.add_prompts_path(path, "my_namespace")`.
 </Property>
 <Property name="max_steps" type="int" defaultValue="3">
-  Maximum conversation turns to generate.
+  Maximum conversation turns to generate. Must be ≥ 0; `0` generates nothing.
+</Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Retries per turn when generation fails. Must be ≥ 0, so each turn is attempted
+  up to `max_retries + 1` times before the generator raises.
 </Property>
 <Property name="as_template" type="bool" defaultValue="False">
   When True, render `prompt` as a Jinja2 template with trace context.
@@ -111,28 +132,34 @@ if isinstance(output, UserSimulatorOutput):
 Exactly one of `prompt` or `prompt_path` must be provided.
 
 ```python
+import giskard.scan  # noqa: F401  — registers the "giskard.scan" prompt namespace
 from giskard.checks import LLMGenerator
 
-gen = LLMGenerator(prompt="You are a user. Ask about the product.")
-gen = LLMGenerator(prompt_path="giskard.checks::scenarios/llm01.j2")
+gen = LLMGenerator(prompt="Ask a concise question about an archive.")
+gen = LLMGenerator(prompt_path="giskard.scan::scenarios/llm01_injection.j2")
 ```
+
+Use `UserSimulator` for a multi-turn persona. Use `LLMGenerator` when you need a custom prompt.
 
 </ResourceSection>
 
 ---
 
-## `UserSimulatorOutput`
+## `LLMGeneratorOutput`
 
-**Module:** `giskard.checks.generators.user`
+**Module:** `giskard.checks.generators.base`
 
-Output format for user simulator results.
+Internal output for each `UserSimulator` or `LLMGenerator` turn. The loop yields `message` and stops when `goal_reached` is true or `message` is empty.
 
-<TypeTable name="UserSimulatorOutput">
+<TypeTable name="LLMGeneratorOutput">
   <Property name="goal_reached" type="bool">
-    Whether the simulator achieved its goal.
+    Whether the goal has been reached and no further messages are needed.
   </Property>
-  <Property name="message" type="str | None">
-    Optional message about the simulation outcome.
+  <Property name="schema_issue" type="str | None" defaultValue="None">
+    Set instead of `message` when the input schema cannot produce a user message. Triggers a retry, up to `max_retries`.
+  </Property>
+  <Property name="message" type="T | None" defaultValue="None">
+    The message to send. `None` when `goal_reached` is true. Cannot be set together with `schema_issue`.
   </Property>
 </TypeTable>
 
@@ -140,14 +167,17 @@ Output format for user simulator results.
 
 ## `InputGenerator`
 
-<ResourceSection description="Abstract base class for creating custom input generators. Extend it to create generators for dynamic test data.">
+<ResourceSection description="Base class for custom input generators.">
 
 **Module:** `giskard.checks.core.input_generator`
+
+`InputGenerator` takes one type parameter, the trace type: `InputGenerator[Trace]`. Passing two raises `TypeError` at class definition.
 
 <MethodCard name=".__call__()" returnType="AsyncGenerator[InputType, TraceType]">
   Yield input values one at a time. Receives the current trace via `send()` between yields, so the generator can adapt to prior interactions.
 
   <Property name="trace" type="TraceType" required>The initial trace passed in when the generator is first called.</Property>
+  <Property name="input_type" type="type | None" defaultValue="None">The type the caller wants each yielded input to have. Accept it in your signature even if you ignore it; `None` means plain `str`.</Property>
 </MethodCard>
 
 ### Sequential generator
@@ -155,22 +185,35 @@ Output format for user simulator results.
 ```python
 from collections.abc import AsyncGenerator
 
+from giskard.checks import Scenario
 from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-class SequentialInputGenerator(InputGenerator[str, Trace]):
+def target(inputs: str) -> str:
+    return f"Received: {inputs}"
+
+
+class SequentialInputGenerator(InputGenerator[Trace]):
     inputs_list: list[str]
 
-    async def __call__(self, trace: Trace) -> AsyncGenerator[str, Trace]:
+    async def __call__(
+        self, trace: Trace, input_type: type | None = None
+    ) -> AsyncGenerator[str, Trace]:
         for value in self.inputs_list:
             trace = yield value
 
 
-gen = SequentialInputGenerator(inputs_list=["Hello", "How are you?", "Goodbye"])
+gen = SequentialInputGenerator(
+    inputs_list=[
+        "Find item 42",
+        "Search the archive",
+        "Show its metadata",
+    ]
+)
 
-scenario = Scenario("sequential").interact(
-    inputs=gen, outputs=lambda inputs: chatbot(inputs)
+scenario = Scenario("generated_inputs").interact(
+    inputs=gen, outputs=target
 )
 ```
 
@@ -183,28 +226,32 @@ from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-class ContextAwareGenerator(InputGenerator[str, Trace]):
+class ContextAwareGenerator(InputGenerator[Trace]):
     strategy: str = "follow_up"
     max_steps: int = 5
 
-    async def __call__(self, trace: Trace) -> AsyncGenerator[str, Trace]:
-        # First message — no prior interactions yet.
-        trace = yield "Hello, I need help"
+    async def __call__(
+        self, trace: Trace, input_type: type | None = None
+    ) -> AsyncGenerator[str, Trace]:
+        # First message: no prior interactions yet.
+        trace = yield "Find item 42."
 
         for _ in range(self.max_steps - 1):
             if not trace.last:
                 return
 
-            last_output = trace.last.outputs
+            last_output = trace.last.outputs.lower()
             if self.strategy == "follow_up":
-                if "question" in last_output.lower():
-                    trace = yield "Yes, please tell me more"
+                if "?" in last_output:
+                    trace = yield "Search the archive."
                     continue
-                if "help" in last_output.lower():
-                    trace = yield "I need assistance with my account"
+                if "found" in last_output:
+                    trace = yield "Show its metadata."
                     continue
-            trace = yield "Thank you"
+            trace = yield "Thanks, that helps."
 ```
+
+Use a custom generator when Python can determine the next message. Otherwise use `UserSimulator`.
 
 </ResourceSection>
 
@@ -212,23 +259,26 @@ class ContextAwareGenerator(InputGenerator[str, Trace]):
 
 ## Usage patterns
 
-### A/B testing with different personas
+### Compare personas
+
+Run the same target with several personas:
 
 ```python
+from giskard.checks import Scenario
 from giskard.checks.generators.user import UserSimulator
 
 personas = [
     {
         "name": "impatient",
-        "persona": "You are impatient and want quick answers.",
+        "persona": "Ask for a one-line answer.",
     },
     {
-        "name": "detailed",
-        "persona": "You like detailed explanations. Ask follow-ups.",
+        "name": "novice",
+        "persona": "Ask for plain-language explanations.",
     },
     {
-        "name": "confused",
-        "persona": "You are confused and need things explained simply.",
+        "name": "pushy",
+        "persona": "Ask a follow-up question after each answer.",
     },
 ]
 
@@ -236,13 +286,15 @@ results = {}
 for persona in personas:
     sim = UserSimulator(persona=persona["persona"], max_steps=3)
     scenario = Scenario(persona["name"]).interact(
-        inputs=sim, outputs=lambda inputs: agent(inputs)
+        inputs=sim, outputs=target
     )
     results[persona["name"]] = await scenario.run()
 
 for name, result in results.items():
     print(f"{name}: {result.status}")
 ```
+
+Each run can generate different messages. Compare results as examples, not a fixed measurement.
 
 ---
 

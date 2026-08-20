@@ -10,15 +10,15 @@ import MethodCard from "../../../../../components/api/MethodCard.astro";
 import ResourceSection from "../../../../../components/api/ResourceSection.astro";
 import TypeTable from "../../../../../components/api/TypeTable.astro";
 
-Ready-to-use validation checks for common testing scenarios, including function-based checks, string matching, comparisons, policy evaluation, check composition, JSON validation, and LLM-powered semantic validation.
+Ready-to-use validation checks: function-based checks, string and regex matching, comparisons, policy evaluation, composition, JSON validation, and LLM judges.
 
----
+For the tradeoffs between rule-based checks, semantic similarity, and LLM judges, see [When to use which check](/oss/checks/explanation/when-to-use-which-check).
 
 ## Function-based Checks
 
 ### `FnCheck`
 
-<ResourceSection description="Create a check from a callable function. Perfect for quick prototyping and simple validation logic. Not reliably serializable — intended for programmatic/test use only.">
+<ResourceSection description="Create a check from a callable function. Use it for quick prototyping and one-off validation logic. Not reliably serializable — intended for programmatic/test use only.">
 
 **Module:** `giskard.checks.builtin.fn`
 
@@ -41,26 +41,36 @@ Ready-to-use validation checks for common testing scenarios, including function-
   Additional details to include in result.
 </Property>
 
+Assert that the agent never quotes a fee without citing the source it came from:
+
 ```python
 from giskard.checks import FnCheck
 
-# Simple boolean check
 check = FnCheck(
-    fn=lambda trace: trace.last.outputs is not None,
-    name="has_output",
-    success_message="Output was provided",
-    failure_message="No output found",
+    fn=lambda trace: len(trace.last.outputs["citations"]) > 0,
+    name="cites_fee_schedule",
+    success_message="Reply cites a source document",
+    failure_message="Reply cites nothing, so the figure was not retrieved",
 )
-
-
-# Async check
-async def validate_response(trace):
-    is_valid = await external_validator(trace.last.outputs)
-    return is_valid
-
-
-check = FnCheck(fn=validate_response, name="async_validation")
 ```
+
+`fn` may be async, so the check can await your own services:
+
+```python
+import asyncio
+
+from giskard.checks import FnCheck
+
+
+async def fee_matches_schedule(trace) -> bool:
+    await asyncio.sleep(0)  # stand-in for awaiting your fee-schedule service
+    return "3.00 EUR" in trace.last.outputs["answer"]
+
+
+check = FnCheck(fn=fee_matches_schedule, name="fee_matches_schedule")
+```
+
+Reach for `FnCheck` when the pass condition is a predicate you can already write in Python and no built-in check expresses it. Prefer a registered [custom check](#creating-custom-checks) when you need to save the suite to disk: `FnCheck` holds a callable and is not reliably serializable.
 
 </ResourceSection>
 
@@ -89,6 +99,8 @@ check = FnCheck(fn=validate_response, name="async_validation")
   Whether matching is case-sensitive.
 </Property>
 
+Require the wording compliance signed off on whenever the agent touches a savings product:
+
 ```python
 from giskard.checks import StringMatching
 
@@ -96,9 +108,13 @@ check = StringMatching(keyword="success", target_key="trace.last.outputs")
 
 # Case-insensitive
 check = StringMatching(
-    keyword="error", target_key="trace.last.outputs", case_sensitive=False
+    keyword="this is not financial advice",
+    target_key="trace.last.outputs.answer",
+    case_sensitive=False,
 )
 ```
+
+Use `StringMatching` when a specific phrase is required, such as a disclaimer your legal team wrote. If the agent is free to paraphrase, this check fails on correct answers; use [`Conformity`](#conformity) or [`SemanticSimilarity`](#semanticsimilarity) instead.
 
 </ResourceSection>
 
@@ -117,17 +133,23 @@ check = StringMatching(
   JSONPath to extract text to match against.
 </Property>
 <Property name="match_timeout_seconds" type="float" defaultValue="2.0">
-  Upper bound on how long regex matching may take before the check errors.
+  Upper bound on how long regex matching may take before the check errors. Must be greater than 0.
 </Property>
 
-```python
-from giskard.checks import RegexMatching
+The agent's reply must never contain a full card number. Wrap the matcher in [`Not`](#not) so a match is a failure:
 
-check = RegexMatching(
-    pattern=r"\d{3}-\d{3}-\d{4}",
-    target_key="trace.last.outputs.phone",
+```python
+from giskard.checks import Not, RegexMatching
+
+check = Not(
+    check=RegexMatching(
+        pattern=r"\b(?:\d[ -]?){13,16}\b",
+        target_key="trace.last.outputs.answer",
+    )
 )
 ```
+
+Use `RegexMatching` for shapes: card numbers, IBANs, payment references, dates. For a fixed phrase, [`StringMatching`](#stringmatching) is clearer and cannot be broken by an escaping mistake.
 
 </ResourceSection>
 
@@ -153,12 +175,19 @@ All comparison checks share these parameters:
 <Property name="normalization_form" type="str | None" defaultValue='"NFKC"'>
   Unicode normalization: `"NFC"`, `"NFD"`, `"NFKC"`, `"NFKD"`.
 </Property>
+<Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+  How to apply the comparison when the resolved value is a list, set, or tuple.
+  Omit it to compare the resolved value directly. `"any"` passes when at least one
+  item matches, `"all"` when every item does, `"none"` when no item does.
+</Property>
 
 Provide exactly one of `expected_value` or `expected_value_key`.
 
 ### `Equals`
 
 Check that extracted values equal an expected value.
+
+The agent classifies each request before answering it. Assert on the classification field, not on the sentence around it:
 
 ```python
 from giskard.checks import Equals
@@ -168,8 +197,18 @@ check = Equals(expected_value="success", target_key="trace.last.outputs.status")
 
 # Compare against another trace value
 check = Equals(
-    expected_value_key="trace.interactions[0].outputs.baseline",
-    target_key="trace.last.outputs.result",
+    expected_value="balance_enquiry", target_key="trace.last.outputs.intent"
+)
+```
+
+Use `Equals` on values your agent produces as data: labels, enums, identifiers, numbers. On free text it fails on any rewording, so compare meaning with [`SemanticSimilarity`](#semanticsimilarity) instead.
+
+`expected_value_key` compares two points in the same trace. Ask the same question twice and require the same classification:
+
+```python
+check = Equals(
+    expected_value_key="trace.interactions[0].outputs.intent",
+    target_key="trace.last.outputs.intent",
 )
 ```
 
@@ -180,16 +219,25 @@ Check that extracted values do **not** equal an expected value.
 ```python
 from giskard.checks import NotEquals
 
-check = NotEquals(expected_value="error", target_key="trace.last.outputs.status")
+check = NotEquals(
+    expected_value="investment_advice", target_key="trace.last.outputs.intent"
+)
 ```
 
+Use `NotEquals` for a single forbidden value. To forbid a condition expressed by another check, wrap that check in [`Not`](#not).
+
 ### `GreaterThan` / `GreaterThanEquals`
+
+Guard the retrieval quality and the sourcing of the agent's answers:
 
 ```python
 from giskard.checks import GreaterThan, GreaterThanEquals
 
 check = GreaterThan(
-    expected_value=0.8, target_key="trace.last.metadata.confidence_score"
+    expected_value=0.8, target_key="trace.last.metadata.retrieval_score"
+)
+check = GreaterThanEquals(
+    expected_value=1, target_key="trace.last.metadata.citation_count"
 )
 check = GreaterThanEquals(expected_value=100, target_key="trace.last.outputs.user_count")
 ```
@@ -199,11 +247,13 @@ check = GreaterThanEquals(expected_value=100, target_key="trace.last.outputs.use
 ```python
 from giskard.checks import LessThan, LessThanEquals
 
-check = LessThan(expected_value=500, target_key="trace.last.metadata.latency_ms")
+check = LessThan(expected_value=2000, target_key="trace.last.metadata.latency_ms")
 check = LessThanEquals(
-    expected_value=1000, target_key="trace.last.metadata.token_count"
+    expected_value=400, target_key="trace.last.metadata.output_tokens"
 )
 ```
+
+Comparison checks are free and deterministic. Put them first when you want their failures to be easy to inspect.
 
 ---
 
@@ -218,9 +268,17 @@ check = LessThanEquals(
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath expression to extract the value to validate.
 </Property>
-<Property name="schema" type="dict[str, Any] | None" defaultValue="None">
+<Property name="parse" type="bool" defaultValue="True">
+  With `True`, the extracted value must be a serialized JSON **string**, parsed
+  with `json.loads` before validation; a non-string value returns
+  `CheckResult.error`. Set it to `False` when the target already returns a
+  parsed value such as a dict or a list.
+</Property>
+<Property name="expected_schema" type="dict[str, Any] | None" defaultValue="None">
   Optional JSON Schema for the parsed value. Serialized as `schema` in JSON.
 </Property>
+
+For an already-parsed value, set `parse=False`:
 
 ```python
 from giskard.checks import JsonValid
@@ -229,13 +287,21 @@ check = JsonValid(target_key="trace.last.outputs")
 
 check = JsonValid(
     target_key="trace.last.outputs",
-    schema={
+    parse=False,
+    expected_schema={
         "type": "object",
-        "required": ["answer"],
-        "properties": {"answer": {"type": "string"}},
+        "required": ["answer", "category"],
+        "properties": {
+            "answer": {"type": "string"},
+            "category": {"type": "string"},
+        },
     },
 )
 ```
+
+Keep the default `parse=True` for JSON returned as text.
+
+Use `JsonValid` when the agent is asked to produce machine-readable output and a downstream system will parse it. It says nothing about whether the content is correct, so pair it with a judge.
 
 </ResourceSection>
 
@@ -250,7 +316,7 @@ check = JsonValid(
 **Module:** `giskard.checks.builtin.rego_policy`
 
 :::note[Optional dependency]
-Requires the `regorus` extra: `pip install 'giskard-checks[regorus]'` (installs the [Regorus](https://github.com/microsoft/regorus) `celine-regorus` wheel; import as `regorus`).
+Requires the `regorus` extra: `pip install --pre 'giskard[regorus]'` (installs the [Regorus](https://github.com/microsoft/regorus) `celine-regorus` wheel; import as `regorus`).
 :::
 
 <Property name="policy" type="str" required>
@@ -266,6 +332,8 @@ Requires the `regorus` extra: `pip install 'giskard-checks[regorus]'` (installs 
   Static `data` document merged into the policy engine via `engine.add_data` (separate from `input`).
 </Property>
 
+Only a reply to an authenticated customer may carry an account balance:
+
 ```python
 from giskard.checks import RegoPolicy
 
@@ -276,12 +344,20 @@ package giskard
 default allow = false
 
 allow if {
-    input.role == "admin"
+    not input.contains_balance
+}
+
+allow if {
+    input.contains_balance
+    input.authenticated
 }
 """,
     rule="data.giskard.allow",
+    target_key="trace.last.metadata",
 )
 ```
+
+Use `RegoPolicy` when the rule already exists as policy elsewhere in your stack and you want one source of truth. For a one-off condition, [`FnCheck`](#fncheck) is less machinery.
 
 </ResourceSection>
 
@@ -299,16 +375,24 @@ Combine built-in or custom checks with logical operators. All composition checks
   Ordered list of checks to evaluate. All must pass.
 </Property>
 
+A balance answer counts as good only if the customer was authenticated and the figure was sourced:
+
 ```python
-from giskard.checks import AllOf, LessThan, Equals
+from giskard.checks import AllOf, Equals, GreaterThanEquals
 
 check = AllOf(
     checks=[
-        LessThan(expected_value=10, target_key="trace.last.outputs"),
-        Equals(expected_value=5, target_key="trace.last.outputs"),
+        Equals(
+            expected_value=True, target_key="trace.last.outputs.authenticated"
+        ),
+        GreaterThanEquals(
+            expected_value=1, target_key="trace.last.metadata.citation_count"
+        ),
     ]
 )
 ```
+
+Adding the same checks separately with `.check()` gives you a verdict per check, which is easier to debug. Use `AllOf` when the conjunction is what you want to report, or when you need to nest it inside `AnyOf` or `Not`.
 
 </ResourceSection>
 
@@ -320,16 +404,25 @@ check = AllOf(
   Ordered list of checks to evaluate. At least one must pass.
 </Property>
 
+Faced with a disputed card payment, the agent may either open the dispute or ask for the details it still needs. Both are acceptable; closing the case unprompted is not:
+
 ```python
-from giskard.checks import AnyOf, StringMatching
+from giskard.checks import AnyOf, Equals
 
 check = AnyOf(
     checks=[
-        StringMatching(keyword="yes", target_key="trace.last.outputs"),
-        StringMatching(keyword="approved", target_key="trace.last.outputs"),
+        Equals(
+            expected_value="opened", target_key="trace.last.outputs.dispute_status"
+        ),
+        Equals(
+            expected_value="information_requested",
+            target_key="trace.last.outputs.dispute_status",
+        ),
     ]
 )
 ```
+
+`AnyOf` runs checks in order and stops at the first pass or error. Put cheap known cases first, then use a judge as a fallback when needed. For "one item in a list matches", use the comparison checks' `match="any"`.
 
 </ResourceSection>
 
@@ -341,13 +434,21 @@ check = AnyOf(
   The inner check whose result will be inverted.
 </Property>
 
+Use `Not` to reject matching output:
+
 ```python
 from giskard.checks import Not, StringMatching
 
 check = Not(
-    check=StringMatching(keyword="forbidden", target_key="trace.last.outputs")
+    check=StringMatching(
+        keyword="unsupported claim",
+        target_key="trace.last.outputs.answer",
+        case_sensitive=False,
+    )
 )
 ```
+
+`Not` is how you express "must never". An inner check that errors or skips passes its result through unchanged, so a broken inner check does not silently turn into a pass.
 
 </ResourceSection>
 
@@ -355,7 +456,7 @@ check = Not(
 
 ## LLM-based Checks
 
-Validation checks powered by Large Language Models for semantic understanding.
+Validation checks powered by Large Language Models for semantic understanding. An LLM judge is another model reading the transcript and returning a verdict. It can be wrong in both directions: read failures before you act, and do not treat a passing suite as proof the agent is safe.
 
 ### `BaseLLMCheck`
 
@@ -383,13 +484,13 @@ Validation checks powered by Large Language Models for semantic understanding.
   Returns the prompt to send to the LLM. Subclasses must implement this method.
 </MethodCard>
 
-<MethodCard name=".get_inputs()" returnType="dict[str, Any]">
+<MethodCard name="async .get_inputs()" returnType="dict[str, Any]">
   Provides template variables for prompt rendering. Override to customize available variables. Default: `{"trace": trace}`.
 
   <Property name="trace" type="Trace" required>The trace containing interaction history.</Property>
 </MethodCard>
 
-<MethodCard name=".run()" returnType="CheckResult">
+<MethodCard name="async .run()" returnType="CheckResult">
   Execute the LLM-based check (inherited, usually doesn't need overriding).
 
   <Property name="trace" type="Trace" required>The trace to evaluate.</Property>
@@ -399,25 +500,25 @@ Validation checks powered by Large Language Models for semantic understanding.
 from giskard.checks.judges.base import BaseLLMCheck
 
 
-@BaseLLMCheck.register("custom_llm_check")
-class CustomLLMCheck(BaseLLMCheck):
-    custom_instruction: str
+@BaseLLMCheck.register("rule_check")
+class RuleCheck(BaseLLMCheck):
+    forbidden_text: str
 
     def get_prompt(self):
         return f"""
-        Evaluate based on: {self.custom_instruction}
+        The reply must not include: {self.forbidden_text}
 
-        Input: {{{{ trace.last.inputs }}}}
-        Output: {{{{ trace.last.outputs }}}}
+        Customer: {{{{ trace.last.inputs }}}}
+        Assistant: {{{{ trace.last.outputs }}}}
 
-        Return passed=true if criteria are met, passed=false otherwise.
+        Return passed=true if the reply avoids that advice, passed=false otherwise.
         """
 
 
-check = CustomLLMCheck(
-    custom_instruction="Response must be concise and helpful"
-)
+check = RuleCheck(forbidden_text="unsupported claim")
 ```
+
+Subclass `BaseLLMCheck` when the same judgement recurs across suites and you want it named, registered, and serializable. For a one-off criterion, [`LLMJudge`](#llmjudge) takes the prompt directly.
 
 </ResourceSection>
 
@@ -432,7 +533,9 @@ Default result model for LLM-based checks. This is the structured output format 
     Whether the check passed.
   </Property>
   <Property name="reason" type="str" required>
-    Non-empty explanation for the result.
+    Explanation for the verdict. Required and non-blank: it is stripped, then
+    validated with `min_length=1`. A judge that returns `None` or an empty
+    string raises a `ValidationError` instead of producing a result.
   </Property>
 </TypeTable>
 
@@ -464,24 +567,70 @@ Default result model for LLM-based checks. This is the structured output format 
   LLM generator for evaluation.
 </Property>
 
+Use `Groundedness` to compare an answer with retrieved documents:
+
 ```python
 from giskard.checks import Groundedness
 
-# Static values
-check = Groundedness(
-    answer="The Eiffel Tower is in Paris.",
-    context=[
-        "Paris is the capital of France.",
-        "The Eiffel Tower is a famous landmark.",
-    ],
-)
-
-# Extract from trace
 check = Groundedness(
     target_key="trace.last.outputs.answer",
     context_key="trace.last.metadata.retrieved_docs",
 )
 ```
+
+You can also pass static values:
+
+```python
+check = Groundedness(
+    answer="The archive holds 20 documents.",
+    context=[
+        "The archive holds 10 documents.",
+    ],
+)
+```
+
+Use `Groundedness` when every claim must be supported by the context. Use [`Contradiction`](#contradiction) when you only need to catch conflicts.
+
+</ResourceSection>
+
+---
+
+### `Contradiction`
+
+<ResourceSection description="LLM-based check that fails only when the answer directly conflicts with the reference context. Omissions and unsupported additions are tolerated.">
+
+**Module:** `giskard.checks.judges.contradiction`
+
+<Property name="answer" type="str | MISSING">
+  The answer text to evaluate (static).
+</Property>
+<Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
+  JSONPath to extract the answer from the trace.
+</Property>
+<Property name="context" type="str | list[str] | MISSING">
+  Context document(s) the answer is checked against (static).
+</Property>
+<Property
+  name="context_key"
+  type="str"
+  defaultValue='"trace.last.metadata.context"'
+>
+  JSONPath to extract context from the trace.
+</Property>
+<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+  LLM generator for evaluation.
+</Property>
+
+```python
+from giskard.checks import Contradiction
+
+check = Contradiction(
+    target_key="trace.last.outputs.answer",
+    context_key="trace.last.metadata.retrieved_docs",
+)
+```
+
+Uses the same inputs as [`Groundedness`](#groundedness), but only reports a conflict with the context.
 
 </ResourceSection>
 
@@ -505,23 +654,41 @@ check = Groundedness(
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the answer from the trace.
 </Property>
-<Property name="context" type="str | None" defaultValue="None">
+<Property name="context" type="str | MISSING" defaultValue="MISSING">
   Optional domain context describing the chatbot's purpose (not extracted from the trace).
+</Property>
+<Property name="include_history" type="bool" defaultValue="True">
+  Whether earlier interactions are shown to the judge as context. Turn it off to
+  score the last turn in isolation.
 </Property>
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation (falls back to default).
 </Property>
 
+Use this check when an answer should address the current question:
+
 ```python
 from giskard.checks import AnswerRelevance, Scenario
 
 scenario = (
-    Scenario(name="rag_relevance_multi_turn")
-    .interact(inputs="What is the best language?", outputs="Python")
-    .interact(inputs="What's Python?", outputs="A snake.")
-    .check(AnswerRelevance())
+    Scenario(name="answer_relevance")
+    .interact(
+        inputs="Where is item 42?",
+        outputs="In the archive.",
+    )
+    .interact(
+        inputs="Who created it?",
+        outputs="The archive is open at 9am.",
+    )
+    .check(
+        AnswerRelevance(
+            context="An assistant for a document archive."
+        )
+    )
 )
 ```
+
+`AnswerRelevance` evaluates relevance, not factual accuracy. Use [`Groundedness`](#groundedness) to evaluate support from context.
 
 </ResourceSection>
 
@@ -539,27 +706,31 @@ scenario = (
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the output from the trace.
 </Property>
-<Property name="categories" type="list[str]" defaultValue='["hate_speech", "harassment", "threats", "self_harm", "sexual_content", "violence"]'>
+<Property name="categories" type="list[ToxicityCategory]" defaultValue='["hate_speech", "harassment", "threats", "self_harm", "sexual_content", "violence"]'>
   Toxicity categories to evaluate. Restrict the list to focus the judge.
+  `ToxicityCategory` is a `Literal` over exactly those six values; any other
+  string raises a `ValidationError` when you construct the check.
 </Property>
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation (falls back to default).
 </Property>
 
+Customers whose card has just been declined are sometimes abusive. The check is on the reply, not the message:
+
 ```python
 from giskard.checks import Toxicity, Scenario
 
 scenario = (
-    Scenario(name="safety_check")
-    .interact(inputs="Tell me a joke", outputs="Here is a clean joke: ...")
-    .check(Toxicity())
-)
-
-check = Toxicity(
-    output="This is a safe response.",
-    categories=["hate_speech", "harassment"],
+    Scenario(name="stays_civil")
+    .interact(
+        inputs="This answer is useless.",
+        outputs="I can help clarify the answer.",
+    )
+    .check(Toxicity(categories=["harassment", "threats"]))
 )
 ```
+
+Narrowing `categories` focuses the judge on what you actually care about and cuts false positives. Use `Toxicity` for the reply's tone and content; use [`Conformity`](#conformity) when the rule you want to enforce is specific to your product.
 
 </ResourceSection>
 
@@ -578,12 +749,28 @@ check = Toxicity(
   LLM generator for evaluation (falls back to default).
 </Property>
 
+Write the rule as one sentence a colleague could apply by hand:
+
 ```python
 from giskard.checks import Conformity
 
-check = Conformity(rule="The response must be professional and polite")
-check = Conformity(rule="The last response should be polite.")
+check = Conformity(
+    rule=(
+        "The reply must not recommend a specific investment product "
+        "and must direct regulated questions to a qualified adviser."
+    )
+)
 ```
+
+The same check states the disclosure rule the agent has to hold to:
+
+```python
+check = Conformity(
+    rule="The reply must not reveal details of any account other than the one the customer is authenticated for."
+)
+```
+
+Use `Conformity` for a policy you can state as a rule. If the rule keeps growing clauses, split it into several `Conformity` checks so a failure tells you which clause broke, or move to [`LLMJudge`](#llmjudge) for a prompt with its own structure.
 
 </ResourceSection>
 
@@ -591,7 +778,7 @@ check = Conformity(rule="The last response should be polite.")
 
 ### `LLMJudge`
 
-<ResourceSection description="General-purpose LLM-based validation with custom prompts. The most flexible LLM check — use when specialized checks (Groundedness, Conformity) don't fit your needs.">
+<ResourceSection description="General-purpose LLM-based validation with custom prompts. The most flexible LLM check — use it when Groundedness or Conformity do not fit.">
 
 **Module:** `giskard.checks.judges.judge`
 
@@ -618,44 +805,38 @@ Exactly one of `prompt` or `prompt_path` must be provided.
 | `trace.last.outputs`  | Outputs from the most recent interaction  |
 | `trace.last.metadata` | Metadata from the most recent interaction |
 
+Judge one turn against criteria no built-in check expresses. Spell out what a failure looks like, or the judge invents its own standard:
+
 ```python
 from giskard.checks import LLMJudge
 
-# Inline prompt
 check = LLMJudge(
     prompt="""
-    Evaluate if the response is helpful and accurate.
+    Customer: {{ trace.last.inputs }}
+    Assistant: {{ trace.last.outputs }}
 
-    User Input: {{ trace.last.inputs }}
-    AI Response: {{ trace.last.outputs }}
-
-    Return passed=true if helpful and accurate, passed=false otherwise.
-    """,
-)
-
-# Multi-turn evaluation
-check = LLMJudge(
-    prompt="""
-    Evaluate the multi-turn conversation quality.
-
-    {% for interaction in trace.interactions %}
-    User: {{ interaction.inputs }}
-    Assistant: {{ interaction.outputs }}
-    {% endfor %}
-
-    Criteria: consistency, relevance, professional tone.
-    Return passed=true if all criteria are met.
+    The reply passes only if it answers the customer's question and states the
+    relevant information needed to answer it.
     """,
 )
 ```
 
-:::tip[When to use LLMJudge]
+Across turns, iterate the trace to check for contradictions:
 
-- Custom evaluation criteria not covered by other checks
-- Multi-turn conversation analysis
-- Complex decision trees requiring LLM reasoning
-- Domain-specific validation logic
-  :::
+```python
+check = LLMJudge(
+    prompt="""
+    {% for interaction in trace.interactions %}
+    Customer: {{ interaction.inputs }}
+    Assistant: {{ interaction.outputs }}
+    {% endfor %}
+
+    Return passed=false if the assistant contradicts an earlier answer.
+    """,
+)
+```
+
+Reach for `LLMJudge` last. If the criterion fits [`Conformity`](#conformity), [`Groundedness`](#groundedness), or a rule-based check, those are cheaper, and the rule-based ones do not vary between runs.
 
 </ResourceSection>
 
@@ -689,15 +870,62 @@ check = LLMJudge(
 </Property>
 <Property name="embedding_model" type="BaseEmbeddingModel" defaultValue="get_default_embedding_model()">Embedding model used to compute similarity scores.</Property>
 
+The agent rewords the dispute procedure every run, but the procedure itself must not drift:
+
 ```python
 from giskard.checks import SemanticSimilarity
 
 check = SemanticSimilarity(
-    reference_text="The capital of France is Paris.",
-    target_key="trace.last.outputs",
+    reference_text="Card disputes are investigated within 15 working days, and any provisional refund is returned if the claim is rejected.",
+    target_key="trace.last.outputs.answer",
     threshold=0.8,
 )
 ```
+
+Use it when phrasing varies but meaning must not. The default `threshold` of 0.95 accepts near-identical text only; loosen it and check the failures, because embeddings score "within 15 working days" and "within 15 months" as very close. When the requirement is a judgement rather than a resemblance, use [`Conformity`](#conformity).
+
+</ResourceSection>
+
+---
+
+### `Readability`
+
+<ResourceSection description="Compute a readability score for a trace value with textstat and validate it against optional thresholds. Deterministic.">
+
+**Module:** `giskard.checks.builtin.nlp_metrics`
+
+:::note[Optional dependency]
+Requires the `textstat` dependency, which ships with the `all-checks` extra: `pip install --pre 'giskard[all-checks]'`.
+:::
+
+<Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
+  JSONPath to the text to score.
+</Property>
+<Property name="metric" type='ReadabilityMetric' defaultValue='"flesch_reading_ease"'>
+  One of `flesch_reading_ease`, `flesch_kincaid_grade`, `gunning_fog`,
+  `automated_readability_index`, `coleman_liau_index`,
+  `dale_chall_readability_score`.
+</Property>
+<Property name="min_score" type="float | None" defaultValue="None">
+  Minimum acceptable score. Use with higher-is-easier metrics such as `flesch_reading_ease`.
+</Property>
+<Property name="max_score" type="float | None" defaultValue="None">
+  Maximum acceptable score. Use with grade-level metrics, where lower is easier.
+</Property>
+
+The agent writes for retail customers, not for the compliance team, so its answers should read as plain English:
+
+```python
+from giskard.checks import Readability
+
+check = Readability(
+    target_key="trace.last.outputs.answer",
+    metric="flesch_reading_ease",
+    min_score=60,
+)
+```
+
+Readability scores measure sentence and word length, not clarity. A reply can score well and still be wrong, so pair it with a check on the content.
 
 </ResourceSection>
 
@@ -709,85 +937,120 @@ check = SemanticSimilarity(
 
 Chain checks on a scenario, or wrap them with `AllOf`, `AnyOf`, and `Not` (see [Check Composition](#check-composition)).
 
+Order matters for cost. The free checks below run first, and the judge only sees traces that already have a citation:
+
 ```python
-from giskard.checks import Groundedness, Conformity, LLMJudge, Scenario
+from giskard.checks import Conformity, Equals, FnCheck, Scenario
+
+
+def bank_support_agent(inputs: str) -> dict:
+    return {
+        "answer": "Your current account ending 4417 is 1,284.50 EUR in credit.",
+        "intent": "balance_enquiry",
+        "authenticated": True,
+        "citations": ["fee-schedule/current-account"],
+    }
+
 
 scenario = (
-    Scenario()
+    Scenario("balance_enquiry")
     .interact(
-        inputs="What is the capital of France?",
-        outputs=lambda inputs: "Paris is the capital of France.",
+        inputs="How much is in my current account?",
+        outputs=lambda inputs: bank_support_agent(inputs),
     )
     .check(
-        Groundedness(
-            context=["France is a country in Europe.", "Paris is the capital."]
+        Equals(
+            expected_value=True, target_key="trace.last.outputs.authenticated"
         )
     )
-    .check(Conformity(rule="The response must be a complete sentence"))
     .check(
-        LLMJudge(
-            prompt="Is the response educational? Return passed=true/false."
+        FnCheck(
+            fn=lambda trace: len(trace.last.outputs["citations"]) > 0,
+            name="cites_fee_schedule",
+        )
+    )
+    .check(
+        Conformity(
+            rule="The reply must not disclose a balance unless the customer is authenticated."
         )
     )
 )
 ```
 
+The last check calls an LLM provider, so this scenario sends the trace off your machine.
+
 ### Reusing generators
+
+Set the judge model once instead of passing it to every LLM check:
 
 ```python
 from giskard.agents.generators import Generator
-from giskard.checks import set_default_generator
+from giskard.checks import Conformity, Groundedness, set_default_generator
 
-# Set once, use everywhere
 set_default_generator(Generator(model="openai/gpt-5", temperature=0.1))
 
-# No need to pass generator anymore
-check1 = Groundedness(answer="...", context=["..."])
-check2 = Conformity(rule="...")
-check3 = LLMJudge(prompt="...")
+check = Groundedness(target_key="trace.last.outputs.answer")
+check = Conformity(
+    rule="The reply must include a citation."
+)
 ```
 
+A low temperature makes verdicts steadier across runs, but does not make them deterministic. Two runs of the same suite can disagree.
+
 ### Creating custom checks
+
+Register a check when the same domain rule appears in several suites and you want it saved with them. This one enforces that the agent only quotes fees that appear in the published schedule:
 
 ```python
 from giskard.checks import Check, CheckResult, Trace
 
+PUBLISHED_FEES = {
+    "current_account_monthly": 3.00,
+    "card_replacement": 0.00,
+    "sepa_transfer": 0.00,
+}
 
-@Check.register("custom_business_logic")
-class CustomBusinessCheck(Check):
-    threshold: float = 0.9
-    allowed_categories: list[str] = []
+
+@Check.register("quotes_published_fee")
+class QuotesPublishedFee(Check):
+    published_fees: dict[str, float] = PUBLISHED_FEES
+    min_retrieval_score: float = 0.7
 
     async def run(self, trace: Trace) -> CheckResult:
         output = trace.last.outputs
-        category = output.get("category")
-        confidence = output.get("confidence", 0)
+        fee_code = output.get("fee_code")
+        quoted = output.get("fee_eur")
+        score = output.get("retrieval_score", 0)
 
-        if category not in self.allowed_categories:
+        if fee_code not in self.published_fees:
             return CheckResult.failure(
-                message=f"Invalid category: {category}",
+                message=f"Quoted a fee that is not in the schedule: {fee_code}",
                 details={
-                    "category": category,
-                    "allowed": self.allowed_categories,
+                    "fee_code": fee_code,
+                    "published": sorted(self.published_fees),
                 },
             )
 
-        if confidence < self.threshold:
+        if quoted != self.published_fees[fee_code]:
             return CheckResult.failure(
-                message=f"Confidence {confidence} below threshold {self.threshold}",
+                message=f"Quoted {quoted} for {fee_code}, schedule says {self.published_fees[fee_code]}",
             )
 
-        return CheckResult.success(message="Validation passed")
+        if score < self.min_retrieval_score:
+            return CheckResult.failure(
+                message=f"Retrieval score {score} below {self.min_retrieval_score}",
+            )
+
+        return CheckResult.success(message=f"Quoted the published {fee_code} fee")
 
 
-check = CustomBusinessCheck(
-    threshold=0.85, allowed_categories=["sports", "news"]
-)
+check = QuotesPublishedFee(min_retrieval_score=0.85)
 ```
 
 ---
 
 ## See also
 
+- [When to use which check](/oss/checks/explanation/when-to-use-which-check) -- Cost, latency, and reliability tradeoffs between check families
 - [Core API](/oss/checks/reference/core) -- Base classes and fundamental types
 - [Scenarios](/oss/checks/reference/scenarios) -- Multi-step workflow testing
