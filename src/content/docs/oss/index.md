@@ -75,14 +75,14 @@ import asyncio
 from giskard.scan import vulnerability_scan
 
 
-async def bank_support_agent(inputs: str) -> str:
+async def bank_support_agent_for_scan(inputs: str) -> str:
     # Call your own LLM app, chain, or agent here
     return "I can't recommend a specific investment. Please speak to a qualified financial adviser."
 
 
 suite_result = asyncio.run(
     vulnerability_scan(
-        target=bank_support_agent,
+        target=bank_support_agent_for_scan,
         description=(
             "A customer-support agent for a retail bank. It answers questions about"
             " accounts, cards, payments, and disputes. It must refuse to give investment"
