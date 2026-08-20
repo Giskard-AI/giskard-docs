@@ -14,6 +14,7 @@
 import { execSync, spawnSync } from "child_process";
 import { readFileSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
+import { join } from "path";
 import { randomUUID } from "crypto";
 import {
   replacePythonFenceCode,
