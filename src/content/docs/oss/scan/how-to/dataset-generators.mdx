@@ -153,6 +153,7 @@ Both cases produce no scenarios rather than an exception. If a scan comes back s
 
 `repo_allow_commercial_use` is a claim you make about the dataset's license, not something read from the Hub, since the recorded license is not always authoritative. It is what `commercial_use=True` filters on:
 
+{/* pyright-skip: This one-line call omits the required target and description for brevity. */}
 ```python
 vulnerability_scan(..., commercial_use=True)
 ```
@@ -178,6 +179,7 @@ The path is inside the installed `giskard.scan` package, not your working direct
 
 Dataset generators go anywhere a generator goes. `generator` below is the one built above, and `bank_agent` is the async target wrapped in [Wrap Your Agent](/oss/scan/how-to/wrap-your-agent). Pass it straight to `generate_suite` when you want only your corpus:
 
+{/* pyright-skip: This integration example reuses the reader's wrapped bank_agent. */}
 ```python
 from giskard.scan import generate_suite
 
@@ -197,6 +199,7 @@ suite = await generate_suite(
 
 That gives a suite of exactly your own prompts, which is the right shape for a fast regression job. Register it instead when you want the corpus to ride along with the LLM-driven generators on a full scan:
 
+{/* pyright-skip: This integration example reuses the generator and bank_agent above. */}
 ```python
 from giskard.scan import vulnerability_scan, vulnerability_suite_generator_registry
 

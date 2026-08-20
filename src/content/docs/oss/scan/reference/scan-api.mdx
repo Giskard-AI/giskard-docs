@@ -75,6 +75,7 @@ Build a suite from the vulnerability generator registry, run it against the targ
   </Property>
 </MethodCard>
 
+{/* pyright-skip: This example reuses support_agent from the wrapping guide. */}
 ```python
 from giskard.scan import vulnerability_scan
 
@@ -145,6 +146,7 @@ All quality generators are knowledge-base driven: without a `knowledge_base` the
   </Property>
 </MethodCard>
 
+{/* pyright-skip: This example reuses support_agent from the wrapping guide. */}
 ```python
 from giskard.scan import quality_scan
 
@@ -197,6 +199,7 @@ Concurrency here is *generation* only; whether the resulting scenarios later run
   </Property>
 </MethodCard>
 
+{/* pyright-skip: This example reuses support_agent from the wrapping guide. */}
 ```python
 from giskard.scan import (
     generate_suite,
@@ -265,6 +268,7 @@ The adapters are imported lazily and run in-process, so the scanner's optional e
 | `attacks_per_vulnerability_type` | `int` | `1` | Number of attacks generated per vulnerability type. |
 | `target_mode` | `"singleturn" \| "multiturn"` | `"multiturn"` | `"singleturn"` drops multi-turn attacks. |
 
+{/* pyright-skip: This example reuses support_agent from the wrapping guide. */}
 ```python
 from giskard.scan import third_party_scan
 
@@ -340,6 +344,7 @@ Raises `ImportError` when the selected tool's optional dependency is not install
   </Property>
 </TypeTable>
 
+{/* pyright-skip: This example reuses support_agent from the wrapping guide. */}
 ```python
 from giskard.scan import ScanOptions, vulnerability_scan
 
@@ -429,6 +434,7 @@ quality_suite_generator_registry.unregister(SycophancyScenarioGenerator)
 
 Type alias naming the scanners `third_party_scan` and `list_scan_items` accept:
 
+{/* pyright-skip: This is a module-scope type alias signature excerpt. */}
 ```python
 type ScanTool = Literal["giskard", "garak", "deepteam"]
 ```

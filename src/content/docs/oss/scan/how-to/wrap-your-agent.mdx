@@ -64,7 +64,7 @@ async def support_agent(inputs: AgentInput) -> AgentOutput:
             {"role": "user", "content": inputs.question},
         ],
     )
-    return AgentOutput(answer=response.choices[0].message.content)
+    return AgentOutput(answer=response.choices[0].message.content or "")
 ```
 
 Run this one with `target_mode="singleturn"`. It has no memory, so a multi-turn attack would send turn two to an agent that never saw turn one.
@@ -76,6 +76,7 @@ The same agent, but the conversation lives on the agent's side and is addressed 
 
 Subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
 
+{/* pyright-skip: Alternative tab example; the checker concatenates every fence on the page. */}
 ```python
 import os
 from uuid import uuid4
@@ -131,6 +132,7 @@ If you forget the `Trace` subclass and generate the id inside the function, ever
 
 The same agent with no store at all: it is a pure function of the whole conversation, which is what most self-hosted chat endpoints look like. Declare a `trace` parameter and rebuild the message list from `trace.interactions`, which holds the previous turns of the current conversation:
 
+{/* pyright-skip: Alternative tab example; the checker concatenates every fence on the page. */}
 ```python
 import os
 

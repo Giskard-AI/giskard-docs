@@ -13,6 +13,7 @@ Every example on this page runs against `support_agent`, the retail-bank support
 
 Pass the generators you want to the lower-level `generate_suite`, then run the suite yourself:
 
+{/* pyright-skip: This example reuses support_agent from the wrapping guide. */}
 ```python
 from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
 
@@ -40,6 +41,7 @@ The full catalog is in the [generators reference](/oss/scan/reference/generators
 
 `max_scenarios` caps the total number of scenarios across all generators, and `max_concurrency` caps how many run against your agent at once:
 
+{/* pyright-skip: This example reuses support_agent from the wrapping guide. */}
 ```python
 from giskard.scan import vulnerability_scan
 
@@ -62,6 +64,7 @@ Pass BCP-47 codes through `languages` (`"en"`, `"fr"`, `"es"`) and the scenarios
 
 Some generators are backed by datasets whose licenses do not permit commercial use. Drop them with `commercial_use=True`. That removes attacks from the run, so the same agent scores better with the flag on. It is a licensing decision, not a tuning knob:
 
+{/* pyright-skip: This example reuses support_agent from the wrapping guide. */}
 ```python
 suite_result = await vulnerability_scan(
     target=support_agent,

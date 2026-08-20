@@ -63,7 +63,7 @@ async def support_agent(inputs: AgentInput) -> AgentOutput:
             {"role": "user", "content": inputs.question},
         ],
     )
-    return AgentOutput(answer=response.choices[0].message.content)
+    return AgentOutput(answer=response.choices[0].message.content or "")
 ```
 
 The parameter must be named `inputs`. Giskard injects arguments by name, and only `inputs` and `trace` are injected.
