@@ -63,8 +63,6 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 
 ### Multi-step example
 
-Examples on this page test a customer-support agent for a retail bank, the same agent used across the checks reference.
-
 A customer reports a payment, then identifies it. The second step depends on the first having happened:
 
 ```python
@@ -293,15 +291,6 @@ Aggregate result from suite execution.
     Number of scenarios that were skipped.
   </Property>
 </TypeTable>
-
-:::caution
-`pass_rate` can be `None`, so formatting it unguarded raises `TypeError`. Guard it:
-
-```python
-rate = result.pass_rate
-print("no scenarios evaluated" if rate is None else f"{rate:.0%}")
-```
-:::
 
 <MethodCard name=".to_junit_xml()" returnType="str">
   Export the suite result as a JUnit XML string. Optionally write to a file.

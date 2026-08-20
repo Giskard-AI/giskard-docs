@@ -14,26 +14,6 @@ Ready-to-use validation checks: function-based checks, string and regex matching
 
 For the tradeoffs between rule-based checks, semantic similarity, and LLM judges, see [When to use which check](/oss/checks/explanation/when-to-use-which-check).
 
-## The agent used in these examples
-
-Examples on this page test a customer-support agent for a retail bank. It answers questions about accounts, cards, payments, and disputes; it must refuse to give investment advice, and it must never disclose another customer's data. Paste this stand-in before running any snippet that needs a target:
-
-```python
-def bank_support_agent(inputs: str) -> dict:
-    """Stand-in for the agent under test. Replace with your own call."""
-    return {
-        "answer": (
-            "Your current account ending 4417 is 1,284.50 EUR in credit. "
-            "The monthly account fee is 3.00 EUR."
-        ),
-        "intent": "balance_enquiry",
-        "authenticated": True,
-        "citations": ["fee-schedule/current-account"],
-    }
-```
-
----
-
 ## Function-based Checks
 
 ### `FnCheck`
@@ -282,7 +262,7 @@ check = LessThanEquals(
 )
 ```
 
-Comparison checks are free and deterministic, so put them first in a scenario and let the paid LLM checks run only on traces that already pass them.
+Comparison checks are free and deterministic. Put them first when you want their failures to be easy to inspect.
 
 ---
 
