@@ -13,6 +13,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "langchain>=1.0",
+    "langchain-openai>=1.0",
+    "langgraph>=1.0",
     "nbmake==1.5.5",
     "pytest==9.0.3",
     "python-dotenv==1.2.2",
