@@ -86,7 +86,6 @@ result = await test_case.run()
 
 `assert_passed()` raises `AssertionError` with the check messages, so a failing check reads like any other pytest failure:
 
-<!-- pyright-skip: This focused predicate assumes the test trace has an interaction. -->
 ```python
 import pytest
 
@@ -108,7 +107,7 @@ async def test_vague_question_gets_a_follow_up():
         trace=trace,
         checks=[
             FnCheck(
-                fn=lambda t: "?" in t.last.outputs,
+                fn=lambda t: t.last is not None and "?" in t.last.outputs,
                 name="asks_a_follow_up",
             ),
         ],
@@ -206,7 +205,7 @@ After each interaction, the mock's call history is written to `Interaction.metad
 
 Assert that the target called a dependency:
 
-<!-- pyright-skip: This integration fragment requires the reader's myapp module. -->
+<!-- pyright-skip: This integration example imports the reader's application module. -->
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 
@@ -275,7 +274,6 @@ Replay does not call the agent.
 
 Run independent test cases concurrently:
 
-<!-- pyright-skip: This continuation example depends on the recorded interaction from the prior block. -->
 ```python
 import asyncio
 
@@ -284,7 +282,10 @@ test_cases = [
         name=f"replay_{i}",
         trace=Trace(interactions=[interaction]),
         checks=[
-            FnCheck(fn=lambda t: bool(t.last.outputs), name="answered")
+            FnCheck(
+                fn=lambda t: t.last is not None and bool(t.last.outputs),
+                name="answered",
+            )
         ],
     )
     for i, interaction in enumerate(recorded)

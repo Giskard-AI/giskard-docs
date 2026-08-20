@@ -15,8 +15,11 @@ sidebar:
 
 To overlap scenarios, opt in:
 
-<!-- pyright-skip: This fragment focuses on run options; the suite is defined by the surrounding example. -->
 ```python
+from giskard.checks import Suite
+
+suite = Suite(name="examples")
+
 # Run every scenario in the suite at once
 result = await suite.run(parallel=True)
 

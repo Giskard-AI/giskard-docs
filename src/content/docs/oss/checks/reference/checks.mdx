@@ -43,12 +43,12 @@ For the tradeoffs between rule-based checks, semantic similarity, and LLM judges
 
 Assert that the agent never quotes a fee without citing the source it came from:
 
-<!-- pyright-skip: This predicate assumes a completed interaction to focus on citation extraction. -->
 ```python
 from giskard.checks import FnCheck
 
 check = FnCheck(
-    fn=lambda trace: len(trace.last.outputs["citations"]) > 0,
+    fn=lambda trace: trace.last is not None
+    and len(trace.last.outputs["citations"]) > 0,
     name="cites_fee_schedule",
     success_message="Reply cites a source document",
     failure_message="Reply cites nothing, so the figure was not retrieved",
@@ -281,7 +281,6 @@ Comparison checks are free and deterministic. Put them first when you want their
 
 For an already-parsed value, set `parse=False`:
 
-<!-- pyright-skip: Schema validation options are shown conceptually; this release exposes them through the generator configuration. -->
 ```python
 from giskard.checks import JsonValid
 
@@ -290,7 +289,7 @@ check = JsonValid(target_key="trace.last.outputs")
 check = JsonValid(
     target_key="trace.last.outputs",
     parse=False,
-    expected_schema={
+    schema={
         "type": "object",
         "required": ["answer", "category"],
         "properties": {
@@ -941,7 +940,6 @@ Chain checks on a scenario, or wrap them with `AllOf`, `AnyOf`, and `Not` (see [
 
 Order matters for cost. The free checks below run first, and the judge only sees traces that already have a citation:
 
-<!-- pyright-skip: This predicate assumes a completed interaction to focus on check ordering. -->
 ```python
 from giskard.checks import Conformity, Equals, FnCheck, Scenario
 
@@ -968,7 +966,8 @@ scenario = (
     )
     .check(
         FnCheck(
-            fn=lambda trace: len(trace.last.outputs["citations"]) > 0,
+            fn=lambda trace: trace.last is not None
+            and len(trace.last.outputs["citations"]) > 0,
             name="cites_fee_schedule",
         )
     )
@@ -986,12 +985,13 @@ The last check calls an LLM provider, so this scenario sends the trace off your 
 
 Set the judge model once instead of passing it to every LLM check:
 
-<!-- pyright-skip: The generator constructor shown here is provider-specific and intentionally illustrative. -->
 ```python
-from giskard.agents.generators import Generator
+from giskard.agents.generators import GenerationParams, Generator
 from giskard.checks import Conformity, Groundedness, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-5", temperature=0.1))
+set_default_generator(
+    Generator(model="openai/gpt-5", params=GenerationParams(temperature=0.1))
+)
 
 check = Groundedness(target_key="trace.last.outputs.answer")
 check = Conformity(
@@ -1005,7 +1005,6 @@ A low temperature makes verdicts steadier across runs, but does not make them de
 
 Register a check when the same domain rule appears in several suites and you want it saved with them. This one enforces that the agent only quotes fees that appear in the published schedule:
 
-<!-- pyright-skip: This custom-check example omits the empty-trace guard to focus on fee validation. -->
 ```python
 from giskard.checks import Check, CheckResult, Trace
 
@@ -1022,6 +1021,8 @@ class QuotesPublishedFee(Check):
     min_retrieval_score: float = 0.7
 
     async def run(self, trace: Trace) -> CheckResult:
+        if trace.last is None:
+            return CheckResult.skip(message="No interaction to check")
         output = trace.last.outputs
         fee_code = output.get("fee_code")
         quoted = output.get("fee_eur")

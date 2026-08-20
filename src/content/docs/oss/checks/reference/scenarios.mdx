@@ -65,7 +65,6 @@ Create a scenario, add interactions and checks, then call `.run()`. Each method 
 
 Each step can add interactions and then validate the trace:
 
-<!-- pyright-skip: This predicate assumes the preceding interaction always supplies outputs. -->
 ```python
 from giskard.checks import Scenario, FnCheck, Equals
 
@@ -77,7 +76,8 @@ result = await (
     )
     .check(
         FnCheck(
-            fn=lambda trace: "?" in trace.last.outputs["answer"],
+            fn=lambda trace: trace.last is not None
+            and "?" in trace.last.outputs["answer"],
             name="asks_follow_up",
         )
     )
@@ -230,9 +230,13 @@ Group multiple scenarios and run them together.
 
 Set the target once on the suite and leave `outputs` off each interaction:
 
-<!-- pyright-skip: This suite fragment uses the application target defined by the reader. -->
 ```python
 from giskard.checks import Scenario, StringMatching, Suite
+
+
+def target(inputs: str) -> str:
+    return f"Received: {inputs}"
+
 
 suite = Suite(name="examples", target=target)
 suite.append(

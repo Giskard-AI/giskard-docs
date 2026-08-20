@@ -40,7 +40,6 @@ An `InteractionSpec` describes _how_ to generate an interaction and is used to d
 
 `InteractionSpec` is the abstract base class. `Interact` is the main spec used by `.interact()`. Other subclasses generate interactions differently.
 
-<!-- pyright-skip: The OpenAI response model is optional in this focused interaction-spec example. -->
 ```python
 from giskard.checks import Interact
 from openai import OpenAI
@@ -57,7 +56,7 @@ def generate_answer(inputs: str) -> str:
         model="gpt-5-mini",
         messages=[{"role": "user", "content": inputs}],
     )
-    return response.choices[0].message.content
+    return response.choices[0].message.content or ""
 
 
 spec = Interact(
@@ -88,14 +87,13 @@ Traces are typically created during scenario execution by resolving each `Intera
 
 Each trace also carries optional **`annotations`**: a dictionary of scenario-level metadata (for example tenant id or experiment name). When you build a scenario, pass `annotations={...}`; the runner copies them onto the initial trace so checks and callables can read `trace.annotations` without attaching the same data to every interaction.
 
-For a **custom trace type**, subclass `Trace` and pass `trace_type=YourTrace` on `Scenario`. Use this when you want extra computed fields, helpers, or custom Rich rendering for the conversation history. See [Custom trace types](/oss/checks/how-to/custom-trace).
+For a **custom trace type**, subclass `Trace` and pass `trace_type=YourTrace` on `Scenario`. `Trace` is a frozen Pydantic model, so the subclass must pass `frozen=True`. Use this when you want extra computed fields, helpers, or custom Rich rendering for the conversation history. See [Custom trace types](/oss/checks/how-to/custom-trace).
 
-<!-- pyright-skip: This conceptual subclass omits the frozen dataclass setup required by Trace. -->
 ```python
 from giskard.checks import Scenario, Trace
 
 
-class MyTrace(Trace[str, str]):
+class MyTrace(Trace[str, str], frozen=True):
     pass
 
 
@@ -135,9 +133,11 @@ check = Groundedness(
 
 A `Scenario` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. Scenarios work for both single-turn and multi-turn tests.
 
-<!-- pyright-skip: This fluent-API fragment uses placeholder checks to explain sequencing. -->
 ```python
-from giskard.checks import Scenario
+from giskard.checks import Equals, Scenario, StringMatching
+
+check1 = Equals(expected_value="test output", target_key="trace.last.outputs")
+check2 = StringMatching(keyword="output", target_key="trace.last.outputs")
 
 test_scenario = (
     Scenario("test_with_checks")
@@ -151,17 +151,10 @@ result = await test_scenario.run()
 
 The `run()` method is asynchronous. When running in a script, use `asyncio.run()`:
 
-<!-- pyright-skip: This continuation fragment depends on the scenario from the prior example. -->
 ```python
 import asyncio
 
-
-async def main():
-    result = await test_scenario.run()
-    return result
-
-
-result = asyncio.run(main())
+result = asyncio.run(test_scenario.run())
 ```
 
 In async contexts (like pytest with `@pytest.mark.asyncio`), you can use `await` directly.
@@ -177,7 +170,6 @@ The fluent API is the preferred user-facing entry point and maps directly to the
 
 Test a two-turn conversation flow. `Conformity` judges the whole trace, so name the relevant turn in its rule:
 
-<!-- pyright-skip: This fragment uses the application callback introduced in the InteractionSpec example. -->
 ```python
 from giskard.checks import Scenario, Conformity
 

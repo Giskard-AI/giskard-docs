@@ -36,7 +36,6 @@ Base class for all checks. Subclass and register with `@Check.register("kind")` 
 
 ### Creating custom checks
 
-<!-- pyright-skip: This custom-check example omits the empty-trace guard to focus on the check contract. -->
 ```python
 from giskard.checks import Check, CheckResult, Trace
 
@@ -46,6 +45,8 @@ class RetrievalConfidence(Check):
     threshold: float = 0.8
 
     async def run(self, trace: Trace) -> CheckResult:
+        if trace.last is None:
+            return CheckResult.skip(message="No interaction to check")
         score = trace.last.metadata.get("retrieval_score", 0.0)
 
         if score >= self.threshold:
@@ -319,7 +320,6 @@ Ordered sequence of interaction specs and checks with shared trace. Provides a f
   Execute the scenario and return results.
 </MethodCard>
 
-<!-- pyright-skip: This scenario fragment assumes every step produces an interaction. -->
 ```python
 from giskard.checks import Scenario, FnCheck, StringMatching
 
@@ -331,7 +331,7 @@ result = await (
     )
     .check(
         FnCheck(
-            fn=lambda trace: "?" in trace.last.outputs,
+            fn=lambda trace: trace.last is not None and "?" in trace.last.outputs,
             name="asks_a_follow_up",
         )
     )
