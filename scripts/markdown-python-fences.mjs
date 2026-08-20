@@ -51,8 +51,9 @@ function closingFencePattern(openingFence) {
  * Parse Python fenced blocks in document order.
  *
  * Line fields are stable diagnostics for checkers. `includeOffsets` adds the
- * exact source range needed by formatters. A pyright-skip marker applies only
- * when it is on the line immediately preceding the opening fence.
+ * exact source range needed by formatters. A pyright-skip marker applies when
+ * it is on the nearest preceding non-blank line (Prettier inserts a blank line
+ * after MDX comments).
  */
 export function parsePythonFences(
   source,
@@ -76,7 +77,13 @@ export function parsePythonFences(
 
     if (closingIndex === lines.length) continue;
 
-    const marker = PYRIGHT_SKIP_RE.exec(lines[lineIndex - 1]?.text ?? "");
+    let markerLineIndex = lineIndex - 1;
+    while (markerLineIndex >= 0 && lines[markerLineIndex].text.trim() === "") {
+      markerLineIndex--;
+    }
+    const marker = PYRIGHT_SKIP_RE.exec(
+      lines[markerLineIndex]?.text ?? "",
+    );
     const closingLine = lines[closingIndex];
     fences.push({
       pagePath,
@@ -95,7 +102,7 @@ export function parsePythonFences(
         : {}),
       skip: marker
         ? {
-            line: lines[lineIndex - 1].number,
+            line: lines[markerLineIndex].number,
             reason: (marker[1] ?? marker[2]).trim(),
           }
         : null,
