@@ -46,8 +46,6 @@ For most use cases, use the `Scenario()` fluent API instead. `TestCase` is for a
   with formatted failure messages if any check fails.
 </MethodCard>
 
-Examples on this page test a customer-support agent for a retail bank, the same agent used across the checks reference.
-
 A conversation you captured in production, replayed against checks without calling the agent again:
 
 ```python
@@ -239,7 +237,7 @@ Use `WithSpy` when debugging complex interaction generation logic, understanding
 
 ### Replaying recorded conversations
 
-A support transcript, replayed to confirm the advice you shipped is still the advice the checks expect:
+Replay a recorded transcript:
 
 ```python
 from giskard.checks import TestCase, Trace, Interaction, FnCheck
@@ -275,7 +273,7 @@ test_case = TestCase(
 await test_case.assert_passed()
 ```
 
-Replay is free and deterministic: no agent runs, so a failure means the checks disagree with a reply you already have.
+Replay does not call the agent.
 
 ### Batch testing
 

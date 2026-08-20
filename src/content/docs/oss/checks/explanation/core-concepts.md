@@ -171,7 +171,7 @@ The fluent API is the preferred user-facing entry point and maps directly to the
 - `.check(...)` adds a `Check` to the scenario sequence.
 - `.run()` resolves specs to interactions, builds the `Trace`, runs checks, and returns a `ScenarioResult`.
 
-Test a two-turn conversation flow. `Conformity` takes only a `rule` and judges the whole trace against it, so write the rule to name the turn you mean rather than passing a key. To judge one extracted value, use `LLMJudge` with a prompt that reads `{{ trace.last.outputs }}`:
+Test a two-turn conversation flow. `Conformity` judges the whole trace, so name the relevant turn in its rule:
 
 ```python
 from giskard.checks import Scenario, Conformity

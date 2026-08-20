@@ -11,7 +11,7 @@ Giskard v3.0.0rc1 is a release candidate. APIs can still change before the stabl
 
 ## Install with a coding agent
 
-Paste a single URL into your coding agent and it installs the dependencies, configures your LLM provider, and sets up the environment.
+Ask your coding agent to follow this page.
 
 :::tip[Paste this into your coding agent:]
 
@@ -55,7 +55,7 @@ Pick the extra that matches your provider:
 Use `pip install --pre "giskard[all-llms]"` for all the native SDKs at once.
 
 :::note[Using LiteLLM instead]
-LiteLLM is supported as an opt-in escape hatch for providers with no native route. Install `pip install --pre "giskard[litellm]"` and pass `LiteLLMGenerator` explicitly:
+For unsupported providers, install `pip install --pre "giskard[litellm]"` and pass `LiteLLMGenerator` explicitly:
 
 ```python
 from giskard.agents.generators import LiteLLMGenerator
@@ -104,7 +104,7 @@ llm_judge = Generator(model="openai/gpt-5-mini")
 set_default_generator(llm_judge)
 ```
 
-`Generator` is `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`. Use a frontier-tier model; small local models give unreliable verdicts in both directions, passing replies they should fail and failing replies that were fine. Read the failures before acting on them.
+`Generator` is `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`. Use a capable judge model and review failures before acting on them.
 
 ## Next Steps
 

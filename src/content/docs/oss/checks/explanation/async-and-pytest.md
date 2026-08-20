@@ -7,8 +7,6 @@ sidebar:
 
 `Scenario.run()` and all `Check.run()` methods are `async def`. AI workloads are I/O-bound: LLM calls, embedding APIs, custom validation endpoints. Async keeps that I/O awaitable, so the library composes with the async agent code you already have and can overlap work where it chooses to.
 
-Async does not mean everything runs at once. Read the next section before you reason about run time.
-
 ## What actually runs concurrently
 
 - **Checks inside a scenario run one after another.** The test-case runner awaits each check in a plain `for` loop. Ten LLM checks on one scenario cost ten sequential LLM calls.
@@ -27,7 +25,7 @@ result = await suite.run(parallel=True, max_concurrency=4)
 
 `parallel=True` schedules every scenario as a task and preserves result order. `max_concurrency` is the cap on how many run at once; `None` (the default) is unbounded, which means your LLM provider's rate limit becomes the real cap. Start with a small explicit number if you are hitting 429s.
 
-Two things `parallel` does not control. It does not change how a scenario runs internally: checks and turns inside one scenario stay sequential. And it does not control scenario *generation*: `generate_suite` always runs its generators concurrently. The scan helpers (`quality_scan`, `vulnerability_scan`) pass `parallel=True` for you.
+Checks and turns inside one scenario stay sequential.
 
 The tradeoff of async is that you need an event loop to call `Scenario.run()`. Giskard Checks works in scripts, pytest, and notebooks, each of which provides the loop differently. See [Run Tests with pytest](/oss/checks/how-to/run-in-pytest) for the setup steps.
 
