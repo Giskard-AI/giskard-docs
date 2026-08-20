@@ -97,12 +97,15 @@ Pass a callable as `outputs` to run the agent instead of replaying a recorded re
 from giskard.checks import Scenario
 
 
-def target(inputs: str) -> str:
-    return f"Received: {inputs}"
+def bank_support_agent(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    if "transfer" in inputs.lower():
+        return "A SEPA transfer arrives within one working day and is free."
+    return "Could you tell me a bit more about what you need?"
 
 
-scenario = Scenario("live_target").interact(
-    inputs="Hello", outputs=target
+scenario = Scenario("transfer_timing").interact(
+    inputs="How long does a SEPA transfer take?", outputs=bank_support_agent
 )
 ```
 
@@ -112,14 +115,14 @@ Pass a callable as `inputs` when the next message depends on what the agent said
 
 ```python
 scenario = (
-    Scenario("follow_up")
+    Scenario("bank_agent_follow_up")
     .interact(
-        inputs="Hello",
-        outputs=target,
+        inputs="How long does a SEPA transfer take?",
+        outputs=bank_support_agent,
     )
     .interact(
-        inputs=lambda trace: f"Repeat: {trace.last.outputs}",
-        outputs=target,
+        inputs=lambda trace: f"You said: {trace.last.outputs} Is that the same at a weekend?",
+        outputs=bank_support_agent,
     )
 )
 ```

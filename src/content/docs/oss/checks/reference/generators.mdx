@@ -37,7 +37,7 @@ Input generators for creating dynamic test data and simulating user interactions
   LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
 </Property>
 
-Describe the user's goal:
+Write the persona as a goal the simulated user is pursuing:
 
 ```python
 from giskard.checks.generators.user import UserSimulator
@@ -45,8 +45,9 @@ from giskard.agents.generators import Generator
 
 user_sim = UserSimulator(
     persona="""
-    Find a document in an archive.
-    Ask one follow-up question if the answer is incomplete.
+    You were charged twice for the same card payment.
+    Describe the two charges without using the word "dispute".
+    Ask how long you will wait for the money.
     """,
     max_steps=3,
     generator=Generator(model="openai/gpt-5"),
@@ -59,17 +60,20 @@ user_sim = UserSimulator(
 from giskard.checks import Scenario, FnCheck
 
 
-def target(inputs: str) -> str:
-    return f"Received: {inputs}"
+def bank_support_agent(inputs: str) -> str:
+    """Stand-in for the agent under test. Replace with your own call."""
+    if "charged twice" in inputs.lower() or "duplicate" in inputs.lower():
+        return "I can help with a duplicate payment. What were the date and amount?"
+    return "Could you share the payment date and amount?"
 
 
 test_scenario = (
-    Scenario("generated_conversation")
-    .interact(inputs=user_sim, outputs=target)
+    Scenario("duplicate_charge_conversation")
+    .interact(inputs=user_sim, outputs=bank_support_agent)
     .check(
         FnCheck(
-            fn=lambda trace: len(trace.last.outputs) > 0,
-            name="answered_every_turn",
+            fn=lambda trace: "payment" in trace.last.outputs.lower(),
+            name="asks_about_the_payment",
         )
     )
 )

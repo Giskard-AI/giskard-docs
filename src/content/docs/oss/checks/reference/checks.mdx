@@ -952,34 +952,35 @@ Order matters for cost. The free checks below run first, and the judge only sees
 from giskard.checks import Conformity, Equals, FnCheck, Scenario
 
 
-def target(inputs: str) -> dict:
+def bank_support_agent(inputs: str) -> dict:
     return {
-        "answer": f"Received: {inputs}",
-        "category": "example",
-        "citations": ["source-1"],
+        "answer": "Your current account ending 4417 is 1,284.50 EUR in credit.",
+        "intent": "balance_enquiry",
+        "authenticated": True,
+        "citations": ["fee-schedule/current-account"],
     }
 
 
 scenario = (
-    Scenario("combined_checks")
+    Scenario("balance_enquiry")
     .interact(
-        inputs="Hello",
-        outputs=target,
+        inputs="How much is in my current account?",
+        outputs=lambda inputs: bank_support_agent(inputs),
     )
     .check(
         Equals(
-            expected_value="example", target_key="trace.last.outputs.category"
+            expected_value=True, target_key="trace.last.outputs.authenticated"
         )
     )
     .check(
         FnCheck(
             fn=lambda trace: len(trace.last.outputs["citations"]) > 0,
-            name="has_citation",
+            name="cites_fee_schedule",
         )
     )
     .check(
         Conformity(
-            rule="The reply must answer the input."
+            rule="The reply must not disclose a balance unless the customer is authenticated."
         )
     )
 )
