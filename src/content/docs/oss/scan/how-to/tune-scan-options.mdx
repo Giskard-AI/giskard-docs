@@ -24,7 +24,7 @@ There are two scans. They run different generators, and both take the same tunin
 
 The examples below scan a retail bank's support agent rather than the tutorial's garden-center assistant, because a bank agent has both the refusal rules a vulnerability scan probes and the policy documents a quality scan needs. Define the target and the documents once:
 
-{/* pyright-skip: This integration example imports the reader's bank agent. */}
+{/* pyright-skip: Imports the reader's application module. */}
 ```python
 from giskard.scan import KnowledgeBase, quality_scan, vulnerability_scan
 
@@ -50,7 +50,7 @@ bank_policy_docs = KnowledgeBase.from_texts(
 <Tabs>
 <TabItem label="vulnerability_scan">
 
-{/* pyright-skip: Alternative tab example; it reuses the reader's bank agent. */}
+{/* pyright-skip: Uses the reader's application code. */}
 ```python
 result = await vulnerability_scan(
     target=bank_agent,
@@ -65,7 +65,7 @@ result = await vulnerability_scan(
 </TabItem>
 <TabItem label="quality_scan">
 
-{/* pyright-skip: Alternative tab example; it reuses the reader's bank agent. */}
+{/* pyright-skip: Uses the reader's application code. */}
 ```python
 result = await quality_scan(
     target=bank_agent,
@@ -109,7 +109,7 @@ Generation and execution are throttled separately:
 <Tabs>
 <TabItem label="vulnerability_scan">
 
-{/* pyright-skip: Alternative tab example; it reuses the reader's bank agent. */}
+{/* pyright-skip: Uses the reader's application code. */}
 ```python
 result = await vulnerability_scan(
     target=bank_agent,
@@ -123,7 +123,7 @@ result = await vulnerability_scan(
 </TabItem>
 <TabItem label="quality_scan">
 
-{/* pyright-skip: Alternative tab example; it reuses the reader's bank agent. */}
+{/* pyright-skip: Uses the reader's application code. */}
 ```python
 result = await quality_scan(
     target=bank_agent,
@@ -173,7 +173,7 @@ When you build the settings dynamically, from a config file for example, collect
 
 `ScanOptions` has no `target_mode` member, so pass `target_mode` as its own keyword argument next to the unpacked dict:
 
-{/* pyright-skip: This fragment reuses options from the reader's configuration. */}
+{/* pyright-skip: Uses the reader's configuration. */}
 ```python
 result = await vulnerability_scan(
     target=bank_agent,

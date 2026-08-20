@@ -93,7 +93,7 @@ Encoding attacks like `Leetspeak` and `ROT13` are trivial to decode. They work b
 
 Both tools go through the same entry point:
 
-{/* pyright-skip: This is a signature excerpt, not executable example code. */}
+{/* pyright-skip: Signature excerpt. */}
 ```python
 async def third_party_scan(
     target,
@@ -151,7 +151,7 @@ async def support_agent(inputs: AgentInput) -> AgentOutput:
 
 Point garak at it:
 
-{/* pyright-skip: This call relies on the reader's configured garak extra. */}
+{/* pyright-skip: Requires the garak extra. */}
 ```python
 from giskard.scan import third_party_scan
 
