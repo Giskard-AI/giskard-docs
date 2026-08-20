@@ -116,11 +116,6 @@ check = StringMatching(
 
 Use `StringMatching` when a specific phrase is required, such as a disclaimer your legal team wrote. If the agent is free to paraphrase, this check fails on correct answers; use [`Conformity`](#conformity) or [`SemanticSimilarity`](#semanticsimilarity) instead.
 
-:::caution
-The path field is `target_key` on every built-in check. Passing `key`, `text_key`, or
-`answer_key` raises a `ValidationError` — the models reject unknown keyword arguments.
-:::
-
 </ResourceSection>
 
 ### `RegexMatching`
@@ -247,10 +242,6 @@ check = GreaterThanEquals(
 check = GreaterThanEquals(expected_value=100, target_key="trace.last.outputs.user_count")
 ```
 
-:::note[Renamed in v3]
-`GreaterThanEquals` is named `GreaterEquals` in releases before v3. If you are pinned to an earlier version, import that name instead. `GreaterThan`, `LessThan` and `LessThanEquals` are unchanged and work on both.
-:::
-
 ### `LessThan` / `LessThanEquals`
 
 ```python
@@ -308,7 +299,7 @@ check = JsonValid(
 )
 ```
 
-Keep the default `parse=True` when the agent returns raw text that is supposed to be JSON, which is the case that catches a model wrapping its object in prose or a code fence.
+Keep the default `parse=True` for JSON returned as text.
 
 Use `JsonValid` when the agent is asked to produce machine-readable output and a downstream system will parse it. It says nothing about whether the content is correct, so pair it with a judge.
 
@@ -431,7 +422,7 @@ check = AnyOf(
 )
 ```
 
-Use `AnyOf` when several distinct answers are correct. For "one item in a list matches", use the comparison checks' `match="any"`, which applies the comparison across a resolved list.
+`AnyOf` runs checks in order and stops at the first pass or error. Put cheap known cases first, then use a judge as a fallback when needed. For "one item in a list matches", use the comparison checks' `match="any"`.
 
 </ResourceSection>
 
@@ -465,7 +456,7 @@ check = Not(
 
 ## LLM-based Checks
 
-Validation checks powered by Large Language Models for semantic understanding. An LLM judge is another model reading the transcript and returning a verdict. It is wrong in both directions: read the failures before you act on them, and do not treat a passing suite as proof the agent is safe.
+Validation checks powered by Large Language Models for semantic understanding. An LLM judge is another model reading the transcript and returning a verdict. It can be wrong in both directions: read failures before you act, and do not treat a passing suite as proof the agent is safe.
 
 ### `BaseLLMCheck`
 
@@ -899,7 +890,7 @@ Use it when phrasing varies but meaning must not. The default `threshold` of 0.9
 
 ### `Readability`
 
-<ResourceSection description="Compute a readability score for a trace value with textstat and validate it against optional thresholds. Deterministic and free after install.">
+<ResourceSection description="Compute a readability score for a trace value with textstat and validate it against optional thresholds. Deterministic.">
 
 **Module:** `giskard.checks.builtin.nlp_metrics`
 

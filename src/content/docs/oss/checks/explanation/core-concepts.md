@@ -38,7 +38,7 @@ Interactions are **immutable**, as they represent something that has already hap
 
 An `InteractionSpec` describes _how_ to generate an interaction and is used to describe a scenario. When you call `.interact(...)` in the fluent API, it adds an interaction spec to the scenario sequence. Inputs and outputs can be static values or dynamic callables, and you can mix both.
 
-`InteractionSpec` is the abstract base class. The concrete spec you construct is `Interact`; instantiating `InteractionSpec` directly gives you an object whose `generate()` raises `NotImplementedError`.
+`InteractionSpec` is the abstract base class. `Interact` is the main spec used by `.interact()`. Other subclasses generate interactions differently.
 
 ```python
 from giskard.checks import Interact
