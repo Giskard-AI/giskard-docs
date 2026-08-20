@@ -135,8 +135,8 @@ Each probe may generate multiple adversarial prompt attempts. Inspect them to un
 attempts = hub.scans.probes.list_attempts("probe-id")
 
 for attempt in attempts:
-    print(f"Prompt: {[m.content for m in attempt.messages[:-1]]}")
-    print(f"Response: {attempt.messages[-1].content}")
+    print(f"Prompt: {[m["content"] for m in attempt.input["messages"]]}")
+    print(f"Response: {attempt.output["response"]["content"]}")
     print(
         f"Severity: {attempt.severity}"
     )  # higher than 0 means the attack succeeded
@@ -177,17 +177,13 @@ for probe in probes:
         if attempt.severity > 0:
             hub.test_cases.create(
                 dataset_id=dataset.id,
-                messages=[
-                    {"role": m.role, "content": m.content}
-                    for m in attempt.messages[:-1]
+                interactions=[
+                    {
+                        "input": attempt.input,
+                        "output": attempt.output,
+                        "checks": [{"identifier": "no-harmful-content"}],
+                    }
                 ],
-                demo_output={
-                    "role": "assistant",
-                    "content": attempt.messages[-1].content,
-                },
-                checks=[
-                    {"identifier": "no-harmful-content"}
-                ],  # or any relevant check
                 tags=[probe.category],
             )
 

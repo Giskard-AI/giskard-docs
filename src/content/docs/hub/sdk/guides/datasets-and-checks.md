@@ -34,77 +34,87 @@ Each test case pairs a conversation with a list of checks. Reference any built-i
 ```python
 tc = hub.test_cases.create(
     dataset_id="dataset-id",
-    messages=[
-        {"role": "user", "content": "What is your refund policy?"},
-    ],
-    demo_output={
-        "role": "assistant",
-        "content": "We offer a 30-day return policy for all unused items.",
-    },
-    checks=[
+    interactions=[
         {
-            "identifier": "correctness",
-            "params": {
-                "reference": "We offer a 30-day return policy for all unused items.",
+            "input": {
+                "messages": [{"role": "user", "content": "What is your refund policy?"}]
             },
-        },
-        {
-            "identifier": "conformity",
-            "params": {
-                "rules": [
-                    "The agent must answer the question in exactly the same language as the question was asked."
-                ]
+            "output": {
+                "response": {
+                    "role": "assistant",
+                    "content": "We offer a 30-day return policy for all unused items.",
+                }
             },
-        },
+            "checks": [
+                {
+                    "identifier": "correctness",
+                    "params": {
+                        "reference": "We offer a 30-day return policy for all unused items.",
+                    },
+                },
+                {
+                    "identifier": "conformity",
+                    "params": {
+                        "rules": [
+                            "The agent must answer the question in exactly the same language as the question was asked."
+                        ]
+                    },
+                },
+            ],
+        }
     ],
 )
 
 print(tc.id)
 ```
 
-### Demo output and metadata
+### Output and metadata
 
-The `demo_output` field is an optional recorded answer displayed alongside the test case in the Hub UI. It is **not** used during evaluation -- the agent always generates a fresh response. If your agent returns structured metadata (e.g. tool calls, categories, resolved status), include it in `demo_output.metadata`:
+The `output` field is an optional recorded answer displayed alongside the test case in the Hub UI. It is **not** used during evaluation -- the agent always generates a fresh response. If your agent returns structured metadata (e.g. tool calls, categories, resolved status), include it in `output.metadata`:
 
 ```python
 hub.test_cases.create(
     dataset_id="dataset-id",
-    messages=[{"role": "user", "content": "I need help with my order #12345"}],
-    demo_output={
-        "role": "assistant",
-        "content": "I've found your order. It was shipped on Monday and should arrive by Thursday.",
-        "metadata": {
-            "category": "order_status",
-            "resolved": True,
-            "tools_called": ["order_lookup"],
-        },
-    },
-    checks=[
+    interactions=[
         {
-            "identifier": "correctness",
-            "params": {
-                "reference": "Order #12345 shipped Monday, arrives Thursday."
+            "input": {
+                "messages": [{"role": "user", "content": "I need help with my order #12345"}]
             },
-        },
-        {
-            "identifier": "metadata",
-            "params": {
-                "json_path_rules": [
-                    {
-                        "json_path": "$.category",
-                        "expected_value": "order_status",
-                        "expected_value_type": "string",
+            "output": {
+                "response": {
+                    "role": "assistant",
+                    "content": "I've found your order. It was shipped on Monday and should arrive by Thursday.",
+                },
+                "metadata": {
+                    "category": "order_status",
+                    "resolved": True,
+                    "tools_called": ["order_lookup"],
+                },
+            },
+            "checks": [
+                {
+                    "identifier": "correctness",
+                    "params": {
+                        "reference": "Order #12345 shipped Monday, arrives Thursday."
                     },
-                ]
-            },
-        },
+                },
+                {
+                    "identifier": "metadata",
+                    "params": {
+                        "json_path_rules": [
+                            {
+                                "json_path": "$.category",
+                                "expected_value": "order_status",
+                                "expected_value_type": "string",
+                            },
+                        ]
+                    },
+                },
+            ],
+        }
     ],
 )
 ```
-
-:::note
-Messages in the test case should **not** include the final assistant response. The last message should always be a user turn. The expected answer goes in `demo_output`, while metadata checks operate on the actual response returned by the agent during evaluation.
-:::
 
 ### Multi-turn conversations
 
@@ -113,25 +123,36 @@ Include prior assistant turns to test multi-turn behaviour:
 ```python
 hub.test_cases.create(
     dataset_id="dataset-id",
-    messages=[
-        {"role": "user", "content": "I ordered a jacket last week."},
+    interactions=[
         {
-            "role": "assistant",
-            "content": "Happy to help! What's your order number?",
-        },
-        {"role": "user", "content": "It's #12345. I want to return it."},
-    ],
-    demo_output={
-        "role": "assistant",
-        "content": "I've initiated a return for order #12345. You'll receive a prepaid label by email.",
-    },
-    checks=[
-        {
-            "identifier": "string_match",
-            "params": {
-                "type": "string_match",
-                "keyword": "#12345",
+            "input": {
+                "messages": [{"role": "user", "content": "I ordered a jacket last week."}]
             },
+            "output": {
+                "response": {
+                    "role": "assistant",
+                    "content": "Happy to help! What's your order number?",
+                }
+            },
+        },
+        {
+            "input": {
+                "messages": [{"role": "user", "content": "It's #12345. I want to return it."}]
+            },
+            "output": {
+                "response": {
+                    "role": "assistant",
+                    "content": "I've initiated a return for order #12345. You'll receive a prepaid label by email.",
+                }
+            },
+            "checks": [
+                {
+                    "identifier": "string_match",
+                    "params": {
+                        "keyword": "#12345",
+                    },
+                },
+            ],
         },
     ],
 )
@@ -144,15 +165,20 @@ Tags let you filter test cases during evaluation runs:
 ```python
 hub.test_cases.create(
     dataset_id="dataset-id",
-    messages=[{"role": "user", "content": "Do you ship internationally?"}],
-    checks=[
+    interactions=[
         {
-            "identifier": "groundedness",
-            "params": {
-                "type": "groundedness",
-                "context": "We don't ship outside the EU",
+            "input": {
+                "messages": [{"role": "user", "content": "Do you ship internationally?"}]
             },
-        },
+            "checks": [
+                {
+                    "identifier": "groundedness",
+                    "params": {
+                        "context": "We don't ship outside the EU",
+                    },
+                },
+            ],
+        }
     ],
     tags=["shipping", "faq"],
 )
@@ -167,7 +193,7 @@ You can annotate test cases with comments for team collaboration:
 ```python
 comment = hub.test_cases.comments.add(
     "test-case-id",
-    content="This test case needs a stronger expected output — the current one is too vague.",
+    content="This test case needs a stronger expected output, the current one is too vague.",
 )
 
 print(comment.id)
@@ -196,28 +222,36 @@ hub = HubClient()
 
 test_cases = [
     {
-        "messages": [
-            {"role": "user", "content": "What is your return policy?"}
-        ],
-        "checks": [
+        "interactions": [
             {
-                "identifier": "correctness",
-                "params": {
-                    "reference": "We accept returns within 30 days of purchase."
+                "input": {
+                    "messages": [{"role": "user", "content": "What is your return policy?"}]
                 },
+                "checks": [
+                    {
+                        "identifier": "correctness",
+                        "params": {
+                            "reference": "We accept returns within 30 days of purchase."
+                        },
+                    }
+                ],
             }
         ],
     },
     {
-        "messages": [
-            {"role": "user", "content": "Do you offer free shipping?"}
-        ],
-        "checks": [
+        "interactions": [
             {
-                "identifier": "correctness",
-                "params": {
-                    "reference": "Free shipping is available on all orders over $50."
+                "input": {
+                    "messages": [{"role": "user", "content": "Do you offer free shipping?"}]
                 },
+                "checks": [
+                    {
+                        "identifier": "correctness",
+                        "params": {
+                            "reference": "Free shipping is available on all orders over $50."
+                        },
+                    }
+                ],
             }
         ],
     },
@@ -242,44 +276,6 @@ dataset = hub.datasets.upload(
     name="Imported Suite",
     data="import_data.jsonl",
 )
-```
-
-### Import from a Giskard RAGET QATestset
-
-If you have an existing `QATestset` from the Giskard open-source library, convert it to the Hub format:
-
-```python
-from giskard.rag import QATestset
-
-testset = QATestset.load("my_testset.jsonl")
-
-for sample in testset.samples:
-    checks = []
-
-    # Add correctness check
-    if getattr(sample, "reference_answer", None):
-        checks.append(
-            {
-                "identifier": "correctness",
-                "params": {"reference": sample.reference_answer},
-            }
-        )
-
-    # Add groundedness check
-    if getattr(sample, "reference_context", None):
-        checks.append(
-            {
-                "identifier": "groundedness",
-                "params": {"context": sample.reference_context},
-            }
-        )
-
-    hub.test_cases.create(
-        dataset_id=dataset.id,
-        messages=sample.conversation_history,
-        checks=checks,
-        tags=[sample.metadata["question_type"], sample.metadata["topic"]],
-    )
 ```
 
 ---
@@ -566,9 +562,13 @@ Once created, reference your custom check by its `identifier` in any test case w
 ```python
 hub.test_cases.create(
     dataset_id="dataset-id",
-    messages=[{"role": "user", "content": "hey, can u help me?"}],
-    checks=[
-        {"identifier": "tone_professional"},
+    interactions=[
+        {
+            "input": {
+                "messages": [{"role": "user", "content": "hey, can u help me?"}]
+            },
+            "checks": [{"identifier": "tone_professional"}],
+        }
     ],
 )
 ```

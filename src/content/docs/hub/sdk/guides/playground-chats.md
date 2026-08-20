@@ -31,8 +31,12 @@ chat = hub.playground_chats.retrieve(
 
 print(f"Chat with: {chat.agent.name}")
 
-for msg in chat.messages:
-    print(f"[{msg.role}] {msg.content}")
+for exchange in chat.exchanges:
+    user_msg = exchange.input["messages"][-1]
+    print(f"[{user_msg['role']}] {user_msg['content']}")
+
+    response = exchange.output["response"]
+    print(f"[{response['role']}] {response['content']}")
 ```
 
 ---
@@ -50,19 +54,17 @@ dataset = hub.datasets.create(
 )
 
 for chat in chats:
-    messages = chat.messages
+    interactions = [
+        {"input": exchange.input, "output": exchange.output}
+        for exchange in chat.exchanges
+    ]
 
-    # If the conversation ends with an assistant turn, treat it as the demo_output
-    demo_output = None
-    if messages and messages[-1].role == "assistant":
-        demo_output = messages.pop()
-
-    if messages:
+    if interactions:
+        # Attach the check to the final assistant turn.
+        interactions[-1]["checks"] = [{"identifier": "no-harmful-content"}]
         hub.test_cases.create(
             dataset_id=dataset.id,
-            messages=messages,
-            demo_output=demo_output,
-            checks=[{"identifier": "no-harmful-content"}],
+            interactions=interactions,
         )
 
 print(f"Imported {len(chats)} conversations into dataset {dataset.id}")
