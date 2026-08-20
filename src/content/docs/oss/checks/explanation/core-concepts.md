@@ -36,10 +36,12 @@ Interactions are **immutable**, as they represent something that has already hap
 
 ## InteractionSpec
 
-An `InteractionSpec` describes _how_ to generate an interaction and is used to describe a scenario. When you call `.interact(...)` in the fluent API, it adds an `InteractionSpec` to the scenario sequence. Inputs and outputs can be static values or dynamic callables, and you can mix both.
+An `InteractionSpec` describes _how_ to generate an interaction and is used to describe a scenario. When you call `.interact(...)` in the fluent API, it adds an interaction spec to the scenario sequence. Inputs and outputs can be static values or dynamic callables, and you can mix both.
+
+`InteractionSpec` is the abstract base class. `Interact` is the main spec used by `.interact()`. Other subclasses generate interactions differently.
 
 ```python
-from giskard.checks import InteractionSpec
+from giskard.checks import Interact
 from openai import OpenAI
 import random
 
@@ -57,14 +59,14 @@ def generate_answer(inputs: str) -> str:
     return response.choices[0].message.content
 
 
-spec = InteractionSpec(
+spec = Interact(
     inputs=generate_random_question,
     outputs=generate_answer,
     metadata={"category": "math", "difficulty": "easy"},
 )
 ```
 
-Specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn) for practical examples.
+Interaction specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn) for practical examples.
 
 ## Trace
 
@@ -169,7 +171,7 @@ The fluent API is the preferred user-facing entry point and maps directly to the
 - `.check(...)` adds a `Check` to the scenario sequence.
 - `.run()` resolves specs to interactions, builds the `Trace`, runs checks, and returns a `ScenarioResult`.
 
-For example, we can test a simple conversation flow with two turns:
+Test a two-turn conversation flow. `Conformity` judges the whole trace, so name the relevant turn in its rule:
 
 ```python
 from giskard.checks import Scenario, Conformity
@@ -182,7 +184,7 @@ test_scenario = (
             rule="response should be a friendly greeting",
         )
     )
-    .interact(inputs="Who invented the HTML?", outputs=generate_answer)
+    .interact(inputs="Who invented HTML?", outputs=generate_answer)
     .check(
         Conformity(
             rule="response should mention Tim Berners-Lee as the inventor of HTML",
