@@ -26,6 +26,7 @@ test("preparePythonSnippetFiles assembles page fences in an async function", () 
   assert.match(snippet.generatedPath, /[a-f0-9]{64}\.py$/);
   assert.deepEqual(snippet.fences.map(({ codeStartLine }) => codeStartLine), [4, 8]);
   assert.match(snippet.code, /async def _snippet_main\(\):/);
+  assert.match(snippet.code, /from typing import Any/);
   assert.match(snippet.code, /    value: str = 1/);
   assert.match(snippet.code, /    await run\(value\)/);
 });

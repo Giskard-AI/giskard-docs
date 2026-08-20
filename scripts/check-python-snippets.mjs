@@ -1,4 +1,5 @@
 import {
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -15,6 +16,17 @@ import {
 } from "./markdown-python-fences.mjs";
 
 const DEFAULT_DOCS_ROOT = "src/content/docs/oss";
+const EXECUTABLE_CONTEXT_RE =
+  /^(?:Uses the target from the wrapping guide|Uses the reader's application code|Imports the reader's application module|Uses the suite from the previous example|Uses the reader's configuration)\.$/;
+
+function writeApplicationFixtures(generatedRoot) {
+  const fixture = "from typing import Any\n\nsupport_agent: Any\nsupport_agent_hardened: Any\nbank_agent: Any\n";
+  mkdirSync(join(generatedRoot, "my_app"));
+  writeFileSync(join(generatedRoot, "agent.py"), fixture);
+  writeFileSync(join(generatedRoot, "bank_support.py"), fixture);
+  writeFileSync(join(generatedRoot, "my_app", "__init__.py"), "");
+  writeFileSync(join(generatedRoot, "my_app", "agent.py"), fixture);
+}
 
 function generatedSnippetPath(generatedRoot, docsRoot, pagePath) {
   const relativePagePath = relative(docsRoot, pagePath);
@@ -29,15 +41,30 @@ function generatedSnippetPath(generatedRoot, docsRoot, pagePath) {
  */
 export function preparePythonSnippetFiles(docsRoot, generatedRoot) {
   const snippets = new Map();
+  writeApplicationFixtures(generatedRoot);
 
   for (const pagePath of walkMarkdownFiles(docsRoot)) {
     const source = readFileSync(pagePath, "utf8");
     const fences = parsePythonFences(source, { pagePath }).filter(
-      (fence) => !fence.skip,
+      (fence) => !fence.skip || EXECUTABLE_CONTEXT_RE.test(fence.skip.reason),
     );
     if (fences.length === 0) continue;
 
-    const generatedLines = ["async def _snippet_main():"];
+    const needsSupportAgent =
+      !source.includes("async def support_agent") &&
+      fences.some((fence) => /\bsupport_agent\b/.test(fence.code));
+    const needsBankAgent =
+      !source.includes("async def bank_agent") &&
+      fences.some((fence) => /\bbank_agent\b/.test(fence.code));
+    const generatedLines = ["from typing import Any", "", "async def _snippet_main():"];
+    if (needsSupportAgent) generatedLines.push("    support_agent: Any");
+    if (needsBankAgent) generatedLines.push("    bank_agent: Any");
+    if (fences.some((fence) => /\boptions\b/.test(fence.code))) {
+      generatedLines.push("    options: dict[str, Any] = {}");
+    }
+    if (fences.some((fence) => /\bsuite\b/.test(fence.code))) {
+      generatedLines.push("    suite: Any");
+    }
     const generatedFences = fences.map((fence) => {
       const generatedStartLine = generatedLines.length;
       const codeLines = fence.code.split("\n");
