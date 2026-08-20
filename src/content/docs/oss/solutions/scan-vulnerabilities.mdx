@@ -7,9 +7,9 @@ sidebar:
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-The Giskard library provides an automatic **scan**: it attacks your own agent on purpose, with hostile inputs generated for it, and reports the ones it handled badly. That practice is called red teaming. Use it to find safety and security problems in an LLM-based agent before your users do.
+Giskard's **scan** red-teams your agent: it generates hostile inputs from a description of what the agent does, runs them, and reports the ones that got through. Use it to find safety and security problems before your users do.
 
-A scan is a search, not a certification. It samples generated attacks; it does not cover every attack, and a run that finds nothing means those attacks did not break your agent, not that the agent is safe. The verdicts come from an LLM, which is sometimes wrong in both directions, so read each failure before acting on it. Do not present scan output as an audit or a compliance result.
+A clean run is not a certificate. The scan samples attacks, an LLM judges the replies (and can be wrong either way), and a miss only means those particular attacks failed. Read the failures before you act on them.
 
 :::note[Coming from Giskard v2?]
 The scan has been redesigned in v3. Instead of wrapping your model with `giskard.Model(...)` and running `giskard.scan(model, dataset)` over a dataset, you wrap your agent as an async function, generate scenarios from a plain-language description with `generate_suite(...)`, and run them with `suite.run(...)`. This means there is no dataset to prepare and no `model_type` or `feature_names` to declare.
@@ -17,25 +17,23 @@ The scan has been redesigned in v3. Instead of wrapping your model with `giskard
 
 ## How does it work?
 
-From a plain-language description of your agent, an LLM generates adversarial scenarios tailored to it and runs them against your agent over single-turn and multi-turn conversations. Then, a second LLM acts as a judge, deciding whether each response reveals a vulnerability.
+From a description of your agent, an LLM writes attack scenarios and runs them — either as a single message or as a conversation that keeps pushing. A second LLM then judges whether each reply is a failure. The [glossary](/start/glossary) covers the failure types, including [prompt injection](/start/glossary/security/injection), [harmful content](/start/glossary/security/harmful-content), and [information disclosure](/start/glossary/security/information-disclosure).
 
-In plain terms: a scenario is one attempted attack, sent as a single message (single-turn) or as a conversation where the attacker keeps pushing over several messages (multi-turn). Adversarial means the input is written to make your agent misbehave, not to represent a normal user. The [glossary](/start/glossary) describes the failure types being hunted, such as [prompt injection](/start/glossary/security/injection), [harmful content](/start/glossary/security/harmful-content), and [information disclosure](/start/glossary/security/information-disclosure).
-
-A benchmark scores a foundation model on generic tasks. This scan attacks your agent on the job it actually does, using the description you provide.
+A benchmark scores a foundation model on generic tasks. This scan attacks _your_ agent, on the job it actually does.
 
 ### Which attacks does it run?
 
 The scan runs seven generators, mapped to the [OWASP LLM Top 10](https://genai.owasp.org/llm-top-10/) and the vulnerability categories used across Giskard:
 
-| Attack                        | What it does                                                                                                                                                                                                                   | Vulnerability category                                        |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| **Prompt injection**          | Hides an injected instruction inside realistic content to see whether the agent obeys it instead of its original instructions.                                                                                                 | Prompt Injection (OWASP LLM01)                                |
-| **Direct adversarial**        | Sends direct requests that test for harmful or unauthorized content such as stereotypes and discrimination, illegal activities, CBRN material, copyright, misinformation, and unqualified financial, medical, or legal advice. Runs up to three turns by default, and one turn when the agent is single-turn. | Harmful Content Generation, Misguidance & Unauthorized Advice |
-| **GOAT multi-turn jailbreak** | Uses an attacker LLM that adapts over several turns, chaining strategies such as refusal suppression, persona modification, and hypothetical framing to push the agent toward objectives it should refuse.                     | Harmful Content Generation                                    |
-| **Crescendo multi-turn**      | Opens with broad, benign questions and narrows the conversation step by step toward a harmful objective. No single message would be refused on its own.                                                                       | Harmful Content Generation                                    |
-| **GCG suffix injection**      | Appends a tuned string of meaningless-looking tokens to a harmful prompt, exploiting the model's token handling rather than its reasoning.                                                                                    | Prompt Injection (OWASP LLM01)                                |
-| **`do-not-answer` corpus**    | Replays a published Hugging Face dataset of prompts a well-behaved agent should refuse. Non-commercial licence, so it is excluded when you pass `commercial_use=True`.                                                        | Harmful Content Generation                                    |
-| **`harmbench` corpus**        | Replays a published Hugging Face dataset of harmful-behavior prompts. Commercial use permitted.                                                                                                                              | Harmful Content Generation                                    |
+| Attack                        | What it does                                                                                                                                                                                                                                                  | Vulnerability category                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **Prompt injection**          | Hides an injected instruction inside realistic content to see whether the agent obeys it instead of its original instructions.                                                                                                                                | Prompt Injection (OWASP LLM01)                                |
+| **Direct adversarial**        | Direct requests across built-in categories: stereotypes, illegal activity, CBRN, copyright, misinformation, unauthorized financial/medical/legal advice, politics, and religion. Up to three turns by default; pass `target_mode="singleturn"` to cap at one. | Harmful Content Generation, Misguidance & Unauthorized Advice |
+| **GOAT multi-turn jailbreak** | Uses an attacker LLM that adapts over several turns, chaining strategies such as refusal suppression, persona modification, and hypothetical framing to push the agent toward objectives it should refuse.                                                    | Harmful Content Generation                                    |
+| **Crescendo multi-turn**      | Opens with broad, benign questions and narrows the conversation step by step toward a harmful objective. No single message would be refused on its own.                                                                                                       | Harmful Content Generation                                    |
+| **GCG suffix injection**      | Appends a tuned string of meaningless-looking tokens to a harmful prompt, exploiting the model's token handling rather than its reasoning.                                                                                                                    | Prompt Injection (OWASP LLM01)                                |
+| **`do-not-answer` corpus**    | Replays a Hugging Face dataset of prompts a well-behaved agent should refuse. Dropped when you pass `commercial_use=True`.                                                                                                                                    | Harmful Content Generation                                    |
+| **`harmbench` corpus**        | Replays a Hugging Face dataset of harmful-behavior prompts. Kept when `commercial_use=True`.                                                                                                                                                                  | Harmful Content Generation                                    |
 
 The [vulnerability categories catalog](/hub/ui/scan/vulnerability-categories) lists every category a finding can be filed under.
 
@@ -45,11 +43,11 @@ The [Giskard Hub](/hub/ui/scan), our enterprise platform, takes red teaming much
 
 ### What data is sent to Language Model providers?
 
-The scan uses an LLM both to **generate** adversarial scenarios and to **judge** your agent's answers. During the scan, these models receive your agent's description and the responses it produces. However, they never receive anything you do not pass to the agent. In both cases, you choose the provider and model (see [Before starting](#before-starting)).
+The scan uses an LLM both to **generate** adversarial scenarios and to **judge** your agent's answers. Those models see the description you pass in and the messages your agent exchanges. They do not see your source code, secrets, or tools unless those show up in the description or in the conversation. You choose the provider and model (see [Before starting](#before-starting)).
 
-### Will the scan work in any language?
+### Which languages does it support?
 
-Yes. Pass the languages your agent is expected to handle through the `languages` argument (BCP-47 codes such as `"en"`, `"fr"`, or `"es"`), and the scenarios will be generated in those languages. Since generation is handled by the LLM you configure, pick a model with strong support for your target languages for the best results.
+LLM-backed generators (direct adversarial, GOAT, Crescendo) write scenarios in the languages you pass — BCP-47 codes such as `"en"`, `"fr"`, or `"es"`. Pick a model that handles those languages well. Dataset-backed generators (prompt injection, the Hugging Face corpora, GCG) only emit scenarios for languages they actually ship; the rest are skipped.
 
 ## Before starting
 
@@ -63,10 +61,10 @@ pip install "giskard[scan,openai]"
 ```
 
 ```python
-from giskard.agents.generators import GiskardLLMGenerator
+from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-llm_judge = GiskardLLMGenerator(model="openai/gpt-4o")
+llm_judge = Generator(model="openai/gpt-4o")
 set_default_generator(llm_judge)
 ```
 
@@ -80,10 +78,10 @@ pip install "giskard[scan,anthropic]"
 ```
 
 ```python
-from giskard.agents.generators import GiskardLLMGenerator
+from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-llm_judge = GiskardLLMGenerator(model="anthropic/claude-sonnet-4-20250514")
+llm_judge = Generator(model="anthropic/claude-sonnet-4-20250514")
 set_default_generator(llm_judge)
 ```
 
@@ -97,10 +95,10 @@ pip install "giskard[scan,google]"
 ```
 
 ```python
-from giskard.agents.generators import GiskardLLMGenerator
+from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-llm_judge = GiskardLLMGenerator(model="gemini/gemini-2.5-flash")
+llm_judge = Generator(model="gemini/gemini-2.5-flash")
 set_default_generator(llm_judge)
 ```
 
@@ -170,6 +168,7 @@ async def my_agent(inputs: AgentInput) -> AgentOutput:
 If your agent stores the conversation on its side (for example a LangGraph checkpointer or a session-based API), it needs the same thread id on every turn of a conversation. To get one, subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
 
 {/* pyright-skip: Alternative tab example; the checker concatenates every fence on the page. */}
+
 ```python
 from uuid import uuid4
 from pydantic import BaseModel, Field
@@ -200,6 +199,7 @@ async def my_agent(inputs: AgentInput, trace: AgentTrace) -> AgentOutput:
 If your agent is stateless and expects the full message history on every call, declare a `trace` parameter. During the scan, `trace.interactions` holds the previous turns of the current conversation, so you can rebuild the history and append the new message:
 
 {/* pyright-skip: Alternative tab example; the checker concatenates every fence on the page. */}
+
 ```python
 from pydantic import BaseModel
 from giskard.checks import Trace
@@ -272,7 +272,7 @@ For every failed scenario, the report shows the judge's verdict and the full con
 
 ### Save your suite
 
-Generating scenarios uses an LLM, so each scan produces different scenarios and a different pass rate. Two runs are only comparable when they use the same saved suite, so generate the suite once and reuse it. The result exposes the suite that produced it via `suite_result.suite`. Since `Suite` is a Pydantic model, you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
+Generating scenarios uses an LLM, so two scans of the same agent are not the same suite. Save it if you want comparable reruns — after a live scan it is on `suite_result.suite`:
 
 ```python
 from pathlib import Path
@@ -290,7 +290,7 @@ In your pipeline, load the saved suite and run it against your agent. Scenarios 
 ```python
 from pathlib import Path
 
-import giskard.scan  # noqa: F401  # registers the scan check types before deserialization
+import giskard.scan  # registers scan check types before deserialization
 from giskard.checks import Suite
 
 suite = Suite.model_validate_json(Path("scan_suite.json").read_text())
@@ -298,15 +298,15 @@ suite = Suite.model_validate_json(Path("scan_suite.json").read_text())
 suite_result = await suite.run(target=my_agent)
 ```
 
-To publish the results in your CI dashboard, export them as JUnit XML. `to_junit_xml()` always returns the XML as a string, and also writes it to disk when you pass a `path`:
+`to_junit_xml()` always returns the XML as a string. Pass `path` to write a file as well (parent directories are created). The returned string has no XML declaration; the written file does.
 
 ```python
-xml = suite_result.to_junit_xml()  # returns the XML string
+xml = suite_result.to_junit_xml()
 
-suite_result.to_junit_xml(path="reports/scan.xml")  # also writes the file
+suite_result.to_junit_xml(path="reports/scan.xml")
 ```
 
-Most CI systems pick the file up from a path you configure, so pass `path` and point your reporting step at it. Missing parent directories are created for you.
+Point your CI reporting step at that path.
 
 For the workflow file, secrets, and cost controls, see [CI/CD Integration](/oss/checks/how-to/ci-cd).
 
@@ -315,6 +315,7 @@ For the workflow file, secrets, and cost controls, see [CI/CD Integration](/oss/
 The saved suite can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the attacks that used to succeed no longer do:
 
 {/* pyright-skip: my_other_agent is the reader's later revision of the wrapper. */}
+
 ```python
 suite_result = await suite.run(target=my_other_agent)
 ```
@@ -353,9 +354,11 @@ suite_result = await vulnerability_scan(
 )
 ```
 
+If the agent only answers a single message (no conversation), also pass `target_mode="singleturn"`. GOAT and Crescendo are skipped; the other generators cap themselves to one turn.
+
 ### Build a broader suite with a coding agent
 
-The method `scan.generate_suite` builds a suite from the built-in scenarios. To go further, the [Scenario Generator skill](/oss/agent-skills#scenario-generator-) turns your coding agent into a red-teamer. Describe your agent and the failure modes you care about, and the skill writes or extends a runnable suite with adversarial scenarios and layered checks tailored to your case. You then run it with `suite.run(...)` exactly as above.
+`generate_suite` only uses the generators you pass it. For coverage beyond those, the [Scenario Generator skill](/oss/agent-skills#scenario-generator-) can write or extend a suite from a description of the agent and the failures you care about. Run that suite with `suite.run(...)` the same way as above.
 
 ```bash
 npx skills add Giskard-AI/giskard-skills --skill scenario-generator
