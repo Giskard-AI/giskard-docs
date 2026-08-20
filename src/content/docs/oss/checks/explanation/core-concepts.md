@@ -41,22 +41,22 @@ An `InteractionSpec` describes _how_ to generate an interaction and is used to d
 `InteractionSpec` is the abstract base class. `Interact` is the main spec used by `.interact()`. Other subclasses generate interactions differently.
 
 ```python
+from giskard.agents.generators import Generator
 from giskard.checks import Interact
-from openai import OpenAI
 import random
+
+generator = Generator(model="openai/gpt-5-mini")
 
 
 def generate_random_question() -> str:
     return f"What is 2 + {random.randint(0, 10)}?"
 
 
-def generate_answer(inputs: str) -> str:
-    client = OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-5-mini",
-        messages=[{"role": "user", "content": inputs}],
+async def generate_answer(inputs: str) -> str | None:
+    response = await generator.complete(
+        [{"role": "user", "content": inputs}],
     )
-    return response.choices[0].message.content or ""
+    return response.choices[0].message.text
 
 
 spec = Interact(
