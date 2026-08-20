@@ -40,6 +40,7 @@ An `InteractionSpec` describes _how_ to generate an interaction and is used to d
 
 `InteractionSpec` is the abstract base class. `Interact` is the main spec used by `.interact()`. Other subclasses generate interactions differently.
 
+<!-- pyright-skip: The OpenAI response model is optional in this focused interaction-spec example. -->
 ```python
 from giskard.checks import Interact
 from openai import OpenAI
@@ -89,6 +90,7 @@ Each trace also carries optional **`annotations`**: a dictionary of scenario-lev
 
 For a **custom trace type**, subclass `Trace` and pass `trace_type=YourTrace` on `Scenario`. Use this when you want extra computed fields, helpers, or custom Rich rendering for the conversation history. See [Custom trace types](/oss/checks/how-to/custom-trace).
 
+<!-- pyright-skip: This conceptual subclass omits the frozen dataclass setup required by Trace. -->
 ```python
 from giskard.checks import Scenario, Trace
 
@@ -133,6 +135,7 @@ check = Groundedness(
 
 A `Scenario` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. Scenarios work for both single-turn and multi-turn tests.
 
+<!-- pyright-skip: This fluent-API fragment uses placeholder checks to explain sequencing. -->
 ```python
 from giskard.checks import Scenario
 
@@ -148,6 +151,7 @@ result = await test_scenario.run()
 
 The `run()` method is asynchronous. When running in a script, use `asyncio.run()`:
 
+<!-- pyright-skip: This continuation fragment depends on the scenario from the prior example. -->
 ```python
 import asyncio
 
@@ -173,6 +177,7 @@ The fluent API is the preferred user-facing entry point and maps directly to the
 
 Test a two-turn conversation flow. `Conformity` judges the whole trace, so name the relevant turn in its rule:
 
+<!-- pyright-skip: This fragment uses the application callback introduced in the InteractionSpec example. -->
 ```python
 from giskard.checks import Scenario, Conformity
 

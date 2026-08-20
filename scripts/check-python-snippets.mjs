@@ -16,36 +16,50 @@ import {
 
 const DEFAULT_DOCS_ROOT = "src/content/docs/oss";
 
-function generatedSnippetPath(generatedRoot, docsRoot, pagePath, index) {
+function generatedSnippetPath(generatedRoot, docsRoot, pagePath) {
   const relativePagePath = relative(docsRoot, pagePath);
   const digest = createHash("sha256").update(relativePagePath).digest("hex");
-  return join(generatedRoot, `${digest}.${index}.py`);
+  return join(generatedRoot, `${digest}.py`);
 }
 
 /**
- * Materialize non-skipped Python fences as individual files for Pyright.
- * The returned map maps each generated file to its Markdown source location.
+ * Materialize each page's non-skipped Python fences as one async file for
+ * Pyright. This preserves source order and lets documentation use top-level
+ * await, as it would in a notebook or async test.
  */
 export function preparePythonSnippetFiles(docsRoot, generatedRoot) {
   const snippets = new Map();
 
   for (const pagePath of walkMarkdownFiles(docsRoot)) {
     const source = readFileSync(pagePath, "utf8");
-    for (const fence of parsePythonFences(source, { pagePath })) {
-      if (fence.skip) continue;
+    const fences = parsePythonFences(source, { pagePath }).filter(
+      (fence) => !fence.skip,
+    );
+    if (fences.length === 0) continue;
 
-      const generatedPath = generatedSnippetPath(
-        generatedRoot,
-        docsRoot,
-        pagePath,
-        fence.index,
+    const generatedLines = ["async def _snippet_main():"];
+    const generatedFences = fences.map((fence) => {
+      const generatedStartLine = generatedLines.length;
+      const codeLines = fence.code.split("\n");
+      generatedLines.push(
+        ...codeLines.map((line) => (line ? `    ${line}` : line)),
       );
-      writeFileSync(generatedPath, fence.code);
-      snippets.set(resolve(generatedPath), {
-        ...fence,
-        generatedPath: resolve(generatedPath),
-      });
-    }
+      const generatedEndLine = generatedLines.length;
+      generatedLines.push("");
+      return { ...fence, generatedStartLine, generatedEndLine };
+    });
+
+    const generatedPath = resolve(
+      generatedSnippetPath(generatedRoot, docsRoot, pagePath),
+    );
+    const code = `${generatedLines.join("\n")}\n`;
+    writeFileSync(generatedPath, code);
+    snippets.set(generatedPath, {
+      pagePath,
+      generatedPath,
+      code,
+      fences: generatedFences,
+    });
   }
 
   return snippets;
@@ -56,8 +70,15 @@ export function formatDiagnostic(diagnostic, snippets) {
   const snippet = snippets.get(resolve(diagnostic.file));
   if (!snippet) return null;
 
-  const line = snippet.codeStartLine + diagnostic.range.start.line;
-  const column = diagnostic.range.start.character + 1;
+  const generatedLine = diagnostic.range.start.line;
+  const fence = snippet.fences.find(
+    ({ generatedStartLine, generatedEndLine }) =>
+      generatedStartLine <= generatedLine && generatedLine < generatedEndLine,
+  );
+  if (!fence) return null;
+
+  const line = fence.codeStartLine + generatedLine - fence.generatedStartLine;
+  const column = Math.max(1, diagnostic.range.start.character - 3);
   const rule = diagnostic.rule ? ` [${diagnostic.rule}]` : "";
   return `${snippet.pagePath}:${line}:${column} - ${diagnostic.severity}${rule}: ${diagnostic.message}`;
 }

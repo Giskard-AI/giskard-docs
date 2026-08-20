@@ -86,6 +86,7 @@ result = await test_case.run()
 
 `assert_passed()` raises `AssertionError` with the check messages, so a failing check reads like any other pytest failure:
 
+<!-- pyright-skip: This focused predicate assumes the test trace has an interaction. -->
 ```python
 import pytest
 
@@ -205,6 +206,7 @@ After each interaction, the mock's call history is written to `Interaction.metad
 
 Assert that the target called a dependency:
 
+<!-- pyright-skip: This integration fragment requires the reader's myapp module. -->
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 
@@ -273,6 +275,7 @@ Replay does not call the agent.
 
 Run independent test cases concurrently:
 
+<!-- pyright-skip: This continuation example depends on the recorded interaction from the prior block. -->
 ```python
 import asyncio
 

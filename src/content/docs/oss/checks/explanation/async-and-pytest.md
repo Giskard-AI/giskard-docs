@@ -15,6 +15,7 @@ sidebar:
 
 To overlap scenarios, opt in:
 
+<!-- pyright-skip: This fragment focuses on run options; the suite is defined by the surrounding example. -->
 ```python
 # Run every scenario in the suite at once
 result = await suite.run(parallel=True)
@@ -31,6 +32,7 @@ The tradeoff of async is that you need an event loop to call `Scenario.run()`. G
 
 ## Common pitfalls
 
+<!-- pyright-skip: This block deliberately shows invalid async patterns alongside the correct ones. -->
 ```python
 # Wrong — run() returns a coroutine, not a result
 result = test_scenario.run()

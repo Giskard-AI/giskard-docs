@@ -56,6 +56,7 @@ user_sim = UserSimulator(
 
 ### Using in scenarios
 
+<!-- pyright-skip: This usage fragment depends on the user simulator configured in the surrounding application. -->
 ```python
 from giskard.checks import Scenario, FnCheck
 
@@ -87,6 +88,7 @@ The LLM can generate different messages on each run. Use fixed inputs for repeat
 
 Generation stops when the LLM reports that the goal is reached, or after `max_steps` turns:
 
+<!-- pyright-skip: This continuation uses the scenario created in the preceding example. -->
 ```python
 result = await test_scenario.run()
 

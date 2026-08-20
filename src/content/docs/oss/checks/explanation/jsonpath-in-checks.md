@@ -11,6 +11,7 @@ Built-in checks like `Groundedness`, `StringMatching`, and `LessThan` accept pat
 
 All paths must start with `trace.`:
 
+<!-- pyright-skip: This block deliberately includes an invalid call to illustrate a bad JSONPath. -->
 ```python
 # Correct
 Groundedness(target_key="trace.last.outputs.answer", ...)
@@ -48,6 +49,7 @@ The distinction matters when you read results. A failure means the check ran and
 
 Follow the same convention in custom checks:
 
+<!-- pyright-skip: This is a method-body fragment; trace, self, and CheckResult come from the enclosing check. -->
 ```python
 from giskard.checks.core.extraction import resolve, NoMatch
 

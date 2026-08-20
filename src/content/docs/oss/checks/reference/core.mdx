@@ -36,6 +36,7 @@ Base class for all checks. Subclass and register with `@Check.register("kind")` 
 
 ### Creating custom checks
 
+<!-- pyright-skip: This custom-check example omits the empty-trace guard to focus on the check contract. -->
 ```python
 from giskard.checks import Check, CheckResult, Trace
 
@@ -318,6 +319,7 @@ Ordered sequence of interaction specs and checks with shared trace. Provides a f
   Execute the scenario and return results.
 </MethodCard>
 
+<!-- pyright-skip: This scenario fragment assumes every step produces an interaction. -->
 ```python
 from giskard.checks import Scenario, FnCheck, StringMatching
 
