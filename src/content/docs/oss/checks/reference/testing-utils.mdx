@@ -46,24 +46,35 @@ For most use cases, use the `Scenario()` fluent API instead. `TestCase` is for a
   with formatted failure messages if any check fails.
 </MethodCard>
 
+A conversation you captured in production, replayed against checks without calling the agent again:
+
 ```python
 from giskard.checks import TestCase, Trace, Interaction, Equals
 
 trace = Trace(
     interactions=[
-        Interaction(inputs="Hello", outputs="Hi there!"),
-        Interaction(inputs="How are you?", outputs="I'm doing well!"),
+        Interaction(
+            inputs="What is the monthly fee on my current account?",
+            outputs={"intent": "fee_enquiry", "fee_eur": 3.00},
+        ),
+        Interaction(
+            inputs="And to replace a lost card?",
+            outputs={"intent": "fee_enquiry", "fee_eur": 0.00},
+        ),
     ]
 )
 
 test_case = TestCase(
-    name="greeting_test",
+    name="fee_enquiry_replay",
     trace=trace,
     checks=[
-        Equals(expected_value="Hi there!", target_key="trace.interactions[0].outputs"),
         Equals(
-            expected_value="I'm doing well!",
-            target_key="trace.interactions[1].outputs",
+            expected_value=3.00,
+            target_key="trace.interactions[0].outputs.fee_eur",
+        ),
+        Equals(
+            expected_value=0.00,
+            target_key="trace.interactions[1].outputs.fee_eur",
         ),
     ],
 )
@@ -73,24 +84,31 @@ result = await test_case.run()
 
 ### Integration with pytest
 
+`assert_passed()` raises `AssertionError` with the check messages, so a failing check reads like any other pytest failure:
+
 ```python
 import pytest
 
+from giskard.checks import FnCheck, Interaction, TestCase, Trace
+
 
 @pytest.mark.asyncio
-async def test_greeting_response():
+async def test_vague_question_gets_a_follow_up():
     trace = Trace(
         interactions=[
-            Interaction(inputs="Hello", outputs="Hi there! How can I help?")
+            Interaction(
+                inputs="Something is wrong with my account.",
+                outputs="Sorry to hear that. Is it a payment, a card, or the balance?",
+            )
         ]
     )
     test_case = TestCase(
-        name="greeting_politeness",
+        name="asks_a_follow_up",
         trace=trace,
         checks=[
             FnCheck(
-                fn=lambda t: "help" in t.last.outputs.lower(),
-                name="offers_help",
+                fn=lambda t: t.last is not None and "?" in t.last.outputs,
+                name="asks_a_follow_up",
             ),
         ],
     )
@@ -172,34 +190,42 @@ Low-level runner for executing test cases. Most users should use `test_case.run(
 
 **Module:** `giskard.checks.testing.spy`
 
-Spy on function calls during interaction generation for debugging. Wraps an interaction spec and records all function calls made during generation.
+Replace a function with a `MagicMock` while the wrapped interaction spec runs, then record what it was called with. Use it to assert that your agent passed the right arguments to an internal call.
 
 <TypeTable name="WithSpy">
   <Property name="interaction_generator" type="InteractionSpec" required>
     The interaction spec to spy on.
   </Property>
   <Property name="target" type="str" required>
-    JSONPath to the value to spy on.
+    Python import path of the function to patch, exactly as you would pass it to `unittest.mock.patch` (for example `"myapp.db.fetch_orders"`). This is not a JSONPath -- a trace expression such as `"trace.last.outputs"` raises.
   </Property>
 </TypeTable>
 
+After each interaction, the mock's call history is written to `Interaction.metadata` under the `target` string, then the mock is reset. The recorded keys are `call_count`, `call_args`, `call_args_list`, and `mock_calls`.
+
+Assert that the target called a dependency:
+
+{/* pyright-skip: This integration example imports the reader's application module. */}
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 
+from myapp.agent import answer
+
 interaction_spec = Interact(
-    inputs=lambda trace: f"Context: {trace.last.outputs if trace.last else 'None'}",
-    outputs=lambda inputs: my_model(inputs),
+    inputs="Find item 42",
+    outputs=answer,
 )
 
 spied_spec = WithSpy(
-    interaction_generator=interaction_spec, target="trace.last.outputs"
+    interaction_generator=interaction_spec,
+    target="myapp.db.fetch_item",  # Python import path, same as mock.patch
 )
 
-result = await Scenario("debug_test").add_interaction(spied_spec).run()
+result = await Scenario("dependency_call").add_interaction(spied_spec).run()
 
-# Access spy data from metadata
-spy_data = result.final_trace.last.metadata.get("trace.last.outputs")
-print(spy_data)
+# Spy data is keyed by the same import path
+spy_data = result.final_trace.last.metadata.get("myapp.db.fetch_item")
+print(spy_data["call_count"], spy_data["call_args"])
 ```
 
 :::tip
@@ -212,29 +238,29 @@ Use `WithSpy` when debugging complex interaction generation logic, understanding
 
 ### Replaying recorded conversations
 
+Replay a recorded transcript:
+
 ```python
 from giskard.checks import TestCase, Trace, Interaction, FnCheck
 
 recorded = [
-    Interaction(inputs="What's the weather?", outputs="It's sunny and 75F."),
-    Interaction(
-        inputs="Should I bring an umbrella?", outputs="No, you won't need one."
-    ),
+    Interaction(inputs="Find item 42", outputs="Item found."),
+    Interaction(inputs="Who created it?", outputs="Alex created it."),
 ]
 
 trace = Trace(interactions=recorded)
 
 test_case = TestCase(
-    name="weather_replay",
+    name="recorded_replay",
     trace=trace,
     checks=[
         FnCheck(
-            fn=lambda t: "sunny" in t.interactions[0].outputs.lower(),
-            name="weather",
+            fn=lambda t: "found" in t.interactions[0].outputs.lower(),
+            name="finds_item",
         ),
         FnCheck(
-            fn=lambda t: "no" in t.interactions[1].outputs.lower(),
-            name="umbrella",
+            fn=lambda t: "Alex" in t.interactions[1].outputs,
+            name="returns_creator",
         ),
     ],
 )
@@ -242,13 +268,27 @@ test_case = TestCase(
 await test_case.assert_passed()
 ```
 
+Replay does not call the agent.
+
 ### Batch testing
 
+Run independent test cases concurrently:
+
 ```python
+import asyncio
+
 test_cases = [
-    TestCase(name="test1", trace=trace1, checks=checks1),
-    TestCase(name="test2", trace=trace2, checks=checks2),
-    TestCase(name="test3", trace=trace3, checks=checks3),
+    TestCase(
+        name=f"replay_{i}",
+        trace=Trace(interactions=[interaction]),
+        checks=[
+            FnCheck(
+                fn=lambda t: t.last is not None and bool(t.last.outputs),
+                name="answered",
+            )
+        ],
+    )
+    for i, interaction in enumerate(recorded)
 ]
 
 results = await asyncio.gather(*[tc.run() for tc in test_cases])
@@ -259,25 +299,41 @@ print(f"Passed: {passed}/{len(results)}")
 
 ### Parameterized tests
 
+One check, many recorded exchanges:
+
 ```python
 import pytest
 
-test_data = [("Hello", "Hi there!"), ("Good morning", "Good morning!")]
+from giskard.checks import Interaction, StringMatching, TestCase, Trace
+
+
+def target(inputs: str) -> str:
+    return f"Received: {inputs}"
+
+
+test_data = [
+    ("Hello", "Received"),
+    ("Goodbye", "Received"),
+]
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("greeting_input,expected_output", test_data)
-async def test_greeting_variations(greeting_input, expected_output):
+@pytest.mark.parametrize("question,required_keyword", test_data)
+async def test_answers_include_keyword(question, required_keyword):
     trace = Trace(
         interactions=[
-            Interaction(inputs=greeting_input, outputs=expected_output)
+            Interaction(inputs=question, outputs=target(question))
         ]
     )
     test_case = TestCase(
-        name=f"greeting_{greeting_input}",
+        name=f"keyword_{required_keyword}",
         trace=trace,
         checks=[
-            Equals(expected_value=expected_output, target_key="trace.last.outputs")
+            StringMatching(
+                keyword=required_keyword,
+                target_key="trace.last.outputs",
+                case_sensitive=False,
+            )
         ],
     )
     await test_case.assert_passed()
