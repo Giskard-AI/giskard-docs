@@ -78,6 +78,18 @@ test("parsePythonFences recognizes MDX skip comments", () => {
   });
 });
 
+test("parsePythonFences allows blank lines between a skip marker and the fence", () => {
+  const html = parsePythonFences(
+    "<!-- pyright-skip: prettier spacing -->\n\n```python\nvalue = 1\n```\n",
+  );
+  const mdx = parsePythonFences(
+    "{/* pyright-skip: prettier spacing */}\n\n```python\nvalue = 1\n```\n",
+  );
+
+  assert.deepEqual(html[0].skip, { line: 1, reason: "prettier spacing" });
+  assert.deepEqual(mdx[0].skip, { line: 1, reason: "prettier spacing" });
+});
+
 test("walkMarkdownFiles returns only Markdown pages in deterministic path order", () => {
   const root = mkdtempSync(join(tmpdir(), "python-fences-"));
   mkdirSync(join(root, "nested"));
