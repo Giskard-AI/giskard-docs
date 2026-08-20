@@ -76,7 +76,8 @@ result = await (
     )
     .check(
         FnCheck(
-            fn=lambda trace: "?" in trace.last.outputs["answer"],
+            fn=lambda trace: trace.last is not None
+            and "?" in trace.last.outputs["answer"],
             name="asks_follow_up",
         )
     )
@@ -231,6 +232,11 @@ Set the target once on the suite and leave `outputs` off each interaction:
 
 ```python
 from giskard.checks import Scenario, StringMatching, Suite
+
+
+def target(inputs: str) -> str:
+    return f"Received: {inputs}"
+
 
 suite = Suite(name="examples", target=target)
 suite.append(

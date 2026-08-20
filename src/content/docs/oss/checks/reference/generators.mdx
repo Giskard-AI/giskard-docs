@@ -72,7 +72,8 @@ test_scenario = (
     .interact(inputs=user_sim, outputs=bank_support_agent)
     .check(
         FnCheck(
-            fn=lambda trace: "payment" in trace.last.outputs.lower(),
+            fn=lambda trace: trace.last is not None
+            and "payment" in trace.last.outputs.lower(),
             name="asks_about_the_payment",
         )
     )

@@ -41,22 +41,22 @@ An `InteractionSpec` describes _how_ to generate an interaction and is used to d
 `InteractionSpec` is the abstract base class. `Interact` is the main spec used by `.interact()`. Other subclasses generate interactions differently.
 
 ```python
+from giskard.agents.generators import Generator
 from giskard.checks import Interact
-from openai import OpenAI
 import random
+
+generator = Generator(model="openai/gpt-5-mini")
 
 
 def generate_random_question() -> str:
     return f"What is 2 + {random.randint(0, 10)}?"
 
 
-def generate_answer(inputs: str) -> str:
-    client = OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-5-mini",
-        messages=[{"role": "user", "content": inputs}],
+async def generate_answer(inputs: str) -> str | None:
+    response = await generator.complete(
+        [{"role": "user", "content": inputs}],
     )
-    return response.choices[0].message.content
+    return response.choices[0].message.text
 
 
 spec = Interact(
@@ -87,13 +87,13 @@ Traces are typically created during scenario execution by resolving each `Intera
 
 Each trace also carries optional **`annotations`**: a dictionary of scenario-level metadata (for example tenant id or experiment name). When you build a scenario, pass `annotations={...}`; the runner copies them onto the initial trace so checks and callables can read `trace.annotations` without attaching the same data to every interaction.
 
-For a **custom trace type**, subclass `Trace` and pass `trace_type=YourTrace` on `Scenario`. Use this when you want extra computed fields, helpers, or custom Rich rendering for the conversation history. See [Custom trace types](/oss/checks/how-to/custom-trace).
+For a **custom trace type**, subclass `Trace` and pass `trace_type=YourTrace` on `Scenario`. `Trace` is a frozen Pydantic model, so the subclass must pass `frozen=True`. Use this when you want extra computed fields, helpers, or custom Rich rendering for the conversation history. See [Custom trace types](/oss/checks/how-to/custom-trace).
 
 ```python
 from giskard.checks import Scenario, Trace
 
 
-class MyTrace(Trace[str, str]):
+class MyTrace(Trace[str, str], frozen=True):
     pass
 
 
@@ -134,7 +134,10 @@ check = Groundedness(
 A `Scenario` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. Scenarios work for both single-turn and multi-turn tests.
 
 ```python
-from giskard.checks import Scenario
+from giskard.checks import Equals, Scenario, StringMatching
+
+check1 = Equals(expected_value="test output", target_key="trace.last.outputs")
+check2 = StringMatching(keyword="output", target_key="trace.last.outputs")
 
 test_scenario = (
     Scenario("test_with_checks")
@@ -151,13 +154,7 @@ The `run()` method is asynchronous. When running in a script, use `asyncio.run()
 ```python
 import asyncio
 
-
-async def main():
-    result = await test_scenario.run()
-    return result
-
-
-result = asyncio.run(main())
+result = asyncio.run(test_scenario.run())
 ```
 
 In async contexts (like pytest with `@pytest.mark.asyncio`), you can use `await` directly.

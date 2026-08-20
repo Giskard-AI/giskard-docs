@@ -45,6 +45,8 @@ class RetrievalConfidence(Check):
     threshold: float = 0.8
 
     async def run(self, trace: Trace) -> CheckResult:
+        if trace.last is None:
+            return CheckResult.skip(message="No interaction to check")
         score = trace.last.metadata.get("retrieval_score", 0.0)
 
         if score >= self.threshold:
@@ -329,7 +331,7 @@ result = await (
     )
     .check(
         FnCheck(
-            fn=lambda trace: "?" in trace.last.outputs,
+            fn=lambda trace: trace.last is not None and "?" in trace.last.outputs,
             name="asks_a_follow_up",
         )
     )

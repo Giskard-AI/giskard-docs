@@ -22,6 +22,15 @@ Three check families cover most use cases. Pick the simplest one that can expres
 **Rule-based** — when you can express the pass condition as a predicate: required keywords, value ranges, exact labels. Use these first; they're free, instant, and never flaky.
 
 ```python
+from giskard.checks import (
+    Conformity,
+    Equals,
+    Groundedness,
+    LessThan,
+    SemanticSimilarity,
+    StringMatching,
+)
+
 Equals(expected_value="potential_fraud", target_key="trace.last.outputs.label")
 StringMatching(
     keyword="Pre-authorization", target_key="trace.last.outputs.answer"

@@ -145,6 +145,11 @@ class AgentOutput(BaseModel):
     answer: str
 
 
+async def my_llm_app(prompt: str, **kwargs: object) -> str:
+    """Replace this placeholder with your LLM application call."""
+    raise NotImplementedError
+
+
 async def my_agent(inputs: AgentInput) -> AgentOutput:
     # Call your own LLM app, chain, or agent here
     answer = await my_llm_app(inputs.question)
@@ -156,6 +161,7 @@ async def my_agent(inputs: AgentInput) -> AgentOutput:
 
 If your agent stores the conversation on its side (for example a LangGraph checkpointer or a session-based API), it needs the same thread id on every turn of a conversation. To get one, subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
 
+{/* pyright-skip: Alternative tab example; the checker concatenates every fence on the page. */}
 ```python
 from uuid import uuid4
 from pydantic import BaseModel, Field
@@ -170,7 +176,7 @@ class AgentOutput(BaseModel):
     answer: str
 
 
-class AgentTrace(Trace[AgentInput, AgentOutput]):
+class AgentTrace(Trace[AgentInput, AgentOutput], frozen=True):
     thread_id: str = Field(default_factory=lambda: str(uuid4()))
 
 
@@ -185,6 +191,7 @@ async def my_agent(inputs: AgentInput, trace: AgentTrace) -> AgentOutput:
 
 If your agent is stateless and expects the full message history on every call, declare a `trace` parameter. During the scan, `trace.interactions` holds the previous turns of the current conversation, so you can rebuild the history and append the new message:
 
+{/* pyright-skip: Alternative tab example; the checker concatenates every fence on the page. */}
 ```python
 from pydantic import BaseModel
 from giskard.checks import Trace
@@ -254,6 +261,9 @@ Generating scenarios uses an LLM, so it is good practice to generate the suite o
 ```python
 from pathlib import Path
 
+if suite_result.suite is None:
+    raise RuntimeError("The scan did not produce a suite")
+
 Path("scan_suite.json").write_text(suite_result.suite.model_dump_json())
 ```
 
@@ -275,6 +285,7 @@ suite_result.to_junit_xml("scan_results.xml")
 
 The saved suite can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the vulnerabilities are gone and that nothing regressed:
 
+{/* pyright-skip: my_other_agent is the reader's later revision of the wrapper. */}
 ```python
 suite_result = await suite.run(target=my_other_agent)
 ```
