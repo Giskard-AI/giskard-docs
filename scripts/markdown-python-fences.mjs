@@ -4,7 +4,7 @@ import { extname, join } from "path";
 const MARKDOWN_EXTENSIONS = new Set([".md", ".mdx"]);
 const PYTHON_FENCE_RE = /^(?:\s*(?:>\s*)?)(`{3,}|~{3,})[ \t]*(python|py)(?:[ \t]+.*)?[ \t]*$/i;
 const PYRIGHT_SKIP_RE =
-  /^\s*<!--\s*pyright-skip\s*:\s*(.+?)\s*-->\s*$/i;
+  /^\s*(?:<!--\s*pyright-skip\s*:\s*(.+?)\s*-->|{\/\*\s*pyright-skip\s*:\s*(.+?)\s*\*\/})\s*$/i;
 
 /**
  * Yield Markdown pages below a directory in stable path order.
@@ -94,7 +94,10 @@ export function parsePythonFences(
           }
         : {}),
       skip: marker
-        ? { line: lines[lineIndex - 1].number, reason: marker[1].trim() }
+        ? {
+            line: lines[lineIndex - 1].number,
+            reason: (marker[1] ?? marker[2]).trim(),
+          }
         : null,
     });
     lineIndex = closingIndex;

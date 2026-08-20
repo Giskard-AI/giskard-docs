@@ -161,7 +161,7 @@ async def my_agent(inputs: AgentInput) -> AgentOutput:
 
 If your agent stores the conversation on its side (for example a LangGraph checkpointer or a session-based API), it needs the same thread id on every turn of a conversation. To get one, subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
 
-<!-- pyright-skip: Alternative tab example; the checker concatenates every fence on the page. -->
+{/* pyright-skip: Alternative tab example; the checker concatenates every fence on the page. */}
 ```python
 from uuid import uuid4
 from pydantic import BaseModel, Field
@@ -191,7 +191,7 @@ async def my_agent(inputs: AgentInput, trace: AgentTrace) -> AgentOutput:
 
 If your agent is stateless and expects the full message history on every call, declare a `trace` parameter. During the scan, `trace.interactions` holds the previous turns of the current conversation, so you can rebuild the history and append the new message:
 
-<!-- pyright-skip: Alternative tab example; the checker concatenates every fence on the page. -->
+{/* pyright-skip: Alternative tab example; the checker concatenates every fence on the page. */}
 ```python
 from pydantic import BaseModel
 from giskard.checks import Trace
@@ -285,7 +285,7 @@ suite_result.to_junit_xml("scan_results.xml")
 
 The saved suite can be pointed at any target. For example, once you have fixed an issue or shipped a new version, run the exact same scenarios against the new agent to confirm that the vulnerabilities are gone and that nothing regressed:
 
-<!-- pyright-skip: `my_other_agent` is the reader's later revision of the wrapper. -->
+{/* pyright-skip: `my_other_agent` is the reader's later revision of the wrapper. */}
 ```python
 suite_result = await suite.run(target=my_other_agent)
 ```

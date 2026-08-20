@@ -986,11 +986,11 @@ The last check calls an LLM provider, so this scenario sends the trace off your 
 Set the judge model once instead of passing it to every LLM check:
 
 ```python
-from giskard.agents.generators import GenerationParams, Generator
+from giskard.agents.generators import Generator
 from giskard.checks import Conformity, Groundedness, set_default_generator
 
 set_default_generator(
-    Generator(model="openai/gpt-5", params=GenerationParams(temperature=0.1))
+    Generator(model="openai/gpt-5").with_params(temperature=0.1)
 )
 
 check = Groundedness(target_key="trace.last.outputs.answer")

@@ -67,6 +67,17 @@ test("parsePythonFences preserves order, page location, and immediate skip marke
   );
 });
 
+test("parsePythonFences recognizes MDX skip comments", () => {
+  const fences = parsePythonFences(
+    "{/* pyright-skip: reader-owned application module */}\n```python\nvalue = 1\n```\n",
+  );
+
+  assert.deepEqual(fences[0].skip, {
+    line: 1,
+    reason: "reader-owned application module",
+  });
+});
+
 test("walkMarkdownFiles returns only Markdown pages in deterministic path order", () => {
   const root = mkdtempSync(join(tmpdir(), "python-fences-"));
   mkdirSync(join(root, "nested"));
