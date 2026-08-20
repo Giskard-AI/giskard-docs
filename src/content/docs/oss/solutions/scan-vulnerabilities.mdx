@@ -133,7 +133,6 @@ Since multi-turn attacks call your agent once per turn, with only the new messag
 
 If your agent answers each message independently, wrap it directly:
 
-<!-- pyright-skip: This adapter requires the reader's LLM application. -->
 ```python
 from pydantic import BaseModel
 
@@ -144,6 +143,11 @@ class AgentInput(BaseModel):
 
 class AgentOutput(BaseModel):
     answer: str
+
+
+async def my_llm_app(prompt: str, **kwargs: object) -> str:
+    """Replace this placeholder with your LLM application call."""
+    raise NotImplementedError
 
 
 async def my_agent(inputs: AgentInput) -> AgentOutput:
@@ -228,7 +232,6 @@ This is the only integration code you need. In fact, anything callable from Pyth
 
 Pass your wrapped agent, a plain-language description, and the languages it handles to `vulnerability_scan`. It generates the adversarial suite, runs every scenario, prints a grouped report, and returns the result:
 
-<!-- pyright-skip: This call uses the wrapped agent defined by the reader. -->
 ```python
 from giskard.scan import vulnerability_scan
 
@@ -255,9 +258,11 @@ For every failed scenario, the report shows the judge's verdict and the full con
 
 Generating scenarios uses an LLM, so it is good practice to generate the suite once and reuse it. The result exposes the suite that produced it via `suite_result.suite`. Since `Suite` is a Pydantic model, you can serialize it to JSON and store it (commit it to your repository or keep it as a build artifact):
 
-<!-- pyright-skip: This continuation uses the scan result produced in the prior step. -->
 ```python
 from pathlib import Path
+
+if suite_result.suite is None:
+    raise RuntimeError("The scan did not produce a suite")
 
 Path("scan_suite.json").write_text(suite_result.suite.model_dump_json())
 ```
@@ -266,7 +271,6 @@ Path("scan_suite.json").write_text(suite_result.suite.model_dump_json())
 
 In your pipeline, load the saved suite and run it against your agent. This time, the scenarios are not regenerated: only the judging step calls the LLM, so remember to configure a judge in CI as well. The run then returns a result you can export as a JUnit XML report for your CI test dashboard:
 
-<!-- pyright-skip: This CI fragment uses the reader's wrapped agent. -->
 ```python
 from pathlib import Path
 from giskard.checks import Suite
@@ -294,7 +298,6 @@ You can customize the scan by passing options directly to `vulnerability_scan`.
 
 By default, the scan runs all of its built-in generators. To focus on a single class of vulnerability, pass the generators you want via the lower-level `generate_suite` API:
 
-<!-- pyright-skip: This focused suite still runs against the reader's wrapped agent. -->
 ```python
 from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
 
@@ -311,7 +314,6 @@ suite_result = await suite.run(target=my_agent)
 
 Limit the total number of scenarios with `max_scenarios`, and cap concurrent execution with `max_concurrency`:
 
-<!-- pyright-skip: This scan call uses the reader's wrapped agent. -->
 ```python
 suite_result = await vulnerability_scan(
     target=my_agent,
