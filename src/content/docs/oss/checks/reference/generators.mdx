@@ -16,7 +16,7 @@ Input generators for creating dynamic test data and simulating user interactions
 
 ## `UserSimulator`
 
-<ResourceSection description="Simulate realistic user behavior in multi-turn conversations using an LLM. Particularly useful for testing conversational AI agents or chatbots with dynamic, goal-oriented interactions.">
+<ResourceSection description="Generate multi-turn user messages with an LLM.">
 
 **Module:** `giskard.checks.generators.user`
 
@@ -37,7 +37,7 @@ Input generators for creating dynamic test data and simulating user interactions
   LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
 </Property>
 
-Write the persona as a goal the simulated customer is pursuing, not as a list of messages:
+Write the persona as a goal the simulated user is pursuing:
 
 ```python
 from giskard.checks.generators.user import UserSimulator
@@ -45,10 +45,9 @@ from giskard.agents.generators import Generator
 
 user_sim = UserSimulator(
     persona="""
-    You are a customer who has been charged twice for the same card payment.
-    - Describe the two charges without saying the word "dispute"
-    - Push back once if the answer is generic
-    - Ask how long you will wait for the money
+    You were charged twice for the same card payment.
+    Describe the two charges without using the word "dispute".
+    Ask how long you will wait for the money.
     """,
     max_steps=3,
     generator=Generator(model="openai/gpt-5"),
@@ -63,7 +62,9 @@ from giskard.checks import Scenario, FnCheck
 
 def bank_support_agent(inputs: str) -> str:
     """Stand-in for the agent under test. Replace with your own call."""
-    return "I can raise a dispute for the duplicate charge. It takes up to 15 working days."
+    if "charged twice" in inputs.lower() or "duplicate" in inputs.lower():
+        return "I can help with a duplicate payment. What were the date and amount?"
+    return "Could you share the payment date and amount?"
 
 
 test_scenario = (
@@ -71,8 +72,8 @@ test_scenario = (
     .interact(inputs=user_sim, outputs=bank_support_agent)
     .check(
         FnCheck(
-            fn=lambda trace: len(trace.last.outputs) > 0,
-            name="answered_every_turn",
+            fn=lambda trace: "payment" in trace.last.outputs.lower(),
+            name="asks_about_the_payment",
         )
     )
 )
@@ -80,11 +81,11 @@ test_scenario = (
 result = await test_scenario.run()
 ```
 
-The simulator writes the customer's messages with an LLM, so the conversation differs between runs. Use it to explore how the agent handles a kind of customer; use fixed inputs when you need a regression test that gives the same answer twice.
+The LLM can generate different messages on each run. Use fixed inputs for repeatable tests.
 
 ### Goal-oriented testing
 
-The simulator stops early once the LLM reports the persona's goal as reached, or after `max_steps` turns. It does not publish that decision to the trace, so assert on the conversation itself:
+Generation stops when the LLM reports that the goal is reached, or after `max_steps` turns:
 
 ```python
 result = await test_scenario.run()
@@ -99,7 +100,7 @@ print(f"Last reply: {result.final_trace.last.outputs}")
 
 ## `LLMGenerator`
 
-<ResourceSection description="Configurable LLM-driven input generator with an inline prompt or template path. Mirrors LLMJudge on the generator side.">
+<ResourceSection description="Generate inputs from an inline prompt or prompt template.">
 
 **Module:** `giskard.checks.generators.base`
 
@@ -134,13 +135,11 @@ Exactly one of `prompt` or `prompt_path` must be provided.
 import giskard.scan  # noqa: F401  — registers the "giskard.scan" prompt namespace
 from giskard.checks import LLMGenerator
 
-gen = LLMGenerator(
-    prompt="You are a retail bank customer. Ask about a payment that left your account twice."
-)
+gen = LLMGenerator(prompt="Ask a concise question about an archive.")
 gen = LLMGenerator(prompt_path="giskard.scan::scenarios/llm01_injection.j2")
 ```
 
-`LLMGenerator` takes a prompt; `UserSimulator` takes a persona and manages the conversation loop for you. Start with `UserSimulator` and drop to `LLMGenerator` when you need control over the prompt itself.
+Use `UserSimulator` for a multi-turn persona. Use `LLMGenerator` when you need a custom prompt.
 
 </ResourceSection>
 
@@ -150,7 +149,7 @@ gen = LLMGenerator(prompt_path="giskard.scan::scenarios/llm01_injection.j2")
 
 **Module:** `giskard.checks.generators.base`
 
-Structured output the LLM returns on every turn of `UserSimulator` and `LLMGenerator`. It is internal to the generation loop: the loop yields `message` as the next input and stops when `goal_reached` is true or `message` is empty. It is not written to the trace, so tests do not read it.
+Internal output for each `UserSimulator` or `LLMGenerator` turn. The loop yields `message` and stops when `goal_reached` is true or `message` is empty.
 
 <TypeTable name="LLMGeneratorOutput">
   <Property name="goal_reached" type="bool">
@@ -168,7 +167,7 @@ Structured output the LLM returns on every turn of `UserSimulator` and `LLMGener
 
 ## `InputGenerator`
 
-<ResourceSection description="Abstract base class for creating custom input generators. Extend it to create generators for dynamic test data.">
+<ResourceSection description="Base class for custom input generators.">
 
 **Module:** `giskard.checks.core.input_generator`
 
@@ -191,9 +190,8 @@ from giskard.checks.core import Trace
 from giskard.checks.core.input_generator import InputGenerator
 
 
-def bank_support_agent(inputs: str) -> str:
-    """Stand-in for the agent under test. Replace with your own call."""
-    return "A SEPA transfer arrives within one working day and is free."
+def target(inputs: str) -> str:
+    return f"Received: {inputs}"
 
 
 class SequentialInputGenerator(InputGenerator[Trace]):
@@ -208,14 +206,14 @@ class SequentialInputGenerator(InputGenerator[Trace]):
 
 gen = SequentialInputGenerator(
     inputs_list=[
-        "Can I send 2,000 EUR to an account in Spain?",
-        "How long does that take?",
-        "Is it any faster at the weekend?",
+        "Find item 42",
+        "Search the archive",
+        "Show its metadata",
     ]
 )
 
-scenario = Scenario("sepa_transfer_walkthrough").interact(
-    inputs=gen, outputs=bank_support_agent
+scenario = Scenario("generated_inputs").interact(
+    inputs=gen, outputs=target
 )
 ```
 
@@ -236,7 +234,7 @@ class ContextAwareGenerator(InputGenerator[Trace]):
         self, trace: Trace, input_type: type | None = None
     ) -> AsyncGenerator[str, Trace]:
         # First message: no prior interactions yet.
-        trace = yield "Something is wrong with my account."
+        trace = yield "Find item 42."
 
         for _ in range(self.max_steps - 1):
             if not trace.last:
@@ -245,15 +243,15 @@ class ContextAwareGenerator(InputGenerator[Trace]):
             last_output = trace.last.outputs.lower()
             if self.strategy == "follow_up":
                 if "?" in last_output:
-                    trace = yield "A payment of 89.00 EUR was taken twice."
+                    trace = yield "Search the archive."
                     continue
-                if "dispute" in last_output:
-                    trace = yield "How long before I get the money back?"
+                if "found" in last_output:
+                    trace = yield "Show its metadata."
                     continue
             trace = yield "Thanks, that helps."
 ```
 
-Use a custom generator when the next message follows a rule you can write in Python. When the branching is fuzzy, a `UserSimulator` persona is less code.
+Use a custom generator when Python can determine the next message. Otherwise use `UserSimulator`.
 
 </ResourceSection>
 
@@ -261,9 +259,9 @@ Use a custom generator when the next message follows a rule you can write in Pyt
 
 ## Usage patterns
 
-### A/B testing with different personas
+### Compare personas
 
-Run the same task through several kinds of customer to see which one the agent handles worst. `bank_support_agent` is the stand-in defined above:
+Run the same target with several personas:
 
 ```python
 from giskard.checks import Scenario
@@ -272,15 +270,15 @@ from giskard.checks.generators.user import UserSimulator
 personas = [
     {
         "name": "impatient",
-        "persona": "You want a one-line answer about how long a SEPA transfer takes.",
+        "persona": "Ask for a one-line answer.",
     },
     {
         "name": "novice",
-        "persona": "You have never sent money abroad. Ask what every term means.",
+        "persona": "Ask for plain-language explanations.",
     },
     {
         "name": "pushy",
-        "persona": "You want the agent to tell you which fund to put your savings in. Keep asking after it declines.",
+        "persona": "Ask a follow-up question after each answer.",
     },
 ]
 
@@ -288,7 +286,7 @@ results = {}
 for persona in personas:
     sim = UserSimulator(persona=persona["persona"], max_steps=3)
     scenario = Scenario(persona["name"]).interact(
-        inputs=sim, outputs=bank_support_agent
+        inputs=sim, outputs=target
     )
     results[persona["name"]] = await scenario.run()
 
@@ -296,7 +294,7 @@ for name, result in results.items():
     print(f"{name}: {result.status}")
 ```
 
-Each run generates different messages, so a difference between personas here is a hint about where to look, not a measurement.
+Each run can generate different messages. Compare results as examples, not a fixed measurement.
 
 ---
 

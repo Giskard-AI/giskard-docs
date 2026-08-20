@@ -203,27 +203,27 @@ Replace a function with a `MagicMock` while the wrapped interaction spec runs, t
 
 After each interaction, the mock's call history is written to `Interaction.metadata` under the `target` string, then the mock is reset. The recorded keys are `call_count`, `call_args`, `call_args_list`, and `mock_calls`.
 
-Assert that the agent looked the payment up rather than inventing one:
+Assert that the target called a dependency:
 
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 
-from bankbot.agent import payment_support_agent
+from myapp.agent import answer
 
 interaction_spec = Interact(
-    inputs="Was a payment of 89.00 EUR taken on 4 March?",
-    outputs=payment_support_agent,
+    inputs="Find item 42",
+    outputs=answer,
 )
 
 spied_spec = WithSpy(
     interaction_generator=interaction_spec,
-    target="bankbot.db.fetch_payments",  # Python import path, same as mock.patch
+    target="myapp.db.fetch_item",  # Python import path, same as mock.patch
 )
 
-result = await Scenario("payment_lookup_hits_the_db").add_interaction(spied_spec).run()
+result = await Scenario("dependency_call").add_interaction(spied_spec).run()
 
 # Spy data is keyed by the same import path
-spy_data = result.final_trace.last.metadata.get("bankbot.db.fetch_payments")
+spy_data = result.final_trace.last.metadata.get("myapp.db.fetch_item")
 print(spy_data["call_count"], spy_data["call_args"])
 ```
 
@@ -243,29 +243,23 @@ Replay a recorded transcript:
 from giskard.checks import TestCase, Trace, Interaction, FnCheck
 
 recorded = [
-    Interaction(
-        inputs="I was charged 89.00 EUR twice by the same shop.",
-        outputs="That looks like a duplicate charge. I can raise a dispute for the second one.",
-    ),
-    Interaction(
-        inputs="Should I move my savings into your equity fund while I wait?",
-        outputs="I can't advise on investments. A qualified adviser can go through that with you.",
-    ),
+    Interaction(inputs="Find item 42", outputs="Item found."),
+    Interaction(inputs="Who created it?", outputs="Alex created it."),
 ]
 
 trace = Trace(interactions=recorded)
 
 test_case = TestCase(
-    name="duplicate_charge_replay",
+    name="recorded_replay",
     trace=trace,
     checks=[
         FnCheck(
-            fn=lambda t: "dispute" in t.interactions[0].outputs.lower(),
-            name="offers_the_dispute_route",
+            fn=lambda t: "found" in t.interactions[0].outputs.lower(),
+            name="finds_item",
         ),
         FnCheck(
-            fn=lambda t: "adviser" in t.interactions[1].outputs.lower(),
-            name="refuses_investment_advice",
+            fn=lambda t: "Alex" in t.interactions[1].outputs,
+            name="returns_creator",
         ),
     ],
 )
@@ -309,29 +303,26 @@ import pytest
 from giskard.checks import Interaction, StringMatching, TestCase, Trace
 
 
-def bank_support_agent(inputs: str) -> str:
-    """Stand-in for the agent under test. Replace with your own call."""
-    if "transfer" in inputs.lower():
-        return "A SEPA transfer arrives within one working day."
-    return "A card dispute is investigated within 15 working days."
+def target(inputs: str) -> str:
+    return f"Received: {inputs}"
 
 
 test_data = [
-    ("How long does a SEPA transfer take?", "working day"),
-    ("How long does a card dispute take?", "15 working days"),
+    ("Hello", "Received"),
+    ("Goodbye", "Received"),
 ]
 
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("question,required_keyword", test_data)
-async def test_answers_state_the_timescale(question, required_keyword):
+async def test_answers_include_keyword(question, required_keyword):
     trace = Trace(
         interactions=[
-            Interaction(inputs=question, outputs=bank_support_agent(question))
+            Interaction(inputs=question, outputs=target(question))
         ]
     )
     test_case = TestCase(
-        name=f"timescale_{required_keyword.replace(' ', '_')}",
+        name=f"keyword_{required_keyword}",
         trace=trace,
         checks=[
             StringMatching(

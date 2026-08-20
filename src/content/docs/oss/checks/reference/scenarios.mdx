@@ -17,7 +17,7 @@ Multi-step workflow testing with scenario builders and runners.
 
 **Module:** `giskard.checks.core.scenario`
 
-The recommended entry point for creating test scenarios. Chain `.interact()`, `.check()`, and related methods: each call updates and returns the same instance. Internally, the runner executes **steps**: each step runs one or more interactions against the shared trace, then runs that step’s checks. Call `.run()` to execute against the SUT. You can also use `scenario.extend(...)` to assemble steps from existing specs and checks, or pass the scenario to `Suite.append()`.
+Create a scenario, add interactions and checks, then call `.run()`. Each method returns the same scenario. Use `.extend()` to add existing specs or checks, or pass the scenario to `Suite.append()`.
 
 <MethodCard name="Scenario()" returnType="Scenario">
   Create a new scenario.
@@ -63,34 +63,28 @@ The recommended entry point for creating test scenarios. Chain `.interact()`, `.
 
 ### Multi-step example
 
-A customer reports a payment, then identifies it. The second step depends on the first having happened:
+Each step can add interactions and then validate the trace:
 
 ```python
 from giskard.checks import Scenario, FnCheck, Equals
 
 result = await (
-    Scenario("bank_agent_payment_lookup")
+    Scenario("two_step_example")
     .interact(
-        inputs="There is a card payment on my account I don't recognise.",
-        outputs={
-            "answer": "Sorry about that. What date and amount was it?",
-            "payment_found": False,
-        },
+        inputs="Find item 42",
+        outputs={"answer": "Which collection?", "found": False},
     )
     .check(
         FnCheck(
             fn=lambda trace: "?" in trace.last.outputs["answer"],
-            name="asks_for_payment_details",
+            name="asks_follow_up",
         )
     )
     .interact(
-        inputs="89.00 EUR on 4 March.",
-        outputs={
-            "answer": "Found it, to Rail Europe. I can raise a dispute.",
-            "payment_found": True,
-        },
+        inputs="In the archive",
+        outputs={"answer": "Item found", "found": True},
     )
-    .check(Equals(expected_value=True, target_key="trace.last.outputs.payment_found"))
+    .check(Equals(expected_value=True, target_key="trace.last.outputs.found"))
     .run()
 )
 ```
@@ -238,18 +232,18 @@ Set the target once on the suite and leave `outputs` off each interaction:
 ```python
 from giskard.checks import Scenario, StringMatching, Suite
 
-suite = Suite(name="bank_agent_transfers", target=bank_support_agent)
+suite = Suite(name="examples", target=target)
 suite.append(
-    Scenario("transfer_timing").interact(
-        inputs="How long does a SEPA transfer take?"
+    Scenario("contains_received").interact(
+        inputs="Hello"
     ).check(
         StringMatching(
-            keyword="working day", target_key="trace.last.outputs"
+            keyword="Received", target_key="trace.last.outputs"
         )
     )
 )
 suite.append(
-    Scenario("vague_question").interact(inputs="Something is wrong with my account.")
+    Scenario("another_input").interact(inputs="Goodbye")
 )
 
 result = await suite.run()
@@ -258,7 +252,7 @@ rate = result.pass_rate
 print("no scenarios evaluated" if rate is None else f"{rate:.0%}")
 ```
 
-A pass rate is a sample from the scenarios in this suite, not a measure of the agent's overall risk. It is only comparable between runs when the suite is fixed.
+`pass_rate` is the fraction of non-skipped scenarios that passed.
 
 ---
 

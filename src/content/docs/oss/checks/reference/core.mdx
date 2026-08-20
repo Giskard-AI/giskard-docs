@@ -195,8 +195,6 @@ interaction = Interaction(
 )
 ```
 
-Structured outputs are worth the effort: they let rule-based checks assert on a field instead of parsing a sentence.
-
 :::note
 Interactions are typically created through the scenario builder's `.interact()` method rather than directly instantiated.
 :::
@@ -263,21 +261,20 @@ Declarative specification for generating interactions. Supports static values or
 from giskard.checks import Scenario
 
 
-def bank_support_agent(inputs: str) -> str:
-    """Stand-in for the agent under test. Replace with your own call."""
-    return "A SEPA transfer arrives within one working day and is free."
+def target(inputs: str) -> str:
+    return f"Received: {inputs}"
 
 
 # Static values: a recorded exchange, no agent called
 scenario = Scenario("recorded").interact(
-    inputs="How long does a SEPA transfer take?",
-    outputs="A SEPA transfer arrives within one working day and is free.",
+    inputs="Hello",
+    outputs="Received: Hello",
 )
 
 # Callable outputs: the agent runs
 scenario = Scenario("live").interact(
-    inputs="How long does a SEPA transfer take?",
-    outputs=lambda inputs: bank_support_agent(inputs),
+    inputs="Hello",
+    outputs=target,
 )
 
 # Callable inputs: the next message depends on the last reply.
@@ -285,12 +282,12 @@ scenario = Scenario("live").interact(
 scenario = (
     Scenario("follow_up")
     .interact(
-        inputs="How long does a SEPA transfer take?",
-        outputs=lambda inputs: bank_support_agent(inputs),
+        inputs="Hello",
+        outputs=target,
     )
     .interact(
-        inputs=lambda trace: f"You said: {trace.last.outputs} Is it the same at a weekend?",
-        outputs=lambda inputs: bank_support_agent(inputs),
+        inputs=lambda trace: f"Repeat: {trace.last.outputs}",
+        outputs=target,
     )
 )
 ```
@@ -325,10 +322,10 @@ Ordered sequence of interaction specs and checks with shared trace. Provides a f
 from giskard.checks import Scenario, FnCheck, StringMatching
 
 result = await (
-    Scenario("bank_agent_dispute_advice")
+    Scenario("two_step_example")
     .interact(
-        inputs="There is a payment on my card I don't recognise.",
-        outputs="I can help with that. Can you tell me the date and amount?",
+        inputs="Find item 42",
+        outputs="Which collection?",
     )
     .check(
         FnCheck(
@@ -337,12 +334,12 @@ result = await (
         )
     )
     .interact(
-        inputs="89.00 EUR on 4 March, to Rail Europe.",
-        outputs="I've raised a dispute. Investigations take up to 15 working days.",
+        inputs="In the archive",
+        outputs="Item found",
     )
     .check(
         StringMatching(
-            keyword="15 working days", target_key="trace.last.outputs"
+            keyword="found", target_key="trace.last.outputs"
         )
     )
     .run()
@@ -372,13 +369,13 @@ A scenario step: a sequence of interaction specs followed by checks. Each step m
 from giskard.checks import Scenario, Step, Interact, StringMatching
 
 scenario = Scenario(
-    name="bank_agent_greeting",
+    name="greeting",
     steps=[
         Step(
             interacts=[
                 Interact(
-                    inputs="Hi, can you help me with a card problem?",
-                    outputs="Of course. Is the card lost, blocked, or showing a payment you don't recognise?",
+                    inputs="Hello",
+                    outputs="How can I help?",
                 )
             ],
             checks=[

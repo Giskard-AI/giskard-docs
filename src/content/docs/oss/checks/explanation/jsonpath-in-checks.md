@@ -44,12 +44,7 @@ target_key = "trace.interactions[-1].outputs"  # same as trace.last.outputs
 
 When a path can't be resolved, the resolver returns a `NoMatch` sentinel instead of raising an exception. Every built-in check turns `NoMatch` into `CheckResult.error`, not a failure, with a message naming the path it could not resolve.
 
-The distinction matters when you read results. A failure means the check ran and your agent did not meet the bar. An error means the check could not run at all, usually because you typed the path wrong or the output shape changed. Code that branches on `result.failed` will skip every unresolved-path case, so check `result.errored` too:
-
-```python
-if result.errored:
-    ...  # the path did not resolve, or the value had the wrong type
-```
+The distinction matters when you read results. A failure means the check ran and your agent did not meet the bar. An error means the check could not run at all, usually because you typed the path wrong or the output shape changed.
 
 Follow the same convention in custom checks:
 

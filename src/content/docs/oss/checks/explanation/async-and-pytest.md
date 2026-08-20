@@ -5,13 +5,13 @@ sidebar:
   order: 3
 ---
 
-`Scenario.run()` and all `Check.run()` methods are `async def`. AI workloads are I/O-bound: LLM calls, embedding APIs, custom validation endpoints. Async keeps that I/O awaitable, so the library composes with the async agent code you already have and can overlap work where it chooses to.
+`Suite.run()`, `Scenario.run()`, and all `Check.run()` methods are `async def`. Use a suite to run scenarios. Async lets the library await LLM calls and other I/O.
 
 ## What actually runs concurrently
 
 - **Checks inside a scenario run one after another.** The test-case runner awaits each check in a plain `for` loop. Ten LLM checks on one scenario cost ten sequential LLM calls.
 - **Interactions inside a scenario run in order.** A multi-turn scenario has to, because each turn depends on the previous one.
-- **Scenarios in a suite run serially by default.** `Suite.run()` defaults to `parallel=False`.
+- **Suites run scenarios serially by default.** `Suite.run()` defaults to `parallel=False`.
 
 To overlap scenarios, opt in:
 
