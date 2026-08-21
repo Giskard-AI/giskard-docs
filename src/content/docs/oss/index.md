@@ -1,6 +1,6 @@
 ---
 title: Giskard Library
-description: "Open-source Python library for testing and evaluating LLM applications, RAG systems, and AI agents."
+description: "Open-source Python library for testing LLM applications, RAG systems, and AI agents with scenarios, checks, and red teaming."
 ---
 
 **Giskard Library** is a Python package for testing and evaluating AI applications. It provides a solid foundation for developers to ensure quality and reliability in LLM-based systems, RAG applications, and AI agents.
@@ -100,7 +100,7 @@ The description is what the generators work from, so the constraints you write i
 v3 is a major rewrite, with new features such as [Checks](/oss/checks) and a redesigned [Scan](/oss/solutions/scan-vulnerabilities).
 
 :::note
-Coming from Giskard v2? Scan has shipped in v3 with a new design, see [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities). RAGET is not part of v3; in v3 the equivalent route is a `KnowledgeBase` with `KnowledgeBaseScenarioGenerator` and `quality_scan`, and for RAGET itself use the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai).
+Coming from Giskard v2? Scan has shipped in v3 with a new design, see [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities). RAGET is not part of v3; the equivalent is `quality_scan` with a `knowledge_base` (a list of documents or a `KnowledgeBase`). For RAGET itself, use the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai).
 :::
 
 ## Resources and support
