@@ -109,7 +109,7 @@ tc = (
 ## Common questions
 
 **When should you use a rule-based check?**
-When you can write the pass condition as ordinary Python: a required keyword, a value range, an exact label. Rule-based checks are free, run in under a millisecond, and give the same verdict every time. `Equals`, `StringMatching`, and `FnCheck` are the built-in ones.
+When you can write the pass condition as ordinary Python: a required keyword, a value range, an exact label. Rule-based checks are free, run in under a millisecond, and give the same verdict every time. `Equals`, `StringMatching`, and `FnCheck` are examples; see the [Checks reference](/oss/checks/reference/checks) for the full list.
 
 **When should you use semantic similarity instead of an LLM judge?**
 When the wording of a correct answer can vary but the meaning should not. `SemanticSimilarity` converts the answer and a reference text into vectors and compares them, so "Paris is the capital of France" matches "The capital of France is Paris". One embedding call takes roughly 50-200 ms and costs far less than an LLM judge, and the result barely changes between runs. It only measures similarity of meaning, so it cannot tell you whether an answer is polite, safe, or supported by your documents.
