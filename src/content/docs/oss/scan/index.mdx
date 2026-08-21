@@ -14,7 +14,7 @@ Most of those test cases are **red teaming**: attacking your own agent on purpos
 
 Two scans ship in the library. `vulnerability_scan` red teams your agent with hostile scenarios. `quality_scan` checks its answers against a knowledge base of your own documents, to catch answers it invented.
 
-A scan needs an LLM provider and an API key: one model writes the attacks, another reads your agent's replies and decides whether each one is a failure. That second model is a **judge**, and it is sometimes wrong, so read the failing conversations rather than trusting the count. A scan that finds nothing means these scenarios did not break your agent, not that your agent is safe.
+A scan needs an LLM provider and an API key. Review the failing conversations: the judge can be wrong, and a clean run is not an exhaustive security assessment.
 
 ```bash
 pip install --pre "giskard[scan,openai]"
@@ -26,12 +26,12 @@ To see the whole thing working first, the [Quickstart](/oss/solutions/scan-vulne
 
 <Steps>
 
-1. [Install & Configure](/oss/scan/installation) (~5 min): install the `scan` extra and register an LLM provider as the default generator. Giskard v3 requires Python 3.12 or newer. The scan calls your own provider with your own key for both generation and judging, so a run costs tokens. After this you can import `giskard.scan`.
-2. [Your First Scan](/oss/scan/tutorials/your-first-scan) (~15 min): wrap a toy agent as an async function, run `vulnerability_scan` with a small `max_scenarios` budget, and read the report. After this you have a real finding in front of you.
-3. [How the Scan Works](/oss/scan/explanation/how-scan-works) (~10 min): what a generator, a suite, and the judge actually do, and why a clean report is not a clean bill of health. After this you can tell an untested threat from a handled one, which is the difference between the two mistakes this tool makes easy.
-4. [Run the Scan in CI](/oss/scan/how-to/scan-in-ci) (~20 min): save the generated suite to JSON, replay it on every pull request, and export JUnit XML. After this two runs' pass rates mean the same thing, because they tested the same scenarios.
-5. [Tune a Scan Run](/oss/scan/how-to/tune-scan-options) (~10 min): control `max_scenarios`, `seed`, concurrency, and how the report is grouped. After this you can set what a scan costs instead of accepting the defaults.
-6. [Find Hallucinations and Sycophancy](/oss/scan/how-to/quality-scan) (~15 min): point `quality_scan` at your own documents to catch wrong answers rather than attacks. After this you have covered both scans the library ships.
+1. [Install & Configure](/oss/scan/installation) (~5 min): install the `scan` extra and register an LLM provider.
+2. [Your First Scan](/oss/scan/tutorials/your-first-scan) (~15 min): wrap a toy agent, run `vulnerability_scan`, and read the report.
+3. [How the Scan Works](/oss/scan/explanation/how-scan-works) (~10 min): learn how generators, suites, and judges fit together.
+4. [Run the Scan in CI](/oss/scan/how-to/scan-in-ci) (~20 min): save a generated suite, replay it on pull requests, and export JUnit XML.
+5. [Tune a Scan Run](/oss/scan/how-to/tune-scan-options) (~10 min): control the scenario budget, seed, concurrency, and report grouping.
+6. [Find Hallucinations and Sycophancy](/oss/scan/how-to/quality-scan) (~15 min): use `quality_scan` against your own documents.
 
 </Steps>
 

@@ -3,9 +3,9 @@ title: Giskard Library
 description: "Open-source Python library for testing and evaluating LLM applications, RAG systems, and AI agents."
 ---
 
-**Giskard Library** is a Python package for testing and evaluating AI applications. It provides a solid foundation for developers to ensure quality and reliability in LLM-based systems, RAG applications, and AI agents.
+**Giskard Library** is a Python package for testing and evaluating LLM applications, RAG systems, and AI agents.
 
-The library is available on [GitHub](https://github.com/Giskard-AI/giskard-oss) and formed the basis for the [Red Teaming LLM Applications](https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/) course on DeepLearning.AI.
+The library is available on [GitHub](https://github.com/Giskard-AI/giskard-oss) and was used in DeepLearning.AI's [Red Teaming LLM Applications](https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/) course.
 
 Giskard v3 is a major rewrite and includes new features such as [Checks](/oss/checks).
 
