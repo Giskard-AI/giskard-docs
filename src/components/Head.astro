@@ -49,9 +49,18 @@ const breadcrumbJsonLd = {
 	})),
 };
 
+// Stable node identifier for the Giskard organization, so the Organization block
+// and the SoftwareApplication `author` reference resolve to one entity instead of
+// creating a duplicate on every page. It is a schema.org node id, not a fetchable
+// URL: the fragment keeps it distinct from the page it appears on. The base is
+// giskard.ai (the org's own home, matching `url` below), not docs.giskard.ai
+// (this site, which the org merely publishes).
+const organizationId = 'https://giskard.ai/#organization';
+
 const organizationJsonLd = {
 	'@context': 'https://schema.org',
 	'@type': 'Organization',
+	'@id': organizationId,
 	name: 'Giskard',
 	url: 'https://giskard.ai',
 	logo: `${siteUrl}/favicon.ico`,
@@ -86,6 +95,26 @@ articleJsonLd.image = ogImageUrl;
 if (route.lastUpdated) {
 	articleJsonLd.dateModified = route.lastUpdated.toISOString();
 }
+
+// The /oss landing page describes the umbrella `giskard` package itself (Apache-2.0).
+// Sub-pages keep TechArticle: their packages carry different licences (giskard-checks is MIT).
+const isOssLanding = Astro.url.pathname === '/oss' || Astro.url.pathname === '/oss/';
+const softwareJsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'SoftwareApplication',
+	'@id': `${siteUrl}/oss`,
+	name: 'Giskard OSS',
+	url: `${siteUrl}/oss`,
+	description:
+		'Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for LLM apps and agents: you write scenarios and checks that pass or fail instead of metric scores, run them locally against your own LLM provider, and red-team the same agent with the same library.',
+	applicationCategory: 'DeveloperApplication',
+	operatingSystem: 'Cross-platform',
+	license: 'https://www.apache.org/licenses/LICENSE-2.0',
+	sameAs: 'https://github.com/Giskard-AI/giskard-oss',
+	author: { '@id': organizationId },
+	offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', url: `${siteUrl}/oss` },
+};
+
 ---
 
 <link rel="preload" href="/fonts/osmose-regular.woff2" as="font" type="font/woff2" crossorigin />
@@ -122,7 +151,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 <script type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
 <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
-<script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+{isOssLanding
+	? <script type="application/ld+json" set:html={JSON.stringify(softwareJsonLd)} />
+	: <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />}
 </>
 )}
 
