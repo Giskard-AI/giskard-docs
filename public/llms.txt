@@ -22,7 +22,31 @@ Giskard provides tools for testing, evaluating, and red-teaming LLM-based applic
 Enterprise platform for LLM agent testing with team collaboration and continuous red teaming. Available as a UI for business users and an SDK for developers.
 
 ### Giskard Checks (Open Source)
-Lightweight Python library for testing non-deterministic AI applications. Supports single-turn and multi-turn scenario testing, LLM-as-a-judge evaluations, and CI/CD integration.
+Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for LLM apps and agents: you write scenarios and checks that pass or fail instead of metric scores, run them locally against your own LLM provider, and red-team the same agent with the same library.
+
+- **Scenario and check:** a scenario is one test case (a message or short conversation sent to the agent); a check is a rule its reply must satisfy, either plain Python or a rule in natural language graded by an LLM ("the judge").
+- **pytest-native:** tests are plain `async def test_*` functions that run under pytest (with `pytest-asyncio`), no separate runner or DSL.
+- **Framework-agnostic:** the target under test is any async callable — an agent from any framework, a raw SDK call, or an HTTP client.
+- **Pass/fail, not scores:** checks return a verdict, so a suite gates a pull request the way unit tests do.
+- **Your provider, your keys:** checks and LLM-as-a-judge evaluations run locally against your own LLM provider. Judged checks and scans send test inputs and agent outputs to that provider.
+- **Red teaming in the same library:** the `giskard.scan` module, installed via the `scan` extra, provides `vulnerability_scan()`, which probes an agent with generated adversarial inputs and returns a suite you can re-run as a regression test.
+- **Third-party red teaming:** `third_party_scan()` runs garak or deepteam against the same agent through the optional `garak` and `deepteam` extras. garak defaults to a curated set of six probes; `probes="all"` runs every active probe garak ships. deepteam supports five vulnerabilities and nine attacks (four single-turn, five multi-turn); names outside that set are reported as skipped rather than run, so use `list_scan_items(tool)` to see what is supported.
+- **Giskard's own generators:** `vulnerability_scan()` builds its suite from seven built-in scenario generators: adversarial, prompt injection, GCG injection, Crescendo and GOAT multi-turn attacks, and two Hugging Face attack datasets. It does not dispatch to garak or deepteam; `third_party_scan()` is the only path there.
+- **Enterprise UI:** the Giskard Hub adds a web UI for business users, shared datasets, and scheduled continuous red teaming on top of the same testing model.
+- **Limits:** a scan runs a sample of generated scenarios, so it does not cover every input. Judge verdicts are LLM output and can be wrong in either direction. Results vary between runs unless the suite is saved and reused.
+- **Licensing:** the `giskard` package is Apache-2.0.
+
+Install with `pip install --pre "giskard[scan,openai]"` (uv: `uv pip install --prerelease=allow "giskard[scan,openai]"`). Swap `openai` for `google`, `anthropic`, `azure`, or `litellm` to match your provider. Requires Python 3.12 or newer.
+
+Use the open-source library for tests that live next to your code and run in CI. Use the Hub when business users annotate tests in a UI, datasets are shared across teams, or red teaming runs on a schedule.
+
+Typical entry points:
+
+- Install & Configure: https://docs.giskard.ai/oss/checks/installation.md
+- Quickstart: https://docs.giskard.ai/oss/checks/quickstart.md
+- Write Your First Test: https://docs.giskard.ai/oss/checks/tutorials/your-first-test.md
+- Run Tests with pytest: https://docs.giskard.ai/oss/checks/how-to/run-in-pytest.md
+- Scan for Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
 
 ### Giskard Research
 Open research on AI safety and security, including the Phare multilingual benchmark, RealHarm incident dataset, and RealPerformance functional issues dataset.
@@ -180,3 +204,38 @@ Open research on AI safety and security, including the Phare multilingual benchm
 - Testing Agents: https://docs.giskard.ai/oss/checks/use-cases/testing-agents.md
 - Chatbot Testing: https://docs.giskard.ai/oss/checks/use-cases/chatbot-testing.md
 - Content Moderation: https://docs.giskard.ai/oss/checks/use-cases/content-moderation.md
+
+### Solutions (Open Source)
+Task-shaped quickstarts that sit above the Checks and Scan sections.
+- Solutions: https://docs.giskard.ai/oss/solutions.md
+- Scan Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
+- Check Agentic Systems: https://docs.giskard.ai/oss/solutions/check-agentic-systems.md
+
+### Giskard Scan (Open Source)
+- Giskard Scan: https://docs.giskard.ai/oss/scan.md
+- Install & Configure: https://docs.giskard.ai/oss/scan/installation.md
+
+### Scan Tutorials
+- Your First Scan: https://docs.giskard.ai/oss/scan/tutorials/your-first-scan.md
+- From Red-Team Finding to Regression Test: https://docs.giskard.ai/oss/scan/tutorials/redteam-to-regression.md
+- Scan a RAG Agent: https://docs.giskard.ai/oss/scan/tutorials/scan-a-rag-agent.md
+- Write a Custom Scenario Generator: https://docs.giskard.ai/oss/scan/tutorials/custom-scenario-generator.md
+
+### Scan How-to Guides
+- Wrap Your Agent for the Scan: https://docs.giskard.ai/oss/scan/how-to/wrap-your-agent.md
+- Customize a Scan: https://docs.giskard.ai/oss/scan/how-to/customize-a-scan.md
+- Tune a Scan Run: https://docs.giskard.ai/oss/scan/how-to/tune-scan-options.md
+- Run the Scan in CI: https://docs.giskard.ai/oss/scan/how-to/scan-in-ci.md
+- Dataset-Backed Generators: https://docs.giskard.ai/oss/scan/how-to/dataset-generators.md
+- Save and Version a Scan Suite: https://docs.giskard.ai/oss/scan/how-to/save-and-version-suites.md
+- Find Hallucinations and Sycophancy with a Quality Scan: https://docs.giskard.ai/oss/scan/how-to/quality-scan.md
+- Run Garak and DeepTeam Scanners: https://docs.giskard.ai/oss/scan/how-to/third-party-scanners.md
+
+### Scan API Reference
+- Scan API: https://docs.giskard.ai/oss/scan/reference/scan-api.md
+- Generators: https://docs.giskard.ai/oss/scan/reference/generators.md
+- Knowledge Base: https://docs.giskard.ai/oss/scan/reference/knowledge-base.md
+
+### Scan Explanation
+- How the Scan Works: https://docs.giskard.ai/oss/scan/explanation/how-scan-works.md
+- What the Scan Looks For: https://docs.giskard.ai/oss/scan/explanation/threat-taxonomy.md
