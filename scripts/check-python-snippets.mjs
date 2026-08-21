@@ -92,7 +92,12 @@ export function checkPythonSnippets({ docsRoot, pyrightCommand = "pyright" }) {
 
     const result = spawnSync(
       pyrightCommand,
-      ["--outputjson", "--project", "pyrightconfig.json", ...snippets.keys()],
+      [
+        "--outputjson",
+        "--project",
+        "pyrightconfig.json",
+        ...snippets.keys(),
+      ],
       { encoding: "utf8" },
     );
     if (result.error) throw result.error;

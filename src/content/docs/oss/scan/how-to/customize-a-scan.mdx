@@ -1,0 +1,94 @@
+---
+title: "Customize a Scan"
+description: "Pick which generators run, bound the scenario budget and concurrency, and extend the suite with your own scenarios."
+sidebar:
+  order: 2
+---
+
+`vulnerability_scan` runs every built-in generator with default budgets. Use the options below when you want less, more, or something different.
+
+Every example on this page runs against `support_agent`, the retail-bank support agent defined in [Wrap your agent](/oss/scan/how-to/wrap-your-agent). Substitute your own target.
+
+## Run only specific generators
+
+Pass the generators you want to the lower-level `generate_suite`, then run the suite yourself:
+
+```python
+from agent import bank_agent as support_agent
+
+from giskard.scan import generate_suite, PromptInjectionScenarioGenerator
+
+suite = await generate_suite(
+    description=(
+        "A customer-support agent for a retail bank. It answers questions "
+        "about accounts, cards, payments and disputes. It must refuse to give "
+        "investment or tax advice, and must never disclose another customer's "
+        "data."
+    ),
+    languages=["en"],
+    generators=[PromptInjectionScenarioGenerator()],
+)
+
+suite_result = await suite.run(target=support_agent, parallel=True)
+```
+
+`PromptInjectionScenarioGenerator` is the right pick here because customers paste text into this agent (a statement line, a disputed transaction, an email from their bank), and that text goes straight into the prompt. An instruction hidden inside a pasted statement is the failure it can cause. Pick `GOATAttackScenarioGenerator` instead when the risk is an attacker with several turns to talk the agent into advice it should refuse, or `HallucinationScenarioGenerator` when the worry is invented answers rather than attacks. Narrowing to one generator narrows the report the same way: injection is the only thing that run can find.
+
+`Suite.run` defaults to `parallel=False`, unlike the scan helpers. Pass `parallel=True` when you want the same concurrency a full scan gives you. Serial runs are slow but easier to debug; parallel runs are fast but hit provider rate limits, and they need an agent that tolerates concurrent calls.
+
+The full catalog is in the [generators reference](/oss/scan/reference/generators).
+
+## Bound the run
+
+`max_scenarios` caps the total number of scenarios across all generators, and `max_concurrency` caps how many run against your agent at once:
+
+```python
+from giskard.scan import vulnerability_scan
+
+suite_result = await vulnerability_scan(
+    target=support_agent,
+    description="A customer-support agent for a retail bank, covering accounts, cards, payments and disputes.",
+    languages=["en"],
+    max_scenarios=20,
+    max_concurrency=10,
+)
+```
+
+The budget is split by a multinomial draw, so a generator that draws zero is skipped. See [the scenario budget](/oss/scan/explanation/how-scan-works#the-scenario-budget). Keep `max_scenarios` small while you are wiring things up. A small budget leaves whole attack types untested, so raise it before you trust the result.
+
+## Generate scenarios in other languages
+
+Pass BCP-47 codes through `languages` (`"en"`, `"fr"`, `"es"`) and the scenarios are generated in those languages. Generation is handled by the model you configured, so pick one with strong support for your target languages.
+
+## Exclude non-commercial datasets
+
+Some generators are backed by datasets whose licenses do not permit commercial use. Drop them with `commercial_use=True`. That removes attacks from the run, so the same agent scores better with the flag on. It is a licensing decision, not a tuning knob:
+
+```python
+suite_result = await vulnerability_scan(
+    target=support_agent,
+    description="A customer-support agent for a retail bank, covering accounts, cards, payments and disputes.",
+    languages=["en"],
+    commercial_use=True,
+)
+```
+
+Leave it at the default `False` while you are testing internally. Turn it on when the run is part of a commercial product and you need the licensing to hold, and expect the pass rate to rise for that reason alone.
+
+## Go further with a coding agent
+
+`generate_suite` builds a suite from the built-in scenarios. The [Scenario Generator skill](/oss/agent-skills#scenario-generator-) turns your coding agent into a red-teamer instead. Describe your agent and the failure modes you care about, and the skill writes or extends a runnable suite with adversarial scenarios and layered checks tailored to your case:
+
+```bash
+npx skills add Giskard-AI/giskard-skills --skill scenario-generator
+```
+
+Prompt it with something like _"red-team our bank support agent for unauthorized investment advice and for disclosing another customer's account details"_. The full set of skills is at [Giskard Skills ↗](https://github.com/Giskard-AI/giskard-skills).
+
+To write the evaluation logic yourself, see [Giskard Checks](/oss/checks).
+
+## Next Steps
+
+- [Run the scan in CI](/oss/scan/how-to/scan-in-ci) to replay a saved suite
+- [Scan API reference](/oss/scan/reference/scan-api) for every argument
+- [How the scan works](/oss/scan/explanation/how-scan-works) for why the budget behaves the way it does

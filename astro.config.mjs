@@ -71,6 +71,10 @@ export default defineConfig({
                     items: [{ autogenerate: { directory: 'oss/solutions', collapsed: false } }],
                 },
                 {
+                    label: 'Scan',
+                    items: [{ autogenerate: { directory: 'oss/scan', collapsed: false } }],
+                },
+                {
                     label: 'Checks',
                     items: [{ autogenerate: { directory: 'oss/checks', collapsed: false } }],
                 },

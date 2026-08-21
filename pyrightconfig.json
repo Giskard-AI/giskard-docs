@@ -2,5 +2,6 @@
   "pythonVersion": "3.13",
   "venvPath": ".",
   "venv": ".venv",
+  "extraPaths": ["tests/fixtures/python-snippets"],
   "typeCheckingMode": "basic"
 }

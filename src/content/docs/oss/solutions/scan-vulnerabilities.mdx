@@ -320,9 +320,17 @@ The saved suite can be pointed at any target. For example, once you have fixed a
 suite_result = await suite.run(target=my_other_agent)
 ```
 
+### Read the API reference
+
+Every argument, generator, and type used on this page is documented in the scan reference:
+
+- [Scan API](/oss/solutions/reference/scan-api) -- `vulnerability_scan`, `quality_scan`, `generate_suite`, `third_party_scan`, `list_scan_items`, `ScanOptions`, `SuiteGeneratorRegistry`
+- [Generators](/oss/solutions/reference/generators) -- The full scenario generator catalog
+- [Knowledge Base](/oss/solutions/reference/knowledge-base) -- `KnowledgeBase` and `Document` for the quality scan
+
 ## Advanced usage
 
-You can customize the scan by passing options directly to `vulnerability_scan`.
+You can customize the scan by passing options directly to `vulnerability_scan`. See the [Scan API reference](/oss/solutions/reference/scan-api) for the complete list.
 
 ### Run only specific scenarios
 

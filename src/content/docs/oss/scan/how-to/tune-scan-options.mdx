@@ -1,0 +1,185 @@
+---
+title: "Tune a Scan Run"
+description: "Control the cost, determinism, concurrency, and report grouping of a Giskard scan with max_scenarios, seed, parallel, max_concurrency, group_by, and the rest."
+sidebar:
+  order: 3
+---
+
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
+A scan writes test cases for your agent, runs them, and reports which ones it failed. Each test case is a **scenario**: a starting message, or a short conversation, plus the checks that decide whether the reply was acceptable. Scenarios come from **generators**, one per kind of problem being probed, and the verdicts come from a **judge**, an LLM that reads the reply and decides pass or fail.
+
+The keyword arguments below control what a scan costs, how repeatable it is, and how the report is grouped. Read [How the Scan Works](/oss/scan/explanation/how-scan-works) first if you have not run a scan yet.
+
+A default scan lets every generator apply its own limit, runs every scenario at once, and groups the report on the axis its entry point picks. Change all of it with keyword arguments on `vulnerability_scan` and `quality_scan`.
+
+## The two entry points
+
+There are two scans. They run different generators, and both take the same tuning arguments:
+
+- `vulnerability_scan` attacks the agent. Its generators write adversarial scenarios: [prompt injection](/start/glossary/security/injection), escalating multi-turn jailbreak attempts, and [harmful content](/start/glossary/security/harmful-content) prompts drawn from public datasets.
+- `quality_scan` tests whether the agent answers well. Its generators work from a knowledge base you pass in and probe for hallucination, sycophancy, and questions that fall outside the documents.
+
+`max_scenarios`, `seed`, `parallel`, `max_concurrency`, `return_exception`, `group_by`, and `target_mode` work the same way on both. Only the defaults for `group_by` differ, and two arguments exist on one side only: `commercial_use` on `vulnerability_scan`, `knowledge_base` on `quality_scan`.
+
+The examples below scan a retail bank's support agent rather than the tutorial's garden-center assistant, because a bank agent has both the refusal rules a vulnerability scan probes and the policy documents a quality scan needs. Define the target and the documents once:
+
+```python
+from giskard.scan import KnowledgeBase, ScanOptions, quality_scan, vulnerability_scan
+
+# An async support agent for a retail bank, wrapped as a target the same way as
+# in /oss/scan/how-to/wrap-your-agent.
+from bank_support import bank_agent
+
+DESCRIPTION = (
+    "A support agent for a retail bank. It answers questions about accounts, "
+    "cards, payments and disputes. It must refuse to give investment or tax "
+    "advice, and must never reveal another customer's data."
+)
+
+bank_policy_docs = KnowledgeBase.from_texts(
+    [
+        "Overdraft fee: $25 per item. Waived once per year on request.",
+        "Card disputes must be raised within 60 days of the statement date.",
+        "A standard checking account has no monthly fee above a $500 balance.",
+    ]
+)
+```
+
+<Tabs>
+<TabItem label="vulnerability_scan">
+
+```python
+options: ScanOptions = {"max_scenarios": 20, "seed": 7}
+
+result = await vulnerability_scan(
+    target=bank_agent,
+    description=DESCRIPTION,
+    languages=["en"],
+    max_scenarios=20,
+    seed=7,
+    max_concurrency=4,
+)
+```
+
+</TabItem>
+<TabItem label="quality_scan">
+
+```python
+result = await quality_scan(
+    target=bank_agent,
+    description=DESCRIPTION,
+    languages=["en"],
+    knowledge_base=bank_policy_docs,
+    max_scenarios=20,
+    seed=7,
+    max_concurrency=4,
+)
+```
+
+</TabItem>
+</Tabs>
+
+## Cap the number of scenarios
+
+Set `max_scenarios` to a total upper bound across all generators. That budget, the number of scenarios the run is allowed to spend, is split between them before generation starts. The default of `None` lets each generator fall back to its own limit; see [How the Scan Works](/oss/scan/explanation/how-scan-works) for what that costs.
+
+Pick too low and each generator gets a handful of scenarios, so whole categories of problem go untested and the report looks cleaner than your agent is. Pick too high and you pay for LLM calls on both generation and judging, and the run takes longer.
+
+Start low. Twenty scenarios is enough to tell you whether the plumbing works and whether your `description` is specific enough. Raise it once the report stops being obviously wrong.
+
+## Make runs reproducible
+
+A **seed** fixes the random draws the scan makes, so the same seed asks for the same scenarios. `seed` defaults to `42` and feeds the top-level random number generator used for scenario sampling and generation. Each generator gets its own child generator, created before the generators run concurrently, so the same seed gives the same scenarios regardless of how the event loop schedules things.
+
+The scenarios are stable. The LLM's answers and the judge's verdicts are not. If you want to compare one run against another, for example to check whether a prompt change fixed a failure, generate the **suite** once with `generate_suite` (a suite is the saved collection of scenarios and their checks) and replay it. See [Run the Scan in CI](/oss/scan/how-to/scan-in-ci) for one way to do that.
+
+Without a fixed seed and a saved suite, two runs test different scenarios. A difference in pass rate then tells you nothing about whether your agent changed, and a fix can look like it worked when it did not.
+
+## Control concurrency
+
+Generation and execution are throttled separately:
+
+- **Generation:** generators always run concurrently. There is no flag for it.
+- **Execution:** calling your agent with each generated scenario is controlled by `parallel`, which defaults to `True` for both scans. `Suite.run` defaults its own `parallel` to `False`; the scan helpers flip it.
+
+`max_concurrency` caps how many scenarios run at once when `parallel=True`. The default of `None` fires all of them simultaneously, which is usually more load than you want to put on the system under test. Your agent, and whatever sits behind it, has to serve every one of those calls at the same time. If nothing else stops the run, your LLM provider's rate limit becomes the real cap, and it shows up as a wave of rate-limit errors partway through a scan. Set `max_concurrency` to something your agent and your API tier can absorb:
+
+<Tabs>
+<TabItem label="vulnerability_scan">
+
+```python
+result = await vulnerability_scan(
+    target=bank_agent,
+    description=DESCRIPTION,
+    languages=["en"],
+    parallel=True,
+    max_concurrency=4,
+)
+```
+
+</TabItem>
+<TabItem label="quality_scan">
+
+```python
+result = await quality_scan(
+    target=bank_agent,
+    description=DESCRIPTION,
+    languages=["en"],
+    knowledge_base=bank_policy_docs,
+    parallel=True,
+    max_concurrency=4,
+)
+```
+
+</TabItem>
+</Tabs>
+
+With `parallel=False` scenarios run one after another. A valid `max_concurrency` then has no effect on scheduling, but an invalid one is still rejected, so you cannot use it as an inert placeholder.
+
+## Keep a failed generation from killing the run
+
+The default `return_exception=False` lets a failure during input generation, such as a malformed LLM response or a provider timeout, propagate and abort the whole scan. Pass `return_exception=True` on long scans against flaky providers: the failure is recorded as an errored result and the scan carries on.
+
+Errored results are not passes. Read the error count in the report before you read the pass rate, the share of scenarios that passed. A run with many errors has a pass rate computed over fewer scenarios than you think.
+
+## Group the report
+
+`group_by` names a result annotation key used to bucket the printed report. The default differs per entry point because the useful axis differs:
+
+| Scan | Default `group_by` |
+| --- | --- |
+| `vulnerability_scan` | `"threat-type"` |
+| `quality_scan` | `"component"` |
+
+A **threat type** is the kind of attack a scenario tries, such as [prompt injection](/start/glossary/security/injection) or [harmful content](/start/glossary/security/harmful-content). A **component** is the part of your agent under test, such as retrieval or the final answer. Group by the axis you plan to act on: threat types point at a defense to add, components point at a part of the pipeline to fix.
+
+Pass `None` to print the report ungrouped. [How the Scan Works](/oss/scan/explanation/how-scan-works#threat-types-vs-components) covers what the two axes mean and why both exist.
+
+## Choose single-turn or multi-turn scenarios
+
+`target_mode` says whether a scenario is a single message or a back-and-forth conversation. It takes `"singleturn"` or `"multiturn"` (default `"multiturn"`) and is available on both scans and on `generate_suite`. Set `"singleturn"` when your agent has no conversation state: it skips generators that are multi-turn by design and caps turn budgets to 1 on the rest. Leaving it at `"multiturn"` for a stateless agent produces scenarios whose follow-up turns cannot land, which shows up as noise rather than a clean skip.
+
+## Vulnerability-scan-only knobs
+
+`commercial_use=True` excludes generators whose underlying datasets are not licensed for commercial use. It defaults to `False`, so a stock scan may pull in scenarios you cannot ship results from. The quality scan has no equivalent.
+
+## Pass options as a dict
+
+When you build the settings dynamically, from a config file for example, collect them in a `ScanOptions` typed dict and unpack it into the call. See [`ScanOptions`](/oss/scan/reference/scan-api#scanoptions) for the members and which of them the quality scan accepts.
+
+`ScanOptions` has no `target_mode` member, so pass `target_mode` as its own keyword argument next to the unpacked dict:
+
+```python
+result = await vulnerability_scan(
+    target=bank_agent,
+    description=DESCRIPTION,
+    languages=["en"],
+    target_mode="singleturn",
+    **options,
+)
+```
+
+## Next Steps
+
+Full signatures, types, and defaults live in the [Scan API reference](/oss/scan/reference/scan-api). To replay a fixed suite instead of regenerating one, see [Run the Scan in CI](/oss/scan/how-to/scan-in-ci).

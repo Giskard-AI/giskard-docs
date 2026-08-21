@@ -1,0 +1,85 @@
+---
+title: "Giskard Scan"
+description: "Automatically red team your LLM agent for safety and security vulnerabilities, and probe its answer quality against your own documents."
+sidebar:
+  order: 0
+  label: Overview
+---
+
+import { LinkCard, CardGrid, Steps } from "@astrojs/starlight/components";
+
+The Giskard scan writes the tests for you. Describe your agent in a sentence, and it builds test cases tailored to that description, runs them against your agent, and reports which ones broke it.
+
+Most of those test cases are **red teaming**: attacking your own agent on purpose to find out how it fails before a user or an attacker does. For a bank's customer-support agent, that means asking it for investment advice it should refuse, hiding an instruction inside a pasted statement to see if it obeys, or talking it out of its own rules over several turns.
+
+Two scans ship in the library. `vulnerability_scan` red teams your agent with hostile scenarios. `quality_scan` checks its answers against a knowledge base of your own documents, to catch answers it invented.
+
+A scan needs an LLM provider and an API key: one model writes the attacks, another reads your agent's replies and decides whether each one is a failure. That second model is a **judge**, and it is sometimes wrong, so read the failing conversations rather than trusting the count. A scan that finds nothing means these scenarios did not break your agent, not that your agent is safe.
+
+```bash
+pip install --pre "giskard[scan,openai]"
+```
+
+## Start here
+
+To see the whole thing working first, the [Quickstart](/oss/solutions/scan-vulnerabilities) runs one end-to-end example. Otherwise, work through these in order.
+
+<Steps>
+
+1. [Install & Configure](/oss/scan/installation) (~5 min): install the `scan` extra and register an LLM provider as the default generator. Giskard v3 requires Python 3.12 or newer. The scan calls your own provider with your own key for both generation and judging, so a run costs tokens. After this you can import `giskard.scan`.
+2. [Your First Scan](/oss/scan/tutorials/your-first-scan) (~15 min): wrap a toy agent as an async function, run `vulnerability_scan` with a small `max_scenarios` budget, and read the report. After this you have a real finding in front of you.
+3. [How the Scan Works](/oss/scan/explanation/how-scan-works) (~10 min): what a generator, a suite, and the judge actually do, and why a clean report is not a clean bill of health. After this you can tell an untested threat from a handled one, which is the difference between the two mistakes this tool makes easy.
+4. [Run the Scan in CI](/oss/scan/how-to/scan-in-ci) (~20 min): save the generated suite to JSON, replay it on every pull request, and export JUnit XML. After this two runs' pass rates mean the same thing, because they tested the same scenarios.
+5. [Tune a Scan Run](/oss/scan/how-to/tune-scan-options) (~10 min): control `max_scenarios`, `seed`, concurrency, and how the report is grouped. After this you can set what a scan costs instead of accepting the defaults.
+6. [Find Hallucinations and Sycophancy](/oss/scan/how-to/quality-scan) (~15 min): point `quality_scan` at your own documents to catch wrong answers rather than attacks. After this you have covered both scans the library ships.
+
+</Steps>
+
+## Browse the docs
+
+<CardGrid>
+  <LinkCard
+    title="Install & Configure"
+    description="Install the package, pick a provider for the generator and judge model, and add the third-party scanner extras."
+    href="/oss/scan/installation"
+  />
+  <LinkCard
+    title="Tutorials"
+    description="Four runnable notebooks: a first scan, red-team then regression-test, scanning a RAG agent, and writing your own generator."
+    href="/oss/scan/tutorials"
+  />
+  <LinkCard
+    title="How-to Guides"
+    description="Wrap your agent, pick generators, tune the run, save suites, scan in CI, bring your own dataset, and run garak or deepteam."
+    href="/oss/scan/how-to"
+  />
+  <LinkCard
+    title="API Reference"
+    description="Every argument of vulnerability_scan, quality_scan, generate_suite and third_party_scan, plus the generator catalog and KnowledgeBase."
+    href="/oss/scan/reference"
+  />
+  <LinkCard
+    title="Explanation"
+    description="How the scan generates, runs and judges scenarios, and what the threat-type, quality and component tags in a report mean."
+    href="/oss/scan/explanation"
+  />
+  <LinkCard
+    title="Agent Skills"
+    description="Drop-in skills that turn Claude Code and other coding agents into Giskard specialists."
+    href="/oss/agent-skills"
+  />
+</CardGrid>
+
+## Scan or checks?
+
+The scan **generates** tests for you from a description. [Giskard Checks](/oss/checks) is the library you use to **write** tests yourself. They share the same runtime: a scan returns an ordinary `Suite`, so anything you learn about running, filtering, or asserting on suites in Checks applies to scan results too.
+
+Use the scan to discover unknown vulnerabilities. Use Checks to lock in the behavior you already care about. Most teams run both.
+
+## Beyond the open-source scan
+
+The [Giskard Hub](/hub/ui/scan) runs 55+ custom-designed probes across 11 vulnerability categories, grades your agent's security, and keeps testing it after deployment with [continuous red teaming](/hub/ui/continuous-red-teaming). See the [Open Source vs Hub comparison](/start/comparison).
+
+## Next Steps
+
+Install the package with [Install & Configure](/oss/scan/installation), then run [Your First Scan](/oss/scan/tutorials/your-first-scan). New to this vocabulary? The [glossary](/start/glossary) defines [prompt injection](/start/glossary/security/injection), [hallucination](/start/glossary/business/hallucination), and the other failure types a scan reports.

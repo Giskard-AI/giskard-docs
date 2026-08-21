@@ -45,3 +45,5 @@ src/content/docs/oss/checks/quickstart.mdx
 src/content/docs/oss/checks/how-to/*.mdx
 src/content/docs/oss/checks/tutorials/*.mdx
 src/content/docs/oss/checks/use-cases/*.mdx
+src/content/docs/oss/scan/tutorials/*.mdx
+src/content/docs/oss/scan/how-to/quality-scan.mdx
