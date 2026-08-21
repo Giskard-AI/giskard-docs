@@ -189,6 +189,8 @@ Adapter behavior to know before you read the results:
 Reusing `support_agent` from above:
 
 ```python
+from giskard.scan import third_party_scan
+
 suite_result = await third_party_scan(
     target=support_agent,
     tool="deepteam",

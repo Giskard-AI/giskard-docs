@@ -24,7 +24,7 @@ from giskard.scan import vulnerability_scan
 from my_app.agent import support_agent
 
 
-async def main():
+async def generate_suite():
     suite_result = await vulnerability_scan(
         target=support_agent,
         description=(
@@ -36,11 +36,11 @@ async def main():
         languages=["en"],
     )
     Path("tests/scan_suite.json").write_text(
-        suite_result.suite.model_dump_json()
+        suite_result.suite.model_dump_json() if suite_result.suite else ""
     )
 
 
-asyncio.run(main())
+asyncio.run(generate_suite())
 ```
 
 `Suite` is a Pydantic model, so the JSON is the whole suite. Commit `tests/scan_suite.json`, so that regenerating shows up as a reviewable diff.
@@ -62,7 +62,7 @@ from my_app.agent import support_agent
 set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o-mini"))
 
 
-async def main():
+async def run_suite():
     suite = Suite.model_validate_json(
         Path("tests/scan_suite.json").read_text()
     )
@@ -75,7 +75,7 @@ async def main():
         raise SystemExit(1)
 
 
-asyncio.run(main())
+asyncio.run(run_suite())
 ```
 
 Do not delete the `import giskard.scan` line. It looks unused, and it fails late. Importing the package registers the prompt templates the scan's scenarios render from. Without it, `Suite.model_validate_json` still succeeds, so the suite looks fine; the run then dies part-way through with `jinja2.exceptions.TemplateNotFound: giskard.scan::scenarios/llm01_indirect_injection.j2`. In CI that reads as a flaky job rather than a missing import, so keep the import next to the load.
@@ -119,8 +119,12 @@ Verdicts come from an LLM, so a scenario can flip between runs. Read [the judge 
 The saved suite is not bound to a target, so you can point it anywhere. This is how you confirm a fix actually fixed something:
 
 ```python
+from pathlib import Path
+
+from giskard.checks import Suite
 from my_app.agent import support_agent, support_agent_hardened
 
+suite = Suite.model_validate_json(Path("tests/scan_suite.json").read_text())
 before = await suite.run(target=support_agent)
 after = await suite.run(target=support_agent_hardened)
 

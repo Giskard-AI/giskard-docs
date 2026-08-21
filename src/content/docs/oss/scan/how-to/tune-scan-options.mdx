@@ -25,7 +25,7 @@ There are two scans. They run different generators, and both take the same tunin
 The examples below scan a retail bank's support agent rather than the tutorial's garden-center assistant, because a bank agent has both the refusal rules a vulnerability scan probes and the policy documents a quality scan needs. Define the target and the documents once:
 
 ```python
-from giskard.scan import KnowledgeBase, quality_scan, vulnerability_scan
+from giskard.scan import KnowledgeBase, ScanOptions, quality_scan, vulnerability_scan
 
 # An async support agent for a retail bank, wrapped as a target the same way as
 # in /oss/scan/how-to/wrap-your-agent.
@@ -50,6 +50,8 @@ bank_policy_docs = KnowledgeBase.from_texts(
 <TabItem label="vulnerability_scan">
 
 ```python
+options: ScanOptions = {"max_scenarios": 20, "seed": 7}
+
 result = await vulnerability_scan(
     target=bank_agent,
     description=DESCRIPTION,
