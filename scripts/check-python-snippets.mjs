@@ -15,7 +15,6 @@ import {
 } from "./markdown-python-fences.mjs";
 
 const DEFAULT_DOCS_ROOT = "src/content/docs/oss";
-const FIXTURE_ROOT = resolve("tests/fixtures/python-snippets");
 
 function generatedSnippetPath(generatedRoot, docsRoot, pagePath) {
   const relativePagePath = relative(docsRoot, pagePath);
@@ -97,8 +96,6 @@ export function checkPythonSnippets({ docsRoot, pyrightCommand = "pyright" }) {
         "--outputjson",
         "--project",
         "pyrightconfig.json",
-        "--extraPaths",
-        FIXTURE_ROOT,
         ...snippets.keys(),
       ],
       { encoding: "utf8" },
