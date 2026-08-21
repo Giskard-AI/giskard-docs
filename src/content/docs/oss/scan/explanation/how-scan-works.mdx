@@ -39,6 +39,8 @@ You have two ways to drive this. Which one you want depends on whether you need 
 The examples below run against `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/scan/how-to/wrap-your-agent). The tutorial uses a garden-center assistant instead, because it runs live against a model:
 
 ```python
+from agent import bank_agent as support_agent
+
 from giskard.scan import (
     PromptInjectionScenarioGenerator,
     generate_suite,

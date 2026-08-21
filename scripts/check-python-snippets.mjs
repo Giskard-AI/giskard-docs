@@ -1,5 +1,4 @@
 import {
-  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -16,15 +15,7 @@ import {
 } from "./markdown-python-fences.mjs";
 
 const DEFAULT_DOCS_ROOT = "src/content/docs/oss";
-
-function writeApplicationFixtures(generatedRoot) {
-  const fixture = "from typing import Any\n\nsupport_agent: Any\nsupport_agent_hardened: Any\nbank_agent: Any\n";
-  mkdirSync(join(generatedRoot, "my_app"));
-  writeFileSync(join(generatedRoot, "agent.py"), fixture);
-  writeFileSync(join(generatedRoot, "bank_support.py"), fixture);
-  writeFileSync(join(generatedRoot, "my_app", "__init__.py"), "");
-  writeFileSync(join(generatedRoot, "my_app", "agent.py"), fixture);
-}
+const FIXTURE_ROOT = resolve("tests/fixtures/python-snippets");
 
 function generatedSnippetPath(generatedRoot, docsRoot, pagePath) {
   const relativePagePath = relative(docsRoot, pagePath);
@@ -39,7 +30,6 @@ function generatedSnippetPath(generatedRoot, docsRoot, pagePath) {
  */
 export function preparePythonSnippetFiles(docsRoot, generatedRoot) {
   const snippets = new Map();
-  writeApplicationFixtures(generatedRoot);
 
   for (const pagePath of walkMarkdownFiles(docsRoot)) {
     const source = readFileSync(pagePath, "utf8");
@@ -48,21 +38,7 @@ export function preparePythonSnippetFiles(docsRoot, generatedRoot) {
     );
     if (fences.length === 0) continue;
 
-    const needsSupportAgent =
-      !source.includes("async def support_agent") &&
-      fences.some((fence) => /\bsupport_agent\b/.test(fence.code));
-    const needsBankAgent =
-      !source.includes("async def bank_agent") &&
-      fences.some((fence) => /\bbank_agent\b/.test(fence.code));
-    const generatedLines = ["from typing import Any", "", "async def _snippet_main():"];
-    if (needsSupportAgent) generatedLines.push("    support_agent: Any");
-    if (needsBankAgent) generatedLines.push("    bank_agent: Any");
-    if (fences.some((fence) => /\boptions\b/.test(fence.code))) {
-      generatedLines.push("    options: dict[str, Any] = {}");
-    }
-    if (fences.some((fence) => /\bsuite\b/.test(fence.code))) {
-      generatedLines.push("    suite: Any");
-    }
+    const generatedLines = ["async def _snippet_main():"];
     const generatedFences = fences.map((fence) => {
       const generatedStartLine = generatedLines.length;
       const codeLines = fence.code.split("\n");
@@ -117,7 +93,14 @@ export function checkPythonSnippets({ docsRoot, pyrightCommand = "pyright" }) {
 
     const result = spawnSync(
       pyrightCommand,
-      ["--outputjson", "--project", "pyrightconfig.json", ...snippets.keys()],
+      [
+        "--outputjson",
+        "--project",
+        "pyrightconfig.json",
+        "--extraPaths",
+        FIXTURE_ROOT,
+        ...snippets.keys(),
+      ],
       { encoding: "utf8" },
     );
     if (result.error) throw result.error;

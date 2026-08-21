@@ -76,6 +76,8 @@ Build a suite from the vulnerability generator registry, run it against the targ
 </MethodCard>
 
 ```python
+from agent import bank_agent as support_agent
+
 from giskard.scan import vulnerability_scan
 
 result = await vulnerability_scan(
