@@ -11,10 +11,6 @@ Giskard's **scan** red-teams your agent: it generates hostile inputs from a desc
 
 A clean run is not a certificate. The scan samples attacks, an LLM judges the replies (and can be wrong either way), and a miss only means those particular attacks failed. Read the failures before you act on them.
 
-:::note[Coming from Giskard v2?]
-The scan has been redesigned in v3. Instead of wrapping your model with `giskard.Model(...)` and running `giskard.scan(model, dataset)` over a dataset, you wrap your agent as an async function, generate scenarios from a plain-language description with `generate_suite(...)`, and run them with `suite.run(...)`. This means there is no dataset to prepare and no `model_type` or `feature_names` to declare.
-:::
-
 ## How does it work?
 
 From a description of your agent, an LLM writes attack scenarios and runs them — either as a single message or as a conversation that keeps pushing. A second LLM then judges whether each reply is a failure. The [glossary](/start/glossary) covers the failure types, including [prompt injection](/start/glossary/security/injection), [harmful content](/start/glossary/security/harmful-content), and [information disclosure](/start/glossary/security/information-disclosure).
@@ -324,13 +320,13 @@ suite_result = await suite.run(target=my_other_agent)
 
 Every argument, generator, and type used on this page is documented in the scan reference:
 
-- [Scan API](/oss/solutions/reference/scan-api) -- `vulnerability_scan`, `quality_scan`, `generate_suite`, `third_party_scan`, `list_scan_items`, `ScanOptions`, `SuiteGeneratorRegistry`
-- [Generators](/oss/solutions/reference/generators) -- The full scenario generator catalog
-- [Knowledge Base](/oss/solutions/reference/knowledge-base) -- `KnowledgeBase` and `Document` for the quality scan
+- [Scan API](/oss/scan/reference/scan-api) -- `vulnerability_scan`, `quality_scan`, `generate_suite`, `third_party_scan`, `list_scan_items`, `ScanOptions`, `SuiteGeneratorRegistry`
+- [Generators](/oss/scan/reference/generators) -- The full scenario generator catalog
+- [Knowledge Base](/oss/scan/reference/knowledge-base) -- `KnowledgeBase` and `Document` for the quality scan
 
 ## Advanced usage
 
-You can customize the scan by passing options directly to `vulnerability_scan`. See the [Scan API reference](/oss/solutions/reference/scan-api) for the complete list.
+You can customize the scan by passing options directly to `vulnerability_scan`. See the [Scan API reference](/oss/scan/reference/scan-api) for the complete list.
 
 ### Run only specific scenarios
 
