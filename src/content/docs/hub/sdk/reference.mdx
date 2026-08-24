@@ -60,6 +60,7 @@ from giskard_hub import HubClient
 
 hub = HubClient()
 projects = hub.projects.list()
+
 ````
   </TabItem>
   <TabItem label="Async">
@@ -239,9 +240,9 @@ Resource groups exposed by the client for managing Hub entities.
 ```python
 from giskard_hub.types import (
     Agent,
-    AgentDetectStatefulness,
     AgentOutput,
     ChatMessage,
+    GenerateCompletionOutput,
 )
 ```
 
@@ -261,13 +262,19 @@ from giskard_hub.types import (
     Language codes the agent supports (e.g. `["en", "fr"]`).
   </Property>
   <Property name="headers" type="dict[str, str]">
-    HTTP headers sent with every request to the agent (e.g. auth tokens). Each header is a `{"name": str, "value": str}` dict.
+    HTTP headers sent with every request to the agent (e.g. auth tokens), as a `{name: value}` dict.
   </Property>
   <Property name="description" type="str | None">
     Human-readable description.
   </Property>
-  <Property name="stateful" type="bool | None">
-    Whether the agent is stateful.
+  <Property name="input_schema" type="dict[str, Any] | None">
+    JSON Schema describing the agent's expected input. Defaults to the conversational (chat) schema when omitted.
+  </Property>
+  <Property name="output_schema" type="dict[str, Any] | None">
+    JSON Schema describing the agent's expected output. Defaults to the conversational (chat) schema when omitted.
+  </Property>
+  <Property name="auto_bindings" type="list[ForwardBindingParam | AggregateBindingParam] | None">
+    Automatic input/output bindings. Chat agents get a default aggregate binding that rebuilds conversation history; pass `[]` for single-turn agents.
   </Property>
 
 ```python title="Example"
@@ -302,6 +309,9 @@ agent = hub.agents.create(
   <Property name="description" type="str | None">Updated description.</Property>
   <Property name="headers" type="dict[str, str] | None">Updated HTTP headers.</Property>
   <Property name="supported_languages" type="list[str] | None">Updated language codes.</Property>
+  <Property name="input_schema" type="dict[str, Any] | None">Updated input JSON Schema.</Property>
+  <Property name="output_schema" type="dict[str, Any] | None">Updated output JSON Schema.</Property>
+  <Property name="auto_bindings" type="list[ForwardBindingParam | AggregateBindingParam] | None">Updated bindings.</Property>
 </MethodCard>
 
 <MethodCard name=".list()" returnType="list[Agent]">
@@ -322,23 +332,29 @@ agent = hub.agents.create(
   <Property name="agent_ids" type="list[str]" required>IDs of agents to delete.</Property>
 </MethodCard>
 
-<MethodCard name=".generate_completion()" returnType="AgentOutput">
-  Call a registered agent with a list of messages and get the response.
+<MethodCard name=".generate_completion()" returnType="GenerateCompletionOutput">
+  Call a registered agent with a structured input and get the response.
 
   <Property name="agent_id" type="str" required>
     ID of the agent to call.
   </Property>
-  <Property name="messages" type="Iterable[ChatMessageParam]" required>
-    Conversation messages as `[{"role": "user", "content": "..."}]`.
+  <Property name="input" type="dict[str, Any]" required>
+    Structured input matching the agent's input schema. For chat agents: `{"messages": [{"role": "user", "content": "..."}]}`. The legacy `messages=` list argument is deprecated.
+  </Property>
+  <Property name="chat_id" type="str | None">
+    Playground chat to attach the completion to.
+  </Property>
+  <Property name="interactions" type="Iterable[tuple[dict, dict]] | None">
+    Prior (input, output) pairs providing conversation context.
   </Property>
 
 ```python title="Example"
 output = hub.agents.generate_completion(
     agent.id,
-    messages=[{"role": "user", "content": "What is your return policy?"}],
+    input={"messages": [{"role": "user", "content": "What is your return policy?"}]},
 )
-print(output.response.content)
-print(output.metadata)
+print(output.output["response"]["content"])
+print(output.output.get("metadata"))
 ```
 
 </MethodCard>
@@ -347,7 +363,10 @@ print(output.metadata)
   Test connectivity to an agent endpoint without persisting the agent.
 
   <Property name="url" type="str" required>HTTP endpoint URL to test.</Property>
+  <Property name="project_id" type="str" required>Project ID.</Property>
   <Property name="headers" type="dict[str, str]">HTTP headers to include in the test request.</Property>
+  <Property name="agent_id" type="str | None">Existing agent to test.</Property>
+  <Property name="input_schema" type="dict[str, Any] | None">Input schema used to build the test payload.</Property>
 </MethodCard>
 
 <MethodCard name=".generate_description()" returnType="str">
@@ -356,29 +375,23 @@ print(output.metadata)
   <Property name="agent_id" type="str" required>ID of the agent.</Property>
 </MethodCard>
 
-<MethodCard name=".detect_statefulness()" returnType="AgentDetectStatefulness">
-  Detect whether the agent is stateful by analyzing its behavior.
-
-  <Property name="agent_id" type="str" required>ID of the agent to detect statefulness for.</Property>
-</MethodCard>
-
 </ResourceSection>
 
 ---
 
 ### `hub.checks`
 
-<ResourceSection description="Define and manage reusable check criteria for evaluating agent responses. Checks are project-scoped and can be referenced by identifier in any test case.">
+<ResourceSection description="Define and manage reusable check criteria for evaluating agent responses. Checks are project-scoped and can be referenced by identifier in any scenario.">
 
 ```python
 from giskard_hub.types import Check, CheckResult
 ```
 
 <MethodCard name=".create()" returnType="Check">
-  Create a custom check in the specified project.
+  Create a custom check in the specified project. Provide either `params` or `spec`, not both.
 
 <Property name="identifier" type="str" required>
-  Unique identifier to reference this check in test cases.
+  Unique identifier to reference this check in scenarios. Must start with `custom_` (e.g. `custom_my_check`).
 </Property>
 <Property name="name" type="str" required>
   Display name.
@@ -386,8 +399,11 @@ from giskard_hub.types import Check, CheckResult
 <Property name="project_id" type="str" required>
   Project this check belongs to.
 </Property>
-<Property name="params" type="CheckTypeParam" required>
-  Check configuration (see check type params below).
+<Property name="params" type="CheckTypeParam">
+  Check configuration with a `type` discriminator (see check type params below).
+</Property>
+<Property name="spec" type="dict[str, object]">
+  Raw check spec with a `kind` discriminator (e.g. `{"kind": "hub_correctness", "reference": "..."}`).
 </Property>
 <Property name="description" type="str | None">
   Human-readable description.
@@ -396,9 +412,9 @@ from giskard_hub.types import Check, CheckResult
 ```python title="Example"
 check = hub.checks.create(
     project_id=project.id,
-    identifier="tone_professional",
+    identifier="custom_tone_professional",
     name="Professional tone",
-    params={"type": "conformity", "rules": ["Use formal language."]},
+    params={"type": "hub_conformity", "rules": ["Use formal language."]},
 )
 ```
 
@@ -443,18 +459,30 @@ check = hub.checks.create(
 
 #### Check type params
 
-The `params` field accepts one of these shapes:
+The `params` field accepts one of these shapes (main params shown; see the [built-in checks guide](/hub/sdk/guides/datasets-and-checks#built-in-checks) for full detail):
 
-| Type                    | `params` shape                                                          | Evaluation method |
-| ----------------------- | ----------------------------------------------------------------------- | ----------------- |
-| **Correctness**         | `{"type": "correctness", "reference": str}`                             | LLM judge         |
-| **Conformity**          | `{"type": "conformity", "rules": list[str]}`                            | LLM judge         |
-| **Groundedness**        | `{"type": "groundedness", "context": str}`                              | LLM judge         |
-| **Semantic similarity** | `{"type": "semantic_similarity", "reference": str, "threshold": float}` | Embedding         |
-| **String match**        | `{"type": "string_match", "keyword": str}`                              | Rule-based        |
-| **Metadata**            | `{"type": "metadata", "json_path_rules": list[JsonPathRule]}`           | Rule-based        |
+| Type                    | `params` shape                                                                                                                              | Evaluation method |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| **Correctness (Hub)**   | `{"type": "hub_correctness", "reference": str}`                                                                                             | LLM judge         |
+| **Conformity (Hub)**    | `{"type": "hub_conformity", "rules": list[str]}`                                                                                            | LLM judge         |
+| **Groundedness (Hub)**  | `{"type": "hub_groundedness", "context": str}`                                                                                              | LLM judge         |
+| **LLM judge**           | `{"type": "llm_judge", "prompt": str}`                                                                                                      | LLM judge         |
+| **Conformity**          | `{"type": "conformity", "rule": str}`                                                                                                       | LLM judge         |
+| **Groundedness**        | `{"type": "groundedness", "context": str \| list[str], "context_key": str}`                                                                 | LLM judge         |
+| **Contradiction**       | `{"type": "contradiction", "context": str \| list[str]}`                                                                                    | LLM judge         |
+| **Toxicity**            | `{"type": "toxicity", "categories": list[str]}`                                                                                             | LLM judge         |
+| **Answer relevance**    | `{"type": "answer_relevance"}`                                                                                                              | LLM judge         |
+| **Semantic similarity** | `{"type": "semantic_similarity", "reference_text": str, "threshold": float}`                                                                | Embedding         |
+| **String matching**     | `{"type": "string_matching", "keyword": str, "case_sensitive": bool}`                                                                       | Rule-based        |
+| **Regex matching**      | `{"type": "regex_matching", "pattern": str}`                                                                                                | Rule-based        |
+| **Comparisons**         | `{"type": "equals" \| "not_equals" \| "greater_than" \| "greater_than_equals" \| "less_than" \| "less_than_equals", "expected_value": Any}` | Rule-based        |
+| **Metadata (Hub)**      | `{"type": "hub_metadata", "json_path_rules": list[JsonPathRule]}`                                                                           | Rule-based        |
+| **JSON valid**          | `{"type": "json_valid", "expected_schema": dict}`                                                                                           | Rule-based        |
+| **Readability**         | `{"type": "readability", "metric": str, "min_score": float, "max_score": float}`                                                            | Rule-based        |
 
 Each `JsonPathRule`: `{"json_path": str, "expected_value": str, "expected_value_type": "string" | "number" | "boolean"}`
+
+Every check also accepts a target path parameter to point it at a specific field of a structured output: `text_key` for the Hub LLM checks, `metadata_key` for `hub_metadata`, and `target_key` for the rest.
 
 </ResourceSection>
 
@@ -462,10 +490,10 @@ Each `JsonPathRule`: `{"json_path": str, "expected_value": str, "expected_value_
 
 ### `hub.datasets`
 
-<ResourceSection description="Create datasets, import test cases, and auto-generate test suites from scenarios or knowledge bases.">
+<ResourceSection description="Create datasets, import scenarios, and auto-generate test suites from prompt presets or knowledge bases.">
 
 ```python
-from giskard_hub.types import Dataset, TestCase, TaskProgress
+from giskard_hub.types import Dataset, Scenario, TaskProgress
 ```
 
 <MethodCard name=".create()" returnType="Dataset">
@@ -474,39 +502,41 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
   <Property name="name" type="str" required>Display name.</Property>
   <Property name="project_id" type="str" required>Project this dataset belongs to.</Property>
   <Property name="description" type="str | None">Human-readable description.</Property>
+  <Property name="input_schema" type="dict[str, Any] | None">JSON Schema for scenario inputs. Defaults to the chat input schema.</Property>
+  <Property name="output_schema" type="dict[str, Any] | None">JSON Schema for scenario outputs. Defaults to the chat output schema.</Property>
 </MethodCard>
 
 <MethodCard name=".upload()" returnType="Dataset">
-  Import test cases from a file or list of dicts into a dataset.
+  Import scenarios from a file or list of dicts into a dataset.
 
   <Property name="project_id" type="str" required>Project ID.</Property>
   <Property name="data" type="FileTypes | list[dict[str, Any]] | str" required>
-    File path (`str` or `Path`), file-like object, or list of dicts. Each record should have a `messages` list and optional `checks` list.
+    File path (`str` or `Path`), file-like object, or list of dicts. Each record should have an `interactions` list (`{"input", "output", "checks"}`). The legacy `messages`/`checks`/`demo_output` record shape is deprecated but still translated.
   </Property>
   <Property name="dataset_id" type="str | None">Append to an existing dataset instead of creating a new one.</Property>
   <Property name="name" type="str | None">Name for the new dataset.</Property>
 </MethodCard>
 
-<MethodCard name=".generate_scenario_based()" returnType="Dataset">
-  Generate a dataset of test cases from scenario definitions. The dataset's `status` will be `"running"` until generation completes -- use `hub.helpers.wait_for_completion()` to wait.
+<MethodCard name=".generate_preset_based()" returnType="Dataset">
+  Generate a dataset of scenarios from a prompt preset. The dataset's `status` will be `"running"` until generation completes -- use `hub.helpers.wait_for_completion()` to wait. The deprecated `generate_scenario_based(scenario_id=)` alias still works.
 
   <Property name="project_id" type="str" required>Project ID.</Property>
-  <Property name="agent_id" type="str" required>Agent to generate test cases for.</Property>
-  <Property name="scenario_id" type="str" required>Scenario template to use.</Property>
-  <Property name="n_examples" type="int">Number of test cases to generate.</Property>
+  <Property name="agent_id" type="str" required>Agent to generate scenarios for.</Property>
+  <Property name="prompt_preset_id" type="str" required>Prompt preset template to use.</Property>
+  <Property name="n_examples" type="int">Number of scenarios to generate.</Property>
   <Property name="dataset_id" type="str | None">Append to an existing dataset.</Property>
   <Property name="dataset_name" type="str | None">Name for the new dataset.</Property>
 </MethodCard>
 
 <MethodCard name=".generate_document_based()" returnType="Dataset">
-  Generate test cases grounded in knowledge base documents. Async -- use `hub.helpers.wait_for_completion()`.
+  Generate scenarios grounded in knowledge base documents. Async -- use `hub.helpers.wait_for_completion()`.
 
-  <Property name="agent_id" type="str" required>Agent to generate test cases for.</Property>
+  <Property name="agent_id" type="str" required>Agent to generate scenarios for.</Property>
   <Property name="knowledge_base_id" type="str" required>Knowledge base to source documents from.</Property>
   <Property name="project_id" type="str" required>Project ID.</Property>
   <Property name="dataset_name" type="str">Name for the new dataset.</Property>
   <Property name="description" type="str | None">Dataset description.</Property>
-  <Property name="n_examples" type="int">Number of test cases to generate.</Property>
+  <Property name="n_examples" type="int">Number of scenarios to generate.</Property>
   <Property name="topic_ids" type="list[str]">Filter to specific KB topics.</Property>
 </MethodCard>
 
@@ -550,24 +580,24 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
 </MethodCard>
 
 <MethodCard name=".list_tags()" returnType="list[str]">
-  List all tags used across test cases in a dataset.
+  List all tags used across scenarios in a dataset.
 
   <Property name="dataset_id" type="str" required>Dataset ID.</Property>
 </MethodCard>
 
-<MethodCard name=".list_test_cases()" returnType="list[TestCase]">
-  List all test cases in a dataset.
+<MethodCard name=".list_scenarios()" returnType="list[Scenario]">
+  List all scenarios in a dataset. The deprecated `list_test_cases()` alias still works.
 
   <Property name="dataset_id" type="str" required>Dataset ID.</Property>
 </MethodCard>
 
-<MethodCard name=".search_test_cases()" returnType="list[TestCase]">
-  Search test cases with filters, sorting, and pagination. Pass `include_metadata=True` to receive `tuple[list[TestCase], APIPaginatedMetadata]`.
+<MethodCard name=".search_scenarios()" returnType="list[Scenario]">
+  Search scenarios with filters, sorting, and pagination. Pass `include_metadata=True` to receive `tuple[list[Scenario], APIPaginatedMetadata]`. The deprecated `search_test_cases()` alias still works.
 
   <Property name="dataset_id" type="str" required>Dataset ID.</Property>
   <Property name="query" type="str | None">Free-text search query.</Property>
-  <Property name="order_by" type="list[TestCaseOrderByParam] | None">Sorting criteria.</Property>
-  <Property name="filters" type="TestCaseFiltersParam | None">Filter criteria.</Property>
+  <Property name="order_by" type="list[ScenarioOrderByParam] | None">Sorting criteria.</Property>
+  <Property name="filters" type="ScenarioFiltersParam | None">Filter criteria.</Property>
   <Property name="limit" type="int | None">Maximum results per page.</Property>
   <Property name="offset" type="int | None">Results offset for pagination.</Property>
   <Property name="include_metadata" type="bool" defaultValue="False">Include pagination metadata in the return value.</Property>
@@ -579,7 +609,7 @@ from giskard_hub.types import Dataset, TestCase, TaskProgress
 
 ### `hub.evaluations`
 
-<ResourceSection description="Run agents against datasets, inspect per-test-case results, and manage the evaluation lifecycle. Sub-resource: hub.evaluations.results.">
+<ResourceSection description="Run agents against datasets, inspect per-scenario results, and manage the evaluation lifecycle. Sub-resource: hub.evaluations.results.">
 
 ```python
 from giskard_hub.types import Evaluation, Metric, CheckResult
@@ -605,10 +635,10 @@ from giskard_hub.types import Evaluation, Metric, CheckResult
   Evaluation run name.
 </Property>
 <Property name="tags" type="list[str] | None">
-  Filter test cases by tags.
+  Filter scenarios by tags.
 </Property>
 <Property name="run_count" type="int">
-  Run each test case N times (for consistency testing).
+  Run each scenario N times (for consistency testing).
 </Property>
 <Property name="scheduled_evaluation_id" type="str | None">
   Link to a scheduled evaluation.
@@ -635,7 +665,7 @@ hub.helpers.print_metrics(evaluation)
   </Property>
   <Property name="dataset_id" type="str | None">Dataset to evaluate against.</Property>
   <Property name="name" type="str | None">Evaluation name.</Property>
-  <Property name="tags" type="list[str] | None">Filter test cases by tags.</Property>
+  <Property name="tags" type="list[str] | None">Filter scenarios by tags.</Property>
   <Property name="old_evaluation_id" type="str | None">Reuse a previous evaluation's dataset.</Property>
 
 :::tip
@@ -644,13 +674,23 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
 
 </MethodCard>
 
+<MethodCard name=".upload()" returnType="Evaluation">
+  Upload a giskard.checks `SuiteResult` (from Giskard OSS) as a local Hub evaluation.
+
+  <Property name="project_id" type="str" required>Project to attach the uploaded evaluation to.</Property>
+  <Property name="payload" type="dict[str, Any]" required>JSON payload produced by `SuiteResult.to_hub_format()`.</Property>
+  <Property name="agent_id" type="str | None">Hub agent to associate with the uploaded evaluation.</Property>
+  <Property name="name" type="str | None">Name for the evaluation. Auto-generated when omitted.</Property>
+  <Property name="auto_classify_failures" type="bool | None">Run the failure-category classifier on each failed scenario synchronously. Defaults to false.</Property>
+</MethodCard>
+
 <MethodCard name=".run_single()" returnType="list[CheckResult]">
   Evaluate a single (input, output) pair against checks without creating a full evaluation.
 
-  <Property name="messages" type="Iterable[ChatMessageParam]" required>Conversation messages.</Property>
-  <Property name="agent_output" type="AgentOutputParam" required>Agent's output to evaluate.</Property>
+  <Property name="project_id" type="str" required>Project ID the checks belong to.</Property>
+  <Property name="input_data" type="dict[str, Any]" required>Structured input (for chat agents: `{"messages": [...]}`). The legacy `messages=` list argument is deprecated.</Property>
+  <Property name="agent_output" type="AgentOutputParam | dict | str" required>Agent's output to evaluate. A bare string is wrapped as an assistant response.</Property>
   <Property name="checks" type="Iterable[CheckConfigParam]" required>Checks to apply.</Property>
-  <Property name="project_id" type="str | None">Project ID.</Property>
   <Property name="agent_description" type="str">Description of the agent for context.</Property>
 </MethodCard>
 
@@ -698,22 +738,22 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
 Inspect, filter, update, and rerun individual evaluation results.
 
 ```python
-from giskard_hub.types import TestCaseEvaluation, FailureCategory
+from giskard_hub.types import ScenarioEvaluation, FailureCategory
 ```
 
-<MethodCard name=".retrieve()" returnType="TestCaseEvaluation">
+<MethodCard name=".retrieve()" returnType="ScenarioEvaluation">
   <Property name="result_id" type="str" required>
     Result ID.
   </Property>
   <Property name="evaluation_id" type="str" required>
     Evaluation ID.
   </Property>
-  <Property name="include" type='list[Literal["test_case"]] | None'>
+  <Property name="include" type='list[Literal["scenario"]] | None'>
     Embed related resources.
   </Property>
 </MethodCard>
 
-<MethodCard name=".update()" returnType="TestCaseEvaluation">
+<MethodCard name=".update()" returnType="ScenarioEvaluation">
   Update the failure category of an evaluation result.
 
   <Property name="result_id" type="str" required>Result ID.</Property>
@@ -721,16 +761,16 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   <Property name="failure_category" type="FailureCategoryParam | None">Failure classification to assign.</Property>
 </MethodCard>
 
-<MethodCard name=".list()" returnType="list[TestCaseEvaluation]">
+<MethodCard name=".list()" returnType="list[ScenarioEvaluation]">
   <Property name="evaluation_id" type="str" required>
     Evaluation ID.
   </Property>
-  <Property name="include" type='list[Literal["test_case"]] | None'>
+  <Property name="include" type='list[Literal["scenario"]] | None'>
     Embed related resources.
   </Property>
 </MethodCard>
 
-<MethodCard name=".search()" returnType="list[TestCaseEvaluation] | tuple[list[TestCaseEvaluation], APIPaginatedMetadata]">
+<MethodCard name=".search()" returnType="list[ScenarioEvaluation] | tuple[list[ScenarioEvaluation], APIPaginatedMetadata]">
   Search and filter results. Pass `include_metadata=True` for pagination metadata.
 
   <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
@@ -739,11 +779,13 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   <Property name="order_by" type="list[ResultOrderByParam] | None">Sorting criteria.</Property>
   <Property name="limit" type="int | None">Maximum results.</Property>
   <Property name="offset" type="int | None">Results offset.</Property>
-  <Property name="include" type='list[Literal["test_case"]] | None'>Embed related resources.</Property>
+  <Property name="include" type='list[Literal["scenario"]] | None'>Embed related resources.</Property>
   <Property name="include_metadata" type="bool" defaultValue="False">Include pagination metadata.</Property>
 </MethodCard>
 
-<MethodCard name=".rerun_test_case()" returnType="TestCaseEvaluation">
+<MethodCard name=".rerun_scenario()" returnType="ScenarioEvaluation">
+  Rerun a single result. The deprecated `rerun_test_case()` alias still works.
+
   <Property name="result_id" type="str" required>
     Result ID.
   </Property>
@@ -752,7 +794,7 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   </Property>
 </MethodCard>
 
-<MethodCard name=".submit_local_output()" returnType="TestCaseEvaluation">
+<MethodCard name=".submit_local_output()" returnType="ScenarioEvaluation">
   Submit locally-generated agent output for evaluation and scoring.
 
   <Property name="result_id" type="str" required>Result ID.</Property>
@@ -761,13 +803,13 @@ from giskard_hub.types import TestCaseEvaluation, FailureCategory
   <Property name="error" type="str | None">Error message if the agent call failed.</Property>
 </MethodCard>
 
-<MethodCard name=".update_visibility()" returnType="TestCaseEvaluation">
+<MethodCard name=".update_visibility()" returnType="ScenarioEvaluation">
   Show or hide a result from the default view.
 
   <Property name="result_id" type="str" required>Result ID.</Property>
   <Property name="evaluation_id" type="str" required>Evaluation ID.</Property>
   <Property name="hidden" type="bool" required>Whether the result should be hidden.</Property>
-  <Property name="set_test_case_draft" type="bool | None">Also set the linked test case to draft status.</Property>
+  <Property name="set_scenario_draft" type="bool | None">Also set the linked scenario to draft status.</Property>
 </MethodCard>
 
 </ResourceSection>
@@ -787,7 +829,7 @@ from giskard_hub.types import Evaluation, Scan, ChatMessage, AgentOutput
 
 <Property name="entity" type="TStateful" required>
   Any stateful entity: `Evaluation`, `Scan`, `Dataset`, `KnowledgeBase`,
-  `ScanProbe`, `TestCaseEvaluation`.
+  `ScanProbe`, `ScenarioEvaluation`.
 </Property>
 <Property name="poll_interval" type="float" defaultValue="5.0">
   Seconds between polling requests.
@@ -828,7 +870,7 @@ Always reassign the return value: `entity = hub.helpers.wait_for_completion(enti
     Required when `agent` is remote (str or Agent). Not required for local callables.
   </Property>
   <Property name="name" type="str | None">Evaluation run name.</Property>
-  <Property name="tags" type="list[str] | None">Filter test cases by tags.</Property>
+  <Property name="tags" type="list[str] | None">Filter scenarios by tags.</Property>
 
   <Tabs>
     <TabItem label="Remote agent">
@@ -973,7 +1015,7 @@ kb = hub.helpers.wait_for_completion(kb)
 
 ### `hub.projects`
 
-<ResourceSection description="Top-level workspace that groups all related resources: agents, datasets, evaluations, scans, and more. Sub-resource: hub.projects.scenarios.">
+<ResourceSection description="Top-level workspace that groups all related resources: agents, datasets, evaluations, scans, and more. Sub-resource: hub.projects.prompt_presets.">
 
 ```python
 from giskard_hub.types import Project
@@ -1028,65 +1070,65 @@ from giskard_hub.types import Project
   <Property name="project_ids" type="list[str]" required>IDs of projects to delete.</Property>
 </MethodCard>
 
-### `hub.projects.scenarios`
+### `hub.projects.prompt_presets`
 
-Reusable persona and behaviour templates for scenario-based dataset generation.
+Reusable persona and behaviour templates for preset-based dataset generation. The deprecated `hub.projects.scenarios` alias still works and maps to the same endpoints.
 
 ```python
-from giskard_hub.types import Scenario, ScenarioPreview
+from giskard_hub.types import PromptPreset, PromptPresetPreview
 ```
 
-<MethodCard name=".create()" returnType="Scenario">
+<MethodCard name=".create()" returnType="PromptPreset">
   <Property name="project_id" type="str" required>
     Project ID.
   </Property>
   <Property name="name" type="str" required>
-    Scenario name.
+    Prompt preset name.
   </Property>
   <Property name="description" type="str" required>
-    Scenario description.
+    Prompt preset description.
   </Property>
   <Property name="rules" type="list[str]">
     Rules the generated conversations should follow.
   </Property>
 </MethodCard>
 
-<MethodCard name=".preview()" returnType="ScenarioPreview">
-  Generate a preview conversation for a scenario without persisting it.
+<MethodCard name=".preview()" returnType="PromptPresetPreview">
+  Generate a preview conversation for a prompt preset without persisting it.
 
   <Property name="project_id" type="str" required>Project ID.</Property>
-  <Property name="description" type="str" required>Scenario description.</Property>
-  <Property name="rules" type="list[str]">Scenario rules.</Property>
+  <Property name="description" type="str" required>Prompt preset description.</Property>
+  <Property name="rules" type="list[str]">Prompt preset rules.</Property>
   <Property name="agent_id" type="str | None">Agent ID for preview.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve()" returnType="Scenario">
-  Retrieve a scenario by its ID within a project.
+<MethodCard name=".retrieve()" returnType="PromptPreset">
+  Retrieve a prompt preset by its ID within a project.
 
-  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="prompt_preset_id" type="str" required>Prompt preset ID.</Property>
   <Property name="project_id" type="str" required>Project ID.</Property>
 </MethodCard>
 
-<MethodCard name=".update()" returnType="Scenario">
-  Update an existing scenario's definition.
+<MethodCard name=".update()" returnType="PromptPreset">
+  Update an existing prompt preset's definition.
 
-  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="prompt_preset_id" type="str" required>Prompt preset ID.</Property>
   <Property name="project_id" type="str" required>Project ID.</Property>
   <Property name="name" type="str | None">Updated name.</Property>
   <Property name="description" type="str | None">Updated description.</Property>
   <Property name="rules" type="list[str] | None">Updated rules.</Property>
 </MethodCard>
 
-<MethodCard name=".list()" returnType="list[Scenario]">
-  List all scenarios for a project.
+<MethodCard name=".list()" returnType="list[PromptPreset]">
+  List all prompt presets for a project.
 
   <Property name="project_id" type="str" required>Project ID.</Property>
 </MethodCard>
 
 <MethodCard name=".delete()" returnType="None">
-  Delete a scenario from a project.
+  Delete a prompt preset from a project.
 
-  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="prompt_preset_id" type="str" required>Prompt preset ID.</Property>
   <Property name="project_id" type="str" required>Project ID.</Property>
 </MethodCard>
 
@@ -1245,10 +1287,10 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
     Monthly only: 1 through 28.
   </Property>
   <Property name="tags" type="list[str] | None">
-    Filter test cases by tags.
+    Filter scenarios by tags.
   </Property>
   <Property name="run_count" type="int | None">
-    Run each test case N times.
+    Run each scenario N times.
   </Property>
 </MethodCard>
 
@@ -1307,7 +1349,7 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
 
 ### `hub.tasks`
 
-<ResourceSection description="Lightweight issue tracker for managing findings from evaluations and scans. Link tasks to specific evaluation results, test cases, or probe attempts.">
+<ResourceSection description="Lightweight issue tracker for managing findings from evaluations and scans. Link tasks to specific evaluation results, scenarios, or probe attempts.">
 
 ```python
 from giskard_hub.types import Task, TaskStatus, TaskPriority
@@ -1332,14 +1374,14 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
   <Property name="evaluation_result_id" type="str | None">
     Link to a specific evaluation result.
   </Property>
-  <Property name="dataset_test_case_id" type="str | None">
-    Link to a specific test case.
+  <Property name="dataset_scenario_id" type="str | None">
+    Link to a specific scenario. The deprecated `dataset_test_case_id` alias still works.
   </Property>
   <Property name="probe_attempt_id" type="str | None">
     Link to a specific scan probe attempt.
   </Property>
   <Property name="disable_test" type="bool">
-    Disable the linked test case.
+    Disable the linked scenario.
   </Property>
   <Property name="hide_result" type="bool">
     Hide the linked evaluation result.
@@ -1360,7 +1402,7 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
   <Property name="priority" type="TaskPriority | None">Updated priority: `"low"`, `"medium"`, or `"high"`.</Property>
   <Property name="description" type="str | None">Updated description.</Property>
   <Property name="assignee_ids" type="list[str] | None">Updated user IDs to assign.</Property>
-  <Property name="set_test_case_status" type="str | None">Also set the linked test case's status.</Property>
+  <Property name="set_scenario_status" type="str | None">Also set the linked scenario's status. The deprecated `set_test_case_status` alias still works.</Property>
 </MethodCard>
 
 <MethodCard name=".list()" returnType="list[Task]">
@@ -1385,65 +1427,58 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
 
 ---
 
-### `hub.test_cases`
+### `hub.scenarios`
 
-<ResourceSection description="Create, update, and manage individual test cases within datasets. Sub-resource: hub.test_cases.comments.">
+<ResourceSection description="Create, update, and manage individual scenarios within datasets. Sub-resource: hub.scenarios.comments. The deprecated hub.test_cases alias still works and maps to the same endpoints.">
 
 ```python
-from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
+from giskard_hub.types import Scenario, ScenarioComment, Interaction
 ```
 
-<MethodCard name=".create()" returnType="TestCase">
-  Create a new test case with conversation messages and optional checks.
+<MethodCard name=".create()" returnType="Scenario">
+  Create a new scenario from a list of interactions.
 
-  <Property name="dataset_id" type="str" required>Dataset this test case belongs to.</Property>
-  <Property name="messages" type="Iterable[ChatMessageParam]" required>
-    Conversation messages as `[{"role": "user", "content": "..."}]`. Should **not** include the final assistant response.
+  <Property name="dataset_id" type="str" required>Dataset this scenario belongs to.</Property>
+  <Property name="interactions" type="Iterable[InteractionParam]" required>
+    Interactions as `[{"input": {...}, "output": {...}, "checks": [...]}]`. For chat agents, `input` is `{"messages": [{"role", "content"}]}`. The legacy `messages=` / `checks=` / `demo_output=` arguments are deprecated but still translated.
   </Property>
-  <Property name="checks" type="Iterable[CheckConfigParam]">
-    Checks to apply: `[{"identifier": "correctness", "params": {"reference": "..."}}]`.
-  </Property>
-  <Property name="demo_output" type="str | ChatMessageWithMetadataParam | None">
-    Expected output for display only -- not used during evaluation.
-  </Property>
-  <Property name="status" type='"active" | "draft" | None'>Test case status.</Property>
+  <Property name="status" type='"active" | "draft" | None'>Scenario status.</Property>
   <Property name="tags" type="list[str]">Tags for filtering.</Property>
+  <Property name="source_probe_attempt_id" type="str | None">Scan probe attempt this scenario was promoted from.</Property>
 </MethodCard>
 
-<MethodCard name=".retrieve()" returnType="TestCase">
-  Retrieve a test case by its ID.
+<MethodCard name=".retrieve()" returnType="Scenario">
+  Retrieve a scenario by its ID.
 
-  <Property name="test_case_id" type="str" required>Test case ID.</Property>
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
 </MethodCard>
 
-<MethodCard name=".update()" returnType="TestCase">
-  Update an existing test case's messages, checks, tags, or status.
+<MethodCard name=".update()" returnType="Scenario">
+  Update an existing scenario's interactions, tags, or status.
 
-  <Property name="test_case_id" type="str" required>Test case ID.</Property>
-  <Property name="messages" type="Iterable[ChatMessageParam] | None">Updated conversation messages.</Property>
-  <Property name="checks" type="Iterable[CheckConfigParam] | None">Updated checks.</Property>
-  <Property name="demo_output" type="str | ChatMessageWithMetadataParam | None">Updated expected output.</Property>
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
+  <Property name="interactions" type="Iterable[InteractionParam] | None">Updated interactions.</Property>
   <Property name="status" type='"active" | "draft" | None'>Updated status.</Property>
   <Property name="tags" type="list[str] | None">Updated tags.</Property>
-  <Property name="dataset_id" type="str | None">Move the test case to a different dataset.</Property>
+  <Property name="dataset_id" type="str | None">Move the scenario to a different dataset.</Property>
 </MethodCard>
 
 <MethodCard name=".delete()" returnType="None">
-  Delete a test case by its ID.
+  Delete a scenario by its ID.
 
-  <Property name="test_case_id" type="str" required>Test case ID.</Property>
+  <Property name="scenario_id" type="str" required>Scenario ID.</Property>
 </MethodCard>
 
 <MethodCard name=".bulk_delete()" returnType="None">
-  <Property name="test_case_ids" type="list[str]" required>
-    IDs of test cases to delete.
+  <Property name="scenario_ids" type="list[str]" required>
+    IDs of scenarios to delete.
   </Property>
 </MethodCard>
 
-<MethodCard name=".bulk_update()" returnType="list[TestCase]">
-  Update multiple test cases at once. Returns the updated test cases.
+<MethodCard name=".bulk_update()" returnType="list[Scenario]">
+  Update multiple scenarios at once. Returns the updated scenarios.
 
-  <Property name="test_case_ids" type="list[str]" required>Test case IDs.</Property>
+  <Property name="scenario_ids" type="list[str]" required>Scenario IDs.</Property>
   <Property name="status" type='Literal["active", "draft"] | None'>Updated status.</Property>
   <Property name="disabled_checks" type="list[str] | None">Checks to disable.</Property>
   <Property name="enabled_checks" type="list[str] | None">Checks to enable.</Property>
@@ -1452,30 +1487,30 @@ from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
 </MethodCard>
 
 <MethodCard name=".bulk_move()" returnType="None">
-  Move or copy test cases to another dataset.
+  Move or copy scenarios to another dataset.
 
-  <Property name="test_case_ids" type="list[str]" required>Test case IDs to move.</Property>
+  <Property name="scenario_ids" type="list[str]" required>Scenario IDs to move.</Property>
   <Property name="target_dataset_id" type="str" required>Target dataset ID.</Property>
   <Property name="duplicate" type="bool">Copy instead of move.</Property>
 </MethodCard>
 
-### `hub.test_cases.comments`
+### `hub.scenarios.comments`
 
-<MethodCard name=".add()" returnType="TestCaseComment">
-  <Property name="test_case_id" type="str" required>
-    Test case ID.
+<MethodCard name=".add()" returnType="ScenarioComment">
+  <Property name="scenario_id" type="str" required>
+    Scenario ID.
   </Property>
   <Property name="content" type="str" required>
     Comment text.
   </Property>
 </MethodCard>
 
-<MethodCard name=".edit()" returnType="TestCaseComment">
+<MethodCard name=".edit()" returnType="ScenarioComment">
   <Property name="comment_id" type="str" required>
     Comment ID.
   </Property>
-  <Property name="test_case_id" type="str" required>
-    Test case ID.
+  <Property name="scenario_id" type="str" required>
+    Scenario ID.
   </Property>
   <Property name="content" type="str" required>
     Updated text.
@@ -1486,8 +1521,8 @@ from giskard_hub.types import TestCase, TestCaseComment, ChatMessageWithMetadata
   <Property name="comment_id" type="str" required>
     Comment ID.
   </Property>
-  <Property name="test_case_id" type="str" required>
-    Test case ID.
+  <Property name="scenario_id" type="str" required>
+    Scenario ID.
   </Property>
 </MethodCard>
 
@@ -1612,7 +1647,7 @@ All Python types referenced by the methods above. Click any type name in a metho
   <LinkCard
     title="Agent types"
     href="#agent-types"
-    description="Agent, AgentOutput, AgentReference, MinimalAgent"
+    description="Agent, AgentOutput, GenerateCompletionOutput, MinimalAgent"
   />
   <LinkCard
     title="Check types"
@@ -1620,14 +1655,14 @@ All Python types referenced by the methods above. Click any type name in a metho
     description="Check, CheckResult, CheckConfig, OutputAnnotation"
   />
   <LinkCard
-    title="Dataset and test case types"
-    href="#dataset-and-test-case-types"
-    description="Dataset, TestCase, TestCaseComment, references"
+    title="Dataset and scenario types"
+    href="#dataset-and-scenario-types"
+    description="Dataset, Scenario, Interaction, ScenarioComment, references"
   />
   <LinkCard
     title="Evaluation types"
     href="#evaluation-types"
-    description="Evaluation, Metric, TestCaseEvaluation, FailureCategory"
+    description="Evaluation, Metric, ScenarioEvaluation, FailureCategory"
   />
   <LinkCard
     title="Scan types"
@@ -1640,9 +1675,9 @@ All Python types referenced by the methods above. Click any type name in a metho
     description="KnowledgeBase, Topic, document rows"
   />
   <LinkCard
-    title="Project and scenario types"
-    href="#project-and-scenario-types"
-    description="Project, Scenario, ScenarioPreview"
+    title="Project and prompt preset types"
+    href="#project-and-prompt-preset-types"
+    description="Project, PromptPreset, PromptPresetPreview"
   />
   <LinkCard
     title="Scheduled evaluation types"
@@ -1831,14 +1866,44 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="headers" type="dict[str, str]">
     HTTP headers sent with every request.
   </Property>
-  <Property name="stateful" type="bool">
-    Whether the agent is stateful.
+  <Property name="input_schema" type="dict[str, Any] | None">
+    JSON Schema describing the agent's expected input.
+  </Property>
+  <Property name="output_schema" type="dict[str, Any] | None">
+    JSON Schema describing the agent's expected output.
+  </Property>
+  <Property name="auto_bindings" type="list[ForwardBinding | AggregateBinding] | None">
+    Automatic input/output bindings.
   </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
   </Property>
   <Property name="updated_at" type="datetime">
     Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ForwardBinding">
+  <Property name="mode" type='"forward"'>
+    Binding mode discriminator.
+  </Property>
+  <Property name="target" type="str">
+    Input field the value is written to.
+  </Property>
+  <Property name="source" type="str">
+    JSONPath in the previous output the value is read from.
+  </Property>
+</TypeTable>
+
+<TypeTable name="AggregateBinding">
+  <Property name="mode" type='"aggregate"'>
+    Binding mode discriminator.
+  </Property>
+  <Property name="target" type="str">
+    Input field the aggregated values are written to (e.g. `"messages"`).
+  </Property>
+  <Property name="outputs_path" type="str">
+    JSONPath in each previous output to aggregate (e.g. `"$.response"`).
   </Property>
 </TypeTable>
 
@@ -1875,9 +1940,12 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="AgentDetectStatefulness">
-  <Property name="stateful" type="bool">
-    Whether the agent was detected as stateful.
+<TypeTable name="GenerateCompletionOutput">
+  <Property name="output" type="dict[str, Any]">
+    Raw structured output of the agent, matching its output schema. For chat agents: `{"response": {...}, "metadata": {...}}`. The deprecated `.response` and `.message` accessors read `output["response"]`.
+  </Property>
+  <Property name="error" type="ExecutionError | None">
+    Error details if the agent call failed.
   </Property>
 </TypeTable>
 
@@ -2011,11 +2079,11 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="CheckTypeParam">
   <Property name="alias" type="union">
-    `TypeAlias` for the union of `CorrectnessParamsParam`, `ConformityParamsParam`, `GroundednessParamsParam`, `StringMatchParamsParam`, `MetadataParamsParam`, and `SemanticSimilarityParamsParam`. See [Check type params](#check-type-params) for the concrete shapes.
+    `TypeAlias` for the union of the typed params dicts for all 21 built-in checks: `HubCorrectnessParamsParam`, `HubConformityParamsParam`, `HubGroundednessParamsParam`, `HubMetadataParamsParam`, `LLMJudgeParamsParam`, `ConformityParamsParam`, `GroundednessParamsParam`, `ContradictionParamsParam`, `ToxicityParamsParam`, `AnswerRelevanceParamsParam`, `SemanticSimilarityParamsParam`, `StringMatchingParamsParam`, `RegexMatchingParamsParam`, the six comparison params, `JsonValidParamsParam`, and `ReadabilityParamsParam`. See [Check type params](#check-type-params) for the concrete shapes.
   </Property>
 </TypeTable>
 
-### Dataset and test case types
+### Dataset and scenario types
 
 <TypeTable name="Dataset">
   <Property name="id" type="str">
@@ -2030,11 +2098,17 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="project_id" type="str">
     Parent project ID.
   </Property>
+  <Property name="input_schema" type="dict[str, Any]">
+    JSON Schema for scenario inputs (defaults to the chat input schema).
+  </Property>
+  <Property name="output_schema" type="dict[str, Any]">
+    JSON Schema for scenario outputs (defaults to the chat output schema).
+  </Property>
   <Property name="status" type="TaskProgress">
     Async operation status (for generated datasets).
   </Property>
   <Property name="tags" type="list[str]">
-    All tags used across test cases.
+    All tags used across scenarios.
   </Property>
   <Property name="state" type="TaskState">
     Computed from `status.state` — e.g. `"finished"`, `"running"`.
@@ -2061,37 +2135,34 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     Dataset to subset.
   </Property>
   <Property name="tags" type="list[str] | None">
-    Restrict to test cases matching these tags.
+    Restrict to scenarios matching these tags.
   </Property>
   <Property name="target_type" type='"dataset" | None'>
     Discriminator for criterion unions.
   </Property>
 </TypeTable>
 
-<TypeTable name="TestCase">
+<TypeTable name="Scenario">
   <Property name="id" type="str">
     Unique identifier.
   </Property>
   <Property name="dataset_id" type="str">
     Parent dataset ID.
   </Property>
-  <Property name="messages" type="list[ChatMessage]">
-    Conversation messages.
+  <Property name="interactions" type="list[Interaction] | None">
+    Ordered interactions, each with an input, optional output, and checks.
   </Property>
-  <Property name="demo_output" type="AgentOutput | None">
-    Expected output (display only — not used during evaluation).
-  </Property>
-  <Property name="checks" type="list[CheckConfig]">
-    Configured checks.
-  </Property>
-  <Property name="comments" type="list[TestCaseComment]">
-    Annotations attached to this test case.
+  <Property name="comments" type="list[ScenarioComment]">
+    Annotations attached to this scenario.
   </Property>
   <Property name="tags" type="list[str]">
     Tags for filtering.
   </Property>
   <Property name="status" type='"active" | "draft"'>
-    Test case status.
+    Scenario status.
+  </Property>
+  <Property name="schema_validation" type="ScenarioSchemaValidation">
+    Whether the scenario's input and output match the dataset schemas.
   </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
@@ -2101,13 +2172,37 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="TestCaseReference">
+<TypeTable name="Interaction">
+  <Property name="position" type="int">
+    Zero-based position of the interaction in the scenario.
+  </Property>
+  <Property name="input" type="dict[str, Any]">
+    Structured input matching the dataset's input schema (for chat: `{"messages": [...]}`).
+  </Property>
+  <Property name="output" type="dict[str, Any] | None">
+    Expected output (display and reference only, matching the output schema).
+  </Property>
+  <Property name="checks" type="list[InteractionCheckConfig] | None">
+    Checks applied to the agent's response for this interaction.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScenarioSchemaValidation">
+  <Property name="input_valid" type="bool">
+    Whether the interaction inputs match the dataset's input schema.
+  </Property>
+  <Property name="output_valid" type="bool">
+    Whether the interaction outputs match the dataset's output schema.
+  </Property>
+</TypeTable>
+
+<TypeTable name="ScenarioReference">
   <Property name="id" type="str">
     Unique identifier.
   </Property>
 </TypeTable>
 
-<TypeTable name="TestCaseComment">
+<TypeTable name="ScenarioComment">
   <Property name="id" type="str">
     Unique identifier.
   </Property>
@@ -2125,7 +2220,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="TestCaseOrderByParam">
+<TypeTable name="ScenarioOrderByParam">
   <Property name="id" type='"created_at" | "id" | "status" | "updated_at"' required>
     Column to sort by.
   </Property>
@@ -2134,7 +2229,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="TestCaseFiltersParam">
+<TypeTable name="ScenarioFiltersParam">
   <Property name="alias" type="dict">
     `Dict` mapping a column name to a filter value. Valid columns: `"metrics"`, `"status"`, `"tags"`.
   </Property>
@@ -2204,40 +2299,40 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="Metric">
   <Property name="name" type="str">
-    Check identifier (e.g. `"correctness"`, `"global"`).
+    Check identifier (e.g. `"hub_correctness"`, `"global"`).
   </Property>
   <Property name="display_name" type="str | None">
     Human-readable name.
   </Property>
   <Property name="passed" type="int | None">
-    Number of test cases that passed.
+    Number of scenarios that passed.
   </Property>
   <Property name="failed" type="int | None">
-    Number of test cases that failed.
+    Number of scenarios that failed.
   </Property>
   <Property name="errored" type="int | None">
-    Number of test cases that errored.
+    Number of scenarios that errored.
   </Property>
   <Property name="total" type="int | None">
-    Total test cases evaluated.
+    Total scenarios evaluated.
   </Property>
   <Property name="success_rate" type="float | None">
     Pass rate as a float between `0.0` and `1.0`.
   </Property>
 </TypeTable>
 
-<TypeTable name="TestCaseEvaluation">
+<TypeTable name="ScenarioEvaluation">
   <Property name="id" type="str">
     Unique identifier.
   </Property>
   <Property name="evaluation_id" type="str">
     Parent evaluation ID.
   </Property>
-  <Property name="test_case" type="TestCase | TestCaseReference">
-    The test case.
+  <Property name="scenario" type="Scenario | ScenarioReference">
+    The scenario. The deprecated `.test_case` accessor still works.
   </Property>
-  <Property name="test_case_exists" type="bool | None">
-    Whether the test case still exists.
+  <Property name="scenario_exists" type="bool | None">
+    Whether the scenario still exists.
   </Property>
   <Property name="state" type="TaskState">
     Result state: `"finished"`, `"running"`, `"error"`.
@@ -2245,7 +2340,10 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="results" type="list[CheckResult]">
     Per-check outcomes.
   </Property>
-  <Property name="output" type="AgentOutput | None">
+  <Property name="interaction_results" type="list[InteractionResultData] | None">
+    Per-interaction inputs, outputs, and check results.
+  </Property>
+  <Property name="output" type="AgentOutput | dict | None">
     The agent's actual response.
   </Property>
   <Property name="error" type="str | None">
@@ -2304,7 +2402,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="TestCaseEvaluationReference">
+<TypeTable name="ScenarioEvaluationReference">
   <Property name="id" type="str">
     Unique identifier.
   </Property>
@@ -2448,8 +2546,11 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="probe_id" type="str">
     Parent probe ID.
   </Property>
-  <Property name="messages" type="list[ChatMessageWithMetadata]">
-    Conversation messages exchanged with the agent.
+  <Property name="input" type="dict[str, Any]">
+    Structured adversarial input sent to the agent (for chat agents: `{"messages": [...]}`). The deprecated `.messages` accessor flattens `input` and `output` into chat messages.
+  </Property>
+  <Property name="output" type="dict[str, Any]">
+    Structured response from the agent.
   </Property>
   <Property name="metadata" type="dict[str, object]">
     Arbitrary metadata about the attempt.
@@ -2636,7 +2737,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-### Project and scenario types
+### Project and prompt preset types
 
 <TypeTable name="Project">
   <Property name="id" type="str">
@@ -2659,15 +2760,15 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="Scenario">
+<TypeTable name="PromptPreset">
   <Property name="id" type="str">
     Unique identifier.
   </Property>
   <Property name="name" type="str">
-    Scenario name.
+    Prompt preset name.
   </Property>
   <Property name="description" type="str | None">
-    Scenario description.
+    Prompt preset description.
   </Property>
   <Property name="rules" type="list[str]">
     Rules the generated conversations should follow.
@@ -2680,12 +2781,12 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="ScenarioPreview">
-  <Property name="conversation" type="list[dict[str, Any]]">
-    Generated preview conversation.
+<TypeTable name="PromptPresetPreview">
+  <Property name="inputs" type="list[dict[str, Any]]">
+    Generated preview inputs.
   </Property>
   <Property name="generated_rules" type="list[str] | None">
-    Rules inferred from the scenario description.
+    Rules inferred from the prompt preset description.
   </Property>
 </TypeTable>
 
@@ -2774,10 +2875,10 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     Monthly only: 1 through 28.
   </Property>
   <Property name="tags" type="list[str]">
-    Tags used to filter test cases.
+    Tags used to filter scenarios.
   </Property>
   <Property name="run_count" type="int">
-    Number of times each test case is run per execution.
+    Number of times each scenario is run per execution.
   </Property>
   <Property name="paused" type="bool">
     Whether the schedule is currently paused.
@@ -2823,8 +2924,8 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="assignees" type="list[User]">
     Assigned users.
   </Property>
-  <Property name="references" type="list[TestCaseEvaluationReference | ScanProbeAttemptReference | TestCaseReference]">
-    Linked resources (evaluation results, test cases, or probe attempts).
+  <Property name="references" type="list[ScenarioEvaluationReference | ScanProbeAttemptReference | ScenarioReference]">
+    Linked resources (evaluation results, scenarios, or probe attempts).
   </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
@@ -2861,14 +2962,26 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="agent" type="AgentReference | Agent | None">
     The agent that responded.
   </Property>
-  <Property name="messages" type="list[ChatMessageWithMetadata]">
-    Conversation messages.
+  <Property name="exchanges" type="list[PlaygroundExchange]">
+    Ordered exchanges. The deprecated `.messages` accessor flattens them into chat messages.
   </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
   </Property>
   <Property name="updated_at" type="datetime">
     Last update timestamp.
+  </Property>
+</TypeTable>
+
+<TypeTable name="PlaygroundExchange">
+  <Property name="input" type="dict[str, Any]">
+    Structured input sent to the agent.
+  </Property>
+  <Property name="output" type="dict[str, Any]">
+    Structured output returned by the agent.
+  </Property>
+  <Property name="metadata" type="dict[str, Any] | None">
+    Arbitrary metadata attached to the exchange.
   </Property>
 </TypeTable>
 
