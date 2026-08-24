@@ -22,7 +22,7 @@ for chat in chats:
     print(f"{chat.id} — agent: {chat.agent.name} — {chat.created_at}")
 ```
 
-`project_id` is required — chats are always scoped to a single project. On a busy project, pass `limit` and `offset` to page through the results, and `include=["agent"]` to embed the full agent object rather than a lightweight reference.
+`project_id` is required — chats are always scoped to a single project. On a busy project, pass `limit` and `offset` to page through the results, and `include=["agent"]` to embed the related agent object in each chat.
 
 ---
 
@@ -31,7 +31,6 @@ for chat in chats:
 ```python
 chat = hub.playground_chats.retrieve(
     "chat-id",
-    include=["agent"],
 )
 
 print(f"Chat with: {chat.agent.name}")
