@@ -1,6 +1,6 @@
 ---
 title: "Omission"
-description: "Learn about LLM omission business failures and how to detect and prevent models from incorrectly omitting information that is present in the reference context."
+description: "Understand omission, the business failure where an LLM leaves out information present in its reference context, and how to detect incomplete answers."
 sidebar:
   order: 7
 ---

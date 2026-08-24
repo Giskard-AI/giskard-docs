@@ -1,6 +1,6 @@
 ---
 title: Migration Guide
-description: Migrate from the Giskard Hub SDK v2.x to v3.x — breaking changes, renamed resources, and updated patterns.
+description: "Move from Giskard Hub SDK v2.x to v3.x: breaking changes, renamed resources, the new hub.projects call style, and updated code patterns."
 sidebar:
   order: 7
 ---

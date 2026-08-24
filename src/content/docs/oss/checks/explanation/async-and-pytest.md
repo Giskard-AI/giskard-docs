@@ -1,6 +1,6 @@
 ---
 title: Async design & pytest
-description: "Why Giskard Checks are async-first and how to use them correctly in scripts, pytest, and Jupyter notebooks."
+description: "Why Giskard Checks are async-first, what actually runs concurrently, and how to await suites and scenarios in scripts, pytest, and Jupyter notebooks."
 sidebar:
   order: 3
 ---

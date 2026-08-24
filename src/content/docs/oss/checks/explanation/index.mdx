@@ -10,6 +10,16 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 Understanding-oriented articles that explain the _why_ behind Giskard Checks design decisions.
 
+These pages are background reading rather than instructions: nothing here is a
+step you follow, and no page assumes you are in the middle of a task. Start with
+[Core Concepts](/oss/checks/explanation/core-concepts), which introduces the
+primitives — Interaction, Trace, Check, Scenario — that the rest of the
+documentation takes for granted. From there, [When to Use Which
+Check](/oss/checks/explanation/when-to-use-which-check) covers how to choose
+between rule-based, semantic, and LLM-as-judge validation, while the remaining
+two pages explain the async execution model and the JSONPath syntax used to pull
+values out of a trace.
+
 <CardGrid>
   <LinkCard
     title="Core Concepts"
