@@ -10,8 +10,6 @@ import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 In this section, we will walk you through how to setup projects, agents and knowledge bases using the Hub interface.
 
-These three pages cover everything you need before you can test an agent. Start with **Setup projects**: a project is the workspace that holds your agents, datasets, evaluations and scans, so it has to exist first. Then move to **Setup agents** to connect a deployed agent to the Hub through its API endpoint, which is what evaluations and red teaming scans run against. Finally, **Setup knowledge bases** is optional but recommended for RAG agents: uploading your domain documents lets the Hub generate test cases and scan probes grounded in your own content.
-
 <CardGrid>
   <LinkCard
     title="Setup projects"
@@ -29,8 +27,6 @@ These three pages cover everything you need before you can test an agent. Start 
     description="Setup and organize knowledge bases we can use to test your agents"
   />
 </CardGrid>
-
-The diagram below shows how the three pieces fit together. A project comes first, then agents and knowledge bases branch off it independently: you can create either one next, and a knowledge base only needs documents uploaded before it is useful. Once an agent is connected, you are ready to move on to [scanning](/hub/ui/scan) for vulnerabilities or building [datasets](/hub/ui/datasets) of test cases to evaluate against.
 
 ## High-level workflow
 

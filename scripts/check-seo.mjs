@@ -1,20 +1,30 @@
 /**
- * Title and meta-description invariants.
+ * Checks the <title> and <meta name="description"> of every built page.
  *
- * Runs against the BUILT html in dist/client, not the markdown source, because
- * Starlight appends " | Giskard Documentation" to every <title>. A 45-character
- * frontmatter title is a 69-character page title, so a source-level check
- * passes on pages that are truncated in production.
+ * Four rules, all objective:
+ *   - <title> present, at most 60 characters, unique across the site
+ *   - meta description present, 120-158 characters, unique across the site
  *
- * Scope is deliberately narrow: these two tags, four objective rules. It exists
- * because an audit found 8 over-length titles, 4 pairs of pages sharing a
- * title, and 65 of 139 descriptions outside the snippet window -- drift that
- * accumulates one reasonable-looking page at a time and is only visible
- * site-wide, which is precisely what a per-PR human review cannot see.
+ * Why built HTML and not frontmatter: Starlight appends " | Giskard
+ * Documentation" to every title, so a 45-character frontmatter title ships as a
+ * 69-character page title. Checking the source would pass pages that are
+ * truncated in production.
  *
- * Page length and content quality are NOT checked here on purpose: "too thin"
- * is a judgement call, and encoding it would need an exemption list that goes
- * stale the first time someone writes a legitimately short page.
+ * Why the lengths: Google truncates the result title around 60 characters and
+ * the snippet around 158. Below 120 it tends to ignore the description and
+ * assemble a snippet from page text instead.
+ *
+ * Why uniqueness: two pages sharing a title or description compete for the same
+ * query and Google picks the winner, not you. This is the rule that pays for
+ * the file. Length mistakes are visible in a single diff; collisions are not --
+ * they appear one reasonable-looking page at a time and are only detectable
+ * site-wide, which is exactly what per-PR review cannot see.
+ *
+ * Deliberately out of scope: word count, readability, keyword use, heading
+ * structure. Those are judgement calls. Encoding a minimum page length here
+ * would need a list of exempt pages, and that list goes stale the first time
+ * someone writes a legitimately short page -- at which point the check is
+ * theatre. Judge content in review; keep CI to what is countable.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "fs";
 import { resolve, dirname, relative } from "path";

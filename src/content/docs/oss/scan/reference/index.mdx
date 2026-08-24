@@ -10,8 +10,6 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 Signatures, defaults, and types for everything exported by `giskard.scan`. These pages assume you have run a scan already; for what the terms mean, see [How the Scan Works](/oss/scan/explanation/how-scan-works) and the [glossary](/start/glossary).
 
-Three pages cover the package. **Scan API** is the one to open first: it documents the entry points you call directly, `vulnerability_scan` and `quality_scan`, along with the lower-level `generate_suite`, the `third_party_scan` bridge, and the `ScanOptions` that bound a run. **Generators** is the catalog of everything that can produce scenarios, and what each one attacks. **Knowledge Base** covers `KnowledgeBase` and `Document`, the documents the quality scan writes questions from and checks answers against. For task-shaped instructions rather than signatures, see the [how-to guides](/oss/scan/how-to).
-
 <CardGrid>
   <LinkCard
     title="Scan API"
