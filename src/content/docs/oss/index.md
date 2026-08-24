@@ -10,7 +10,7 @@ The library is available on [GitHub](https://github.com/Giskard-AI/giskard-oss) 
 Giskard v3 is a major rewrite and includes new features such as [Checks](/oss/checks).
 
 :::note
-Looking for Giskard v2 features? **Scan** is available in v3 through the `scan` extra: install `pip install --pre "giskard[scan]"`. **RAGET** is not available in v3 yet — use the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai) if you need it, and follow the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252) for progress.
+Coming from Giskard v2? Read [Migrate from Giskard v2 to v3](/oss/migrate-from-v2). In short: the v2 **scan** is now `vulnerability_scan` and **RAGET** is now `quality_scan`, both in the `scan` extra (`pip install --pre "giskard[scan]"`). Tabular, classification, and regression models have no v3 equivalent — keep using the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai) for those, and follow the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252) for progress.
 :::
 
 ## Resources and support
