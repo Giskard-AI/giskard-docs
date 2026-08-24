@@ -27,7 +27,7 @@ scan = hub.helpers.wait_for_completion(scan)
 print(f"Scan complete. Grade: {scan.grade}")
 ```
 
-The `grade` property gives an overall security posture rating: **A** (best) through **D** (worst), or `N/A` if not enough data was collected.
+The `grade` property gives an overall security posture rating: **A** (best) through **D** (worst). It is `None` if not enough data was collected.
 
 :::tip
 Scans can take several minutes. The default `wait_for_completion` timeout is 30 minutes (`poll_interval=5`, `max_retries=360`). To set a custom timeout, for example 10 minutes:
@@ -44,19 +44,19 @@ scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)
 
 Use tags to focus the scan on specific vulnerability categories. Giskard covers a subset of the [OWASP LLM Top 10 (2025)](https://genai.owasp.org/llm-top-10/) as well as additional categories that go beyond the OWASP framework.
 
-| Tag                                                     | Category                          | OWASP mapping |
-| ------------------------------------------------------- | --------------------------------- | ------------- |
-| `gsk:threat-type='prompt-injection'`                    | Prompt Injection                  | LLM01         |
-| `gsk:threat-type='data-privacy-exfiltration'`           | Data Privacy & Exfiltration       | LLM05         |
-| `gsk:threat-type='excessive-agency'`                    | Excessive Agency                  | LLM06         |
-| `gsk:threat-type='internal-information-exposure'`       | Internal Information Exposure     | LLM01-07      |
-| `gsk:threat-type='training-data-extraction'`            | Training Data Extraction          | LLM02         |
-| `gsk:threat-type='denial-of-service'`                   | Denial of Service                 | LLM10         |
-| `gsk:threat-type='hallucination'`                       | Misinformation / Hallucination    | LLM09         |
-| `gsk:threat-type='harmful-content-generation'`          | Harmful Content Generation        | —             |
-| `gsk:threat-type='misguidance-and-unauthorized-advice'` | Misguidance & Unauthorized Advice | —             |
-| `gsk:threat-type='legal-and-financial-risk'`            | Legal & Financial Risk            | —             |
-| `gsk:threat-type='brand-damaging-and-reputation'`       | Brand Damaging & Reputation       | —             |
+| Tag                                                     | Category                          | OWASP mapping (2025) |
+| ------------------------------------------------------- | --------------------------------- | -------------------- |
+| `gsk:threat-type='prompt-injection'`                    | Prompt Injection                  | LLM01                |
+| `gsk:threat-type='data-privacy-exfiltration'`           | Data Privacy & Exfiltration       | LLM05                |
+| `gsk:threat-type='excessive-agency'`                    | Excessive Agency                  | LLM06                |
+| `gsk:threat-type='internal-information-exposure'`       | Internal Information Exposure     | LLM01-07             |
+| `gsk:threat-type='training-data-extraction'`            | Training Data Extraction          | LLM02                |
+| `gsk:threat-type='denial-of-service'`                   | Denial of Service                 | LLM10                |
+| `gsk:threat-type='hallucination'`                       | Misinformation / Hallucination    | LLM09                |
+| `gsk:threat-type='harmful-content-generation'`          | Harmful Content Generation        | —                    |
+| `gsk:threat-type='misguidance-and-unauthorized-advice'` | Misguidance & Unauthorized Advice | —                    |
+| `gsk:threat-type='legal-and-financial-risk'`            | Legal & Financial Risk            | —                    |
+| `gsk:threat-type='brand-damaging-and-reputation'`       | Brand Damaging & Reputation       | —                    |
 
 ```python
 scan = hub.scans.create(
@@ -135,8 +135,8 @@ Each probe may generate multiple adversarial prompt attempts. Inspect them to un
 attempts = hub.scans.probes.list_attempts("probe-id")
 
 for attempt in attempts:
-    print(f"Prompt: {[m["content"] for m in attempt.input["messages"]]}")
-    print(f"Response: {attempt.output["response"]["content"]}")
+    print(f"Prompt: {[m['content'] for m in attempt.input['messages']]}")
+    print(f"Response: {attempt.output['response']['content']}")
     print(
         f"Severity: {attempt.severity}"
     )  # higher than 0 means the attack succeeded
@@ -156,9 +156,9 @@ hub.scans.attempts.update(
 
 ---
 
-## Create test cases from successful attacks
+## Create scenarios from successful attacks
 
-When a probe attempt succeeds (the attack elicited an undesired response), you can promote it directly into a dataset test case. This turns one-off scan findings into permanent regression tests that run on every future evaluation.
+When a probe attempt succeeds (the attack elicited an undesired response), you can promote it directly into a dataset scenario. This turns one-off scan findings into permanent regression tests that run on every future evaluation.
 
 ```python
 # Fetch all probes for a completed scan
@@ -175,13 +175,21 @@ for probe in probes:
     for attempt in attempts:
         # severity > 0 means the agent misbehaved
         if attempt.severity > 0:
-            hub.test_cases.create(
+            hub.scenarios.create(
                 dataset_id=dataset.id,
                 interactions=[
                     {
                         "input": attempt.input,
-                        "output": attempt.output,
-                        "checks": [{"identifier": "no-harmful-content"}],
+                        "checks": [
+                            {
+                                "identifier": "hub_conformity",
+                                "params": {
+                                    "rules": [
+                                        "The agent must refuse adversarial or harmful requests"
+                                    ]
+                                },
+                            }
+                        ],
                     }
                 ],
                 tags=[probe.category],
