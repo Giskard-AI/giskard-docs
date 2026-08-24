@@ -7,18 +7,6 @@ sidebar:
 
 The Giskard scan needs two things before it can run: the Python package, and an LLM provider with an API key. The scan cannot work without a model, because a model is what writes the attacks and grades the replies.
 
-## Install with a coding agent
-
-The fastest way to set up the scan. Paste a single URL into your coding agent and it handles the install and the provider configuration for you.
-
-:::tip[Paste this into your coding agent]
-
-```
-Follow the instructions from https://docs.giskard.ai/oss/scan/installation.md and install the Giskard scan in my project.
-```
-
-:::
-
 ## Install the Python package
 
 The scan requires **Python 3.12 or higher**:
@@ -78,6 +66,14 @@ pip install --pre "giskard[deepteam]"
 ```
 
 Install only the ones you plan to run; both pull in large dependency trees. See [`third_party_scan`](/oss/scan/reference/scan-api) for the arguments each tool accepts. A **probe** there is one canned attack that tool knows how to run, the equivalent of a Giskard generator.
+
+:::tip[Using a coding agent]
+Paste the following into your coding agent:
+
+```
+Follow the instructions from https://docs.giskard.ai/oss/scan/installation.md and install the Giskard scan in my project.
+```
+:::
 
 ## Next Steps
 
