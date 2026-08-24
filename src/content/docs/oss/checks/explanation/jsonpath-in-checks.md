@@ -5,18 +5,19 @@ sidebar:
   order: 4
 ---
 
-Built-in checks like `Groundedness`, `StringMatching`, and `LesserThan` accept path parameters (`key`, `answer_key`, `text_key`) that point into the trace. This page covers the syntax.
+Built-in checks like `Groundedness`, `StringMatching`, and `LessThan` accept path parameters such as `target_key`, `context_key`, and `question_key` that point into the trace. This page covers the syntax.
 
 ## The `trace.` Prefix
 
 All paths must start with `trace.`:
 
+<!-- pyright-skip: This block deliberately includes an invalid call to illustrate a bad JSONPath. -->
 ```python
 # Correct
-Groundedness(answer_key="trace.last.outputs.answer", ...)
+Groundedness(target_key="trace.last.outputs.answer", ...)
 
 # Wrong — raises an error
-Groundedness(answer_key="last.outputs.answer", ...)
+Groundedness(target_key="last.outputs.answer", ...)
 ```
 
 ## trace.last
@@ -24,9 +25,9 @@ Groundedness(answer_key="last.outputs.answer", ...)
 `trace.last` is shorthand for `trace.interactions[-1]` — the most recent interaction. Use an explicit index to reference earlier turns in multi-turn scenarios:
 
 ```python
-key = "trace.last.outputs"  # most recent
-key = "trace.interactions[0].outputs"  # first interaction
-key = "trace.interactions[-1].outputs"  # same as trace.last.outputs
+target_key = "trace.last.outputs"  # most recent
+target_key = "trace.interactions[0].outputs"  # first interaction
+target_key = "trace.interactions[-1].outputs"  # same as trace.last.outputs
 ```
 
 ## Common Patterns
@@ -42,14 +43,19 @@ key = "trace.interactions[-1].outputs"  # same as trace.last.outputs
 
 ## NoMatch
 
-When a path can't be resolved, the resolver returns a `NoMatch` sentinel instead of raising an exception. Built-in checks treat `NoMatch` as a failure with a descriptive message. In custom checks, handle it explicitly:
+When a path can't be resolved, the resolver returns a `NoMatch` sentinel instead of raising an exception. Every built-in check turns `NoMatch` into `CheckResult.error`, not a failure, with a message naming the path it could not resolve.
 
+The distinction matters when you read results. A failure means the check ran and your agent did not meet the bar. An error means the check could not run at all, usually because you typed the path wrong or the output shape changed.
+
+Follow the same convention in custom checks:
+
+<!-- pyright-skip: This is a method-body fragment; trace, self, and CheckResult come from the enclosing check. -->
 ```python
 from giskard.checks.core.extraction import resolve, NoMatch
 
 value = resolve(trace, self.field_path)
 if isinstance(value, NoMatch):
-    return CheckResult.failure(message=f"No value at '{self.field_path}'")
+    return CheckResult.error(message=f"No value at '{self.field_path}'")
 ```
 
 ## Paths in Jinja2 Templates

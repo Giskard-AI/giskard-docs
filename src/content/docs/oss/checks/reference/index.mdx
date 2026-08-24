@@ -8,9 +8,9 @@ sidebar:
 
 import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
-Complete API documentation for Giskard Checks -- a comprehensive testing framework for AI applications.
+These pages document the symbols in `giskard.checks` you will use directly. They assume you have written a test already. If you have not, start with [Your First Test](/oss/checks/tutorials/your-first-test); the terms used here (scenario, check, trace, judge) are introduced in [Core Concepts](/oss/checks/explanation/core-concepts).
 
-## API Modules
+## API modules
 
 <CardGrid>
   <LinkCard
@@ -43,6 +43,11 @@ Complete API documentation for Giskard Checks -- a comprehensive testing framewo
     description="Helper functions for normalization, value providers, and parameter injection"
     href="/oss/checks/reference/utils"
   />
+  <LinkCard
+    title="Settings"
+    description="Default LLM generator, embedding model, and environment-backed GiskardChecksSettings"
+    href="/oss/checks/reference/settings"
+  />
 </CardGrid>
 
 ## Quick reference
@@ -54,21 +59,25 @@ from giskard.checks import (
     CheckResult,
     CheckStatus,
     Interaction,
-    Trace,
     InteractionSpec,
+    Trace,
     Scenario,
     TestCase,
+    Suite,
+    SuiteResult,
     # Built-in checks
     FnCheck,
     StringMatching,
     RegexMatching,
     JsonValid,
+    Readability,
+    SemanticSimilarity,
     Equals,
     NotEquals,
-    LesserThan,
+    LessThan,
+    LessThanEquals,
     GreaterThan,
-    LesserThanEquals,
-    GreaterEquals,
+    GreaterThanEquals,
     AllOf,
     AnyOf,
     Not,
@@ -86,54 +95,13 @@ from giskard.checks import (
     AnswerRelevance,
     Toxicity,
     Conformity,
+    Contradiction,
     LLMJudge,
-    SemanticSimilarity,
 )
 
-# Scenarios
-from giskard.checks import generate_suite, ScenarioCategory
-
 # Generators
-from giskard.checks import LLMGenerator
-```
+from giskard.checks import LLMGenerator, DatasetInputGenerator, UserSimulator
 
-## Package structure
-
-```text
-giskard.checks/
-├── core/                 # Base classes and fundamental types
-│   ├── check.py          # Check base class
-│   ├── result.py         # CheckResult, CheckStatus
-│   ├── scenario.py       # Scenario
-│   ├── testcase.py       # TestCase
-│   ├── extraction.py     # Extractors
-│   └── interaction/      # Interaction types
-├── builtin/              # Ready-to-use checks
-│   ├── fn.py             # FnCheck
-│   ├── text_matching.py  # StringMatching, RegexMatching
-│   ├── comparison.py     # Equals, NotEquals, etc.
-│   ├── composition.py    # AllOf, AnyOf, Not
-│   ├── json_valid.py     # JsonValid
-│   ├── rego_policy.py    # RegoPolicy
-│   └── semantic_similarity.py
-├── judges/               # LLM-based checks
-│   ├── base.py           # BaseLLMCheck, LLMCheckResult
-│   ├── groundedness.py   # Groundedness
-│   ├── answer_relevance.py
-│   ├── toxicity.py
-│   ├── conformity.py     # Conformity
-│   └── judge.py          # LLMJudge
-├── scenarios/            # Multi-step workflows
-│   ├── runner.py         # ScenarioRunner
-│   ├── suite.py          # Suite
-│   └── catalog.py        # generate_suite, ScenarioCategory
-├── testing/              # Testing utilities
-│   ├── runner.py         # TestCaseRunner
-│   └── spy.py            # WithSpy
-├── generators/           # Input generators
-│   └── user.py           # UserSimulator
-└── utils/                # Helper utilities
-    ├── normalization.py
-    ├── injectable.py     # ValueProvider, ValueGenerator
-    └── generator.py
+# Suite generation lives in the scan package, not in giskard.checks
+from giskard.scan import generate_suite
 ```

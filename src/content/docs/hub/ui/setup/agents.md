@@ -108,7 +108,7 @@ Example stateful request (after the first turn):
     "messages": [
         {"role": "user", "content": "What color is an orange?"},
     ],
-    "metadata": {"thread_id": "abc-123"}
+    "metadata": {"thread_id": "abc-123"},
 }
 ```
 
@@ -117,7 +117,7 @@ Example stateful response:
 ```python
 {
     "response": {"role": "assistant", "content": "An orange is orange."},
-    "metadata": {"thread_id": "abc-123"}
+    "metadata": {"thread_id": "abc-123"},
 }
 ```
 

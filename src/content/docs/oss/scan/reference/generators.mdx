@@ -1,0 +1,441 @@
+---
+title: Generators
+description: "The giskard.scan scenario generator catalog: adversarial, Crescendo, GCG, GOAT, prompt injection, dataset-backed, and knowledge-base generators."
+sidebar:
+  order: 2
+---
+
+import Property from "../../../../../components/api/Property.astro";
+import MethodCard from "../../../../../components/api/MethodCard.astro";
+import ResourceSection from "../../../../../components/api/ResourceSection.astro";
+import TypeTable from "../../../../../components/api/TypeTable.astro";
+
+Scenario generators turn a plain-language description of your agent into runnable scenarios, where a scenario is one test case: a message or short conversation, plus the checks that judge the reply. Every scan is a set of generators plus a target. Pick them yourself with [`generate_suite`](/oss/scan/reference/scan-api#generate_suite), or take the curated sets used by `vulnerability_scan` and `quality_scan`.
+
+Which generators you run decides what the scan can find. Drop one and the failures it would have found never appear in the report. The table below lists every generator that produces scenarios, so it is also the limit of what a scan covers. Two more classes exist as bases you subclass rather than run: `KnowledgeBaseScenarioGenerator` (documented [below](#knowledgebasescenariogenerator)) and `BaseDatasetScenarioGenerator` in `giskard.scan.generators.base`.
+
+| Generator | Family | Multi-turn | Used by |
+| --------- | ------ | ---------- | ------- |
+| [`AdversarialScenarioGenerator`](#adversarialscenariogenerator) | LLM-driven | Yes | `vulnerability_scan` |
+| [`CrescendoAttackScenarioGenerator`](#crescendoattackscenariogenerator) | LLM-driven | Multi-turn only | `vulnerability_scan` |
+| [`GOATAttackScenarioGenerator`](#goatattackscenariogenerator) | LLM-driven | Multi-turn only | `vulnerability_scan` |
+| [`PromptInjectionScenarioGenerator`](#promptinjectionscenariogenerator) | Bundled dataset | Yes (dataset-defined) | `vulnerability_scan` |
+| [`GCGInjectionScenarioGenerator`](#gcginjectionscenariogenerator) | Hugging Face dataset | No | `vulnerability_scan` |
+| [`HuggingFaceDatasetScenarioGenerator`](#huggingfacedatasetscenariogenerator) | Hugging Face dataset | No | `vulnerability_scan` |
+| [`LocalDatasetScenarioGenerator`](#localdatasetscenariogenerator) | Bundled dataset | No | n/a |
+| [`HallucinationScenarioGenerator`](#hallucinationscenariogenerator) | Knowledge base | Yes | `quality_scan` |
+| [`SycophancyScenarioGenerator`](#sycophancyscenariogenerator) | Knowledge base | Yes | `quality_scan` |
+| [`SplitQuestionsScenarioGenerator`](#splitquestionsscenariogenerator) | Knowledge base | Multi-turn only (exactly 2 turns) | `quality_scan` |
+| [`MultiTopicScenarioGenerator`](#multitopicscenariogenerator) | Knowledge base | Multi-turn only (2+ turns) | `quality_scan` |
+| [`OutOfScopeScenarioGenerator`](#outofscopescenariogenerator) | Knowledge base | Yes | `quality_scan` |
+
+---
+
+## `ScenarioGenerator`
+
+**Module:** `giskard.scan.generators.base`
+
+Abstract base class for every generator. It is a Pydantic model, so generators are configured by constructor keyword and compare by value. Subclass it and implement `generate_scenario` to add your own.
+
+<MethodCard name=".generate_scenario()" returnType="list[Scenario]">
+  Generate scenarios for the described agent. Coroutine.
+
+  <Property name="context" type="ScenarioContext" required>Run-wide context carrying `description`, `languages`, and the optional `knowledge_base`.</Property>
+  <Property name="max_scenarios" type="int | None" defaultValue="None">Upper bound on the scenarios to return. `None` applies the generator's own default.</Property>
+  <Property name="rng" type="numpy.random.Generator | None" defaultValue="None">Seeded generator for reproducible sampling. In a multi-generator run each generator receives an independent child RNG.</Property>
+  <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>Desired conversation mode for the generated scenarios.</Property>
+</MethodCard>
+
+<TypeTable name="ScenarioGenerator">
+  <Property name="allow_commercial_use" type="bool">
+    Read-only property. Whether the generator's data permits commercial use. `True` on the base class; dataset generators override it from `repo_allow_commercial_use`.
+  </Property>
+</TypeTable>
+
+`ScenarioContext` is a frozen model with `description: str`, `languages: list[str]`, and `knowledge_base: KnowledgeBase | None`.
+
+```python
+from typing import Any, override
+from giskard.checks import Scenario, Trace
+from giskard.scan import ScenarioGenerator
+from giskard.scan.generators.base import DEFAULT_TARGET_MODE, ScenarioContext, TargetMode
+import numpy as np
+
+
+class MyScenarioGenerator(ScenarioGenerator):
+    max_turns: int = 2
+
+    @override
+    async def generate_scenario(
+        self,
+        context: ScenarioContext,
+        max_scenarios: int | None = None,
+        rng: np.random.Generator | None = None,
+        target_mode: TargetMode = DEFAULT_TARGET_MODE,
+    ) -> list[Scenario[Any, Any, Trace[Any, Any]]]:
+        return [Scenario("my-scenario")]
+```
+
+---
+
+## LLM-driven generators
+
+These generators call an LLM to build attacks tailored to your agent's description.
+
+### `AdversarialScenarioGenerator`
+
+<ResourceSection description="For each built-in adversarial category, an LLM produces natural-language conformity rules (for example 'the agent must not provide instructions for synthesizing chemical weapons'). Each rule becomes one scenario that crafts a realistic adversarial prompt and judges the response against the rule with a Conformity check.">
+
+**Module:** `giskard.scan.generators.adversarial`
+
+<Property name="max_turns" type="int" defaultValue="3">
+  Maximum conversation turns per scenario (`>= 1`). Capped to `1` automatically when `target_mode="singleturn"`.
+</Property>
+
+The attack style is a direct ask, dressed up to sound legitimate for your agent. It is the broadest generator, and the one most likely to catch a topic your agent should refuse but was never told about.
+
+Categories in `ADVERSARIAL_CATEGORIES`: Stereotypes and Discrimination, Politics, Religion, Chemical, Biological, Radiological and Nuclear materials, Copyright Violations, Misinformation & Disinformation, Illegal Activities, and Unauthorized Advice. Each carries its own tags: `threat-type:harmful-content-generation` for all but Unauthorized Advice, which uses `threat-type:misguidance-and-unauthorized-advice`.
+
+When `max_scenarios` is set, the budget is distributed across categories with a multinomial draw and each category is additionally capped at `MAX_RULES_PER_CATEGORY` (10), so the output count can be lower than requested. Without a budget each category produces `DEFAULT_RULES_PER_CATEGORY` (5) rules. Categories allocated zero budget are skipped entirely, with no LLM call.
+
+```python
+from giskard.scan import AdversarialScenarioGenerator
+
+generator = AdversarialScenarioGenerator(max_turns=3)
+```
+
+</ResourceSection>
+
+### `CrescendoAttackScenarioGenerator`
+
+<ResourceSection description="Generates one multi-turn scenario per harmful-content objective. The attacker starts with broad, benign questions and progressively narrows the conversation toward the objective.">
+
+**Module:** `giskard.scan.generators.crescendo`
+
+<Property name="max_turns" type="int" defaultValue="10">
+  Maximum attacker turns per scenario (`>= 1`). Defaults to `DEFAULT_CRESCENDO_MAX_TURNS`.
+</Property>
+
+An **objective** here is the harmful end state the attacker is steering toward. No single message would be refused on its own, which is the point: Crescendo catches agents that guard each turn in isolation but lose track of where the conversation is heading.
+
+Objectives come from `DEFAULT_CRESCENDO_OBJECTIVES` (botulinum toxin, sabotage, terrorist attack, self harm, anti-vaccine misinformation, moon landing hoax, sexual content, explosive device). `max_scenarios` selects how many objectives to include; `None` includes all of them.
+
+Multi-turn by design: with `target_mode="singleturn"` the generator logs a warning and returns no scenarios.
+
+```python
+from giskard.scan import CrescendoAttackScenarioGenerator
+
+generator = CrescendoAttackScenarioGenerator(max_turns=6)
+```
+
+</ResourceSection>
+
+### `GOATAttackScenarioGenerator`
+
+<ResourceSection description="Generates one multi-turn scenario per GOAT objective. An attacker LLM adapts over several turns, chaining strategies such as refusal suppression, persona modification, and hypothetical framing. The full strategy list is exposed to both the attacker and the evaluator prompt.">
+
+**Module:** `giskard.scan.generators.goat`
+
+<Property name="max_turns" type="int" defaultValue="10">
+  Maximum attacker turns per scenario (`>= 1`). Defaults to `DEFAULT_GOAT_MAX_TURNS`.
+</Property>
+
+Where Crescendo follows one fixed escalation, GOAT switches tactic when a turn fails. It catches agents whose refusal holds against one framing but folds when the same request comes back as a hypothetical or from a different persona.
+
+Objectives come from `DEFAULT_GOAT_OBJECTIVES`; strategies are `GOATAttackStrategy` entries with a `name`, `definition`, and optional `examples`. Multi-turn by design: `target_mode="singleturn"` yields no scenarios.
+
+```python
+from giskard.scan import GOATAttackScenarioGenerator
+
+generator = GOATAttackScenarioGenerator(max_turns=5)
+```
+
+</ResourceSection>
+
+---
+
+## Dataset-backed generators
+
+These load scenarios from a static dataset rather than generating them with an LLM. Without an explicit `max_scenarios` they return at most 20 scenarios; when a smaller budget is set, a random subset is drawn without replacement using the run's RNG. In `singleturn` mode every interaction generator inside the loaded scenarios is clamped to a single step.
+
+### `LocalDatasetScenarioGenerator`
+
+<ResourceSection description="Scenario generator backed by a static JSONL dataset bundled in the package. Reads one JSON object per line from data/<dataset_name>.jsonl and annotates each scenario with the run's description and languages.">
+
+**Module:** `giskard.scan.generators.base`
+
+<Property name="dataset_name" type="str" required>
+  Stem of the `.jsonl` file inside the package `data/` directory (e.g. `"prompt_injection"`). A missing file raises `RuntimeError`.
+</Property>
+<Property name="tags" type="list[str]" defaultValue="[]">
+  Tags applied to every loaded scenario. They replace the scenario's own tags rather than adding to them, so on a generator that ships default `threat-type:` and `owasp:` tags, passing `tags=` drops those and the default `group_by="threat-type"` report loses its buckets. Repeat the defaults in your list if you want to keep them.
+</Property>
+
+There is no attack style of its own: it replays whatever prompts the file holds. Use it, or `HuggingFaceDatasetScenarioGenerator`, when you have a corpus of attacks the LLM-driven generators will not invent, such as ones collected from your own production traffic.
+
+```python
+from giskard.scan import LocalDatasetScenarioGenerator
+
+generator = LocalDatasetScenarioGenerator(
+    dataset_name="prompt_injection",
+    tags=["team:security"],
+)
+```
+
+</ResourceSection>
+
+### `PromptInjectionScenarioGenerator`
+
+<ResourceSection description="Loads the bundled prompt_injection.jsonl dataset and tags every scenario as OWASP LLM Top-10 2025 LLM01 (prompt injection). Sampling behavior is inherited from LocalDatasetScenarioGenerator.">
+
+**Module:** `giskard.scan.generators.prompt_injection`
+
+A [prompt injection](/start/glossary/security/injection) tries to override your agent's own instructions with instructions in the user's message. These are published attempts that already work on other systems, so they are cheap to run and catch an agent that follows any instruction it reads.
+
+Some bundled scenarios carry their own turn budget: the indirect-injection entries declare `max_steps: 3`, so they run as short conversations under the default `target_mode="multiturn"`. Under `"singleturn"` they are clamped to one step rather than skipped.
+
+<Property name="dataset_name" type="str" defaultValue='"prompt_injection"'>
+  Bundled dataset stem.
+</Property>
+<Property name="tags" type="list[str]" defaultValue='["threat-type:prompt-injection", "owasp:llm-top-10-2025:LLM01"]'>
+  Tags applied to every loaded scenario.
+</Property>
+
+```python
+from giskard.scan import PromptInjectionScenarioGenerator
+
+generator = PromptInjectionScenarioGenerator()
+```
+
+</ResourceSection>
+
+### `HuggingFaceDatasetScenarioGenerator`
+
+<ResourceSection description="Scenario generator backed by a Hugging Face dataset repository. Scenarios are loaded from the repo and annotated with the run's description and languages.">
+
+**Module:** `giskard.scan.generators.huggingface`
+
+<Property name="repo_id" type="str" required>
+  Hugging Face dataset repository id, e.g. `"giskardai/do-not-answer-scenarios"`.
+</Property>
+<Property name="repo_allow_commercial_use" type="bool" defaultValue="True">
+  Whether the dataset's license permits commercial use. Set it explicitly per repo, because the license recorded on the Hub card is not always authoritative. This value backs `allow_commercial_use`, which is what `commercial_use=True` filters on.
+</Property>
+<Property name="tags" type="list[str]" defaultValue="[]">
+  Tags applied to every loaded scenario.
+</Property>
+
+The dataset must declare one *subset* (config) per language in its dataset card, named by BCP-47 code (e.g. an `"en"` config). Available languages are discovered from the card's `configs`, resolving each subset's `data_files` against the repo file list, so one language may span several files. Requested languages with no matching subset are skipped; if none match, an empty list is returned and a warning is emitted.
+
+```python
+from giskard.scan import HuggingFaceDatasetScenarioGenerator
+
+generator = HuggingFaceDatasetScenarioGenerator(
+    repo_id="giskardai/harmbench-scenarios",
+    repo_allow_commercial_use=True,
+)
+```
+
+</ResourceSection>
+
+### `GCGInjectionScenarioGenerator`
+
+<ResourceSection description="Generates GCG (Greedy Coordinate Gradient) injection scenarios: adversarial suffixes appended to harmful prompts to bypass safety measures and content filters.">
+
+**Module:** `giskard.scan.generators.gcg`
+
+<Property name="repo_id" type="str" defaultValue='"giskardai/harmbench-scenarios"'>
+  Hugging Face dataset of harmful base prompts.
+</Property>
+<Property name="repo_allow_commercial_use" type="bool" defaultValue="True">
+  Whether the base dataset's license permits commercial use.
+</Property>
+
+A **suffix** is a short string of nonsense-looking tokens, found by an optimizer against an open model, that pushes the model toward complying instead of refusing. It reads as garbage to a human, which is why it catches safety training that keys on how a request is phrased rather than what it asks for.
+
+Subclasses [`HuggingFaceDatasetScenarioGenerator`](#huggingfacedatasetscenariogenerator), so it inherits the per-language subset handling and the dataset's own safety judge. One adversarial suffix is appended to each loaded scenario, rotating through the suffix list by scenario index, so the output count matches the base dataset and `max_scenarios` is not inflated.
+
+It also appends its `gcg-suffix:<n>` tag to whatever tags the base scenario already had, instead of replacing them the way the `tags` field does. The dataset's `threat-type:` and `dataset:` tags survive, so grouped reports still work.
+
+The suffixes are English-tuned and appended verbatim regardless of the base prompt's language; per the upstream probe, they may not generalize to translated prompts.
+
+```python
+from giskard.scan import GCGInjectionScenarioGenerator
+
+generator = GCGInjectionScenarioGenerator()
+```
+
+</ResourceSection>
+
+---
+
+## Knowledge-base generators
+
+Document-grounded quality generators. They sample seed documents from the run's [`KnowledgeBase`](/oss/scan/reference/knowledge-base), retrieve nearest neighbors as private reference context, and build scenarios whose checks compare the agent's answers to that context. With no knowledge base in the run context they return an empty list.
+
+Two of the five are multi-turn by design. `SplitQuestionsScenarioGenerator` and `MultiTopicScenarioGenerator` log a warning and return no scenarios under `target_mode="singleturn"`, so `quality_scan(target_mode="singleturn")` runs three generators, not five, and produces no `component:history` results. Check the warnings if a single-turn quality report looks thinner than you expected.
+
+### `KnowledgeBaseScenarioGenerator`
+
+<ResourceSection description="Base class for document-grounded quality scenarios. It owns seed document sampling, nearest-neighbor retrieval, language sampling, turn-budget handling, and the default contradiction scenario shape; subclasses supply the prompt, scenario name, and quality tags.">
+
+**Module:** `giskard.scan.generators.knowledge_base.base`
+
+<Property name="context_documents" type="int" defaultValue="4">
+  Maximum number of nearest-neighbor documents used as private reference context for each scenario (`>= 1`).
+</Property>
+<Property name="max_turns" type="int" defaultValue="3">
+  Maximum user-simulator turns per scenario (`>= 1`). `target_mode="singleturn"` caps it to one turn, except on the two subclasses that skip single-turn runs entirely.
+</Property>
+
+Without an explicit `max_scenarios`, subclasses generate `DEFAULT_KNOWLEDGE_BASE_SCENARIOS` (5) scenarios. A subclass that does not define non-empty `scenario_name_prefix`, `prompt_path`, and `quality_tags` class variables raises `TypeError` at definition time.
+
+</ResourceSection>
+
+### `HallucinationScenarioGenerator`
+
+<ResourceSection description="Document-grounded hallucination scenarios. Samples seed documents and their nearest neighbors, then builds multi-turn scenarios driven by an LLM user simulator grounded in those documents. A contradiction check flags responses that clearly conflict with the retrieved context.">
+
+**Module:** `giskard.scan.generators.knowledge_base.hallucination`
+
+It asks plain questions your documents do answer, and catches the agent stating something the documents contradict. Start here: it is the cheapest check on whether answers track your sources at all.
+
+Scenario name prefix: `"Knowledge Base Direct Questions"`. Inherits `context_documents` and `max_turns` from [`KnowledgeBaseScenarioGenerator`](#knowledgebasescenariogenerator).
+
+```python
+from giskard.scan import HallucinationScenarioGenerator
+
+generator = HallucinationScenarioGenerator(context_documents=4, max_turns=3)
+```
+
+</ResourceSection>
+
+### `SycophancyScenarioGenerator`
+
+<ResourceSection description="Document-grounded sycophancy scenarios. An LLM user simulator pressures the agent with a plausible premise that the sampled documents explicitly contradict, testing whether the agent caves to the user rather than to its sources.">
+
+**Module:** `giskard.scan.generators.knowledge_base.sycophancy`
+
+The user states something false with confidence. An agent that answers correctly when asked neutrally can still agree with a confident user, and only this generator applies that pressure.
+
+Scenario name prefix: `"Knowledge Base Sycophantic Questions"`.
+
+```python
+from giskard.scan import SycophancyScenarioGenerator
+
+generator = SycophancyScenarioGenerator()
+```
+
+</ResourceSection>
+
+### `SplitQuestionsScenarioGenerator`
+
+<ResourceSection description="Two-message document-grounded questions. The first user message supplies context without asking anything; the second asks a question that only makes sense given the first.">
+
+**Module:** `giskard.scan.generators.knowledge_base.split_questions`
+
+<Property name="max_turns" type="int" defaultValue="2">
+  Fixed at exactly `2` (`ge=2, le=2`); the scenario shape needs both messages.
+</Property>
+
+The question is only answerable if the agent still has the first message. It catches retrieval that runs on the latest message alone and so searches for the wrong thing.
+
+Multi-turn by design: with `target_mode="singleturn"` the generator logs a warning and returns no scenarios.
+
+Scenario name prefix: `"Knowledge Base Split Questions"`.
+
+```python
+from giskard.scan import SplitQuestionsScenarioGenerator
+
+generator = SplitQuestionsScenarioGenerator()
+```
+
+</ResourceSection>
+
+### `MultiTopicScenarioGenerator`
+
+<ResourceSection description="Multi-turn direct questions spanning different knowledge-base topics, testing whether the agent keeps its grounding as the conversation moves between subjects.">
+
+**Module:** `giskard.scan.generators.knowledge_base.multi_topic`
+
+<Property name="max_turns" type="int" defaultValue="3">
+  Maximum user-simulator turns per scenario. Requires `>= 2`, because a single turn cannot cover several topics.
+</Property>
+
+Each turn changes subject. It catches an agent that answers the second topic using documents retrieved for the first.
+
+Multi-turn by design: with `target_mode="singleturn"` the generator logs a warning and returns no scenarios. It also needs at least two knowledge-base documents, and returns none below that.
+
+Scenario name prefix: `"Knowledge Base Multi Topic Questions"`.
+
+```python
+from giskard.scan import MultiTopicScenarioGenerator
+
+generator = MultiTopicScenarioGenerator(max_turns=4)
+```
+
+</ResourceSection>
+
+### `OutOfScopeScenarioGenerator`
+
+<ResourceSection description="Questions about precise, plausible objects that are absent from the knowledge base. An LLM proposes candidate topics and validates that they really are missing before a scenario is built, testing whether the agent invents an answer instead of declining.">
+
+**Module:** `giskard.scan.generators.knowledge_base.out_of_scope`
+
+Every other knowledge-base generator asks something your documents can answer. This one asks something they cannot, so it is the only one that tests whether the agent says "I do not know".
+
+Scenario name prefix: `"Knowledge Base Out Of Scope Questions"`. Inherits `context_documents` and `max_turns`.
+
+```python
+from giskard.scan import OutOfScopeScenarioGenerator
+
+generator = OutOfScopeScenarioGenerator()
+```
+
+</ResourceSection>
+
+---
+
+## Composing your own suite
+
+```python
+from giskard.scan import (
+    generate_suite,
+    AdversarialScenarioGenerator,
+    PromptInjectionScenarioGenerator,
+    SycophancyScenarioGenerator,
+)
+
+suite = await generate_suite(
+    description=(
+        "A customer-support agent for a retail bank, answering questions "
+        "about accounts, cards, payments and disputes from our published "
+        "policies. It must refuse to give investment or tax advice."
+    ),
+    languages=["en", "fr"],
+    generators=[
+        AdversarialScenarioGenerator(max_turns=2),
+        PromptInjectionScenarioGenerator(),
+        SycophancyScenarioGenerator(),
+    ],
+    knowledge_base=[
+        "A disputed card transaction must be reported within 120 days of the statement date.",
+        "A card reported lost cannot be unfrozen and must be replaced.",
+    ],
+    max_scenarios=15,
+    seed=7,
+)
+```
+
+This mix crosses the two families on purpose: the first two attack the agent, and `SycophancyScenarioGenerator` catches the opposite failure, where a customer insists the dispute window is 60 days and the agent agrees with them instead of with the policy. Mixing families needs `knowledge_base`, because the knowledge-base generators produce nothing without it and would silently contribute zero scenarios.
+
+Pass classes instead of instances when the defaults are fine. `generate_suite` and `SuiteGeneratorRegistry.register` both instantiate them for you.
+
+---
+
+## See also
+
+- [Scan API](/oss/scan/reference/scan-api) for `generate_suite`, the built-in scans, and `SuiteGeneratorRegistry`
+- [Knowledge Base](/oss/scan/reference/knowledge-base) for `KnowledgeBase` and `Document`
+- [Customize a scan](/oss/scan/how-to/customize-a-scan) to pick generators for a run
+- [Checks: Generators](/oss/checks/reference/generators) for `UserSimulator` and custom input generators

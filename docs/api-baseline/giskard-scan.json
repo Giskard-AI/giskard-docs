@@ -1,0 +1,854 @@
+{
+  "module": "giskard.scan",
+  "package": "giskard-scan",
+  "referenced": {
+    "giskard.agents.embeddings.base.BaseEmbeddingModel": {
+      "bases": [
+        "giskard.core.discriminated.Discriminated",
+        "abc.ABC"
+      ],
+      "doc_summary": "Base class for embedding models.",
+      "fields": {
+        "params": {
+          "annotation": "<class 'giskard.agents.embeddings.base.EmbeddingParams'>",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "batched_embeddings": {
+          "doc_summary": "Batches texts for embedding process.",
+          "kind": "method",
+          "signature": "(self, texts: list[str], max_batch_size: int | None = None, max_total_chars: int | None = None) -> collections.abc.Iterator[list[str]]"
+        },
+        "embed": {
+          "doc_summary": "",
+          "kind": "method",
+          "signature": "(self, texts: list[str], params: giskard.agents.embeddings.base.EmbeddingParams | None = None, max_batch_size: int | None = None, max_total_chars: int | None = None) -> list[numpy.ndarray]"
+        }
+      },
+      "signature": "(*, params: giskard.agents.embeddings.base.EmbeddingParams = <factory>) -> None"
+    },
+    "giskard.agents.generators.base.BaseGenerator": {
+      "bases": [
+        "giskard.core.discriminated.Discriminated",
+        "abc.ABC"
+      ],
+      "doc_summary": "Base class for all generators.",
+      "fields": {
+        "middlewares": {
+          "annotation": "list[giskard.agents.generators.middleware.CompletionMiddleware]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "params": {
+          "annotation": "<class 'giskard.agents.generators._types.GenerationParams'>",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "rate_limiter": {
+          "annotation": "giskard.core.rate_limiter.base.BaseRateLimiter | None",
+          "required": false
+        },
+        "retry_policy": {
+          "annotation": "giskard.agents.generators.middleware.RetryPolicy | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "batch_complete": {
+          "doc_summary": "Get a batch of completions from the model.",
+          "kind": "method",
+          "signature": "(self, messages: list[list[giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage]], params: giskard.agents.generators._types.GenerationParams | None = None, metadata: dict[str, Any] | None = None) -> list[giskard.llm.types.chat_completion.CompletionResponse]"
+        },
+        "chat": {
+          "doc_summary": "Create a new chat workflow with the given message.",
+          "kind": "method",
+          "signature": "(self, message: str, role: Literal['user', 'assistant', 'system', 'developer'] = 'user', *, as_template: bool = False) -> 'ChatWorkflow[Any]'"
+        },
+        "complete": {
+          "doc_summary": "Get a completion from the model.",
+          "kind": "method",
+          "signature": "(self, messages: Sequence[giskard.llm.types.chat_param.SystemMessageParam | giskard.llm.types.chat_param.DeveloperMessageParam | giskard.llm.types.chat_param.UserMessageParam | giskard.llm.types.chat_param.AssistantMessageParam | giskard.llm.types.chat_param.ToolMessageParam | giskard.llm.types.chat_param.FunctionMessageParam | giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage], params: giskard.agents.generators._types.GenerationParams | None = None, metadata: dict[str, Any] | None = None) -> giskard.llm.types.chat_completion.CompletionResponse"
+        },
+        "template": {
+          "doc_summary": "Create a new chat workflow from a template.",
+          "kind": "method",
+          "signature": "(self, template_name: str) -> 'ChatWorkflow[Any]'"
+        },
+        "with_params": {
+          "doc_summary": "Create a new generator with the given parameters.",
+          "kind": "method",
+          "signature": "(self, **kwargs: Any) -> Self"
+        },
+        "with_rate_limiter": {
+          "doc_summary": "Return a copy with the given rate limiter.",
+          "kind": "method",
+          "signature": "(self, rate_limiter: giskard.core.rate_limiter.base.BaseRateLimiter | str | None) -> Self"
+        },
+        "with_retries": {
+          "doc_summary": "Return a copy with an updated retry policy.",
+          "kind": "method",
+          "signature": "(self, max_attempts: int, *, base_delay: float | None = None, max_delay: float | None = None) -> Self"
+        }
+      },
+      "signature": "(*, params: giskard.agents.generators._types.GenerationParams = <factory>, retry_policy: giskard.agents.generators.middleware.RetryPolicy | None = None, rate_limiter: giskard.core.rate_limiter.base.BaseRateLimiter | None = None, middlewares: list[giskard.agents.generators.middleware.CompletionMiddleware] = <factory>) -> None"
+    },
+    "giskard.checks.core.mixin.WithEmbeddingMixin": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "!!! abstract \"Usage Documentation\"",
+      "fields": {
+        "embedding_model": {
+          "annotation": "giskard.agents.embeddings.base.BaseEmbeddingModel | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, embedding_model: giskard.agents.embeddings.base.BaseEmbeddingModel | None = None) -> None"
+    },
+    "giskard.checks.core.mixin.WithGeneratorMixin": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "!!! abstract \"Usage Documentation\"",
+      "fields": {
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None) -> None"
+    },
+    "giskard.checks.core.result.SuiteResult": {
+      "bases": [
+        "giskard.checks.core.result.BaseResult"
+      ],
+      "doc_summary": "Aggregate result object for the suite.",
+      "fields": {
+        "duration_ms": {
+          "annotation": "<class 'int'>",
+          "required": true
+        },
+        "recommendation": {
+          "annotation": "str | None",
+          "required": false
+        },
+        "results": {
+          "annotation": "list[giskard.checks.core.result.ScenarioResult[Any]]",
+          "required": true
+        },
+        "suite": {
+          "annotation": "giskard.checks.scenarios.suite.Suite[Any, Any] | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "errored_count": {
+          "doc_summary": "Number of errored scenarios.",
+          "kind": "property"
+        },
+        "failed_count": {
+          "doc_summary": "Number of failed scenarios.",
+          "kind": "property"
+        },
+        "failures_and_errors": {
+          "doc_summary": "Return a list of scenario results that failed or errored.",
+          "kind": "property"
+        },
+        "group_by": {
+          "doc_summary": "Group results by a tag key and return a GroupedSuiteResult.",
+          "kind": "method",
+          "signature": "(self, key: str) -> 'GroupedSuiteResult'"
+        },
+        "pass_rate": {
+          "doc_summary": "The pass rate of the suite (passed scenarios / (total scenarios - skipped scenarios)).",
+          "kind": "property"
+        },
+        "passed_count": {
+          "doc_summary": "Number of passed scenarios.",
+          "kind": "property"
+        },
+        "print_report": {
+          "doc_summary": "Print the suite report, optionally with a grouped pass-rate table.",
+          "kind": "method",
+          "signature": "(self, console: rich.console.Console | None = None, group_by: str | None = None) -> None"
+        },
+        "skipped_count": {
+          "doc_summary": "Number of skipped scenarios.",
+          "kind": "property"
+        },
+        "to_hub_format": {
+          "doc_summary": "Convert the suite result into a JSON-serializable Giskard Hub payload.",
+          "kind": "method",
+          "signature": "(self) -> dict[str, typing.Any]"
+        },
+        "to_junit_xml": {
+          "doc_summary": "",
+          "kind": "method",
+          "signature": "(self, path: str | pathlib.Path | None = None) -> str"
+        }
+      },
+      "signature": "(*, results: list[giskard.checks.core.result.ScenarioResult[Any]], duration_ms: int, suite: giskard.checks.scenarios.suite.Suite[Any, Any] | None = None, recommendation: str | None = None) -> None"
+    },
+    "giskard.checks.core.scenario.Scenario": {
+      "bases": [
+        "pydantic.main.BaseModel",
+        "typing.Generic"
+      ],
+      "doc_summary": "A scenario composed of steps, each containing interacts and checks.",
+      "fields": {
+        "annotations": {
+          "annotation": "dict[str, typing.Any]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "multiple_runs": {
+          "annotation": "<class 'int'>",
+          "default": "1",
+          "required": false
+        },
+        "name": {
+          "annotation": "<class 'str'>",
+          "default": "'Unnamed Scenario'",
+          "required": false
+        },
+        "steps": {
+          "annotation": "list[giskard.checks.core.scenario.Step[TypeVar, TypeVar, TypeVar]]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "tags": {
+          "annotation": "list[str]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "target": {
+          "annotation": "Target[InputType, OutputType, TraceType] | <MISSING>",
+          "default": "<MISSING>",
+          "required": false
+        },
+        "trace_type": {
+          "annotation": "type[TraceType] | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "add_interaction": {
+          "doc_summary": "Add a custom InteractionSpec to the scenario.",
+          "kind": "method",
+          "signature": "(self, interaction: giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar]) -> Self"
+        },
+        "add_interactions": {
+          "doc_summary": "Add multiple InteractionSpec objects to the scenario.",
+          "kind": "method",
+          "signature": "(self, *interactions: giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar]) -> Self"
+        },
+        "append": {
+          "doc_summary": "Append any component to the scenario.",
+          "kind": "method",
+          "signature": "(self, component: giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar] | giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]) -> Self"
+        },
+        "check": {
+          "doc_summary": "Add a check to the scenario.",
+          "kind": "method",
+          "signature": "(self, check: giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]) -> Self"
+        },
+        "checks": {
+          "doc_summary": "Add multiple checks to the scenario.",
+          "kind": "method",
+          "signature": "(self, *checks: giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]) -> Self"
+        },
+        "extend": {
+          "doc_summary": "Extend the scenario with multiple components of any type.",
+          "kind": "method",
+          "signature": "(self, *components: giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar] | giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]) -> Self"
+        },
+        "interact": {
+          "doc_summary": "Add an interaction to the scenario.",
+          "kind": "method",
+          "signature": "(self, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: Target[InputType, OutputType, TraceType] | <MISSING> = <MISSING>, metadata: dict[str, object] | None = None) -> Self"
+        },
+        "run": {
+          "doc_summary": "Execute the scenario via the default runner, with optional multiple runs.",
+          "kind": "method",
+          "signature": "(self, target: Target[InputType, OutputType, TraceType] | <MISSING> = <MISSING>, return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
+        },
+        "with_annotations": {
+          "doc_summary": "Set scenario-level annotations.",
+          "kind": "method",
+          "signature": "(self, annotations: dict[str, typing.Any]) -> Self"
+        },
+        "with_tags": {
+          "doc_summary": "Set scenario tags for grouping and Hub upload.",
+          "kind": "method",
+          "signature": "(self, tags: list[str]) -> Self"
+        },
+        "with_target": {
+          "doc_summary": "Set the default SUT for interactions with ``MISSING`` outputs.",
+          "kind": "method",
+          "signature": "(self, target: Target[InputType, OutputType, TraceType]) -> Self"
+        }
+      },
+      "signature": "(name: str | None = None, /, *, steps: list[giskard.checks.core.scenario.Step[TypeVar, TypeVar, TypeVar]] = <factory>, trace_type: type[TraceType] | None = None, annotations: dict[str, typing.Any] = <factory>, target: Target[InputType, OutputType, TraceType] | <MISSING> = <MISSING>, multiple_runs: Annotated[int, Strict(strict=True), Ge(ge=1)] = 1, tags: list[str] = <factory>) -> None"
+    },
+    "giskard.checks.scenarios.suite.Suite": {
+      "bases": [
+        "pydantic.main.BaseModel",
+        "typing.Generic"
+      ],
+      "doc_summary": "A suite of scenarios that can be run together with a shared target.",
+      "fields": {
+        "name": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "scenarios": {
+          "annotation": "list[giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]]",
+          "default": "PydanticUndefined",
+          "required": false
+        },
+        "target": {
+          "annotation": "Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | <MISSING>",
+          "default": "<MISSING>",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "append": {
+          "doc_summary": "Add a scenario to the suite.",
+          "kind": "method",
+          "signature": "(self, scenario: giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]) -> Self"
+        },
+        "run": {
+          "doc_summary": "Run all scenarios in the suite.",
+          "kind": "method",
+          "signature": "(self, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | <MISSING> = <MISSING>, return_exception: bool = False, parallel: bool = False, max_concurrency: int | None = None, verbose: bool = True) -> giskard.checks.core.result.SuiteResult"
+        }
+      },
+      "signature": "(*, name: str, scenarios: list[giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]] = <factory>, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | <MISSING> = <MISSING>) -> None"
+    }
+  },
+  "source_ref": "giskard-scan/v1.0.0rc1",
+  "symbols": {
+    "giskard.scan.AdversarialScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.base.ScenarioGenerator",
+        "giskard.checks.core.mixin.WithGeneratorMixin"
+      ],
+      "doc_summary": "LLM-driven generator that probes an agent with adversarial inputs.",
+      "fields": {
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "generate_scenario": {
+          "doc_summary": "Generate adversarial scenarios across all built-in categories.",
+          "kind": "method",
+          "signature": "(self, context: giskard.scan.generators.base.ScenarioContext, max_scenarios: int | None = None, rng: numpy.random._generator.Generator | None = None, target_mode: TargetMode = 'multiturn') -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, max_turns: Annotated[int, Ge(ge=1)] = 3) -> None"
+    },
+    "giskard.scan.CrescendoAttackScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.base.ScenarioGenerator"
+      ],
+      "doc_summary": "Generate Crescendo attack scenarios for harmful-content robustness testing.",
+      "fields": {
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "10",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "generate_scenario": {
+          "doc_summary": "Generate Crescendo attack scenarios for the described agent.",
+          "kind": "method",
+          "signature": "(self, context: giskard.scan.generators.base.ScenarioContext, max_scenarios: int | None = None, rng: numpy.random._generator.Generator | None = None, target_mode: TargetMode = 'multiturn') -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, max_turns: Annotated[int, Ge(ge=1)] = 10) -> None"
+    },
+    "giskard.scan.DEFAULT_TARGET_MODE": {
+      "kind": "constant",
+      "type": "str"
+    },
+    "giskard.scan.Document": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "Document stored in a scan knowledge base.",
+      "fields": {
+        "content": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "embeddings": {
+          "annotation": "list[float] | None",
+          "required": false
+        },
+        "tags": {
+          "annotation": "list[str] | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, content: str, embeddings: list[float] | None = None, tags: list[str] | None = None) -> None"
+    },
+    "giskard.scan.GCGInjectionScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.huggingface.HuggingFaceDatasetScenarioGenerator"
+      ],
+      "doc_summary": "Generate GCG (Greedy Coordinate Gradient) injection scenarios.",
+      "fields": {
+        "repo_allow_commercial_use": {
+          "annotation": "<class 'bool'>",
+          "default": "True",
+          "required": false
+        },
+        "repo_id": {
+          "annotation": "<class 'str'>",
+          "default": "'giskardai/harmbench-scenarios'",
+          "required": false
+        },
+        "tags": {
+          "annotation": "list[str]",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "load_scenarios": {
+          "doc_summary": "Load scenarios, annotating each with ``description`` and ``languages``.",
+          "kind": "method",
+          "signature": "(self, description: str, languages: list[str]) -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, tags: list[str] = <factory>, repo_id: str = 'giskardai/harmbench-scenarios', repo_allow_commercial_use: bool = True) -> None"
+    },
+    "giskard.scan.GOATAttackScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.base.ScenarioGenerator"
+      ],
+      "doc_summary": "Generate GOAT attack scenarios for harmful-content robustness testing.",
+      "fields": {
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "10",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "generate_scenario": {
+          "doc_summary": "Generate GOAT attack scenarios for the described agent.",
+          "kind": "method",
+          "signature": "(self, context: giskard.scan.generators.base.ScenarioContext, max_scenarios: int | None = None, rng: numpy.random._generator.Generator | None = None, target_mode: TargetMode = 'multiturn') -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, max_turns: Annotated[int, Ge(ge=1)] = 10) -> None"
+    },
+    "giskard.scan.HallucinationScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.knowledge_base.base.KnowledgeBaseScenarioGenerator"
+      ],
+      "doc_summary": "Generate document-grounded hallucination quality scenarios.",
+      "fields": {
+        "context_documents": {
+          "annotation": "<class 'int'>",
+          "default": "4",
+          "required": false
+        },
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, context_documents: Annotated[int, Ge(ge=1)] = 4, max_turns: Annotated[int, Ge(ge=1)] = 3) -> None"
+    },
+    "giskard.scan.HuggingFaceDatasetScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.base.BaseDatasetScenarioGenerator"
+      ],
+      "doc_summary": "Scenario generator backed by a Hugging Face dataset.",
+      "fields": {
+        "repo_allow_commercial_use": {
+          "annotation": "<class 'bool'>",
+          "default": "True",
+          "required": false
+        },
+        "repo_id": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "tags": {
+          "annotation": "list[str]",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "allow_commercial_use": {
+          "doc_summary": "Whether the generator allows commercial use.",
+          "kind": "property"
+        },
+        "load_scenarios": {
+          "doc_summary": "Load scenarios, annotating each with ``description`` and ``languages``.",
+          "kind": "method",
+          "signature": "(self, description: str, languages: list[str]) -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, tags: list[str] = <factory>, repo_id: str, repo_allow_commercial_use: bool = True) -> None"
+    },
+    "giskard.scan.KnowledgeBase": {
+      "bases": [
+        "giskard.checks.core.mixin.WithEmbeddingMixin"
+      ],
+      "doc_summary": "Collection of documents used by knowledge-base scenario generators.",
+      "fields": {
+        "documents": {
+          "annotation": "tuple[giskard.scan.utils.knowledge_base.Document, ...]",
+          "required": true
+        },
+        "embedding_model": {
+          "annotation": "giskard.agents.embeddings.base.BaseEmbeddingModel | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "closest_documents": {
+          "doc_summary": "Return the documents closest to a seed document by cosine similarity.",
+          "kind": "method",
+          "signature": "(self, seed_index: int, max_documents: int) -> list[giskard.scan.utils.knowledge_base.Document]"
+        },
+        "closest_documents_to_text": {
+          "doc_summary": "Return the documents closest to arbitrary text by cosine similarity.",
+          "kind": "method",
+          "signature": "(self, text: str, max_documents: int) -> list[giskard.scan.utils.knowledge_base.Document]"
+        },
+        "ensure_embeddings": {
+          "doc_summary": "Ensure every document has embeddings from the same model.",
+          "kind": "method",
+          "signature": "(self) -> None"
+        },
+        "from_texts": {
+          "doc_summary": "Create a knowledge base from raw text documents.",
+          "kind": "classmethod",
+          "signature": "(cls, texts: list[str]) -> Self"
+        },
+        "model_post_init": {
+          "doc_summary": "This function is meant to behave like a BaseModel method to initialize private attributes.",
+          "kind": "method",
+          "signature": "(self: 'BaseModel', context: 'Any', /) -> 'None'"
+        }
+      },
+      "signature": "(*, embedding_model: giskard.agents.embeddings.base.BaseEmbeddingModel | None = None, documents: tuple[giskard.scan.utils.knowledge_base.Document, ...]) -> None"
+    },
+    "giskard.scan.KnowledgeBaseScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.base.ScenarioGenerator"
+      ],
+      "doc_summary": "Base class for document-grounded quality scenarios from a knowledge base.",
+      "fields": {
+        "context_documents": {
+          "annotation": "<class 'int'>",
+          "default": "4",
+          "required": false
+        },
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "generate_scenario": {
+          "doc_summary": "Generate scenarios from nearest-neighbor knowledge base contexts.",
+          "kind": "method",
+          "signature": "(self, context: giskard.scan.generators.base.ScenarioContext, max_scenarios: int | None = None, rng: numpy.random._generator.Generator | None = None, target_mode: TargetMode = 'multiturn') -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, context_documents: Annotated[int, Ge(ge=1)] = 4, max_turns: Annotated[int, Ge(ge=1)] = 3) -> None"
+    },
+    "giskard.scan.LocalDatasetScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.base.BaseDatasetScenarioGenerator"
+      ],
+      "doc_summary": "Scenario generator backed by a static JSONL dataset bundled in the package.",
+      "fields": {
+        "dataset_name": {
+          "annotation": "<class 'str'>",
+          "required": true
+        },
+        "tags": {
+          "annotation": "list[str]",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "load_scenarios": {
+          "doc_summary": "Load scenarios, annotating each with ``description`` and ``languages``.",
+          "kind": "method",
+          "signature": "(self, description: str, languages: list[str]) -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, tags: list[str] = <factory>, dataset_name: str) -> None"
+    },
+    "giskard.scan.MultiTopicScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.knowledge_base.base.KnowledgeBaseScenarioGenerator"
+      ],
+      "doc_summary": "Generate multi-turn direct questions over different knowledge-base topics.",
+      "fields": {
+        "context_documents": {
+          "annotation": "<class 'int'>",
+          "default": "4",
+          "required": false
+        },
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "generate_scenario": {
+          "doc_summary": "Generate scenarios from nearest-neighbor knowledge base contexts.",
+          "kind": "method",
+          "signature": "(self, context: giskard.scan.generators.base.ScenarioContext, max_scenarios: int | None = None, rng: numpy.random._generator.Generator | None = None, target_mode: TargetMode = 'multiturn') -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, context_documents: Annotated[int, Ge(ge=1)] = 4, max_turns: Annotated[int, Ge(ge=2)] = 3) -> None"
+    },
+    "giskard.scan.OutOfScopeScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.knowledge_base.base.KnowledgeBaseScenarioGenerator",
+        "giskard.checks.core.mixin.WithGeneratorMixin"
+      ],
+      "doc_summary": "Generate questions about precise, plausible objects absent from the KB.",
+      "fields": {
+        "context_documents": {
+          "annotation": "<class 'int'>",
+          "default": "4",
+          "required": false
+        },
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "generate_scenario": {
+          "doc_summary": "Generate scenarios from nearest-neighbor knowledge base contexts.",
+          "kind": "method",
+          "signature": "(self, context: giskard.scan.generators.base.ScenarioContext, max_scenarios: int | None = None, rng: numpy.random._generator.Generator | None = None, target_mode: TargetMode = 'multiturn') -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, context_documents: Annotated[int, Ge(ge=1)] = 4, max_turns: Annotated[int, Ge(ge=1)] = 3) -> None"
+    },
+    "giskard.scan.PromptInjectionScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.base.LocalDatasetScenarioGenerator"
+      ],
+      "doc_summary": "Dataset-backed generator for prompt-injection test scenarios.",
+      "fields": {
+        "dataset_name": {
+          "annotation": "<class 'str'>",
+          "default": "'prompt_injection'",
+          "required": false
+        },
+        "tags": {
+          "annotation": "list[str]",
+          "default": "PydanticUndefined",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, tags: list[str] = <factory>, dataset_name: str = 'prompt_injection') -> None"
+    },
+    "giskard.scan.ScanOptions": {
+      "bases": [
+        "builtins.dict"
+      ],
+      "doc_summary": "Optional keyword settings for a vulnerability scan.",
+      "kind": "class",
+      "members": {},
+      "signature": ""
+    },
+    "giskard.scan.ScanTool": {
+      "kind": "constant",
+      "type": "TypeAliasType"
+    },
+    "giskard.scan.ScenarioGenerator": {
+      "bases": [
+        "pydantic.main.BaseModel"
+      ],
+      "doc_summary": "Abstract base class for all scenario generators.",
+      "kind": "class",
+      "members": {
+        "allow_commercial_use": {
+          "doc_summary": "Whether the generator allows commercial use.",
+          "kind": "property"
+        },
+        "generate_scenario": {
+          "doc_summary": "Generate a list of test scenarios for the described agent.",
+          "kind": "method",
+          "signature": "(self, context: giskard.scan.generators.base.ScenarioContext, max_scenarios: int | None = None, rng: numpy.random._generator.Generator | None = None, target_mode: TargetMode = 'multiturn') -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "() -> None"
+    },
+    "giskard.scan.SplitQuestionsScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.knowledge_base.base.KnowledgeBaseScenarioGenerator"
+      ],
+      "doc_summary": "Generate two-message document-grounded questions.",
+      "fields": {
+        "context_documents": {
+          "annotation": "<class 'int'>",
+          "default": "4",
+          "required": false
+        },
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "2",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "generate_scenario": {
+          "doc_summary": "Generate scenarios from nearest-neighbor knowledge base contexts.",
+          "kind": "method",
+          "signature": "(self, context: giskard.scan.generators.base.ScenarioContext, max_scenarios: int | None = None, rng: numpy.random._generator.Generator | None = None, target_mode: TargetMode = 'multiturn') -> list[giskard.checks.core.scenario.Scenario[Any, Any, Trace[Any, Any]]]"
+        }
+      },
+      "signature": "(*, context_documents: Annotated[int, Ge(ge=1)] = 4, max_turns: Annotated[int, Ge(ge=2), Le(le=2)] = 2) -> None"
+    },
+    "giskard.scan.SuiteGeneratorRegistry": {
+      "bases": [],
+      "doc_summary": "Mutable registry of scenario generator instances.",
+      "kind": "class",
+      "members": {
+        "clear": {
+          "doc_summary": "",
+          "kind": "method",
+          "signature": "(self) -> None"
+        },
+        "generators": {
+          "doc_summary": "",
+          "kind": "method",
+          "signature": "(self, commercial_use: bool = False) -> list[giskard.scan.generators.base.ScenarioGenerator]"
+        },
+        "register": {
+          "doc_summary": "",
+          "kind": "method",
+          "signature": "(self, generator: 'ScenarioGenerator | type[ScenarioGenerator]') -> None"
+        },
+        "unregister": {
+          "doc_summary": "",
+          "kind": "method",
+          "signature": "(self, generator: 'ScenarioGenerator | type[ScenarioGenerator]') -> None"
+        }
+      },
+      "signature": "() -> None"
+    },
+    "giskard.scan.SycophancyScenarioGenerator": {
+      "bases": [
+        "giskard.scan.generators.knowledge_base.base.KnowledgeBaseScenarioGenerator"
+      ],
+      "doc_summary": "Generate document-grounded sycophancy quality scenarios.",
+      "fields": {
+        "context_documents": {
+          "annotation": "<class 'int'>",
+          "default": "4",
+          "required": false
+        },
+        "max_turns": {
+          "annotation": "<class 'int'>",
+          "default": "3",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {},
+      "signature": "(*, context_documents: Annotated[int, Ge(ge=1)] = 4, max_turns: Annotated[int, Ge(ge=1)] = 3) -> None"
+    },
+    "giskard.scan.TargetMode": {
+      "kind": "constant",
+      "type": "TypeAliasType"
+    },
+    "giskard.scan.generate_suite": {
+      "doc_summary": "Generate a test suite by running the supplied generators.",
+      "kind": "function",
+      "signature": "(description: str, languages: list[str], generators: collections.abc.Sequence[giskard.scan.generators.base.ScenarioGenerator | type[giskard.scan.generators.base.ScenarioGenerator]], max_scenarios: int | None = None, seed: int = 42, target_mode: TargetMode = 'multiturn', knowledge_base: giskard.scan.utils.knowledge_base.KnowledgeBase | list[str] | None = None) -> giskard.checks.scenarios.suite.Suite[Any, Any]"
+    },
+    "giskard.scan.list_scan_items": {
+      "doc_summary": "List selectable item names for a scan tool.",
+      "kind": "function",
+      "signature": "(tool: ScanTool, *, include_inactive: bool = False) -> list[str]"
+    },
+    "giskard.scan.quality_scan": {
+      "doc_summary": "Generate and run the standard quality scan suite.",
+      "kind": "function",
+      "signature": "(target: Target[InputType, OutputType, TraceType], description: str, languages: list[str], *, knowledge_base: giskard.scan.utils.knowledge_base.KnowledgeBase | list[str] | None = None, max_scenarios: int | None = None, seed: int = 42, group_by: str | None = 'component', parallel: bool = True, max_concurrency: int | None = None, return_exception: bool = False, target_mode: TargetMode = 'multiturn') -> giskard.checks.core.result.SuiteResult"
+    },
+    "giskard.scan.quality_suite_generator_registry": {
+      "kind": "constant",
+      "type": "SuiteGeneratorRegistry"
+    },
+    "giskard.scan.third_party_scan": {
+      "doc_summary": "Run an external security scanner against a Giskard target.",
+      "kind": "function",
+      "signature": "(target: Target[InputType, OutputType, TraceType], tool: Literal['garak', 'lidar', 'deepteam'], *, description: str, languages: list[str] | None = None, **kwargs: Any) -> giskard.checks.core.result.SuiteResult"
+    },
+    "giskard.scan.vulnerability_scan": {
+      "doc_summary": "Generate and run the standard vulnerability scan suite.",
+      "kind": "function",
+      "signature": "(target: Target[InputType, OutputType, TraceType], description: str, languages: list[str], *, max_scenarios: int | None = None, seed: int = 42, group_by: str | None = 'threat-type', parallel: bool = True, max_concurrency: int | None = None, return_exception: bool = False, target_mode: TargetMode = 'multiturn', commercial_use: bool = False) -> giskard.checks.core.result.SuiteResult"
+    },
+    "giskard.scan.vulnerability_suite_generator_registry": {
+      "kind": "constant",
+      "type": "SuiteGeneratorRegistry"
+    }
+  },
+  "version": "1.0.0rc1"
+}

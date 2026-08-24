@@ -1,0 +1,140 @@
+---
+title: "Run the Scan in CI"
+description: "Generate the scan suite once, commit it, and replay it on every pull request with a JUnit XML report."
+sidebar:
+  order: 4
+---
+
+Generate the scan's scenarios once, save them to a file, and replay that same file on every pull request. This turns a scan into a **regression test**: a fixed set of cases you re-run to catch a behavior that used to work and now does not.
+
+Regenerating on every run is slow, costs LLM calls, and produces different scenarios each time, so the numbers from two builds cannot be compared.
+
+The examples use `support_agent`, the retail-bank support agent from [Wrap your agent](/oss/scan/how-to/wrap-your-agent), imported from your own package.
+
+## 1. Generate and save the suite
+
+Run this once, locally, whenever you want fresh scenarios:
+
+```python
+import asyncio
+from pathlib import Path
+
+from giskard.scan import vulnerability_scan
+
+from my_app.agent import support_agent
+
+
+async def generate_suite():
+    suite_result = await vulnerability_scan(
+        target=support_agent,
+        description=(
+            "A customer-support agent for a retail bank. It answers "
+            "questions about accounts, cards, payments and disputes. It "
+            "must refuse to give investment or tax advice, and must never "
+            "disclose another customer's data."
+        ),
+        languages=["en"],
+    )
+    Path("tests/scan_suite.json").write_text(
+        suite_result.suite.model_dump_json() if suite_result.suite else ""
+    )
+
+
+asyncio.run(generate_suite())
+```
+
+`Suite` is a Pydantic model, so the JSON is the whole suite. Commit `tests/scan_suite.json`, so that regenerating shows up as a reviewable diff.
+
+## 2. Replay it in the pipeline
+
+Loading the suite skips generation entirely. Only the judge still calls an LLM, so **CI needs an API key too**:
+
+```python
+import asyncio
+from pathlib import Path
+
+import giskard.scan  # noqa: F401  # registers the scan types the saved suite uses
+from giskard.agents.generators import GiskardLLMGenerator
+from giskard.checks import Suite, set_default_generator
+
+from my_app.agent import support_agent
+
+set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o-mini"))
+
+
+async def run_suite():
+    suite = Suite.model_validate_json(
+        Path("tests/scan_suite.json").read_text()
+    )
+    result = await suite.run(
+        target=support_agent, parallel=True, max_concurrency=10
+    )
+    result.to_junit_xml("scan_results.xml")
+
+    if result.failed_count:
+        raise SystemExit(1)
+
+
+asyncio.run(run_suite())
+```
+
+Do not delete the `import giskard.scan` line. It looks unused, and it fails late. Importing the package registers the prompt templates the scan's scenarios render from. Without it, `Suite.model_validate_json` still succeeds, so the suite looks fine; the run then dies part-way through with `jinja2.exceptions.TemplateNotFound: giskard.scan::scenarios/llm01_indirect_injection.j2`. In CI that reads as a flaky job rather than a missing import, so keep the import next to the load.
+
+`Suite.run` is serial by default, so pass `parallel=True` and bound the fan-out with `max_concurrency` to keep CI from hammering your provider.
+
+Failing the build on `failed_count` is the strict policy: any failure stops the pipeline. It is the right default for a small suite you have already triaged. On a large generated suite, judge noise will turn some builds red for no real regression, so teams often gate on a threshold instead and review the artifact.
+
+`to_junit_xml` writes a standard report that GitHub Actions, GitLab, Jenkins, and CircleCI all render natively.
+
+## 3. Wire it into GitHub Actions
+
+```yaml
+name: Giskard scan
+
+on: [pull_request]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install --pre "giskard[scan,openai]" -e .
+      - run: python scripts/run_scan.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: scan-results
+          path: scan_results.xml
+```
+
+Verdicts come from an LLM, so a scenario can flip between runs. Read [the judge is an LLM](/oss/scan/explanation/how-scan-works#the-judge-is-an-llm) before you treat a single new failure as a regression.
+
+## Compare two versions of your agent
+
+The saved suite is not bound to a target, so you can point it anywhere. This is how you confirm a fix actually fixed something:
+
+```python
+from pathlib import Path
+
+from giskard.checks import Suite
+from my_app.agent import support_agent, support_agent_hardened
+
+suite = Suite.model_validate_json(Path("tests/scan_suite.json").read_text())
+before = await suite.run(target=support_agent)
+after = await suite.run(target=support_agent_hardened)
+
+print(before.pass_rate, "->", after.pass_rate)
+```
+
+The **pass rate** is the share of scenarios that passed. Comparing two numbers only means something because both runs used the same saved suite. It is still a sample of generated scenarios, not a measure of how safe either version is, and the judge can flip a borderline verdict between the two runs, so a small change is noise.
+
+## Next Steps
+
+- [Your First Scan](/oss/scan/tutorials/your-first-scan) for the guided first run
+- [Run checks in pytest](/oss/checks/how-to/run-in-pytest): a scan suite is an ordinary `Suite`, so the same pytest patterns apply
+- [Scan API reference](/oss/scan/reference/scan-api) for every argument in full
