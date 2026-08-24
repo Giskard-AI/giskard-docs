@@ -26,6 +26,8 @@ task = hub.tasks.create(
 print(f"Task created: {task.id}")
 ```
 
+A task can be linked to the resource where the problem was found: pass `evaluation_result_id` for an evaluation result, `dataset_scenario_id` for a scenario, or `probe_attempt_id` for a scan probe attempt.
+
 ### Status values
 
 | Status          | Meaning                          |
@@ -88,7 +90,7 @@ hub.tasks.bulk_delete(task_ids=["task-id-1", "task-id-2"])
 
 ## Workflow example: create tasks from failed evaluation results
 
-A common pattern is to automatically create tasks for every failed test case after an evaluation:
+A common pattern is to automatically create tasks for every failed scenario after an evaluation:
 
 ```python
 evaluation = hub.evaluations.create(
@@ -108,7 +110,7 @@ failed_results = hub.evaluations.results.search(
 for result in failed_results:
     hub.tasks.create(
         project_id="project-id",
-        description=f"Test case {result.test_case.id} failed checks: "
+        description=f"Scenario {result.scenario.id} failed checks: "
         + ", ".join(c.name for c in result.results if not c.passed),
         status="open",
         priority="medium",
