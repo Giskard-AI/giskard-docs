@@ -22,10 +22,12 @@ Input generators for creating dynamic test data and simulating user interactions
 **Module:** `giskard.checks.generators.user`
 
 <Property name="persona" type="str" required>
-  Predefined persona name (e.g., `"frustrated_customer"`) or a custom persona description.
+  Predefined persona name (e.g., `"frustrated_customer"`) or a custom persona
+  description.
 </Property>
 <Property name="max_steps" type="int" defaultValue="3">
-  Maximum number of conversation turns to generate. Must be ≥ 0; `0` generates nothing.
+  Maximum number of conversation turns to generate. Must be ≥ 0; `0` generates
+  nothing.
 </Property>
 <Property name="max_retries" type="int" defaultValue="2">
   Retries per turn when generation fails. Must be ≥ 0, so each turn is attempted
@@ -35,7 +37,8 @@ Input generators for creating dynamic test data and simulating user interactions
   Optional context to customize the persona's behavior.
 </Property>
 <Property name="generator" type="BaseGenerator | None" defaultValue="None">
-  LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
+  LLM generator used to simulate the user's messages. Defaults to the
+  framework's default generator.
 </Property>
 
 Write the persona as a goal the simulated user is pursuing:
@@ -121,8 +124,12 @@ print(f"Last reply: {result.final_trace.last.outputs}")
   a strong one.
 </Property>
 
-<MethodCard name=".get_prompt()" returnType="ChatMessage | MessageTemplate | TemplateReference">
-  Return the prompt that drives generation. Subclasses **must** override this; the base raises `NotImplementedError`.
+<MethodCard
+  name=".get_prompt()"
+  returnType="ChatMessage | MessageTemplate | TemplateReference"
+>
+  Return the prompt that drives generation. Subclasses **must** override this;
+  the base raises `NotImplementedError`.
 </MethodCard>
 
 <MethodCard name="async .get_inputs()" returnType="dict[str, Any]">
@@ -162,11 +169,11 @@ class AngryCustomer(BaseLLMGenerator):
   Inline prompt string. Jinja2 rendering applies only when `as_template=True`.
 </Property>
 <Property name="prompt_path" type="str | None">
-  Template reference, written as `namespace::path/to/template.j2`. `giskard-scan`
-  registers the `giskard.scan` namespace and ships the attack templates there
-  (for example `"giskard.scan::scenarios/llm01_injection.j2"`); `giskard-checks`
-  registers `giskard.checks`, which holds the bundled judge and generator
-  prompts. Register your own directory with
+  Template reference, written as `namespace::path/to/template.j2`.
+  `giskard-scan` registers the `giskard.scan` namespace and ships the attack
+  templates there (for example `"giskard.scan::scenarios/llm01_injection.j2"`);
+  `giskard-checks` registers `giskard.checks`, which holds the bundled judge and
+  generator prompts. Register your own directory with
   `giskard.agents.add_prompts_path(path, "my_namespace")`.
 </Property>
 <Property name="max_steps" type="int" defaultValue="3">
@@ -210,10 +217,12 @@ Internal output for each `UserSimulator` or `LLMGenerator` turn. The loop yields
     Whether the goal has been reached and no further messages are needed.
   </Property>
   <Property name="schema_issue" type="str | None" defaultValue="None">
-    Set instead of `message` when the input schema cannot produce a user message. Triggers a retry, up to `max_retries`.
+    Set instead of `message` when the input schema cannot produce a user
+    message. Triggers a retry, up to `max_retries`.
   </Property>
   <Property name="message" type="T | None" defaultValue="None">
-    The message to send. `None` when `goal_reached` is true. Cannot be set together with `schema_issue`.
+    The message to send. `None` when `goal_reached` is true. Cannot be set
+    together with `schema_issue`.
   </Property>
 </TypeTable>
 

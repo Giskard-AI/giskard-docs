@@ -27,10 +27,16 @@ Immutable collection of documents used by knowledge-base scenario generators. Em
 
 <TypeTable name="KnowledgeBase">
   <Property name="documents" type="tuple[Document, ...]" required>
-    The documents. Entries whose `content` is blank are dropped on validation; a knowledge base with no non-empty document raises `ValueError`.
+    The documents. Entries whose `content` is blank are dropped on validation; a
+    knowledge base with no non-empty document raises `ValueError`.
   </Property>
-  <Property name="embedding_model" type="BaseEmbeddingModel | None" defaultValue="None">
-    Embedding model used to embed the documents. Falls back to the global default when `None`.
+  <Property
+    name="embedding_model"
+    type="BaseEmbeddingModel | None"
+    defaultValue="None"
+  >
+    Embedding model used to embed the documents. Falls back to the global
+    default when `None`.
   </Property>
 </TypeTable>
 
@@ -41,7 +47,10 @@ Immutable collection of documents used by knowledge-base scenario generators. Em
 </MethodCard>
 
 <MethodCard name=".ensure_embeddings()" returnType="None">
-  Coroutine. Ensure every document has embeddings from the same model. If any document is missing them, all embeddings are recomputed in one batch so vectors from different embedding models are never mixed. Called automatically by the retrieval methods.
+  Coroutine. Ensure every document has embeddings from the same model. If any
+  document is missing them, all embeddings are recomputed in one batch so
+  vectors from different embedding models are never mixed. Called automatically
+  by the retrieval methods.
 </MethodCard>
 
 <MethodCard name=".closest_documents()" returnType="list[Document]">
@@ -131,7 +140,8 @@ A single document stored in a knowledge base.
     Text content used for question generation and grounding.
   </Property>
   <Property name="embeddings" type="list[float] | None" defaultValue="None">
-    Optional embedding vector. Missing vectors are computed lazily when nearest-neighbor retrieval is requested.
+    Optional embedding vector. Missing vectors are computed lazily when
+    nearest-neighbor retrieval is requested.
   </Property>
   <Property name="tags" type="list[str] | None" defaultValue="None">
     Optional document labels carried by the caller.

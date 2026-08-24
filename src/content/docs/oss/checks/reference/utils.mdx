@@ -64,7 +64,7 @@ Use normalization when comparing text from different sources (APIs, files, user 
 **Module:** `giskard.checks.utils.injectable`
 
 :::note[Internal machinery]
-`ValueProvider` and `ValueGenerator` are used internally by the framework to normalize how checks and interaction specs source their inputs. Most users never construct them directly — they are documented here so the behaviour they impose on *your* callables, such as which parameter names may be injected, is written down somewhere.
+`ValueProvider` and `ValueGenerator` are used internally by the framework to normalize how checks and interaction specs source their inputs. Most users never construct them directly — they are documented here so the behaviour they impose on _your_ callables, such as which parameter names may be injected, is written down somewhere.
 :::
 
 Thin wrappers that let the framework treat a static value and a callable interchangeably. Both wrappers accept either a plain value or a (sync or async) callable, and both inject only the keyword arguments declared in their `kwargs_keys` set.

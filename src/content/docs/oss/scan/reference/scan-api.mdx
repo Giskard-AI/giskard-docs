@@ -50,28 +50,61 @@ Build a suite from the vulnerability generator registry, run it against the targ
     BCP-47 language codes the agent is expected to handle (e.g. `["en", "fr"]`).
   </Property>
   <Property name="max_scenarios" type="int | None" defaultValue="None">
-    Total upper bound on scenarios across all vulnerability generators. `None` lets each generator apply its own default, so seven generators each contribute scenarios and the run is large: expect 100+ scenarios, each costing one call to your agent and one to the judge, and several minutes of wall time. Set it low and the budget is spread thin, so some attack types get no scenarios at all and go untested. Keep it around 20 while iterating, raise it before you trust the result.
+    Total upper bound on scenarios across all vulnerability generators. `None`
+    lets each generator apply its own default, so seven generators each
+    contribute scenarios and the run is large: expect 100+ scenarios, each
+    costing one call to your agent and one to the judge, and several minutes of
+    wall time. Set it low and the budget is spread thin, so some attack types
+    get no scenarios at all and go untested. Keep it around 20 while iterating,
+    raise it before you trust the result.
   </Property>
   <Property name="seed" type="int" defaultValue="42">
-    Integer seed used for reproducible scenario generation. Two runs with different seeds generate different scenarios, so their pass rates are not comparable.
+    Integer seed used for reproducible scenario generation. Two runs with
+    different seeds generate different scenarios, so their pass rates are not
+    comparable.
   </Property>
   <Property name="group_by" type="str | None" defaultValue='"threat-type"'>
-    Result annotation key used to group the printed report. `None` prints the ungrouped report. Grouping only changes the printed layout, never which scenarios ran: `"threat-type"` groups by kind of failure, `"component"` by which part of the agent pipeline was exercised (`component:llm`, `component:retrieval`, `component:history`). Only the knowledge-base quality generators emit a `component:` tag, so `group_by="component"` on a vulnerability scan puts every result in one unnamed bucket.
+    Result annotation key used to group the printed report. `None` prints the
+    ungrouped report. Grouping only changes the printed layout, never which
+    scenarios ran: `"threat-type"` groups by kind of failure, `"component"` by
+    which part of the agent pipeline was exercised (`component:llm`,
+    `component:retrieval`, `component:history`). Only the knowledge-base quality
+    generators emit a `component:` tag, so `group_by="component"` on a
+    vulnerability scan puts every result in one unnamed bucket.
   </Property>
   <Property name="parallel" type="bool" defaultValue="True">
-    Run generated scenarios concurrently against the target. Pass `False` for serial execution, which is slower but easier to debug and gentler on provider rate limits. `True` requires an agent that tolerates concurrent calls. This controls suite *execution*; scenario *generation* is always concurrent.
+    Run generated scenarios concurrently against the target. Pass `False` for
+    serial execution, which is slower but easier to debug and gentler on
+    provider rate limits. `True` requires an agent that tolerates concurrent
+    calls. This controls suite *execution*; scenario *generation* is always
+    concurrent.
   </Property>
   <Property name="max_concurrency" type="int | None" defaultValue="None">
-    Cap on concurrent scenarios when `parallel=True`. `None` runs all scenarios at once, so provider rate limits become the effective cap.
+    Cap on concurrent scenarios when `parallel=True`. `None` runs all scenarios
+    at once, so provider rate limits become the effective cap.
   </Property>
   <Property name="return_exception" type="bool" defaultValue="False">
-    When `True`, a scenario whose input generation fails is recorded as an errored result and the scan continues. When `False`, the failure aborts the scan.
+    When `True`, a scenario whose input generation fails is recorded as an
+    errored result and the scan continues. When `False`, the failure aborts the
+    scan.
   </Property>
-  <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
-    Whether the agent supports single-turn or multi-turn conversations. `"singleturn"` skips generators that are multi-turn by design and caps turn budgets to 1 on the others. Choosing `"singleturn"` for an agent that does hold conversations removes multi-turn jailbreaks from the report entirely, so the run looks clean for a class of attack it never tried. Choosing `"multiturn"` for an agent with no memory makes those attacks run but never really escalate.
+  <Property
+    name="target_mode"
+    type='"singleturn" | "multiturn"'
+    defaultValue='"multiturn"'
+  >
+    Whether the agent supports single-turn or multi-turn conversations.
+    `"singleturn"` skips generators that are multi-turn by design and caps turn
+    budgets to 1 on the others. Choosing `"singleturn"` for an agent that does
+    hold conversations removes multi-turn jailbreaks from the report entirely,
+    so the run looks clean for a class of attack it never tried. Choosing
+    `"multiturn"` for an agent with no memory makes those attacks run but never
+    really escalate.
   </Property>
   <Property name="commercial_use" type="bool" defaultValue="False">
-    When `True`, exclude generators whose datasets do not permit commercial use. This removes attacks from the run, so the same agent scores better with it on. Set it from your licensing situation, not to improve a number.
+    When `True`, exclude generators whose datasets do not permit commercial use.
+    This removes attacks from the run, so the same agent scores better with it
+    on. Set it from your licensing situation, not to improve a number.
   </Property>
 </MethodCard>
 
@@ -121,8 +154,15 @@ All quality generators are knowledge-base driven: without a `knowledge_base` the
   <Property name="languages" type="list[str]" required>
     BCP-47 language codes the agent is expected to handle.
   </Property>
-  <Property name="knowledge_base" type="KnowledgeBase | list[str] | None" defaultValue="None">
-    Documents used by the knowledge-base quality generators. A plain list of strings is converted to a [`KnowledgeBase`](/oss/scan/reference/knowledge-base). A single `str` is rejected.
+  <Property
+    name="knowledge_base"
+    type="KnowledgeBase | list[str] | None"
+    defaultValue="None"
+  >
+    Documents used by the knowledge-base quality generators. A plain list of
+    strings is converted to a
+    [`KnowledgeBase`](/oss/scan/reference/knowledge-base). A single `str` is
+    rejected.
   </Property>
   <Property name="max_scenarios" type="int | None" defaultValue="None">
     Total upper bound on scenarios across all quality generators.
@@ -131,7 +171,9 @@ All quality generators are knowledge-base driven: without a `knowledge_base` the
     Integer seed used for reproducible scenario generation.
   </Property>
   <Property name="group_by" type="str | None" defaultValue='"component"'>
-    Result annotation key used to group the printed report. Quality generators tag scenarios `component:llm`, `component:retrieval`, or `component:history`, naming the part of the pipeline under test.
+    Result annotation key used to group the printed report. Quality generators
+    tag scenarios `component:llm`, `component:retrieval`, or
+    `component:history`, naming the part of the pipeline under test.
   </Property>
   <Property name="parallel" type="bool" defaultValue="True">
     Run generated scenarios concurrently against the target.
@@ -142,8 +184,13 @@ All quality generators are knowledge-base driven: without a `knowledge_base` the
   <Property name="return_exception" type="bool" defaultValue="False">
     Record input-generation failures as errored results instead of aborting.
   </Property>
-  <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
-    Conversation mode supported by the agent under test. Same consequences as for [`vulnerability_scan`](#vulnerability_scan).
+  <Property
+    name="target_mode"
+    type='"singleturn" | "multiturn"'
+    defaultValue='"multiturn"'
+  >
+    Conversation mode supported by the agent under test. Same consequences as
+    for [`vulnerability_scan`](#vulnerability_scan).
   </Property>
 </MethodCard>
 
@@ -173,7 +220,7 @@ Use `quality_scan` when the risk is a wrong answer rather than a hostile user: t
 
 Lower-level builder: resolve the supplied generators, build one run-wide context, distribute the scenario budget, run every generator concurrently, and wrap the output in a `Suite`. Use it when you want to pick generators yourself instead of taking a registry as-is. Coroutine: `await` it.
 
-Concurrency here is *generation* only; whether the resulting scenarios later run in parallel is decided by `Suite.run(parallel=...)`.
+Concurrency here is _generation_ only; whether the resulting scenarios later run in parallel is decided by `Suite.run(parallel=...)`.
 
 <MethodCard name="generate_suite()" returnType="Suite">
   <Property name="description" type="str" required>
@@ -182,20 +229,38 @@ Concurrency here is *generation* only; whether the resulting scenarios later run
   <Property name="languages" type="list[str]" required>
     BCP-47 language codes the agent is expected to handle.
   </Property>
-  <Property name="generators" type="Sequence[ScenarioGenerator | type[ScenarioGenerator]]" required>
-    Generator instances or classes. Classes are instantiated with their defaults.
+  <Property
+    name="generators"
+    type="Sequence[ScenarioGenerator | type[ScenarioGenerator]]"
+    required
+  >
+    Generator instances or classes. Classes are instantiated with their
+    defaults.
   </Property>
   <Property name="max_scenarios" type="int | None" defaultValue="None">
-    Total upper bound across all generators, split between them via a multinomial draw, so a generator can draw zero and be skipped. Must be non-negative; a negative value raises `ValueError`.
+    Total upper bound across all generators, split between them via a
+    multinomial draw, so a generator can draw zero and be skipped. Must be
+    non-negative; a negative value raises `ValueError`.
   </Property>
   <Property name="seed" type="int" defaultValue="42">
-    Seed for the top-level RNG. Child RNGs are spawned before concurrent generation so results stay stable. Keep the same seed when you want to compare two runs.
+    Seed for the top-level RNG. Child RNGs are spawned before concurrent
+    generation so results stay stable. Keep the same seed when you want to
+    compare two runs.
   </Property>
-  <Property name="target_mode" type='"singleturn" | "multiturn"' defaultValue='"multiturn"'>
+  <Property
+    name="target_mode"
+    type='"singleturn" | "multiturn"'
+    defaultValue='"multiturn"'
+  >
     Conversation mode forwarded to every generator.
   </Property>
-  <Property name="knowledge_base" type="KnowledgeBase | list[str] | None" defaultValue="None">
-    Documents forwarded through the context to generators that use knowledge-base context.
+  <Property
+    name="knowledge_base"
+    type="KnowledgeBase | list[str] | None"
+    defaultValue="None"
+  >
+    Documents forwarded through the context to generators that use
+    knowledge-base context.
   </Property>
 </MethodCard>
 
@@ -238,34 +303,40 @@ The adapters are imported lazily and run in-process, so the scanner's optional e
     Agent or provider target to evaluate.
   </Property>
   <Property name="tool" type='"garak" | "deepteam"' required>
-    Scanner to use. The parameter's type annotation also accepts `"lidar"`, which resolves to a private Giskard package and is not a supported public integration.
+    Scanner to use. The parameter's type annotation also accepts `"lidar"`,
+    which resolves to a private Giskard package and is not a supported public
+    integration.
   </Property>
   <Property name="description" type="str" required>
-    Natural-language description of the agent under test. Deepteam uses it as `red_team`'s `target_purpose`; garak has no target-profile concept and ignores it.
+    Natural-language description of the agent under test. Deepteam uses it as
+    `red_team`'s `target_purpose`; garak has no target-profile concept and
+    ignores it.
   </Property>
   <Property name="languages" type="list[str] | None" defaultValue="None">
-    BCP-47 language codes. Reserved for scanners that support language filtering; ignored by garak and deepteam.
+    BCP-47 language codes. Reserved for scanners that support language
+    filtering; ignored by garak and deepteam.
   </Property>
   <Property name="**kwargs" type="Any">
-    Tool-specific options, listed below. Passing a keyword the selected tool does not accept raises `TypeError`.
+    Tool-specific options, listed below. Passing a keyword the selected tool
+    does not accept raises `TypeError`.
   </Property>
 </MethodCard>
 
 **Garak options**
 
-| Option | Type | Default | Description |
-| ------ | ---- | ------- | ----------- |
-| `probes` | `list[str] \| "all" \| None` | `None` | `None` runs a curated default set, `"all"` runs every active probe, or pass explicit probe names. |
-| `target_mode` | `"singleturn" \| "multiturn"` | `"multiturn"` | `"multiturn"` keeps garak's iterative probes. |
+| Option        | Type                          | Default       | Description                                                                                       |
+| ------------- | ----------------------------- | ------------- | ------------------------------------------------------------------------------------------------- |
+| `probes`      | `list[str] \| "all" \| None`  | `None`        | `None` runs a curated default set, `"all"` runs every active probe, or pass explicit probe names. |
+| `target_mode` | `"singleturn" \| "multiturn"` | `"multiturn"` | `"multiturn"` keeps garak's iterative probes.                                                     |
 
 **Deepteam options**
 
-| Option | Type | Default | Description |
-| ------ | ---- | ------- | ----------- |
-| `vulnerabilities` | `list[str] \| None` | `None` | Vulnerability names; `None` runs a curated default set. |
-| `attacks` | `list[str] \| None` | `None` | Attack names; `None` runs a curated default set. |
-| `attacks_per_vulnerability_type` | `int` | `1` | Number of attacks generated per vulnerability type. |
-| `target_mode` | `"singleturn" \| "multiturn"` | `"multiturn"` | `"singleturn"` drops multi-turn attacks. |
+| Option                           | Type                          | Default       | Description                                             |
+| -------------------------------- | ----------------------------- | ------------- | ------------------------------------------------------- |
+| `vulnerabilities`                | `list[str] \| None`           | `None`        | Vulnerability names; `None` runs a curated default set. |
+| `attacks`                        | `list[str] \| None`           | `None`        | Attack names; `None` runs a curated default set.        |
+| `attacks_per_vulnerability_type` | `int`                         | `1`           | Number of attacks generated per vulnerability type.     |
+| `target_mode`                    | `"singleturn" \| "multiturn"` | `"multiturn"` | `"singleturn"` drops multi-turn attacks.                |
 
 ```python
 from giskard.scan import third_party_scan
@@ -294,7 +365,9 @@ List the selectable item names for a scan tool. Use it to discover what you can 
 
 <MethodCard name="list_scan_items()" returnType="list[str]">
   <Property name="tool" type="ScanTool" required>
-    `"giskard"` returns scenario generator class names, `"garak"` returns probe plugin names, `"deepteam"` returns supported vulnerability and attack names. Any other value raises `ValueError`.
+    `"giskard"` returns scenario generator class names, `"garak"` returns probe
+    plugin names, `"deepteam"` returns supported vulnerability and attack names.
+    Any other value raises `ValueError`.
   </Property>
   <Property name="include_inactive" type="bool" defaultValue="False">
     Garak only: also include inactive catalog probes. Ignored for other tools.
@@ -320,7 +393,8 @@ Raises `ImportError` when the selected tool's optional dependency is not install
 
 <TypeTable name="ScanOptions">
   <Property name="max_scenarios" type="int | None">
-    Total upper bound on scenarios across all generators. `None` lets each generator apply its own default.
+    Total upper bound on scenarios across all generators. `None` lets each
+    generator apply its own default.
   </Property>
   <Property name="seed" type="int">
     Integer seed used for reproducible scenario generation.
@@ -335,10 +409,12 @@ Raises `ImportError` when the selected tool's optional dependency is not install
     Cap on concurrent scenarios when `parallel=True`.
   </Property>
   <Property name="return_exception" type="bool">
-    Record input-generation failures as errored results instead of aborting the scan.
+    Record input-generation failures as errored results instead of aborting the
+    scan.
   </Property>
   <Property name="commercial_use" type="bool">
-    Exclude generators whose datasets do not permit commercial use. Vulnerability scan only.
+    Exclude generators whose datasets do not permit commercial use.
+    Vulnerability scan only.
   </Property>
 </TypeTable>
 
@@ -432,6 +508,7 @@ quality_suite_generator_registry.unregister(SycophancyScenarioGenerator)
 Type alias naming the scanners `third_party_scan` and `list_scan_items` accept:
 
 {/* pyright-skip: Signature excerpt. */}
+
 ```python
 type ScanTool = Literal["giskard", "garak", "deepteam"]
 ```

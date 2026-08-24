@@ -53,17 +53,18 @@ from giskard.checks import set_default_generator
 
 set_default_generator(LiteLLMGenerator(model="ollama/llama3"))
 ```
+
 :::
 
 Each provider reads its own credentials from the environment:
 
-| Provider | Model prefix | Environment variables |
-| --- | --- | --- |
-| OpenAI | `openai/` | `OPENAI_API_KEY` |
-| Anthropic | `anthropic/` | `ANTHROPIC_API_KEY` |
-| Google | `google/`, `gemini/` | `GEMINI_API_KEY` or `GOOGLE_API_KEY` |
-| Azure OpenAI | `azure/` | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION` (defaults to `2024-10-21`) |
-| Azure AI | `azure_ai/` | `AZURE_AI_API_KEY`, `AZURE_AI_ENDPOINT`, `AZURE_AI_API_VERSION` (defaults to `2024-10-21`) |
+| Provider     | Model prefix         | Environment variables                                                                      |
+| ------------ | -------------------- | ------------------------------------------------------------------------------------------ |
+| OpenAI       | `openai/`            | `OPENAI_API_KEY`                                                                           |
+| Anthropic    | `anthropic/`         | `ANTHROPIC_API_KEY`                                                                        |
+| Google       | `google/`, `gemini/` | `GEMINI_API_KEY` or `GOOGLE_API_KEY`                                                       |
+| Azure OpenAI | `azure/`             | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION` (defaults to `2024-10-21`)          |
+| Azure AI     | `azure_ai/`          | `AZURE_AI_API_KEY`, `AZURE_AI_ENDPOINT`, `AZURE_AI_API_VERSION` (defaults to `2024-10-21`) |
 
 Keep them in a `.env` file and load it before you build the generator:
 
@@ -98,6 +99,7 @@ Paste the following into your coding agent:
 ```
 Follow the instructions from https://docs.giskard.ai/oss/scan/installation.md and install the Giskard scan in my project.
 ```
+
 :::
 
 ## Next Steps

@@ -22,7 +22,7 @@ Most checks accept a value in two ways: as a static field (`keyword`, `expected_
 from pydantic.experimental.missing_sentinel import MISSING
 ```
 
-`MISSING` means *you did not supply a value*, so the check falls back to the matching `*_key` path. Passing `None` explicitly supplies `None` **as the value** and the fallback does not happen — a static `None` is compared, matched, or judged like any other value. This is the most common source of a check that quietly evaluates the wrong thing, so leave the field out rather than passing `None` to mean "unset".
+`MISSING` means _you did not supply a value_, so the check falls back to the matching `*_key` path. Passing `None` explicitly supplies `None` **as the value** and the fallback does not happen — a static `None` is compared, matched, or judged like any other value. This is the most common source of a check that quietly evaluates the wrong thing, so leave the field out rather than passing `None` to mean "unset".
 
 You rarely need to import `MISSING` yourself. It appears in this page's default columns to show which fields behave this way.
 
@@ -136,14 +136,26 @@ check = from_fn(
 <Property name="keyword" type="str | MISSING" defaultValue="MISSING">
   Substring to search for. Left at `MISSING`, the check reads `keyword_key`.
 </Property>
-<Property name="keyword_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+<Property
+  name="keyword_key"
+  type="JSONPathStr | MISSING"
+  defaultValue="MISSING"
+>
   JSONPath to extract the keyword from the trace.
 </Property>
-<Property name="text" type="str | MISSING" defaultValue="MISSING">Static text to search in. Left at `MISSING`, the check reads `target_key`.</Property>
+<Property name="text" type="str | MISSING" defaultValue="MISSING">
+  Static text to search in. Left at `MISSING`, the check reads `target_key`.
+</Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to search in.
 </Property>
-<Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>Unicode normalization applied before matching.</Property>
+<Property
+  name="normalization_form"
+  type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None'
+  defaultValue='"NFKC"'
+>
+  Unicode normalization applied before matching.
+</Property>
 <Property name="case_sensitive" type="bool" defaultValue="True">
   Whether matching is case-sensitive.
 </Property>
@@ -178,13 +190,23 @@ Use `StringMatching` when a specific phrase is required, such as a disclaimer yo
 <Property name="pattern" type="str | MISSING" defaultValue="MISSING">
   Regular expression pattern.
 </Property>
-<Property name="pattern_key" type="JSONPathStr | MISSING" defaultValue="MISSING">JSONPath to extract the regex pattern from the trace. Provide exactly one of `pattern` or `pattern_key`.</Property>
-<Property name="text" type="str | MISSING" defaultValue="MISSING">Static text to match against. Left at `MISSING`, the check reads `target_key`.</Property>
+<Property
+  name="pattern_key"
+  type="JSONPathStr | MISSING"
+  defaultValue="MISSING"
+>
+  JSONPath to extract the regex pattern from the trace. Provide exactly one of
+  `pattern` or `pattern_key`.
+</Property>
+<Property name="text" type="str | MISSING" defaultValue="MISSING">
+  Static text to match against. Left at `MISSING`, the check reads `target_key`.
+</Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to match against.
 </Property>
 <Property name="match_timeout_seconds" type="float" defaultValue="2.0">
-  Upper bound on how long regex matching may take before the check errors. Must be greater than 0.
+  Upper bound on how long regex matching may take before the check errors. Must
+  be greater than 0.
 </Property>
 
 The agent's reply must never contain a full card number. Wrap the matcher in [`Not`](#not) so a match is a failure:
@@ -226,19 +248,32 @@ The six comparison checks take the same four fields, listed in full under each o
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
     Static expected value.
   </Property>
-  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+  <Property
+    name="expected_value_key"
+    type="JSONPathStr | MISSING"
+    defaultValue="MISSING"
+  >
     JSONPath to the expected value in the trace.
   </Property>
   <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
     JSONPath to the value being checked.
   </Property>
-  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+  <Property
+    name="normalization_form"
+    type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None'
+    defaultValue='"NFKC"'
+  >
     Unicode normalization applied to both sides before comparing.
   </Property>
-  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
-    How to apply the comparison when the resolved value is a list, set, or tuple.
-    Omit it to compare the resolved value directly. `"any"` passes when at least
-    one item matches, `"all"` when every item does, `"none"` when no item does.
+  <Property
+    name="match"
+    type='Literal["any", "all", "none"] | MISSING'
+    defaultValue="MISSING"
+  >
+    How to apply the comparison when the resolved value is a list, set, or
+    tuple. Omit it to compare the resolved value directly. `"any"` passes when
+    at least one item matches, `"all"` when every item does, `"none"` when no
+    item does.
   </Property>
 </TypeTable>
 
@@ -274,16 +309,28 @@ intent_is_stable = Equals(
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
     Static value the target must differ from.
   </Property>
-  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+  <Property
+    name="expected_value_key"
+    type="JSONPathStr | MISSING"
+    defaultValue="MISSING"
+  >
     JSONPath to that value in the trace.
   </Property>
   <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
     JSONPath to the value being checked.
   </Property>
-  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+  <Property
+    name="normalization_form"
+    type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None'
+    defaultValue='"NFKC"'
+  >
     Unicode normalization applied to both sides before comparing.
   </Property>
-  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+  <Property
+    name="match"
+    type='Literal["any", "all", "none"] | MISSING'
+    defaultValue="MISSING"
+  >
     How to apply the comparison over a resolved list, set, or tuple.
   </Property>
 </TypeTable>
@@ -308,16 +355,28 @@ Use `NotEquals` for a single forbidden value. To forbid a condition expressed by
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
     Static lower bound, exclusive.
   </Property>
-  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+  <Property
+    name="expected_value_key"
+    type="JSONPathStr | MISSING"
+    defaultValue="MISSING"
+  >
     JSONPath to that bound in the trace.
   </Property>
   <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
     JSONPath to the value being checked.
   </Property>
-  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+  <Property
+    name="normalization_form"
+    type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None'
+    defaultValue='"NFKC"'
+  >
     Unicode normalization applied before comparing.
   </Property>
-  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+  <Property
+    name="match"
+    type='Literal["any", "all", "none"] | MISSING'
+    defaultValue="MISSING"
+  >
     How to apply the comparison over a resolved list, set, or tuple.
   </Property>
 </TypeTable>
@@ -340,16 +399,28 @@ retrieval_is_confident = GreaterThan(
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
     Static lower bound, inclusive.
   </Property>
-  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+  <Property
+    name="expected_value_key"
+    type="JSONPathStr | MISSING"
+    defaultValue="MISSING"
+  >
     JSONPath to that bound in the trace.
   </Property>
   <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
     JSONPath to the value being checked.
   </Property>
-  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+  <Property
+    name="normalization_form"
+    type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None'
+    defaultValue='"NFKC"'
+  >
     Unicode normalization applied before comparing.
   </Property>
-  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+  <Property
+    name="match"
+    type='Literal["any", "all", "none"] | MISSING'
+    defaultValue="MISSING"
+  >
     How to apply the comparison over a resolved list, set, or tuple.
   </Property>
 </TypeTable>
@@ -372,16 +443,28 @@ cites_a_source = GreaterThanEquals(
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
     Static upper bound, exclusive.
   </Property>
-  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+  <Property
+    name="expected_value_key"
+    type="JSONPathStr | MISSING"
+    defaultValue="MISSING"
+  >
     JSONPath to that bound in the trace.
   </Property>
   <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
     JSONPath to the value being checked.
   </Property>
-  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+  <Property
+    name="normalization_form"
+    type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None'
+    defaultValue='"NFKC"'
+  >
     Unicode normalization applied before comparing.
   </Property>
-  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+  <Property
+    name="match"
+    type='Literal["any", "all", "none"] | MISSING'
+    defaultValue="MISSING"
+  >
     How to apply the comparison over a resolved list, set, or tuple.
   </Property>
 </TypeTable>
@@ -404,16 +487,28 @@ answers_in_time = LessThan(
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
     Static upper bound, inclusive.
   </Property>
-  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+  <Property
+    name="expected_value_key"
+    type="JSONPathStr | MISSING"
+    defaultValue="MISSING"
+  >
     JSONPath to that bound in the trace.
   </Property>
   <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
     JSONPath to the value being checked.
   </Property>
-  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+  <Property
+    name="normalization_form"
+    type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None'
+    defaultValue='"NFKC"'
+  >
     Unicode normalization applied before comparing.
   </Property>
-  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+  <Property
+    name="match"
+    type='Literal["any", "all", "none"] | MISSING'
+    defaultValue="MISSING"
+  >
     How to apply the comparison over a resolved list, set, or tuple.
   </Property>
 </TypeTable>
@@ -449,13 +544,18 @@ Comparison checks are free and deterministic. Put them first when you want their
   `CheckResult.error`. Set it to `False` when the target already returns a
   parsed value such as a dict or a list.
 </Property>
-<Property name="expected_schema" type="dict[str, Any] | None" defaultValue="None">
+<Property
+  name="expected_schema"
+  type="dict[str, Any] | None"
+  defaultValue="None"
+>
   Optional JSON Schema for the parsed value. Serialized as `schema` in JSON.
 </Property>
 
 For an already-parsed value, set `parse=False`:
 
 {/* pyright-skip: Pydantic types the constructor alias schema; the Python field is expected_schema. */}
+
 ```python
 from giskard.checks import JsonValid
 
@@ -501,13 +601,15 @@ Requires the `regorus` extra: `pip install --pre 'giskard[regorus]'` (installs t
   Inline Rego source loaded into the engine.
 </Property>
 <Property name="rule" type="str" required>
-  Fully qualified boolean rule path (e.g. `data.giskard.allow`). Must evaluate to a boolean, be undefined (fail), or error on other types.
+  Fully qualified boolean rule path (e.g. `data.giskard.allow`). Must evaluate
+  to a boolean, be undefined (fail), or error on other types.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath into the trace for the JSON value exposed to the policy as `input`.
 </Property>
 <Property name="data" type="dict[str, Any]" defaultValue="{}">
-  Static `data` document merged into the policy engine via `engine.add_data` (separate from `input`).
+  Static `data` document merged into the policy engine via `engine.add_data`
+  (separate from `input`).
 </Property>
 
 Only a reply to an authenticated customer may carry an account balance:
@@ -732,13 +834,19 @@ Default result model for LLM-based checks. This is the structured output format 
 **Module:** `giskard.checks.judges.groundedness`
 
 <Property name="answer" type="str | MISSING" defaultValue="MISSING">
-  The answer text to evaluate (static). Left at `MISSING`, the check reads `target_key`.
+  The answer text to evaluate (static). Left at `MISSING`, the check reads
+  `target_key`.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract answer from trace.
 </Property>
-<Property name="context" type="str | list[str] | MISSING" defaultValue="MISSING">
-  Context document(s) that should support the answer (static). Left at `MISSING`, the check reads `context_key`.
+<Property
+  name="context"
+  type="str | list[str] | MISSING"
+  defaultValue="MISSING"
+>
+  Context document(s) that should support the answer (static). Left at
+  `MISSING`, the check reads `context_key`.
 </Property>
 <Property
   name="context_key"
@@ -788,13 +896,19 @@ Use `Groundedness` when every claim must be supported by the context. Use [`Cont
 **Module:** `giskard.checks.judges.contradiction`
 
 <Property name="answer" type="str | MISSING" defaultValue="MISSING">
-  The answer text to evaluate (static). Left at `MISSING`, the check reads `target_key`.
+  The answer text to evaluate (static). Left at `MISSING`, the check reads
+  `target_key`.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the answer from the trace.
 </Property>
-<Property name="context" type="str | list[str] | MISSING" defaultValue="MISSING">
-  Context document(s) the answer is checked against (static). Left at `MISSING`, the check reads `context_key`.
+<Property
+  name="context"
+  type="str | list[str] | MISSING"
+  defaultValue="MISSING"
+>
+  Context document(s) the answer is checked against (static). Left at `MISSING`,
+  the check reads `context_key`.
 </Property>
 <Property
   name="context_key"
@@ -829,7 +943,8 @@ Uses the same inputs as [`Groundedness`](#groundedness), but only reports a conf
 **Module:** `giskard.checks.judges.answer_relevance`
 
 <Property name="question" type="str | MISSING" defaultValue="MISSING">
-  Question to evaluate against. Left at `MISSING`, the check reads `question_key`.
+  Question to evaluate against. Left at `MISSING`, the check reads
+  `question_key`.
 </Property>
 <Property name="question_key" type="str" defaultValue='"trace.last.inputs"'>
   JSONPath to extract the question from the trace.
@@ -841,7 +956,8 @@ Uses the same inputs as [`Groundedness`](#groundedness), but only reports a conf
   JSONPath to extract the answer from the trace.
 </Property>
 <Property name="context" type="str | MISSING" defaultValue="MISSING">
-  Optional domain context describing the chatbot's purpose (not extracted from the trace).
+  Optional domain context describing the chatbot's purpose (not extracted from
+  the trace).
 </Property>
 <Property name="include_history" type="bool" defaultValue="True">
   Whether earlier interactions are shown to the judge as context. Turn it off to
@@ -892,7 +1008,11 @@ scenario = (
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the output from the trace.
 </Property>
-<Property name="categories" type="list[ToxicityCategory]" defaultValue='["hate_speech", "harassment", "threats", "self_harm", "sexual_content", "violence"]'>
+<Property
+  name="categories"
+  type="list[ToxicityCategory]"
+  defaultValue='["hate_speech", "harassment", "threats", "self_harm", "sexual_content", "violence"]'
+>
   Toxicity categories to evaluate. Restrict the list to focus the judge.
   `ToxicityCategory` is a `Literal` over exactly those six values; any other
   string raises a `ValidationError` when you construct the check.
@@ -1041,7 +1161,8 @@ No judge, but not free either: these call an embeddings API, so they need a conf
 **Module:** `giskard.checks.builtin.semantic_similarity`
 
 <Property name="reference_text" type="str | MISSING" defaultValue="MISSING">
-  Reference text to compare against (static). Left at `MISSING`, the check reads `reference_text_key`.
+  Reference text to compare against (static). Left at `MISSING`, the check reads
+  `reference_text_key`.
 </Property>
 <Property
   name="reference_text_key"
@@ -1050,17 +1171,20 @@ No judge, but not free either: these call an embeddings API, so they need a conf
 >
   JSONPath to extract reference text from trace.
 </Property>
-<Property
-  name="target_key"
-  type="str"
-  defaultValue='"trace.last.outputs"'
->
+<Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract actual value from trace.
 </Property>
 <Property name="threshold" type="float" defaultValue="0.95">
   Similarity threshold (0.0 to 1.0).
 </Property>
-<Property name="embedding_model" type="BaseEmbeddingModel | None" defaultValue="None">Embedding model used to compute similarity scores. `None` falls back to the global default.</Property>
+<Property
+  name="embedding_model"
+  type="BaseEmbeddingModel | None"
+  defaultValue="None"
+>
+  Embedding model used to compute similarity scores. `None` falls back to the
+  global default.
+</Property>
 
 The agent rewords the dispute procedure every run, but the procedure itself must not drift:
 
@@ -1097,13 +1221,18 @@ Requires the `textstat` dependency, which ships with the `all-checks` extra: `pi
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to the text to score.
 </Property>
-<Property name="metric" type='ReadabilityMetric' defaultValue='"flesch_reading_ease"'>
+<Property
+  name="metric"
+  type="ReadabilityMetric"
+  defaultValue='"flesch_reading_ease"'
+>
   One of `flesch_reading_ease`, `flesch_kincaid_grade`, `gunning_fog`,
   `automated_readability_index`, `coleman_liau_index`,
   `dale_chall_readability_score`.
 </Property>
 <Property name="min_score" type="float | None" defaultValue="None">
-  Minimum acceptable score. Use with higher-is-easier metrics such as `flesch_reading_ease`.
+  Minimum acceptable score. Use with higher-is-easier metrics such as
+  `flesch_reading_ease`.
 </Property>
 <Property name="max_score" type="float | None" defaultValue="None">
   Maximum acceptable score. Use with grade-level metrics, where lower is easier.
@@ -1217,7 +1346,6 @@ class QuotesPublishedFee(Check):
 ```
 
 Fields are ordinary Pydantic fields, and `extra="forbid"` applies to your subclass too. For the full walkthrough — registration, metrics, composing several checks, and when to prefer [`FnCheck`](#fncheck) — see [Custom checks](/oss/checks/how-to/custom-checks).
-
 
 ---
 

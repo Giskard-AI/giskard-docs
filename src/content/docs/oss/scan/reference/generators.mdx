@@ -14,20 +14,20 @@ Scenario generators turn a plain-language description of your agent into runnabl
 
 Which generators you run decides what the scan can find. Drop one and the failures it would have found never appear in the report. The table below lists every generator that produces scenarios, so it is also the limit of what a scan covers. Two more classes exist as bases you subclass rather than run: `KnowledgeBaseScenarioGenerator` (documented [below](#knowledgebasescenariogenerator)) and `BaseDatasetScenarioGenerator` in `giskard.scan.generators.base`.
 
-| Generator | Family | Multi-turn | Used by |
-| --------- | ------ | ---------- | ------- |
-| [`AdversarialScenarioGenerator`](#adversarialscenariogenerator) | LLM-driven | Yes | `vulnerability_scan` |
-| [`CrescendoAttackScenarioGenerator`](#crescendoattackscenariogenerator) | LLM-driven | Multi-turn only | `vulnerability_scan` |
-| [`GOATAttackScenarioGenerator`](#goatattackscenariogenerator) | LLM-driven | Multi-turn only | `vulnerability_scan` |
-| [`PromptInjectionScenarioGenerator`](#promptinjectionscenariogenerator) | Bundled dataset | Yes (dataset-defined) | `vulnerability_scan` |
-| [`GCGInjectionScenarioGenerator`](#gcginjectionscenariogenerator) | Hugging Face dataset | No | `vulnerability_scan` |
-| [`HuggingFaceDatasetScenarioGenerator`](#huggingfacedatasetscenariogenerator) | Hugging Face dataset | No | `vulnerability_scan` |
-| [`LocalDatasetScenarioGenerator`](#localdatasetscenariogenerator) | Bundled dataset | No | n/a |
-| [`HallucinationScenarioGenerator`](#hallucinationscenariogenerator) | Knowledge base | Yes | `quality_scan` |
-| [`SycophancyScenarioGenerator`](#sycophancyscenariogenerator) | Knowledge base | Yes | `quality_scan` |
-| [`SplitQuestionsScenarioGenerator`](#splitquestionsscenariogenerator) | Knowledge base | Multi-turn only (exactly 2 turns) | `quality_scan` |
-| [`MultiTopicScenarioGenerator`](#multitopicscenariogenerator) | Knowledge base | Multi-turn only (2+ turns) | `quality_scan` |
-| [`OutOfScopeScenarioGenerator`](#outofscopescenariogenerator) | Knowledge base | Yes | `quality_scan` |
+| Generator                                                                     | Family               | Multi-turn                        | Used by              |
+| ----------------------------------------------------------------------------- | -------------------- | --------------------------------- | -------------------- |
+| [`AdversarialScenarioGenerator`](#adversarialscenariogenerator)               | LLM-driven           | Yes                               | `vulnerability_scan` |
+| [`CrescendoAttackScenarioGenerator`](#crescendoattackscenariogenerator)       | LLM-driven           | Multi-turn only                   | `vulnerability_scan` |
+| [`GOATAttackScenarioGenerator`](#goatattackscenariogenerator)                 | LLM-driven           | Multi-turn only                   | `vulnerability_scan` |
+| [`PromptInjectionScenarioGenerator`](#promptinjectionscenariogenerator)       | Bundled dataset      | Yes (dataset-defined)             | `vulnerability_scan` |
+| [`GCGInjectionScenarioGenerator`](#gcginjectionscenariogenerator)             | Hugging Face dataset | No                                | `vulnerability_scan` |
+| [`HuggingFaceDatasetScenarioGenerator`](#huggingfacedatasetscenariogenerator) | Hugging Face dataset | No                                | `vulnerability_scan` |
+| [`LocalDatasetScenarioGenerator`](#localdatasetscenariogenerator)             | Bundled dataset      | No                                | n/a                  |
+| [`HallucinationScenarioGenerator`](#hallucinationscenariogenerator)           | Knowledge base       | Yes                               | `quality_scan`       |
+| [`SycophancyScenarioGenerator`](#sycophancyscenariogenerator)                 | Knowledge base       | Yes                               | `quality_scan`       |
+| [`SplitQuestionsScenarioGenerator`](#splitquestionsscenariogenerator)         | Knowledge base       | Multi-turn only (exactly 2 turns) | `quality_scan`       |
+| [`MultiTopicScenarioGenerator`](#multitopicscenariogenerator)                 | Knowledge base       | Multi-turn only (2+ turns)        | `quality_scan`       |
+| [`OutOfScopeScenarioGenerator`](#outofscopescenariogenerator)                 | Knowledge base       | Yes                               | `quality_scan`       |
 
 ---
 
@@ -48,7 +48,9 @@ Abstract base class for every generator. It is a Pydantic model, so generators a
 
 <TypeTable name="ScenarioGenerator">
   <Property name="allow_commercial_use" type="bool">
-    Read-only property. Whether the generator's data permits commercial use. `True` on the base class; dataset generators override it from `repo_allow_commercial_use`.
+    Read-only property. Whether the generator's data permits commercial use.
+    `True` on the base class; dataset generators override it from
+    `repo_allow_commercial_use`.
   </Property>
 </TypeTable>
 
@@ -164,10 +166,15 @@ These load scenarios from a static dataset rather than generating them with an L
 **Module:** `giskard.scan.generators.base`
 
 <Property name="dataset_name" type="str" required>
-  Stem of the `.jsonl` file inside the package `data/` directory (e.g. `"prompt_injection"`). A missing file raises `RuntimeError`.
+  Stem of the `.jsonl` file inside the package `data/` directory (e.g.
+  `"prompt_injection"`). A missing file raises `RuntimeError`.
 </Property>
 <Property name="tags" type="list[str]" defaultValue="[]">
-  Tags applied to every loaded scenario. They replace the scenario's own tags rather than adding to them, so on a generator that ships default `threat-type:` and `owasp:` tags, passing `tags=` drops those and the default `group_by="threat-type"` report loses its buckets. Repeat the defaults in your list if you want to keep them.
+  Tags applied to every loaded scenario. They replace the scenario's own tags
+  rather than adding to them, so on a generator that ships default
+  `threat-type:` and `owasp:` tags, passing `tags=` drops those and the default
+  `group_by="threat-type"` report loses its buckets. Repeat the defaults in your
+  list if you want to keep them.
 </Property>
 
 There is no attack style of its own: it replays whatever prompts the file holds. Use it, or `HuggingFaceDatasetScenarioGenerator`, when you have a corpus of attacks the LLM-driven generators will not invent, such as ones collected from your own production traffic.
@@ -204,7 +211,11 @@ Some bundled scenarios carry their own turn budget: the indirect-injection entri
 <Property name="dataset_name" type="str" defaultValue='"prompt_injection"'>
   Bundled dataset stem.
 </Property>
-<Property name="tags" type="list[str]" defaultValue='["threat-type:prompt-injection", "owasp:llm-top-10-2025:LLM01"]'>
+<Property
+  name="tags"
+  type="list[str]"
+  defaultValue='["threat-type:prompt-injection", "owasp:llm-top-10-2025:LLM01"]'
+>
   Tags applied to every loaded scenario.
 </Property>
 
@@ -223,16 +234,20 @@ generator = PromptInjectionScenarioGenerator()
 **Module:** `giskard.scan.generators.huggingface`
 
 <Property name="repo_id" type="str" required>
-  Hugging Face dataset repository id, e.g. `"giskardai/do-not-answer-scenarios"`.
+  Hugging Face dataset repository id, e.g.
+  `"giskardai/do-not-answer-scenarios"`.
 </Property>
 <Property name="repo_allow_commercial_use" type="bool" defaultValue="True">
-  Whether the dataset's license permits commercial use. Set it explicitly per repo, because the license recorded on the Hub card is not always authoritative. This value backs `allow_commercial_use`, which is what `commercial_use=True` filters on.
+  Whether the dataset's license permits commercial use. Set it explicitly per
+  repo, because the license recorded on the Hub card is not always
+  authoritative. This value backs `allow_commercial_use`, which is what
+  `commercial_use=True` filters on.
 </Property>
 <Property name="tags" type="list[str]" defaultValue="[]">
   Tags applied to every loaded scenario.
 </Property>
 
-The dataset must declare one *subset* (config) per language in its dataset card, named by BCP-47 code (e.g. an `"en"` config). Available languages are discovered from the card's `configs`, resolving each subset's `data_files` against the repo file list, so one language may span several files. Requested languages with no matching subset are skipped; if none match, an empty list is returned and a warning is emitted.
+The dataset must declare one _subset_ (config) per language in its dataset card, named by BCP-47 code (e.g. an `"en"` config). Available languages are discovered from the card's `configs`, resolving each subset's `data_files` against the repo file list, so one language may span several files. Requested languages with no matching subset are skipped; if none match, an empty list is returned and a warning is emitted.
 
 ```python
 from giskard.scan import HuggingFaceDatasetScenarioGenerator
@@ -251,7 +266,11 @@ generator = HuggingFaceDatasetScenarioGenerator(
 
 **Module:** `giskard.scan.generators.gcg`
 
-<Property name="repo_id" type="str" defaultValue='"giskardai/harmbench-scenarios"'>
+<Property
+  name="repo_id"
+  type="str"
+  defaultValue='"giskardai/harmbench-scenarios"'
+>
   Hugging Face dataset of harmful base prompts.
 </Property>
 <Property name="repo_allow_commercial_use" type="bool" defaultValue="True">

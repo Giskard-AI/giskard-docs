@@ -7,20 +7,20 @@ The errors below are the ones a first run tends to produce. Each entry quotes th
 
 ## Symptom table
 
-| Message | Cause | Fix |
-| :------ | :---- | :-- |
-| `WorkflowError: Step processing failed` | A judged check or a generator called an LLM and the provider call failed — most often no API key, or a model string the provider does not recognize. | [Configure a provider](#no-api-key-or-a-bad-model-string) |
-| `ValueError: Provider 'x' is not configured and not in the registry.` | `Generator` routes only to the native providers. | [Use LiteLLM](#unknown-provider) |
-| `ValidationError … Invalid JSONPath expression 'last.outputs': path must start with 'trace.'` | Every `*_key` is a JSONPath rooted at the trace. | [Prefix the path](#jsonpath-must-start-with-trace) |
-| A check ERRORs with `No value found for key 'trace.last.outputs.zz'` | The path is valid but matched nothing. | [Fix the path](#a-path-that-matches-nothing) |
-| `ValidationError … Extra inputs are not permitted [type=extra_forbidden]` | Checks reject unknown fields. | [Check the field name](#unknown-field-on-a-check) |
-| `TypeError: Parameter 'x' is required but not in the injection requirements.` | Callback parameter names are load-bearing. | [Rename the parameter](#wrong-callback-parameter-name) |
-| `RuntimeError: asyncio.run() cannot be called from a running event loop` | `asyncio.run` inside a notebook or another async context. | [Await instead](#asyncio-run-inside-a-running-loop) |
-| `InputGenerationException: generation failed at turn N after M attempt(s)` | A `UserSimulator` or `LLMGenerator` was refused or blocked on every retry. | [Adjust the generator](#the-user-simulator-gave-up) |
-| `TypeError: from_fn callable must return bool or CheckResult (or awaitable thereof), but got …` | A custom function check returned something else. | [Return a bool](#custom-function-returned-the-wrong-type) |
-| `ValidationError: The 'textstat' package is required for the Readability check.` | Optional dependency missing. | [Install the extra](#missing-optional-dependency) |
-| `ModuleNotFoundError: No module named 'giskard.checks'` right after a clean install | The environment is on Python 3.11 or older, so pip installed Giskard v2 instead. | [Use Python 3.12+](#pip-installed-v2-instead-of-v3) |
-| `ImportError: Package conflict detected: The legacy package 'giskard' is installed …` | Giskard v2 is installed alongside v3. | [Uninstall v2](#giskard-v2-installed-alongside-v3) |
+| Message                                                                                         | Cause                                                                                                                                                | Fix                                                       |
+| :---------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------- |
+| `WorkflowError: Step processing failed`                                                         | A judged check or a generator called an LLM and the provider call failed — most often no API key, or a model string the provider does not recognize. | [Configure a provider](#no-api-key-or-a-bad-model-string) |
+| `ValueError: Provider 'x' is not configured and not in the registry.`                           | `Generator` routes only to the native providers.                                                                                                     | [Use LiteLLM](#unknown-provider)                          |
+| `ValidationError … Invalid JSONPath expression 'last.outputs': path must start with 'trace.'`   | Every `*_key` is a JSONPath rooted at the trace.                                                                                                     | [Prefix the path](#jsonpath-must-start-with-trace)        |
+| A check ERRORs with `No value found for key 'trace.last.outputs.zz'`                            | The path is valid but matched nothing.                                                                                                               | [Fix the path](#a-path-that-matches-nothing)              |
+| `ValidationError … Extra inputs are not permitted [type=extra_forbidden]`                       | Checks reject unknown fields.                                                                                                                        | [Check the field name](#unknown-field-on-a-check)         |
+| `TypeError: Parameter 'x' is required but not in the injection requirements.`                   | Callback parameter names are load-bearing.                                                                                                           | [Rename the parameter](#wrong-callback-parameter-name)    |
+| `RuntimeError: asyncio.run() cannot be called from a running event loop`                        | `asyncio.run` inside a notebook or another async context.                                                                                            | [Await instead](#asyncio-run-inside-a-running-loop)       |
+| `InputGenerationException: generation failed at turn N after M attempt(s)`                      | A `UserSimulator` or `LLMGenerator` was refused or blocked on every retry.                                                                           | [Adjust the generator](#the-user-simulator-gave-up)       |
+| `TypeError: from_fn callable must return bool or CheckResult (or awaitable thereof), but got …` | A custom function check returned something else.                                                                                                     | [Return a bool](#custom-function-returned-the-wrong-type) |
+| `ValidationError: The 'textstat' package is required for the Readability check.`                | Optional dependency missing.                                                                                                                         | [Install the extra](#missing-optional-dependency)         |
+| `ModuleNotFoundError: No module named 'giskard.checks'` right after a clean install             | The environment is on Python 3.11 or older, so pip installed Giskard v2 instead.                                                                     | [Use Python 3.12+](#pip-installed-v2-instead-of-v3)       |
+| `ImportError: Package conflict detected: The legacy package 'giskard' is installed …`           | Giskard v2 is installed alongside v3.                                                                                                                | [Uninstall v2](#giskard-v2-installed-alongside-v3)        |
 
 ## No API key, or a bad model string
 
@@ -98,7 +98,7 @@ expected
 
 `Check` sets `extra="forbid"` on purpose: a persisted suite that referenced a renamed field would otherwise fall back to the default and run green while evaluating the wrong value. Look up the exact field name in the [checks reference](/oss/checks/reference/checks) — `Equals` takes `expected_value`, not `expected`.
 
-`Scenario` deliberately does *not* forbid extras, so the same typo in a scenario constructor is accepted silently.
+`Scenario` deliberately does _not_ forbid extras, so the same typo in a scenario constructor is accepted silently.
 
 ## Wrong callback parameter name
 

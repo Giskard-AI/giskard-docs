@@ -100,13 +100,13 @@ To set this once per pytest session, see [CI/CD Integration](/oss/checks/how-to/
 
 `GISKARD_CHECKS_DEFAULT_MODEL` picks the model. The credentials for the provider in front of the `/` come from that provider's own environment variables, which are read at the point the provider is first constructed — not at import — so a missing key surfaces mid-run rather than at startup.
 
-| Model prefix | Environment variables |
-| --- | --- |
-| `openai/` | `OPENAI_API_KEY` (read by the OpenAI SDK) |
-| `anthropic/` | `ANTHROPIC_API_KEY` (read by the Anthropic SDK) |
-| `google/`, `gemini/` | `GEMINI_API_KEY`, or `GOOGLE_API_KEY` as a fallback |
-| `azure/` | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION` |
-| `azure_ai/` | `AZURE_AI_API_KEY`, `AZURE_AI_ENDPOINT`, and optionally `AZURE_AI_API_VERSION` (defaults to `2024-10-21`) |
+| Model prefix         | Environment variables                                                                                     |
+| -------------------- | --------------------------------------------------------------------------------------------------------- |
+| `openai/`            | `OPENAI_API_KEY` (read by the OpenAI SDK)                                                                 |
+| `anthropic/`         | `ANTHROPIC_API_KEY` (read by the Anthropic SDK)                                                           |
+| `google/`, `gemini/` | `GEMINI_API_KEY`, or `GOOGLE_API_KEY` as a fallback                                                       |
+| `azure/`             | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION`                                                    |
+| `azure_ai/`          | `AZURE_AI_API_KEY`, `AZURE_AI_ENDPOINT`, and optionally `AZURE_AI_API_VERSION` (defaults to `2024-10-21`) |
 
 Those five prefixes are the whole registry. A model string with any other prefix raises `ValueError: Provider '<name>' is not configured and not in the registry.` For anything else, install the `litellm` extra and pass a `LiteLLMGenerator` explicitly.
 

@@ -21,13 +21,13 @@ No provider SDK ships with `giskard` itself, so installing it without a provider
 
 Each row is the complete setup for one provider: the install command, the environment variables it reads, and the model string you pass to `Generator`.
 
-| Provider | Install | Environment variables | Example model string |
-| --- | --- | --- | --- |
-| OpenAI | `pip install --pre "giskard[openai]"` | `OPENAI_API_KEY` | `openai/gpt-4o-mini` |
-| Google Gemini | `pip install --pre "giskard[google]"` | `GEMINI_API_KEY` or `GOOGLE_API_KEY` | `gemini/gemini-2.0-flash` |
-| Anthropic | `pip install --pre "giskard[anthropic]"` | `ANTHROPIC_API_KEY` | `anthropic/claude-sonnet-4-5` |
-| Azure OpenAI | `pip install --pre "giskard[azure]"` | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION` | `azure/my-deployment` |
-| Azure AI | `pip install --pre "giskard[azure]"` | `AZURE_AI_API_KEY`, `AZURE_AI_ENDPOINT`, `AZURE_AI_API_VERSION` | `azure_ai/my-deployment` |
+| Provider      | Install                                  | Environment variables                                           | Example model string          |
+| ------------- | ---------------------------------------- | --------------------------------------------------------------- | ----------------------------- |
+| OpenAI        | `pip install --pre "giskard[openai]"`    | `OPENAI_API_KEY`                                                | `openai/gpt-4o-mini`          |
+| Google Gemini | `pip install --pre "giskard[google]"`    | `GEMINI_API_KEY` or `GOOGLE_API_KEY`                            | `gemini/gemini-2.0-flash`     |
+| Anthropic     | `pip install --pre "giskard[anthropic]"` | `ANTHROPIC_API_KEY`                                             | `anthropic/claude-sonnet-4-5` |
+| Azure OpenAI  | `pip install --pre "giskard[azure]"`     | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION`          | `azure/my-deployment`         |
+| Azure AI      | `pip install --pre "giskard[azure]"`     | `AZURE_AI_API_KEY`, `AZURE_AI_ENDPOINT`, `AZURE_AI_API_VERSION` | `azure_ai/my-deployment`      |
 
 Use `pip install --pre "giskard[all-llms]"` for all the native SDKs at once.
 
@@ -35,10 +35,10 @@ Use `pip install --pre "giskard[all-llms]"` for all the native SDKs at once.
 
 Two checks need a dependency that is not installed by default:
 
-| Extra | Install | Enables |
-| --- | --- | --- |
+| Extra        | Install                                   | Enables                                                                                                                                            |
+| ------------ | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `all-checks` | `pip install --pre "giskard[all-checks]"` | `Readability`, which needs `textstat`. Without it the check raises `ValidationError: The 'textstat' package is required for the Readability check` |
-| `regorus` | `pip install --pre "giskard[regorus]"` | `RegoPolicy`, policy-as-code checks evaluated by Rego |
+| `regorus`    | `pip install --pre "giskard[regorus]"`    | `RegoPolicy`, policy-as-code checks evaluated by Rego                                                                                              |
 
 :::caution
 The `regorus` extra installs on macOS (Intel and Apple silicon) and on Linux x86_64. On other platforms — Windows and linux-aarch64 — the extra installs nothing and `RegoPolicy` stays unavailable.
@@ -118,12 +118,12 @@ Use a capable judge model and review failures before acting on them.
 
 If you would rather not call `set_default_generator` at all, set the model in the environment instead. These variables are read from the process environment or from a `.env` file in the working directory.
 
-| Variable | Default | What it does |
-| --- | --- | --- |
-| `GISKARD_CHECKS_DEFAULT_MODEL` | `openai/gpt-4o-mini` | Model used by every judged check when no generator is configured |
-| `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL` | `text-embedding-3-small` | Model used by `SemanticSimilarity` |
-| `GISKARD_CHECKS_MAX_REPORTED_FAILURES` | unlimited | Caps how many failures a report prints, which keeps CI logs bounded |
-| `GISKARD_CHECKS_DISABLE_RICH_PRETTY` | `false` | Set it to `1` to turn off rich formatting in reports |
+| Variable                                 | Default                  | What it does                                                        |
+| ---------------------------------------- | ------------------------ | ------------------------------------------------------------------- |
+| `GISKARD_CHECKS_DEFAULT_MODEL`           | `openai/gpt-4o-mini`     | Model used by every judged check when no generator is configured    |
+| `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL` | `text-embedding-3-small` | Model used by `SemanticSimilarity`                                  |
+| `GISKARD_CHECKS_MAX_REPORTED_FAILURES`   | unlimited                | Caps how many failures a report prints, which keeps CI logs bounded |
+| `GISKARD_CHECKS_DISABLE_RICH_PRETTY`     | `false`                  | Set it to `1` to turn off rich formatting in reports                |
 
 A generator passed to `set_default_generator`, or to an individual check, always wins over the environment.
 

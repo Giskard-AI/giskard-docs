@@ -49,6 +49,7 @@ The tradeoff of async is that you need an event loop to call `Scenario.run()`. G
 ## Common pitfalls
 
 <!-- pyright-skip: This block deliberately shows invalid async patterns alongside the correct ones. -->
+
 ```python
 # Wrong — run() returns a coroutine, not a result
 result = test_scenario.run()

@@ -17,11 +17,11 @@ Before you start, run `pip install --pre "giskard[scan,openai]"`, which brings i
 
 Find your agent in this table, then open the matching tab:
 
-| Your agent | Pattern |
-| --- | --- |
-| Answers one question at a time and forgets it. A single LLM call, a RAG endpoint, a `/ask` route. | **Basic** |
-| Keeps the conversation on its own side, keyed by a session or thread id. A LangGraph checkpointer, an Assistants-style thread, a chat API with a `conversation_id`. | **Stateful** |
-| Holds no state but expects the whole message list on every call. | **History-passing** |
+| Your agent                                                                                                                                                          | Pattern             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| Answers one question at a time and forgets it. A single LLM call, a RAG endpoint, a `/ask` route.                                                                   | **Basic**           |
+| Keeps the conversation on its own side, keyed by a session or thread id. A LangGraph checkpointer, an Assistants-style thread, a chat API with a `conversation_id`. | **Stateful**        |
+| Holds no state but expects the whole message list on every call.                                                                                                    | **History-passing** |
 
 All three examples wrap the same agent, a customer-support assistant for a retail bank, so the only thing that changes between them is how the turn history is carried. The rest of the scan docs reuse this agent; the tutorial uses a lower-stakes garden-center assistant instead, because it runs against a live model.
 
@@ -72,11 +72,12 @@ Run this one with `target_mode="singleturn"`. It has no memory, so a multi-turn 
 </TabItem>
 <TabItem label="Stateful">
 
-The same agent, but the conversation lives on the agent's side and is addressed by a thread id: a LangGraph checkpointer, a session-based HTTP API, or the in-memory store below. Giskard has to hand you the *same* id on every turn of one conversation.
+The same agent, but the conversation lives on the agent's side and is addressed by a thread id: a LangGraph checkpointer, a session-based HTTP API, or the in-memory store below. Giskard has to hand you the _same_ id on every turn of one conversation.
 
 Subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
 
 {/* pyright-skip: Alternative example. */}
+
 ```python
 import os
 from uuid import uuid4
@@ -133,6 +134,7 @@ If you forget the `Trace` subclass and generate the id inside the function, ever
 The same agent with no store at all: it is a pure function of the whole conversation, which is what most self-hosted chat endpoints look like. Declare a `trace` parameter and rebuild the message list from `trace.interactions`, which holds the previous turns of the current conversation:
 
 {/* pyright-skip: Alternative example. */}
+
 ```python
 import os
 
@@ -177,7 +179,7 @@ async def support_agent(
     return AgentOutput(answer=response.choices[0].message.content)
 ```
 
-`trace.interactions` is the history *before* the current message, so append `inputs.question` yourself. Drop that last line and the agent answers the previous turn twice.
+`trace.interactions` is the history _before_ the current message, so append `inputs.question` yourself. Drop that last line and the agent answers the previous turn twice.
 
 </TabItem>
 </Tabs>

@@ -120,7 +120,7 @@ Named quantitative measurement attached to a check result (e.g. performance timi
   </Property>
 </TypeTable>
 
-Attach metrics to a result to record a number alongside the verdict. They travel with the `CheckResult`, so a suite can report *how close* a check was, not just whether it passed:
+Attach metrics to a result to record a number alongside the verdict. They travel with the `CheckResult`, so a suite can report _how close_ a check was, not just whether it passed:
 
 ```python
 from giskard.checks import CheckResult, Metric
@@ -356,8 +356,8 @@ The concrete `InteractionSpec` that `.interact()` builds. Construct it directly 
   </Property>
   <Property name="outputs" type="Target | MISSING" defaultValue="MISSING">
     A static value or a callable `(inputs)` / `(inputs, trace)`. Left at
-    `MISSING`, the interaction uses the scenario-level or run-level target;
-    if there is none, generation raises `ValueError`.
+    `MISSING`, the interaction uses the scenario-level or run-level target; if
+    there is none, generation raises `ValueError`.
   </Property>
   <Property name="metadata" type="dict[str, Any]" defaultValue="{}">
     Metadata copied onto every interaction this spec produces.
@@ -425,13 +425,18 @@ Two mixins give a custom check the same model-configuration field the built-ins 
 
 <TypeTable name="WithGeneratorMixin">
   <Property name="generator" type="BaseGenerator | None" defaultValue="None">
-    LLM generator for this check. `None` falls back to `get_default_generator()`.
-    Read it inside `run()` as `self._generator`, which resolves the fallback.
+    LLM generator for this check. `None` falls back to
+    `get_default_generator()`. Read it inside `run()` as `self._generator`,
+    which resolves the fallback.
   </Property>
 </TypeTable>
 
 <TypeTable name="WithEmbeddingMixin">
-  <Property name="embedding_model" type="BaseEmbeddingModel | None" defaultValue="None">
+  <Property
+    name="embedding_model"
+    type="BaseEmbeddingModel | None"
+    defaultValue="None"
+  >
     Embedding model for this check. `None` falls back to
     `get_default_embedding_model()`. Read it as `self._embedding_model`.
   </Property>
@@ -469,10 +474,18 @@ Raised out of `Trace.with_interaction()` and its siblings. `Scenario.run()` unwr
 `TestCaseError` is not an exception you catch. It is the frozen model attached to `TestCaseResult.error` recording why a step could not run:
 
 <TypeTable name="TestCaseError">
-  <Property name="message" type="str" required>The `str()` of the original exception.</Property>
-  <Property name="exception_type" type="str" required>Its class name.</Property>
-  <Property name="traceback" type="str | None" defaultValue="None">Formatted traceback, when one was captured.</Property>
-  <Property name="phase" type="str | None" defaultValue="None">Where it happened, for example `"input_generation"`.</Property>
+  <Property name="message" type="str" required>
+    The `str()` of the original exception.
+  </Property>
+  <Property name="exception_type" type="str" required>
+    Its class name.
+  </Property>
+  <Property name="traceback" type="str | None" defaultValue="None">
+    Formatted traceback, when one was captured.
+  </Property>
+  <Property name="phase" type="str | None" defaultValue="None">
+    Where it happened, for example `"input_generation"`.
+  </Property>
 </TypeTable>
 
 Call `.summary()` for the one-line form, `<ExceptionType> during <phase>: <message>`.
@@ -483,16 +496,16 @@ Call `.summary()` for the one-line form, `<ExceptionType> during <phase>: <messa
 
 The errors you are most likely to meet, and what each one means.
 
-| Error | Cause | Fix |
-| --- | --- | --- |
-| `ValidationError: … extra_forbidden` on a check | `Check` sets `extra="forbid"`, so a misspelled or renamed field is rejected rather than dropped | Check the field name against this reference |
-| A `Scenario(...)` keyword that silently does nothing | `Scenario` deliberately does **not** forbid extras (see below) | Put scenario metadata in `annotations`, not at the top level |
-| `ValidationError: Invalid JSONPath expression '…': path must start with 'trace.'` | Any `*_key` field is a `JSONPathStr` | Prefix the path with `trace.` |
-| `CheckResult.error` mentioning "No value found for key" | The path resolved to `NoMatch` — a typo, or the output shape changed | Print `trace.last.outputs` and correct the path |
-| `TypeError: Parameter 'x' is required but not in the injection requirements` | A callable declared a parameter the framework cannot supply | Name it `inputs` or `trace`, or give it a default |
-| `InteractionGenerationError` out of `Scenario.run()` | A spec failed mid-scenario | Read `.partial_trace`, or pass `return_exception=True` |
-| `TypeError: from_fn callable must return bool or CheckResult` | An `FnCheck` function returned something else | Return a `bool` or a `CheckResult` |
-| `TypeError` / `ValueError` from `Suite.run()` | `max_concurrency` is not a positive integer — validated even when `parallel=False` | Pass a positive `int`, or `None` |
+| Error                                                                             | Cause                                                                                           | Fix                                                          |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `ValidationError: … extra_forbidden` on a check                                   | `Check` sets `extra="forbid"`, so a misspelled or renamed field is rejected rather than dropped | Check the field name against this reference                  |
+| A `Scenario(...)` keyword that silently does nothing                              | `Scenario` deliberately does **not** forbid extras (see below)                                  | Put scenario metadata in `annotations`, not at the top level |
+| `ValidationError: Invalid JSONPath expression '…': path must start with 'trace.'` | Any `*_key` field is a `JSONPathStr`                                                            | Prefix the path with `trace.`                                |
+| `CheckResult.error` mentioning "No value found for key"                           | The path resolved to `NoMatch` — a typo, or the output shape changed                            | Print `trace.last.outputs` and correct the path              |
+| `TypeError: Parameter 'x' is required but not in the injection requirements`      | A callable declared a parameter the framework cannot supply                                     | Name it `inputs` or `trace`, or give it a default            |
+| `InteractionGenerationError` out of `Scenario.run()`                              | A spec failed mid-scenario                                                                      | Read `.partial_trace`, or pass `return_exception=True`       |
+| `TypeError: from_fn callable must return bool or CheckResult`                     | An `FnCheck` function returned something else                                                   | Return a `bool` or a `CheckResult`                           |
+| `TypeError` / `ValueError` from `Suite.run()`                                     | `max_concurrency` is not a positive integer — validated even when `parallel=False`              | Pass a positive `int`, or `None`                             |
 
 ### The `extra="forbid"` asymmetry
 
@@ -524,7 +537,6 @@ result = await (
     .run()
 )
 ```
-
 
 ## `Step`
 

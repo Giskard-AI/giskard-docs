@@ -171,7 +171,8 @@ One `TestCaseResult` is produced per **step** of a scenario, which is why `Scena
 </MethodCard>
 
 <MethodCard name=".assert_passed()" returnType="None">
-  Raise `AssertionError` carrying `format_failures()` if the test case did not pass. Useful in pytest.
+  Raise `AssertionError` carrying `format_failures()` if the test case did not
+  pass. Useful in pytest.
 </MethodCard>
 
 <MethodCard name=".print_report()" returnType="None">
@@ -212,7 +213,8 @@ Low-level runner for executing test cases. Most users should use `test_case.run(
 </MethodCard>
 
 <MethodCard name="get_runner()" returnType="TestCaseRunner">
-  Get the default process-wide singleton runner instance. `TestCase.run()` calls this for you.
+  Get the default process-wide singleton runner instance. `TestCase.run()` calls
+  this for you.
 </MethodCard>
 
 ```python
@@ -234,7 +236,9 @@ Replace a function with a `MagicMock` while the wrapped interaction spec runs, t
     The interaction spec to spy on.
   </Property>
   <Property name="target" type="str" required>
-    Python import path of the function to patch, exactly as you would pass it to `unittest.mock.patch` (for example `"myapp.db.fetch_orders"`). This is not a JSONPath -- a trace expression such as `"trace.last.outputs"` raises.
+    Python import path of the function to patch, exactly as you would pass it to
+    `unittest.mock.patch` (for example `"myapp.db.fetch_orders"`). This is not a
+    JSONPath -- a trace expression such as `"trace.last.outputs"` raises.
   </Property>
 </TypeTable>
 
@@ -243,6 +247,7 @@ After each interaction, the mock's call history is written to `Interaction.metad
 Assert that the target called a dependency:
 
 {/* pyright-skip: This integration example imports the reader's application module. */}
+
 ```python
 from giskard.checks import Scenario, Interact, WithSpy
 

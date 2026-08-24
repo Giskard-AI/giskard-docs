@@ -145,10 +145,10 @@ Errored results are not passes. Read the error count in the report before you re
 
 `group_by` names a result annotation key used to bucket the printed report. The default differs per entry point because the useful axis differs:
 
-| Scan | Default `group_by` |
-| --- | --- |
-| `vulnerability_scan` | `"threat-type"` |
-| `quality_scan` | `"component"` |
+| Scan                 | Default `group_by` |
+| -------------------- | ------------------ |
+| `vulnerability_scan` | `"threat-type"`    |
+| `quality_scan`       | `"component"`      |
 
 A **threat type** is the kind of attack a scenario tries, such as [prompt injection](/start/glossary/security/injection) or [harmful content](/start/glossary/security/harmful-content). A **component** is the part of your agent under test, such as retrieval or the final answer. Group by the axis you plan to act on: threat types point at a defense to add, components point at a part of the pipeline to fix.
 
