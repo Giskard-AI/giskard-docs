@@ -9,7 +9,7 @@ import { LinkCard } from "@astrojs/starlight/components";
 
 Giskard offers two solutions for LLM agent testing and evaluation, each designed for different use cases and requirements.
 
-**Giskard Open Source** is a Python library you run locally from code: it covers the full testing loop for one developer or one CI pipeline. **Giskard Hub** is the hosted platform: broader red-teaming coverage, continuous testing of a deployed agent, and a web interface that non-engineers can use.
+**Giskard Hub** is our enterprise platform with advanced collaboration features, while **Giskard Open Source** is our free Python library for individual developers and researchers.
 
 This guide will help you understand the differences and choose the right solution for your needs. For definitions of common terms, see the [AI testing glossary](/start/glossary).
 
@@ -18,12 +18,12 @@ This guide will help you understand the differences and choose the right solutio
 | Feature                          | Giskard Open Source     | Giskard Hub                                                   |
 | :------------------------------- | :---------------------- | :------------------------------------------------------------ |
 | **Core Testing**                 |                         |                                                               |
-| Security vulnerability detection | [Basic coverage](/oss/scan) | [55+ probes, continuously updated](/hub/ui/scan)              |
-| Business failure detection       | [Basic coverage](/oss/scan) | [Knowledge-base driven](/hub/ui/datasets/knowledge-base)      |
+| Security vulnerability detection | [Basic coverage](/oss)  | [State-of-the-art detection](/hub/ui/scan)                    |
+| Business failure detection       | [Basic coverage](/oss)  | [State-of-the-art detection](/hub/ui/datasets/knowledge-base) |
 | Continuous red teaming           | ❌ Not available        | [✅ Full support](/hub/ui/continuous-red-teaming)             |
-| Custom tests                     | [✅ Full support](/oss/checks) | [✅ Full support](/hub/ui/annotate/overview)                  |
-| Tool/function calling assertions | [✅ `WithSpy`](/oss/checks/how-to/spy-on-calls) | [✅ Full support](/hub/ui/annotate/overview)                  |
-| Local evaluations                | [✅ Full support](/oss/checks) | [✅ Full support](/hub/ui/evaluations)                        |
+| Tool/function calling tests      | ❌ Not available        | [✅ Full support](/hub/ui/annotate/overview)                  |
+| Custom tests                     | [✅ Full support](/oss) | [✅ Full support](/hub/ui/annotate/overview)                  |
+| Local evaluations                | [✅ Full support](/oss) | [✅ Full support](/hub/ui/evaluations)                        |
 | **Team Collaboration**           |                         |                                                               |
 | Multi-user access                | ❌ Single user only     | [✅ Full team support](/hub/ui/access-rights)                 |
 | Access control                   | ❌ Not available        | [✅ Role-based access](/hub/ui/access-rights)                 |
@@ -57,9 +57,9 @@ This guide will help you understand the differences and choose the right solutio
 
 **What you get:**
 
-- Around twenty built-in checks, LLM-as-judge, multi-turn scenarios, suites, and JUnit export
-- Seven red-teaming generators mapped to the OWASP LLM Top 10, plus RAG quality evaluation
-- Local control over your data and models: nothing leaves your machine except the calls you make to your own LLM provider
+- Full access to our basic testing capabilities
+- Local control over your data and models
+- No external dependencies or data sharing
 - Community support and open-source contributions
 
 ## When to upgrade to Giskard Hub
@@ -84,5 +84,5 @@ The transition from Open Source to Giskard Hub is designed to be seamless. You c
 
 ## Choose your Giskard solution
 
-- **Want to get started with Open Source?** Start at [Giskard Library](/oss)
+- **Want to get started with Open Source?** Start with [Giskard Checks Quickstart](/oss/checks/quickstart)
 - **Need help choosing?** [Contact our team for a consultation ↗](https://www.giskard.ai/contact)

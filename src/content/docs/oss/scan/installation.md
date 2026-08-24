@@ -102,4 +102,4 @@ Follow the instructions from https://docs.giskard.ai/oss/scan/installation.md an
 
 ## Next Steps
 
-Run the [Quickstart](/oss/scan/quickstart) for a scan end to end in under ten minutes, take [Your First Scan](/oss/scan/tutorials/your-first-scan) for a guided run against a toy agent, or go straight to [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) to point the scan at your own.
+Take [Your First Scan](/oss/scan/tutorials/your-first-scan) for a guided run against a toy agent, or go straight to [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) to point the scan at your own.

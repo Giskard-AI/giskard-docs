@@ -72,11 +72,6 @@ The default judge model is `openai/gpt-4o-mini`. If you would rather start witho
     description="The errors you are most likely to hit on a first run, and what each one means."
     href="/oss/troubleshooting"
   />
-  <LinkCard
-    title="Migrate from v2"
-    description="What changed between Giskard v2 and v3, and what stays on v2."
-    href="/oss/migrate-from-v2"
-  />
 </CardGrid>
 
 ## What Giskard v3 does not cover
@@ -102,7 +97,7 @@ Everything in v3 is currently a pre-release, which is why every install command 
 `giskard.checks` and `giskard.scan` are the public APIs; `giskard.agents.generators` is the third name you will meet, because that is where `Generator` and `LiteLLMGenerator` live. `giskard.core` and `giskard.llm` are pulled in automatically and are rarely imported directly. Signatures may still change between release candidates; pin a version if you need reproducible CI, and read the [CHANGELOG ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/CHANGELOG.md) before upgrading.
 
 :::note[Coming from Giskard v2?]
-The v2 **Scan** is now `giskard.scan.vulnerability_scan`, and **RAGET** is replaced by `giskard.scan.quality_scan` with a `KnowledgeBase`. Both ship in the `scan` extra: `pip install --pre "giskard[scan]"`. See [Migrating from v2](/oss/migrate-from-v2), or the [v3 announcement ↗](https://github.com/orgs/Giskard-AI/discussions/2250).
+The v2 **Scan** is now `giskard.scan.vulnerability_scan`, and **RAGET** is replaced by `giskard.scan.quality_scan` with a `KnowledgeBase`. Both ship in the `scan` extra: `pip install --pre "giskard[scan]"`. See the [CHANGELOG ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/CHANGELOG.md) for the full breaking-change list, or the [v3 announcement ↗](https://github.com/orgs/Giskard-AI/discussions/2250).
 :::
 
 ## Resources and support
