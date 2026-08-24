@@ -10,6 +10,18 @@ import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 In this section, we will walk you through how to setup projects, agents and knowledge bases using the Hub interface.
 
+## Before you begin
+
+Gather these before you open the Hub, so you are not switching context halfway through:
+
+- **A deployed agent with an HTTP endpoint.** The Hub tests agents over the network rather than importing your code, so the agent has to be reachable from the Hub and accept a `messages` array of `role`/`content` objects. A staging deployment is fine, and is usually the better choice for red teaming.
+- **Any credentials that endpoint needs.** These are supplied as request headers, so an API key, bearer token, or custom auth header should be to hand.
+- **A written description of what the agent is for.** This is not documentation for your teammates: the Hub uses it to generate test cases and to judge whether an answer was acceptable, so a specific description produces sharper tests than a vague one.
+- **The languages your agent supports**, since this steers which test data gets generated.
+- **Your domain documents, as JSON or JSONL**, if the agent does retrieval. Only needed for a knowledge base.
+
+If someone else administers your Hub, you also need permission to create projects. Permissions can be granted globally or per project, so ask your administrator to check both — see [Set access rights](/hub/ui/access-rights).
+
 <CardGrid>
   <LinkCard
     title="Setup projects"

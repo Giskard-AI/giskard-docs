@@ -45,6 +45,18 @@ LLM benchmarks are standardized tests designed to measure and compare the capabi
   />
 </CardGrid>
 
+## How to read a benchmark score
+
+Benchmark numbers are easy to compare and easy to over-read. Three caveats are worth carrying into any leaderboard:
+
+- **Contamination.** Most benchmarks are published openly, which means their questions and answers circulate on the web and can end up in a later model's training data. A model that has effectively memorised the test scores well without being better at the underlying skill. This is why newer benchmarks increasingly ship held-out or human-validated splits.
+- **Saturation.** Once frontier models cluster near the ceiling of a benchmark, the remaining gap stops being informative and differences of a point or two are mostly noise. Older benchmarks tend to persist in marketing long after they have stopped separating models.
+- **Construct gap.** A benchmark measures the task it contains, not the task you have. Strong scores on general reasoning say little about whether a model will follow your system prompt, stay inside your business rules, or refuse the right requests when wired into your retrieval stack and tools.
+
+The practical consequence: benchmarks are a reasonable way to shortlist which model to start from, and a poor way to decide whether your application works. Model choice is one variable among your prompts, retrieval, tool definitions, and guardrails, and the failures that reach users usually come from the interaction between them rather than from raw model capability.
+
+That is the gap the pages below are for: instead of scoring a model against a public dataset, you generate test cases from your own documents and business context, and evaluate the agent you actually deployed.
+
 ## Creating your own evaluation benchmarks with Giskard
 
 <CardGrid>
