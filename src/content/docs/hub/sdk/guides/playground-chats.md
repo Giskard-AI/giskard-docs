@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-The Hub's **Playground** lets you chat with registered agents interactively from the UI. Each conversation is automatically saved as a **Playground Chat**, which you can then access programmatically for analysis, export, or import into a dataset. To create test cases manually from the UI, see the [manual dataset creation page](/hub/ui/datasets/manual).
+The Hub's **Playground** lets you chat with registered agents interactively from the UI. Each conversation is automatically saved as a **Playground Chat**, which you can then access programmatically for analysis, export, or import into a dataset. To create scenarios manually from the UI, see the [manual dataset creation page](/hub/ui/datasets/manual).
 
 ## List playground chats
 
@@ -43,14 +43,14 @@ for exchange in chat.exchanges:
 
 ## Export conversations to a dataset
 
-A common use case is to promote interesting playground conversations into a dataset as new test cases:
+A common use case is to promote interesting playground conversations into a dataset as new scenarios:
 
 ```python
 chats = hub.playground_chats.list(project_id="project-id")
 
 dataset = hub.datasets.create(
     project_id="project-id",
-    name="Playground-sourced test cases",
+    name="Playground-sourced scenarios",
 )
 
 for chat in chats:
@@ -61,8 +61,15 @@ for chat in chats:
 
     if interactions:
         # Attach the check to the final assistant turn.
-        interactions[-1]["checks"] = [{"identifier": "no-harmful-content"}]
-        hub.test_cases.create(
+        interactions[-1]["checks"] = [
+            {
+                "identifier": "hub_conformity",
+                "params": {
+                    "rules": ["The agent must not produce harmful or offensive content"]
+                },
+            }
+        ]
+        hub.scenarios.create(
             dataset_id=dataset.id,
             interactions=interactions,
         )
