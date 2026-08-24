@@ -23,7 +23,7 @@ This release pairs with Hub v3 and must be upgraded together with it: upgrade th
 
 ### What's changed?
 
-- **Built-in check identifiers renamed by Hub v3**: `correctness` → `hub_correctness`, `metadata` → `hub_metadata`, `string_match` → `string_matching`, `regex_match` → `regex_matching`. `conformity` and `groundedness` now name the open-source checks; use `hub_conformity` and `hub_groundedness` for the Hub checks. Old identifiers are rejected by the Hub with a 422 error.
+- **Built-in check identifiers renamed by Hub v3**: `correctness` → `hub_correctness`, `metadata` → `hub_metadata`, `string_match` → `string_matching`. `conformity` and `groundedness` now name the open-source checks; use `hub_conformity` and `hub_groundedness` for the Hub checks. Old identifiers are rejected by the Hub.
 - Removed `hub.agents.detect_statefulness()` and the agent `stateful` field, which no longer exist in the Hub v3 API.
 - Deprecated (still working, with a `DeprecationWarning`): the `hub.test_cases` surface and its `test_case_*` parameters, `hub.projects.scenarios`, the flat `messages` / `demo_output` / `checks` arguments, `messages=` on `generate_completion()` and `run_single()`, and the flattened `.messages` accessors on `Scenario`, `PlaygroundChat`, and `ScanProbeAttempt`.
 

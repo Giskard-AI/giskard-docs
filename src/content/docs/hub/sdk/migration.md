@@ -36,7 +36,6 @@ The Hub renamed several built-in check identifiers. Requests that pass an old id
 | `groundedness` (Hub check) | `hub_groundedness` |
 | `metadata`                 | `hub_metadata`     |
 | `string_match`             | `string_matching`  |
-| `regex_match`              | `regex_matching`   |
 
 ```python
 # Hub v2 (SDK 3.1)
@@ -62,7 +61,7 @@ hub.scenarios.create(
 )
 ```
 
-:::danger
+:::caution
 `conformity` and `groundedness` **still exist but changed meaning**. They now name the open-source giskard-checks variants, not the Hub checks. The OSS `conformity` takes a single `rule: str` instead of `rules: list[str]`, so a script that keeps passing `{"identifier": "conformity", "params": {"rules": [...]}}` fails with a 422 instead of a rename tip. Switch those to `hub_conformity` and `hub_groundedness`. See [Built-in checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for the full new catalogue.
 :::
 
@@ -234,7 +233,7 @@ See [Projects & Prompt Presets](/hub/sdk/guides/projects#prompt-presets) for the
 If your CI started failing after the Hub upgrade, work through this checklist:
 
 1. **Pin the SDK to 3.2.0 or later** in your requirements.
-2. **Search your scripts for old check identifiers** (`correctness`, `metadata`, `string_match`, `regex_match`) and replace them with the new names from the table above.
+2. **Search your scripts for old check identifiers** (`correctness`, `metadata`, `string_match`) and replace them with the new names from the table above.
 3. **Check every `conformity` and `groundedness` usage.** If it passes `rules=` or a fixed `context=` for the Hub behaviour, rename it to `hub_conformity` / `hub_groundedness`.
 4. **Update uploaded dataset files** (`hub.datasets.upload()` JSON/JSONL): the records may keep the legacy shape, but the identifiers inside `checks` must be the new ones.
 5. Treat any remaining `UnprocessableEntityError` (422) as a validation message from the Hub. The error body names the rejected identifier or param and often suggests the correct check.

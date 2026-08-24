@@ -1701,7 +1701,7 @@ All Python types referenced by the methods above. Click any type name in a metho
   <LinkCard
     title="Audit types"
     href="#audit-types"
-    description="Audit, AuditDisplay, AuditDiffItem"
+    description="Audit, AuditDisplay, AuditDisplayDiffItem"
   />
 </CardGrid>
 
@@ -2281,6 +2281,9 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="local" type="bool">
     Whether this is a local evaluation.
   </Property>
+  <Property name="is_upload" type="bool">
+    Whether this evaluation was imported via `hub.evaluations.upload()`.
+  </Property>
   <Property name="metrics" type="list[Metric]">
     Aggregated pass/fail metrics per check.
   </Property>
@@ -2380,9 +2383,6 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="hidden" type="bool">
     Whether this result is hidden from the default view.
   </Property>
-  <Property name="divergence_warnings" type="list[DivergenceWarning] | None">
-    Divergence warnings detected during multi-turn evaluation.
-  </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
   </Property>
@@ -2391,15 +2391,27 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
 </TypeTable>
 
-<TypeTable name="DivergenceWarning">
-  <Property name="turn" type="int">
-    The conversation turn where divergence was detected.
+<TypeTable name="InteractionResultData">
+  <Property name="interaction_position" type="int">
+    Position of the interaction in the scenario.
   </Property>
-  <Property name="expected" type="str">
-    The expected message content.
+  <Property name="input" type="dict[str, Any] | None">
+    The input sent to the agent for this interaction.
   </Property>
-  <Property name="actual" type="str">
-    The actual message content received.
+  <Property name="output" type="dict[str, Any] | None">
+    The agent's response for this interaction.
+  </Property>
+  <Property name="checks" type="list | None">
+    Check configurations applied to this interaction.
+  </Property>
+  <Property name="check_results" type="list[CheckResult] | None">
+    Outcomes of the checks for this interaction.
+  </Property>
+  <Property name="state" type="TaskState | None">
+    Execution state of this interaction.
+  </Property>
+  <Property name="error" type="str | None">
+    Error message if the interaction failed.
   </Property>
 </TypeTable>
 
@@ -3048,14 +3060,23 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="project_id" type="str | None">
     Project the entity belongs to, if applicable.
   </Property>
-  <Property name="diff" type="list[AuditDiffItem] | None">
-    Field-level changes for `update` actions.
+  <Property name="user_name" type="str | None">
+    Display name of the user who performed the action.
   </Property>
-  <Property name="metadata" type="dict[str, object] | None">
-    Arbitrary metadata captured with the event.
+  <Property name="data" type="dict[str, object] | None">
+    Snapshot of the entity data captured with the event.
+  </Property>
+  <Property name="triggered_by_entity_type" type="str | None">
+    Type of the entity that triggered this change, if cascaded.
+  </Property>
+  <Property name="triggered_by_entity_id" type="str | None">
+    ID of the entity that triggered this change, if cascaded.
   </Property>
   <Property name="created_at" type="datetime">
     When the action occurred.
+  </Property>
+  <Property name="updated_at" type="datetime">
+    Last update timestamp.
   </Property>
 </TypeTable>
 
@@ -3083,21 +3104,6 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   </Property>
   <Property name="created_at" type="datetime">
     When the action occurred.
-  </Property>
-</TypeTable>
-
-<TypeTable name="AuditDiffItem">
-  <Property name="kind" type='"added" | "removed" | "changed"'>
-    Kind of change.
-  </Property>
-  <Property name="field" type="str">
-    Field path.
-  </Property>
-  <Property name="old_value" type="Any | None">
-    Previous value (for `removed`/`changed`).
-  </Property>
-  <Property name="new_value" type="Any | None">
-    New value (for `added`/`changed`).
   </Property>
 </TypeTable>
 

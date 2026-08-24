@@ -224,7 +224,7 @@ You can also view the full evaluation with aggregated metrics in the Hub UI.
 ## Next steps
 
 - **Local agents**: evaluate a Python function directly without an HTTP endpoint — see [Evaluations](/hub/sdk/guides/evaluations#local-evaluations)
-- **Generate scenarios automatically**: use prompt presets, knowledge bases, or playground conversations -- see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks)
+- **Generate scenarios automatically**: use prompt presets or knowledge bases -- see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks); or promote playground conversations with [Playground Chats](/hub/sdk/guides/playground-chats)
 - **Vulnerability scanning**: find security weaknesses with [Scans](/hub/sdk/guides/scans)
 - **Schedule recurring runs**: see [Scheduled Evaluations](/hub/sdk/guides/evaluations#scheduled-evaluations)
 - **Full API details**: see the [API Reference](/hub/sdk/reference)
