@@ -9,6 +9,28 @@ Below you will find the release notes for each version of Giskard Hub SDK. Each 
 
 ---
 
+## 3.2.0 (2026-08-25)
+
+This release pairs with Hub v3 and must be upgraded together with it: upgrade the Hub first, then the SDK. It introduces support for structured (non-conversational) agents, renames test cases to **scenarios** and project scenarios to **prompt presets**, and ships a much larger check catalogue with renamed identifiers. The check identifier renames are **breaking** — see the [Migration Guide](/hub/sdk/migration) before upgrading, especially if you run evaluations in CI.
+
+### New features
+
+- **Structured agents** — agents and datasets now carry `input_schema` / `output_schema` (JSON Schema), so you can evaluate classifiers, extraction pipelines, and other non-chat applications. Conversational agents remain the default and get an automatic conversation-history binding via `auto_bindings`. See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases#structured-agents).
+- **Scenarios with interactions** — `hub.scenarios` replaces `hub.test_cases`. A scenario holds a list of interactions, each with a structured `input`, an optional expected `output`, and `checks`, replacing the flat `messages` / `demo_output` / `checks` shape. Evaluation results expose per-interaction outcomes via `interaction_results`.
+- **Prompt presets** — `hub.projects.prompt_presets` replaces `hub.projects.scenarios`, and `hub.datasets.generate_preset_based()` replaces `generate_scenario_based()`. Same feature, clearer name: reusable persona/behaviour templates for dataset generation.
+- **Upload Giskard OSS results** — `hub.evaluations.upload()` imports a run executed with the open-source `giskard.checks` library (or a `giskard.scan` run) via `SuiteResult.to_hub_format()`. See [Evaluations](/hub/sdk/guides/evaluations#upload-results-from-giskard-oss).
+- **Expanded check catalogue** — 21 built-in checks, including `llm_judge` (custom prompt), `toxicity`, `answer_relevance`, `contradiction`, `regex_matching`, comparison checks (`equals`, `greater_than`, ...), `json_valid`, and `readability`. Every check accepts a target path parameter (`target_key`, `text_key`, or `metadata_key`) to evaluate specific fields of structured outputs. See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#built-in-checks).
+
+### What's changed?
+
+- **Built-in check identifiers renamed by Hub v3**: `correctness` → `hub_correctness`, `metadata` → `hub_metadata`, `string_match` → `string_matching`, `regex_match` → `regex_matching`. `conformity` and `groundedness` now name the open-source checks; use `hub_conformity` and `hub_groundedness` for the Hub checks. Old identifiers are rejected by the Hub with a 422 error.
+- Removed `hub.agents.detect_statefulness()` and the agent `stateful` field, which no longer exist in the Hub v3 API.
+- Deprecated (still working, with a `DeprecationWarning`): the `hub.test_cases` surface and its `test_case_*` parameters, `hub.projects.scenarios`, the flat `messages` / `demo_output` / `checks` arguments, `messages=` on `generate_completion()` and `run_single()`, and the flattened `.messages` accessors on `Scenario`, `PlaygroundChat`, and `ScanProbeAttempt`.
+
+See the [Migration Guide](/hub/sdk/migration) for the complete list with before/after code examples.
+
+---
+
 ## 3.1.1 (2026-05-04)
 
 This patch release adds a new option to target a specific tenant on multi-tenant Hub deployments. Supported by [Hub 2.5.0+](/hub/ui/release-notes#250-2026-03-31).
