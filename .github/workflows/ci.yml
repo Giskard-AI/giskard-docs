@@ -143,6 +143,12 @@ jobs:
       - name: Check redirects
         run: pnpm run test:redirects
 
+      # The notebooks run against the Azure AI proxy behind AZURE_AI_API_BASE, so
+      # every model id they name has to exist as a deployment there. They all use
+      # openai/gpt-4o-mini, the giskard-checks default (settings.py: DEFAULT_MODEL).
+      # Covers oss/checks and oss/scan; the full-scan notebooks are opt-in behind
+      # RUN_SLOW_NOTEBOOKS=1 (see tests/test_docs_nb.py) because each costs minutes
+      # and real money.
       - name: Run notebook tests
         if: steps.nbchanges.outputs.relevant == 'true'
         env:

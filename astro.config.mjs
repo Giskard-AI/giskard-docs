@@ -78,7 +78,7 @@ export default defineConfig({
                             items: [{ autogenerate: { directory: 'oss/scan', collapsed: true } }],
                         },
                         { slug: 'oss/troubleshooting', label: 'Troubleshooting' },
-                        { slug: 'oss/migrating-from-v2', label: 'Migrating from v2' },
+                        { slug: 'oss/migrate-from-v2', label: 'Migrate from v2' },
                         { slug: 'oss/agent-skills', label: 'Agent Skills' },
                         { slug: 'oss/contributing', label: 'Contributing' },
                     ]

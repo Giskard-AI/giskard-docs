@@ -5,6 +5,7 @@ End-to-end tests for Jupyter notebooks.
 Cells tagged skip-execution (the colab-install cells) are skipped automatically.
 
 - No OPENAI_API_KEY / OPENAI_BASE_URL → only NO_API_NOTEBOOKS run; the rest skip.
+- RUN_SLOW_NOTEBOOKS=1 → also run SLOW_NOTEBOOKS (full scans; minutes and dollars each).
 - OVERWRITE_NB=0    → skip writing outputs back (default is to overwrite).
                       After the run, regenerate .mdx files:
                       node scripts/convert-notebooks.mjs
@@ -16,15 +17,24 @@ import os
 import pytest
 from pathlib import Path
 
-DOCS_ROOT = (
-    Path(__file__).parent.parent
-    / "src" / "content" / "docs" / "oss" / "checks"
-)
+DOCS_ROOT = Path(__file__).parent.parent / "src" / "content" / "docs" / "oss"
 
 # Notebooks confirmed to need no API key.
 NO_API_NOTEBOOKS = {
-    "tutorials/your-first-test.ipynb",
-    "how-to/custom-trace.ipynb",
+    "checks/tutorials/your-first-test.ipynb",
+    "checks/how-to/custom-trace.ipynb",
+}
+
+# A full vulnerability_scan fans out over every generator: minutes of wall clock
+# and real money per run, which is too much to spend on every pull request. They
+# stay opt-in via RUN_SLOW_NOTEBOOKS=1. scan/quickstart.ipynb is deliberately not
+# here -- it caps itself at max_scenarios=4 so it is cheap enough to gate on.
+SLOW_NOTEBOOKS = {
+    "scan/tutorials/your-first-scan.ipynb",
+    "scan/tutorials/redteam-to-regression.ipynb",
+    "scan/tutorials/scan-a-rag-agent.ipynb",
+    "scan/tutorials/custom-scenario-generator.ipynb",
+    "scan/how-to/quality-scan.ipynb",
 }
 
 
@@ -46,6 +56,10 @@ def pytest_generate_tests(metafunc):
 
 
 def test_notebook(nb_path):
+    relative = str(nb_path.relative_to(DOCS_ROOT))
+    if relative in SLOW_NOTEBOOKS and os.environ.get("RUN_SLOW_NOTEBOOKS") != "1":
+        pytest.skip("full scan: set RUN_SLOW_NOTEBOOKS=1 to run it")
+
     if _needs_api(nb_path):
         if not (os.environ.get("OPENAI_API_KEY") and os.environ.get("OPENAI_BASE_URL")):
             pytest.skip("OPENAI_API_KEY and OPENAI_BASE_URL not set")

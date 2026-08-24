@@ -75,7 +75,7 @@ The default judge model is `openai/gpt-4o-mini`. If you would rather start witho
   <LinkCard
     title="Migrating from v2"
     description="What changed between Giskard v2 and v3, and what stays on v2."
-    href="/oss/migrating-from-v2"
+    href="/oss/migrate-from-v2"
   />
 </CardGrid>
 
@@ -102,7 +102,7 @@ Everything in v3 is currently a pre-release, which is why every install command 
 `giskard.checks` and `giskard.scan` are the public APIs. `giskard.core`, `giskard.llm`, and `giskard.agents` are pulled in automatically and are rarely used directly. Signatures may still change between release candidates; pin a version if you need reproducible CI, and read the [CHANGELOG ↗](https://github.com/Giskard-AI/giskard-oss/blob/main/CHANGELOG.md) before upgrading.
 
 :::note[Coming from Giskard v2?]
-The v2 **Scan** is now `giskard.scan.vulnerability_scan`, and **RAGET** is replaced by `giskard.scan.quality_scan` with a `KnowledgeBase`. Both ship in the `scan` extra: `pip install --pre "giskard[scan]"`. See [Migrating from v2](/oss/migrating-from-v2), or the [v3 announcement ↗](https://github.com/orgs/Giskard-AI/discussions/2250).
+The v2 **Scan** is now `giskard.scan.vulnerability_scan`, and **RAGET** is replaced by `giskard.scan.quality_scan` with a `KnowledgeBase`. Both ship in the `scan` extra: `pip install --pre "giskard[scan]"`. See [Migrating from v2](/oss/migrate-from-v2), or the [v3 announcement ↗](https://github.com/orgs/Giskard-AI/discussions/2250).
 :::
 
 ## Resources and support
