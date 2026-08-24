@@ -80,26 +80,26 @@ Scans can optionally be anchored to a Knowledge Base to generate attacks that ar
 
 A **Check** is a criterion evaluated on an agent's response. Checks belong to a project and can be reused across any dataset in that project. Not all checks use an LLM judge — some are purely rule-based:
 
-| Identifier                              | How it evaluates     | What it checks                                                                        |
-| --------------------------------------- | -------------------- | ------------------------------------------------------------------------------------- |
-| `hub_correctness`                       | LLM judge            | Does the response fully agree with the reference answer, with no omissions?           |
-| `hub_conformity`                        | LLM judge            | Does the response comply with one or more business rules?                             |
-| `hub_groundedness`                      | LLM judge            | Is the response grounded in the provided context (no hallucinations)?                 |
-| `llm_judge`                             | LLM judge            | Evaluate the response with a custom LLM prompt that returns pass or fail with reason. |
-| `conformity`                            | LLM judge            | Does the full trace conform to a single natural-language rule?                        |
-| `groundedness`                          | LLM judge            | Is the answer grounded in context extracted from configurable trace paths?            |
-| `contradiction`                         | LLM judge            | Does the response contradict a reference context?                                     |
-| `toxicity`                              | LLM judge            | Does the response contain toxic, harmful, or offensive content?                       |
-| `answer_relevance`                      | LLM judge            | Does the response directly address the user question?                                 |
-| `semantic_similarity`                   | Embedding similarity | Is the response semantically close to a reference?                                    |
-| `string_matching`                       | Rule-based           | Does the response contain a given keyword or sentence?                                |
-| `regex_matching`                        | Rule-based           | Does the response match a regular expression pattern?                                 |
-| `equals` / `not_equals`                 | Rule-based           | Does a value extracted from the trace equal (or differ from) the expected value?      |
-| `greater_than` / `greater_than_equals`  | Rule-based           | Is a numeric trace value greater than (or equal to) the expected value?               |
-| `less_than` / `less_than_equals`        | Rule-based           | Is a numeric trace value less than (or equal to) the expected value?                  |
-| `hub_metadata`                          | Rule-based           | Do JSON path values in the response metadata meet specified conditions?               |
-| `json_valid`                            | Rule-based           | Is an extracted value valid JSON, optionally conforming to a JSON Schema?             |
-| `readability`                           | Rule-based           | Does the response meet readability score thresholds for a chosen metric?              |
+| Identifier                             | How it evaluates     | What it checks                                                                        |
+| -------------------------------------- | -------------------- | ------------------------------------------------------------------------------------- |
+| `hub_correctness`                      | LLM judge            | Does the response fully agree with the reference answer, with no omissions?           |
+| `hub_conformity`                       | LLM judge            | Does the response comply with one or more business rules?                             |
+| `hub_groundedness`                     | LLM judge            | Is the response grounded in the provided context (no hallucinations)?                 |
+| `llm_judge`                            | LLM judge            | Evaluate the response with a custom LLM prompt that returns pass or fail with reason. |
+| `conformity`                           | LLM judge            | Does the full trace conform to a single natural-language rule?                        |
+| `groundedness`                         | LLM judge            | Is the answer grounded in context extracted from configurable trace paths?            |
+| `contradiction`                        | LLM judge            | Does the response contradict a reference context?                                     |
+| `toxicity`                             | LLM judge            | Does the response contain toxic, harmful, or offensive content?                       |
+| `answer_relevance`                     | LLM judge            | Does the response directly address the user question?                                 |
+| `semantic_similarity`                  | Embedding similarity | Is the response semantically close to a reference?                                    |
+| `string_matching`                      | Rule-based           | Does the response contain a given keyword or sentence?                                |
+| `regex_matching`                       | Rule-based           | Does the response match a regular expression pattern?                                 |
+| `equals` / `not_equals`                | Rule-based           | Does a value extracted from the trace equal (or differ from) the expected value?      |
+| `greater_than` / `greater_than_equals` | Rule-based           | Is a numeric trace value greater than (or equal to) the expected value?               |
+| `less_than` / `less_than_equals`       | Rule-based           | Is a numeric trace value less than (or equal to) the expected value?                  |
+| `hub_metadata`                         | Rule-based           | Do JSON path values in the response metadata meet specified conditions?               |
+| `json_valid`                           | Rule-based           | Is an extracted value valid JSON, optionally conforming to a JSON Schema?             |
+| `readability`                          | Rule-based           | Does the response meet readability score thresholds for a chosen metric?              |
 
 You can also define **custom checks** via `hub.checks.create()` — a named, reusable configuration of any built-in check type with pre-set parameters, so you don't have to repeat them across scenarios.
 

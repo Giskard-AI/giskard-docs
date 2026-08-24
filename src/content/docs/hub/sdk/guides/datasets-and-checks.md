@@ -454,26 +454,26 @@ For example, `"target_key": "trace.last.outputs.category"` evaluates the `catego
 
 Each built-in check can be used directly in scenarios by passing its `identifier` and the required `params`:
 
-| Identifier                             | Method               | What it evaluates                                                          | Key params                 |
-| -------------------------------------- | -------------------- | -------------------------------------------------------------------------- | -------------------------- |
-| `hub_correctness`                      | LLM judge            | Does the response fully agree with the reference answer?                    | `reference`                |
-| `hub_conformity`                       | LLM judge            | Does the response comply with one or more business rules?                   | `rules`                    |
-| `hub_groundedness`                     | LLM judge            | Is the response grounded in the provided context, without hallucinations?   | `context`                  |
-| `llm_judge`                            | LLM judge            | Evaluate with a custom Jinja2 prompt returning pass or fail with a reason.  | `prompt`                   |
-| `conformity`                           | LLM judge            | Does the full trace conform to a single natural-language rule?              | `rule`                     |
-| `groundedness`                         | LLM judge            | Is the answer grounded in context extracted from configurable trace paths?  | `context`, `context_key`   |
-| `contradiction`                        | LLM judge            | Does the response contradict a reference context?                           | `context`                  |
-| `toxicity`                             | LLM judge            | Does the response contain toxic, harmful, or offensive content?             | `categories`               |
-| `answer_relevance`                     | LLM judge            | Does the response directly address the user question?                       | (none required)            |
-| `semantic_similarity`                  | Embedding similarity | Is the response semantically close to a reference?                          | `reference_text`, `threshold` |
-| `string_matching`                      | Rule-based           | Does the response contain a given keyword or sentence?                      | `keyword`                  |
-| `regex_matching`                       | Rule-based           | Does the response match a regular expression pattern?                       | `pattern`                  |
-| `equals` / `not_equals`                | Rule-based           | Does a value extracted from the trace equal (or differ from) the expected?  | `expected_value`           |
-| `greater_than` / `greater_than_equals` | Rule-based           | Is a numeric trace value greater than (or equal to) the expected value?     | `expected_value`           |
-| `less_than` / `less_than_equals`       | Rule-based           | Is a numeric trace value less than (or equal to) the expected value?        | `expected_value`           |
-| `hub_metadata`                         | Rule-based           | Do JSON path values in the response metadata satisfy specified conditions?  | `json_path_rules`          |
-| `json_valid`                           | Rule-based           | Is an extracted value valid JSON, optionally conforming to a JSON Schema?   | `expected_schema`          |
-| `readability`                          | Rule-based           | Does the response meet readability score thresholds for a chosen metric?    | `metric`                   |
+| Identifier                             | Method               | What it evaluates                                                          | Key params                    |
+| -------------------------------------- | -------------------- | -------------------------------------------------------------------------- | ----------------------------- |
+| `hub_correctness`                      | LLM judge            | Does the response fully agree with the reference answer?                   | `reference`                   |
+| `hub_conformity`                       | LLM judge            | Does the response comply with one or more business rules?                  | `rules`                       |
+| `hub_groundedness`                     | LLM judge            | Is the response grounded in the provided context, without hallucinations?  | `context`                     |
+| `llm_judge`                            | LLM judge            | Evaluate with a custom Jinja2 prompt returning pass or fail with a reason. | `prompt`                      |
+| `conformity`                           | LLM judge            | Does the full trace conform to a single natural-language rule?             | `rule`                        |
+| `groundedness`                         | LLM judge            | Is the answer grounded in context extracted from configurable trace paths? | `context`, `context_key`      |
+| `contradiction`                        | LLM judge            | Does the response contradict a reference context?                          | `context`                     |
+| `toxicity`                             | LLM judge            | Does the response contain toxic, harmful, or offensive content?            | `categories`                  |
+| `answer_relevance`                     | LLM judge            | Does the response directly address the user question?                      | (none required)               |
+| `semantic_similarity`                  | Embedding similarity | Is the response semantically close to a reference?                         | `reference_text`, `threshold` |
+| `string_matching`                      | Rule-based           | Does the response contain a given keyword or sentence?                     | `keyword`                     |
+| `regex_matching`                       | Rule-based           | Does the response match a regular expression pattern?                      | `pattern`                     |
+| `equals` / `not_equals`                | Rule-based           | Does a value extracted from the trace equal (or differ from) the expected? | `expected_value`              |
+| `greater_than` / `greater_than_equals` | Rule-based           | Is a numeric trace value greater than (or equal to) the expected value?    | `expected_value`              |
+| `less_than` / `less_than_equals`       | Rule-based           | Is a numeric trace value less than (or equal to) the expected value?       | `expected_value`              |
+| `hub_metadata`                         | Rule-based           | Do JSON path values in the response metadata satisfy specified conditions? | `json_path_rules`             |
+| `json_valid`                           | Rule-based           | Is an extracted value valid JSON, optionally conforming to a JSON Schema?  | `expected_schema`             |
+| `readability`                          | Rule-based           | Does the response meet readability score thresholds for a chosen metric?   | `metric`                      |
 
 Each check is detailed below.
 
@@ -569,11 +569,11 @@ The raw giskard-checks variant of conformity. Judges the full trace against a si
 
 The raw giskard-checks variant of groundedness. Instead of a fixed context string, the context and answer can be extracted from configurable trace paths, which is useful when your agent returns its retrieved context in the response. Uses an LLM judge.
 
-| Parameter     | Type                | Description                                        |
-| ------------- | ------------------- | -------------------------------------------------- |
-| `context`     | `str` / `list[str]` | Reference context provided directly                |
-| `context_key` | `str`               | Trace path to extract the context from             |
-| `target_key`  | `str`               | Trace path of the answer under test                |
+| Parameter     | Type                | Description                            |
+| ------------- | ------------------- | -------------------------------------- |
+| `context`     | `str` / `list[str]` | Reference context provided directly    |
+| `context_key` | `str`               | Trace path to extract the context from |
+| `target_key`  | `str`               | Trace path of the answer under test    |
 
 ```python
 {
@@ -602,8 +602,8 @@ Checks that the response does not directly contradict a reference context. Omiss
 
 Checks that the response does not contain toxic, harmful, or offensive content. Uses an LLM judge.
 
-| Parameter    | Type        | Description                                                                                                    |
-| ------------ | ----------- | -------------------------------------------------------------------------------------------------------------- |
+| Parameter    | Type        | Description                                                                                                   |
+| ------------ | ----------- | ------------------------------------------------------------------------------------------------------------- |
 | `categories` | `list[str]` | Safety categories to check: `hate_speech`, `harassment`, `threats`, `self_harm`, `sexual_content`, `violence` |
 
 ```python
@@ -617,10 +617,10 @@ Checks that the response does not contain toxic, harmful, or offensive content. 
 
 Checks that the response directly and appropriately addresses the user question. Uses an LLM judge. No parameters are required; by default the question is taken from the conversation.
 
-| Parameter         | Type   | Description                                    |
-| ----------------- | ------ | ---------------------------------------------- |
-| `question`        | `str`  | Question provided directly (optional)          |
-| `include_history` | `bool` | Include prior turns when judging the response  |
+| Parameter         | Type   | Description                                   |
+| ----------------- | ------ | --------------------------------------------- |
+| `question`        | `str`  | Question provided directly (optional)         |
+| `include_history` | `bool` | Include prior turns when judging the response |
 
 ```python
 {"identifier": "answer_relevance"}
@@ -646,10 +646,10 @@ Computes embedding-based similarity between the agent's response and a reference
 
 Checks whether the agent's response contains a specific keyword or substring. Case-sensitive by default; pass `case_sensitive: False` to lowercase both sides before comparison. Does **not** use an LLM judge.
 
-| Parameter        | Type   | Description                              |
-| ---------------- | ------ | ---------------------------------------- |
-| `keyword`        | `str`  | The keyword or substring to search for   |
-| `case_sensitive` | `bool` | Match case exactly (default: `True`)     |
+| Parameter        | Type   | Description                            |
+| ---------------- | ------ | -------------------------------------- |
+| `keyword`        | `str`  | The keyword or substring to search for |
+| `case_sensitive` | `bool` | Match case exactly (default: `True`)   |
 
 ```python
 {"identifier": "string_matching", "params": {"keyword": "#12345"}}
@@ -671,11 +671,11 @@ Checks whether the agent's response matches a regular expression pattern. Does *
 
 Six rule-based checks compare a value extracted from the trace against an expected value: `equals`, `not_equals`, `greater_than`, `greater_than_equals`, `less_than`, `less_than_equals`. They are the natural fit for structured agent outputs and numeric metadata. The numeric checks default their `target_key` to `trace.last.outputs.metadata.score`.
 
-| Parameter        | Type                    | Description                                            |
-| ---------------- | ----------------------- | ------------------------------------------------------ |
-| `expected_value` | scalar                  | The value to compare against                           |
-| `target_key`     | `str`                   | Trace path of the value under test                     |
-| `match`          | `str`                   | For list values: `"any"`, `"all"`, or `"none"`         |
+| Parameter        | Type   | Description                                    |
+| ---------------- | ------ | ---------------------------------------------- |
+| `expected_value` | scalar | The value to compare against                   |
+| `target_key`     | `str`  | Trace path of the value under test             |
+| `match`          | `str`  | For list values: `"any"`, `"all"`, or `"none"` |
 
 ```python
 {
@@ -738,10 +738,10 @@ Metadata checks operate on the `metadata` field of the agent's response (`AgentO
 
 Checks that a value extracted from the trace is valid JSON and, optionally, that it conforms to a JSON Schema. Does **not** use an LLM judge.
 
-| Parameter         | Type   | Description                                          |
-| ----------------- | ------ | ---------------------------------------------------- |
-| `expected_schema` | `dict` | JSON Schema the value must conform to (optional)     |
-| `parse`           | `bool` | Parse the value from a string before validating      |
+| Parameter         | Type   | Description                                      |
+| ----------------- | ------ | ------------------------------------------------ |
+| `expected_schema` | `dict` | JSON Schema the value must conform to (optional) |
+| `parse`           | `bool` | Parse the value from a string before validating  |
 
 ```python
 {
@@ -760,11 +760,11 @@ Checks that a value extracted from the trace is valid JSON and, optionally, that
 
 Checks that the response satisfies readability score thresholds for a selected metric. Does **not** use an LLM judge.
 
-| Parameter   | Type    | Description                                                                                                                                                            |
-| ----------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Parameter   | Type    | Description                                                                                                                                              |
+| ----------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `metric`    | `str`   | One of `flesch_reading_ease`, `flesch_kincaid_grade`, `gunning_fog`, `automated_readability_index`, `coleman_liau_index`, `dale_chall_readability_score` |
-| `min_score` | `float` | Minimum acceptable score (optional)                                                                                                                                      |
-| `max_score` | `float` | Maximum acceptable score (optional)                                                                                                                                      |
+| `min_score` | `float` | Minimum acceptable score (optional)                                                                                                                      |
+| `max_score` | `float` | Maximum acceptable score (optional)                                                                                                                      |
 
 ```python
 {

@@ -29,14 +29,14 @@ python -c "import giskard_hub; print(giskard_hub.__version__)"
 
 The Hub renamed several built-in check identifiers. Requests that pass an old identifier now get a **422 error** from the Hub, usually with a "Did you mean the '...' check?" tip. This applies everywhere an identifier appears: `checks` inside scenarios, `hub.evaluations.run_single()`, custom check `params`, and uploaded dataset files.
 
-| Old identifier               | New identifier     |
-| ---------------------------- | ------------------ |
-| `correctness`                | `hub_correctness`  |
-| `conformity` (Hub check)     | `hub_conformity`   |
-| `groundedness` (Hub check)   | `hub_groundedness` |
-| `metadata`                   | `hub_metadata`     |
-| `string_match`               | `string_matching`  |
-| `regex_match`                | `regex_matching`   |
+| Old identifier             | New identifier     |
+| -------------------------- | ------------------ |
+| `correctness`              | `hub_correctness`  |
+| `conformity` (Hub check)   | `hub_conformity`   |
+| `groundedness` (Hub check) | `hub_groundedness` |
+| `metadata`                 | `hub_metadata`     |
+| `string_match`             | `string_matching`  |
+| `regex_match`              | `regex_matching`   |
 
 ```python
 # Hub v2 (SDK 3.1)
@@ -162,11 +162,11 @@ hub.evaluations.run_single(project_id=project_id, input_data={"messages": [...]}
 
 These model properties still work but emit a `DeprecationWarning`. They flatten structured data back into chat messages, which loses information for non-chat agents:
 
-| Deprecated accessor            | Read instead                          |
-| ------------------------------ | ------------------------------------- |
-| `Scenario.messages`            | `scenario.interactions[i].input`      |
-| `PlaygroundChat.messages`      | `chat.exchanges` (`input` / `output`) |
-| `ScanProbeAttempt.messages`    | `attempt.input` / `attempt.output`    |
+| Deprecated accessor         | Read instead                          |
+| --------------------------- | ------------------------------------- |
+| `Scenario.messages`         | `scenario.interactions[i].input`      |
+| `PlaygroundChat.messages`   | `chat.exchanges` (`input` / `output`) |
+| `ScanProbeAttempt.messages` | `attempt.input` / `attempt.output`    |
 
 ---
 
@@ -174,18 +174,18 @@ These model properties still work but emit a `DeprecationWarning`. They flatten 
 
 The Hub renamed test cases to **scenarios**. The old SDK surface still works and maps to the new endpoints, but every call emits a `DeprecationWarning`. Update at your own pace:
 
-| Deprecated (still works)                     | Use instead                              |
-| -------------------------------------------- | ---------------------------------------- |
-| `hub.test_cases.*`                           | `hub.scenarios.*`                        |
-| `hub.test_cases.comments`                    | `hub.scenarios.comments`                 |
-| `hub.datasets.list_test_cases()`             | `hub.datasets.list_scenarios()`          |
-| `hub.datasets.search_test_cases()`           | `hub.datasets.search_scenarios()`        |
-| `hub.evaluations.results.rerun_test_case()`  | `hub.evaluations.results.rerun_scenario()` |
-| `test_case_ids=` (bulk operations)           | `scenario_ids=`                          |
-| `include=["test_case"]` (results)            | `include=["scenario"]`                   |
-| `set_test_case_draft=`                       | `set_scenario_draft=`                    |
-| `dataset_test_case_id=` (`hub.tasks.create`) | `dataset_scenario_id=`                   |
-| `set_test_case_status=` (`hub.tasks.update`) | `set_scenario_status=`                   |
+| Deprecated (still works)                       | Use instead                                  |
+| ---------------------------------------------- | -------------------------------------------- |
+| `hub.test_cases.*`                             | `hub.scenarios.*`                            |
+| `hub.test_cases.comments`                      | `hub.scenarios.comments`                     |
+| `hub.datasets.list_test_cases()`               | `hub.datasets.list_scenarios()`              |
+| `hub.datasets.search_test_cases()`             | `hub.datasets.search_scenarios()`            |
+| `hub.evaluations.results.rerun_test_case()`    | `hub.evaluations.results.rerun_scenario()`   |
+| `test_case_ids=` (bulk operations)             | `scenario_ids=`                              |
+| `include=["test_case"]` (results)              | `include=["scenario"]`                       |
+| `set_test_case_draft=`                         | `set_scenario_draft=`                        |
+| `dataset_test_case_id=` (`hub.tasks.create`)   | `dataset_scenario_id=`                       |
+| `set_test_case_status=` (`hub.tasks.update`)   | `set_scenario_status=`                       |
 | `result.test_case` / `result.test_case_exists` | `result.scenario` / `result.scenario_exists` |
 
 The legacy flat scenario shape (`messages=`, `checks=`, `demo_output=`) is also deprecated in favour of `interactions=`. See [chat-shaped arguments](#deprecated-chat-shaped-arguments-become-structured-inputoutput) above for the mapping.
@@ -198,9 +198,9 @@ In audit logs, the endpoint accepts `entity_type="scenario"` and `"scenario_eval
 
 The project-level "Scenarios" (persona and behaviour templates) are now **Prompt Presets**. The old Hub endpoints were removed, which is why SDK 3.1.x breaks against Hub v3. In SDK 3.2, the old methods still work against the new endpoints with a `DeprecationWarning`:
 
-| Deprecated (still works)                          | Use instead                                            |
-| ------------------------------------------------- | ------------------------------------------------------ |
-| `hub.projects.scenarios.*`                        | `hub.projects.prompt_presets.*`                        |
+| Deprecated (still works)                             | Use instead                                             |
+| ---------------------------------------------------- | ------------------------------------------------------- |
+| `hub.projects.scenarios.*`                           | `hub.projects.prompt_presets.*`                         |
 | `hub.datasets.generate_scenario_based(scenario_id=)` | `hub.datasets.generate_preset_based(prompt_preset_id=)` |
 
 ```python
