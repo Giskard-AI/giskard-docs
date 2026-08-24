@@ -100,7 +100,7 @@ An agent points to your LLM application. The Hub calls this endpoint during eval
 agent = hub.agents.create(
     project_id=project.id,
     name="Support Bot v1",
-    description="GPT-4o-based customer support chatbot",
+    description="LLM-based customer support chatbot",
     url="https://your-app.example.com/api/chat",
     supported_languages=["en"],
     headers={"Authorization": "Bearer <your-app-token>"},
@@ -110,7 +110,7 @@ print(f"Agent registered: {agent.id}")
 ```
 
 :::note
-Your agent endpoint must accept a JSON body with a `messages` array and return a response in the format the Hub expects. See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases) for details on local Python agents.
+By default, the Hub expects your agent to be a chat-style endpoint. See [Agents & Knowledge Bases](/hub/sdk/guides/agents-and-knowledge-bases) for details on other agent types and local Python agents.
 :::
 
 ## 5. Run a vulnerability scan
@@ -134,11 +134,11 @@ print(f"Scan complete. Grade: {scan.grade}")
 hub.helpers.print_metrics(scan)
 ```
 
-The grade ranges from **A** (no issues found) to **D** (critical vulnerabilities detected). See [Vulnerability Scanning](/hub/sdk/guides/scans) for the full tag catalogue, KB-grounded scans, and how to review probe results and turn successful attacks into test cases.
+The grade ranges from **A** (no issues found) to **D** (critical vulnerabilities detected). See [Vulnerability Scanning](/hub/sdk/guides/scans) for the full tag catalogue, KB-grounded scans, and how to review probe results and turn successful attacks into replayable scenarios.
 
-## 6. Create a dataset and add test cases
+## 6. Create a dataset and add scenarios
 
-A dataset is a collection of test cases — conversations with expected outcomes and quality checks.
+A dataset is a collection of scenarios — interactions with expected outcomes and quality checks.
 
 ```python
 dataset = hub.datasets.create(
@@ -147,8 +147,8 @@ dataset = hub.datasets.create(
     description="Basic correctness and tone checks",
 )
 
-# Add a test case
-hub.test_cases.create(
+# Add a chat-style scenario with a single interaction and a single check
+hub.scenarios.create(
     dataset_id=dataset.id,
     interactions=[
         {
@@ -165,7 +165,7 @@ hub.test_cases.create(
             },
             "checks": [
                 {
-                    "identifier": "correctness",
+                    "identifier": "hub_correctness",
                     "params": {
                         "reference": "We offer a 30-day return policy for all items."
                     },
@@ -176,11 +176,11 @@ hub.test_cases.create(
 )
 ```
 
-The `checks` field controls which criteria are applied to each agent response -- these can be LLM-judge, embedding similarity, or rule-based checks. See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for the full list of built-in checks and how to define custom ones.
+The `checks` field controls which criteria are applied to each agent response -- these can be LLM-judge, embedding similarity, or rule-based checks. See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for the full list of available checks and how to define custom ones.
 
 ## 7. Run an evaluation
 
-Now trigger an evaluation that sends every test case to your agent and scores the responses:
+Now trigger an evaluation that sends every scenario to your agent and scores the responses:
 
 ```python
 evaluation = hub.evaluations.create(
@@ -214,7 +214,7 @@ You can also iterate over individual results programmatically:
 results = hub.evaluations.results.list(evaluation.id)
 
 for result in results:
-    print(f"Test case {result.test_case.id}: {result.state}")
+    print(f"Scenario {result.scenario.id}: {result.state}")
     for check in result.results:
         print(f"  {check.name}: {'passed' if check.passed else 'failed'}")
 ```
@@ -224,7 +224,7 @@ You can also view the full evaluation with aggregated metrics in the Hub UI.
 ## Next steps
 
 - **Local agents**: evaluate a Python function directly without an HTTP endpoint — see [Evaluations](/hub/sdk/guides/evaluations#local-evaluations)
-- **Generate test cases automatically**: use scenarios or knowledge bases -- see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks)
+- **Generate scenarios automatically**: use prompt presets, knowledge bases, or playground conversations -- see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks)
 - **Vulnerability scanning**: find security weaknesses with [Scans](/hub/sdk/guides/scans)
 - **Schedule recurring runs**: see [Scheduled Evaluations](/hub/sdk/guides/evaluations#scheduled-evaluations)
 - **Full API details**: see the [API Reference](/hub/sdk/reference)
