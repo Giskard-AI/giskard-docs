@@ -36,9 +36,54 @@ from typing import Any
 _MEMORY_ADDRESS = re.compile(r" at 0x[0-9a-fA-F]+")
 
 
+def _collapse_unions(text: str) -> str:
+    """Rewrite ``Union[A, B]`` as ``A | B`` and ``Optional[X]`` as ``X | None``.
+
+    Which of the two spellings ``inspect`` and Pydantic render is a property of
+    the interpreter, not of the API: Python 3.12 prints ``str | MISSING`` where
+    3.13 prints ``Union[str, MISSING]``. Left alone, a version bump on the
+    machine taking the snapshot reports every affected symbol as a signature
+    change -- 74 phantom deltas across giskard.checks, all of them "error"
+    severity, which teaches reviewers to skip the diff.
+    """
+    for keyword, joiner in (("Union[", " | "), ("Optional[", None)):
+        while (start := text.rfind(keyword)) != -1:
+            open_bracket = start + len(keyword) - 1
+            depth = 0
+            for index in range(open_bracket, len(text)):
+                if text[index] == "[":
+                    depth += 1
+                elif text[index] == "]":
+                    depth -= 1
+                    if depth == 0:
+                        break
+            else:  # Unbalanced -- leave the text alone rather than corrupt it.
+                return text
+
+            inner = text[open_bracket + 1 : index]
+            if joiner is None:
+                replacement = f"{inner} | None"
+            else:
+                args, depth, current = [], 0, ""
+                for char in inner:
+                    if char in "[(":
+                        depth += 1
+                    elif char in "])":
+                        depth -= 1
+                    if char == "," and depth == 0:
+                        args.append(current.strip())
+                        current = ""
+                    else:
+                        current += char
+                args.append(current.strip())
+                replacement = joiner.join(args)
+            text = text[:start] + replacement + text[index + 1 :]
+    return text
+
+
 def normalize(signature: str) -> str:
     """Strip run-to-run noise so an unchanged API renders byte-identically."""
-    return _MEMORY_ADDRESS.sub("", signature)
+    return _collapse_unions(_MEMORY_ADDRESS.sub("", signature).replace("typing.", ""))
 
 # Public names in a module's __all__ that are re-exported from elsewhere are
 # recorded once, at their canonical location, with the other paths listed as

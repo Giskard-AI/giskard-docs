@@ -11,16 +11,28 @@ Giskard Checks is built around a few core primitives that work together:
 - **InteractionSpec**: A specification for generating interactions dynamically
 - **Trace**: An immutable snapshot of all interactions in a scenario
 - **Check**: A validation that runs on a trace and returns a result
-- **Scenario**: A list of steps (interactions and checks) executed sequentially
+- **Step**: A group of interaction specs followed by the checks that validate them
+- **Scenario**: A list of steps executed sequentially against one shared trace
 
 At runtime, the flow looks like this:
 
 1.  A Scenario is created with a sequence of steps.
 2.  For each step in order:
-    1.  Each InteractionSpec is resolved into a concrete Interaction.
-    2.  The Interaction is appended to the Trace.
-    3.  Checks run against the current Trace.
-3.  Results are returned as a ScenarioResult.
+    1.  Every InteractionSpec in the step is driven as an async generator and
+        appends **one or more** Interactions to the Trace. A single spec can
+        yield several turns: a `UserSimulator` or an `LLMGenerator` produces up
+        to `max_steps` messages before it stops.
+    2.  Once every spec in the step has finished, each check in that step runs
+        against the resulting Trace.
+3.  If the step does not pass — a FAIL, an ERROR, or every check skipped —
+    execution stops there. Every remaining step is still reported, with each of
+    its checks marked SKIP and the message
+    `Step N was skipped due to previous failure`.
+4.  Results are returned as a ScenarioResult, one `TestCaseResult` per step.
+
+The fluent API decides where the step boundaries are: `.check()` after
+`.interact()` adds to the checks of the current step, and the next `.interact()`
+opens a new step.
 
 ## Interaction
 
@@ -40,33 +52,19 @@ An `InteractionSpec` describes _how_ to generate an interaction and is used to d
 
 `InteractionSpec` is the abstract base class. `Interact` is the main spec used by `.interact()`. Other subclasses generate interactions differently.
 
+<!-- pyright-skip: schematic: generate_question and call_my_agent stand in for the reader's own callables -->
+
 ```python
-from giskard.agents.generators import Generator
 from giskard.checks import Interact
-import random
-
-generator = Generator(model="openai/gpt-5-mini")
-
-
-def generate_random_question() -> str:
-    return f"What is 2 + {random.randint(0, 10)}?"
-
-
-async def generate_answer(inputs: str) -> str | None:
-    response = await generator.complete(
-        [{"role": "user", "content": inputs}],
-    )
-    return response.choices[0].message.text
-
 
 spec = Interact(
-    inputs=generate_random_question,
-    outputs=generate_answer,
-    metadata={"category": "math", "difficulty": "easy"},
+    inputs=generate_question,  # value, callable, or input generator
+    outputs=call_my_agent,  # value or callable, or MISSING to use the target
+    metadata={"category": "math"},
 )
 ```
 
-Interaction specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn) for practical examples.
+A spec is not a single interaction. It is driven as an async generator during execution and can append several interactions to the trace before it stops, which is what makes multi-turn conversations possible from one `.interact()` call. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn) for practical examples.
 
 ## Trace
 
@@ -106,7 +104,7 @@ scenario = Scenario(
 
 ## Checks
 
-A `Check` validates something about a trace and returns a `CheckResult`. Checks run after each interaction in a scenario and can inspect any part of the trace — including outputs from earlier turns.
+A `Check` validates something about a trace and returns a `CheckResult`. Checks run once per **step**, after every interaction spec in that step has been applied, and can inspect any part of the trace — including outputs from earlier turns. When a step's spec generates several turns, the checks see only the trace as it stands after the last of them.
 
 When referencing values in a trace, use JSONPath expressions that start with `trace.`. The `last` property is a shortcut for `interactions[-1]` and can be used in both JSONPath keys and Python code.
 
@@ -149,51 +147,17 @@ test_scenario = (
 result = await test_scenario.run()
 ```
 
-The `run()` method is asynchronous. When running in a script, use `asyncio.run()`:
+`run()` is asynchronous. See [Async design & pytest](/oss/checks/explanation/async-and-pytest) for how to await it from a script, from pytest, and from a notebook.
 
-```python
-import asyncio
-
-result = asyncio.run(test_scenario.run())
-```
-
-In async contexts (like pytest with `@pytest.mark.asyncio`), you can use `await` directly.
-
-## Fluent API Mapping
+## Fluent API mapping
 
 The fluent API is the preferred user-facing entry point and maps directly to the core primitives above:
 
 - `Scenario(name)` creates a scenario builder.
-- `.interact(...)` adds an `InteractionSpec` to the scenario sequence.
-- `.check(...)` adds a `Check` to the scenario sequence.
-- `.run()` resolves specs to interactions, builds the `Trace`, runs checks, and returns a `ScenarioResult`.
+- `.interact(...)` adds an `InteractionSpec` to the current step, opening a new step if the current one already has checks.
+- `.check(...)` adds a `Check` to the current step.
+- `.run()` drives the specs, builds the `Trace`, runs the checks of each step, and returns a `ScenarioResult`.
 
-Test a two-turn conversation flow. `Conformity` judges the whole trace, so name the relevant turn in its rule:
-
-```python
-from giskard.checks import Scenario, Conformity
-
-test_scenario = (
-    Scenario("conversation_flow")
-    .interact(inputs="Hello", outputs=generate_answer)
-    .check(
-        Conformity(
-            rule="response should be a friendly greeting",
-        )
-    )
-    .interact(inputs="Who invented HTML?", outputs=generate_answer)
-    .check(
-        Conformity(
-            rule="response should mention Tim Berners-Lee as the inventor of HTML",
-        )
-    )
-)
-
-# In a script: result = asyncio.run(test_scenario.run())
-# In async context (e.g. pytest): result = await test_scenario.run()
-import asyncio
-
-result = asyncio.run(test_scenario.run())
-```
+The example above therefore has one step: two checks over a single interaction. Adding a second `.interact()` after `.check(check1)` would make two steps, and a failure in the first would leave the second reported as SKIP.
 
 For a practical introduction to the fluent API, see [Quickstart](/oss/checks/quickstart).

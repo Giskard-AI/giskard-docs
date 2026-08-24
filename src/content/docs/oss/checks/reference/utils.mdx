@@ -2,7 +2,7 @@
 title: Utilities
 description: "Helper functions for string normalization, value providers, and async generator helpers."
 sidebar:
-  order: 7
+  order: 8
 ---
 
 import Property from "../../../../../components/api/Property.astro";
@@ -63,6 +63,10 @@ Use normalization when comparing text from different sources (APIs, files, user 
 
 **Module:** `giskard.checks.utils.injectable`
 
+:::note[Internal machinery]
+`ValueProvider` and `ValueGenerator` are used internally by the framework to normalize how checks and interaction specs source their inputs. Most users never construct them directly — they are documented here so the behaviour they impose on *your* callables, such as which parameter names may be injected, is written down somewhere.
+:::
+
 Thin wrappers that let the framework treat a static value and a callable interchangeably. Both wrappers accept either a plain value or a (sync or async) callable, and both inject only the keyword arguments declared in their `kwargs_keys` set.
 
 ### `ValueProvider`
@@ -76,21 +80,31 @@ Wraps either a static value or a (sync or async) callable that returns a value. 
   <Property name="kwargs_keys" type="set[str]" required>Names of keyword arguments that may be injected when the provider is called. The constructor inspects the callable's signature against this set: any non-injected parameter must have a default, otherwise a `TypeError` is raised.</Property>
 </MethodCard>
 
+Providers are awaited, so the calls below are shown inside a coroutine. In a notebook you can `await` them directly instead.
+
 ```python
+import asyncio
+
 from giskard.checks.utils.injectable import ValueProvider
 
-# Static value
-static_provider = ValueProvider(value_or_callable="hello", kwargs_keys=set())
-result = await static_provider()  # "hello"
 
-
-# Callable with injected kwargs
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 
 
-callable_provider = ValueProvider(value_or_callable=greet, kwargs_keys={"name"})
-result = await callable_provider(name="world")  # "Hello, world!"
+async def main():
+    # Static value
+    static_provider = ValueProvider(value_or_callable="hello", kwargs_keys=set())
+    print(await static_provider())  # "hello"
+
+    # Callable with injected kwargs
+    callable_provider = ValueProvider(
+        value_or_callable=greet, kwargs_keys={"name"}
+    )
+    print(await callable_provider(name="world"))  # "Hello, world!"
+
+
+asyncio.run(main())
 ```
 
 ### `ValueGenerator`
@@ -105,6 +119,8 @@ Wraps either a value or a (sync or async) generator. Internally delegates to a `
 </MethodCard>
 
 ```python
+import asyncio
+
 from giskard.checks.utils.injectable import ValueGenerator
 
 
@@ -113,14 +129,14 @@ async def items():
     yield "second"
 
 
-gen = ValueGenerator(value_or_callable=items, kwargs_keys=set())
-async for value in await gen():
-    print(value)
-```
+async def main():
+    gen = ValueGenerator(value_or_callable=items, kwargs_keys=set())
+    async for value in await gen():
+        print(value)
 
-:::note
-`ValueProvider` and `ValueGenerator` are primarily used internally by the framework to normalize how checks and interaction specs source their inputs. Most users won't construct them directly -- they're documented here for reference.
-:::
+
+asyncio.run(main())
+```
 
 ---
 
@@ -164,6 +180,6 @@ asyncio.run(main())
 
 ## See also
 
-- [Core API](/oss/checks/reference/core) -- Core types and base classes
-- [Built-in Checks](/oss/checks/reference/checks) -- Checks using normalization
-- [Generators](/oss/checks/reference/generators) -- Input generators
+- [Core API](/oss/checks/reference/core) — Core types and base classes
+- [Built-in Checks](/oss/checks/reference/checks) — Checks using normalization
+- [Generators](/oss/checks/reference/generators) — Input generators

@@ -2,7 +2,7 @@
 title: Testing Utilities
 description: "Testing utilities: TestCase for bundling traces with checks, assert_passed(), and debugging helpers."
 sidebar:
-  order: 5
+  order: 6
 ---
 
 import Property from "../../../../../components/api/Property.astro";
@@ -35,7 +35,7 @@ For most use cases, use the `Scenario()` fluent API instead. `TestCase` is for a
   </Property>
 </TypeTable>
 
-<MethodCard name=".run()" returnType="TestCaseResult">
+<MethodCard name="async .run()" returnType="TestCaseResult">
   Execute all checks against the trace.
 
   <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
@@ -123,32 +123,61 @@ async def test_vague_question_gets_a_follow_up():
 
 Result of test case execution with check outcomes.
 
+One `TestCaseResult` is produced per **step** of a scenario, which is why `ScenarioResult.steps` is a list of them.
+
 <TypeTable name="TestCaseResult">
-  <Property name="status" type="TestCaseStatus">
-    Overall test case status (PASS/FAIL/ERROR/SKIP).
-  </Property>
   <Property name="results" type="list[CheckResult]">
-    Results from all checks.
-  </Property>
-  <Property name="passed" type="bool">
-    True if all checks passed.
-  </Property>
-  <Property name="failed" type="bool">
-    True if any check failed.
-  </Property>
-  <Property name="errored" type="bool">
-    True if any check errored.
-  </Property>
-  <Property name="skipped" type="bool">
-    True if all checks were skipped.
+    Results from all checks, in the order they ran.
   </Property>
   <Property name="duration_ms" type="int">
     Execution time in milliseconds.
   </Property>
+  <Property name="last_interaction_index" type="int | None" defaultValue="None">
+    0-based index, in the scenario's final trace, of the last interaction this
+    step added before its checks ran. `None` when the step added none. This is
+    how a check verdict is attributed back to a specific turn.
+  </Property>
+  <Property name="error" type="TestCaseError | None" defaultValue="None">
+    Why the step could not run at all — an input-generation failure, for
+    example. See [`TestCaseError`](/oss/checks/reference/core#exceptions).
+  </Property>
+  <Property name="status" type="TestCaseStatus">
+    Aggregated outcome. ERROR whenever `error` is set, then ERROR if any check
+    errored, FAIL if any failed, SKIP if all were skipped, PASS otherwise.
+  </Property>
+  <Property name="passed" type="bool">
+    True when every check passed — **and also when there are no checks at all**.
+  </Property>
+  <Property name="failed" type="bool">
+    True when at least one check failed and none errored.
+  </Property>
+  <Property name="errored" type="bool">
+    True when the step errored or any check errored.
+  </Property>
+  <Property name="skipped" type="bool">
+    True when all checks were skipped.
+  </Property>
+  <Property name="failures_and_errors" type="list[CheckResult]">
+    The check results that failed or errored. Excludes SKIP.
+  </Property>
 </TypeTable>
 
+:::caution[A step with no checks passes]
+`passed` is True when `results` is empty. A scenario built with `.interact()` and no `.check()` therefore reports PASS while asserting nothing, and looks identical in a report to one that genuinely passed. If a suite goes green unexpectedly, count the checks first.
+:::
+
+<MethodCard name=".format_failures()" returnType="list[str]">
+  Render every non-passing check as `<check name> <STATUS>: <reason>`. Includes SKIP as well as FAIL and ERROR, and prepends `Test case ERRORED: …` when `error` is set — a step that did not pass should never be left unexplained. This is the diagnostic superset that `assert_passed()` uses.
+</MethodCard>
+
 <MethodCard name=".assert_passed()" returnType="None">
-  Raise `AssertionError` with formatted failure messages if any check did not pass. Useful in pytest.
+  Raise `AssertionError` carrying `format_failures()` if the test case did not pass. Useful in pytest.
+</MethodCard>
+
+<MethodCard name=".print_report()" returnType="None">
+  Print the step to the terminal with Rich: one row per check, then a status-count footer.
+
+  <Property name="console" type="Console | None" defaultValue="None">Rich `Console` to print to.</Property>
 </MethodCard>
 
 ```python
@@ -157,13 +186,15 @@ result = await test_case.run()
 if result.passed:
     print("All checks passed!")
 else:
-    for check_result in result.results:
-        if check_result.failed:
-            print(f"Failed: {check_result.message}")
+    for message in result.format_failures():
+        print(message)
+    # is_authenticated ERRORED: No value found for key
+    # 'trace.last.metadata.authenticated', expected a value equal to True.
 
-# Assert (raises if failed)
-result.assert_passed()
+result.assert_passed()  # raises AssertionError with those same messages
 ```
+
+`TestCaseStatus` is a `str` enum whose values are lowercase — `"pass"`, `"fail"`, `"error"`, `"skip"` — so `result.status == "PASS"` is always False. See [`CheckStatus`](/oss/checks/reference/core#checkstatus).
 
 ---
 
@@ -181,8 +212,14 @@ Low-level runner for executing test cases. Most users should use `test_case.run(
 </MethodCard>
 
 <MethodCard name="get_runner()" returnType="TestCaseRunner">
-  Get the default process-wide singleton runner instance.
+  Get the default process-wide singleton runner instance. `TestCase.run()` calls this for you.
 </MethodCard>
+
+```python
+from giskard.checks.testing.runner import get_runner
+
+result = await get_runner().run(test_case)
+```
 
 ---
 
@@ -228,121 +265,23 @@ spy_data = result.final_trace.last.metadata.get("myapp.db.fetch_item")
 print(spy_data["call_count"], spy_data["call_args"])
 ```
 
-:::tip
-Use `WithSpy` when debugging complex interaction generation logic, understanding multi-turn interaction flow, or investigating unexpected behavior in scenarios.
+:::note[It serializes]
+`WithSpy` is registered as the `InteractionSpec` kind `"with_spy"`, so a suite containing one round-trips through `model_dump()` and back. That is unlike [`FnCheck`](/oss/checks/reference/checks#fncheck), whose callable is excluded from serialization.
 :::
 
 ---
 
-## Usage patterns
+## See also — task guides
 
-### Replaying recorded conversations
+These recipes used to live here. They are how-to material rather than reference, so they belong with the guides:
 
-Replay a recorded transcript:
-
-```python
-from giskard.checks import TestCase, Trace, Interaction, FnCheck
-
-recorded = [
-    Interaction(inputs="Find item 42", outputs="Item found."),
-    Interaction(inputs="Who created it?", outputs="Alex created it."),
-]
-
-trace = Trace(interactions=recorded)
-
-test_case = TestCase(
-    name="recorded_replay",
-    trace=trace,
-    checks=[
-        FnCheck(
-            fn=lambda t: "found" in t.interactions[0].outputs.lower(),
-            name="finds_item",
-        ),
-        FnCheck(
-            fn=lambda t: "Alex" in t.interactions[1].outputs,
-            name="returns_creator",
-        ),
-    ],
-)
-
-await test_case.assert_passed()
-```
-
-Replay does not call the agent.
-
-### Batch testing
-
-Run independent test cases concurrently:
-
-```python
-import asyncio
-
-test_cases = [
-    TestCase(
-        name=f"replay_{i}",
-        trace=Trace(interactions=[interaction]),
-        checks=[
-            FnCheck(
-                fn=lambda t: t.last is not None and bool(t.last.outputs),
-                name="answered",
-            )
-        ],
-    )
-    for i, interaction in enumerate(recorded)
-]
-
-results = await asyncio.gather(*[tc.run() for tc in test_cases])
-
-passed = sum(1 for r in results if r.passed)
-print(f"Passed: {passed}/{len(results)}")
-```
-
-### Parameterized tests
-
-One check, many recorded exchanges:
-
-```python
-import pytest
-
-from giskard.checks import Interaction, StringMatching, TestCase, Trace
-
-
-def target(inputs: str) -> str:
-    return f"Received: {inputs}"
-
-
-test_data = [
-    ("Hello", "Received"),
-    ("Goodbye", "Received"),
-]
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize("question,required_keyword", test_data)
-async def test_answers_include_keyword(question, required_keyword):
-    trace = Trace(
-        interactions=[
-            Interaction(inputs=question, outputs=target(question))
-        ]
-    )
-    test_case = TestCase(
-        name=f"keyword_{required_keyword}",
-        trace=trace,
-        checks=[
-            StringMatching(
-                keyword=required_keyword,
-                target_key="trace.last.outputs",
-                case_sensitive=False,
-            )
-        ],
-    )
-    await test_case.assert_passed()
-```
+- Replaying a recorded conversation against checks, and running many replays at once — [Batch evaluation](/oss/checks/how-to/batch-evaluation)
+- Parameterizing a `TestCase` across many inputs in pytest — [Run tests with pytest](/oss/checks/how-to/run-in-pytest)
 
 ---
 
 ## See also
 
-- [Core API](/oss/checks/reference/core) -- Trace, Interaction, and Check details
-- [Scenarios](/oss/checks/reference/scenarios) -- Building multi-step test workflows
-- [Built-in Checks](/oss/checks/reference/checks) -- Ready-to-use validation checks
+- [Core API](/oss/checks/reference/core) — `Trace`, `Interaction`, and `TestCaseError`
+- [Scenarios](/oss/checks/reference/scenarios) — Building multi-step test workflows
+- [Built-in Checks](/oss/checks/reference/checks) — Ready-to-use validation checks

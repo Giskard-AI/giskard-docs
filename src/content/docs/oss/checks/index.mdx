@@ -10,7 +10,7 @@ sidebar:
 
 import { LinkCard, CardGrid, Steps } from "@astrojs/starlight/components";
 
-Giskard Checks is a lightweight Python library for testing and evaluating non-deterministic applications such as LLM-based systems.
+Giskard Checks tests LLM apps the way pytest tests code: you write a scenario (what to send) and a check (what the reply must satisfy), and get pass or fail.
 
 An LLM answers differently every time, so an exact-string assertion fails on the next run. You write two things instead. A scenario is one test case: a message, or a short conversation, to send to your agent. A check is a rule the reply has to satisfy, either plain Python or a rule written in English and graded by an LLM, called a judge.
 
@@ -20,7 +20,7 @@ A judge is an LLM, so it is sometimes wrong in both directions. Read the failing
 
 ## Key features
 
-- **Checks that need no LLM call**: string and regex matching, comparisons, JSON validity, semantic similarity, and Rego policies, so deterministic rules stay fast and free
+- **Checks that need no LLM call**: string and regex matching, comparisons, JSON validity, and Rego policies, so deterministic rules stay fast and free. `SemanticSimilarity` needs no judge but does call an embeddings API
 - **LLM judges**: `LLMJudge` for any rule you write in English, plus ready-made `Groundedness`, `AnswerRelevance`, `Contradiction`, `Toxicity`, and `Conformity`
 - **Single-turn and multi-turn scenarios**: send one message, or drive a whole conversation with `UserSimulator` to see whether the agent keeps track of what was said earlier
 - **Composition**: combine checks with `AllOf`, `AnyOf`, and `Not` instead of writing a new check per combination
@@ -36,7 +36,7 @@ Install the [Giskard Agent Skills](/oss/agent-skills) and let your coding agent 
 
 ## Start here
 
-To see the whole thing working first, the [Quickstart](/oss/checks/quickstart) runs one end-to-end example. Otherwise, work through these in order.
+To see the whole thing working first, [Your First Test](/oss/checks/tutorials/your-first-test) runs end to end with no API key. The [Quickstart (needs an OpenAI key)](/oss/checks/quickstart) shows the same loop with a judged check. Otherwise, work through these in order.
 
 <Steps>
 
@@ -58,7 +58,7 @@ To see the whole thing working first, the [Quickstart](/oss/checks/quickstart) r
   />
   <LinkCard
     title="Quickstart"
-    description="Your first scenario in under 5 minutes"
+    description="Your first judged scenario in under 5 minutes. Needs an OpenAI key"
     href="/oss/checks/quickstart"
   />
   <LinkCard

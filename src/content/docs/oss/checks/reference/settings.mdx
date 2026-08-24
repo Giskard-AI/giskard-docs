@@ -2,7 +2,7 @@
 title: Settings
 description: "Default LLM generator, embedding model, and environment-backed configuration for Giskard Checks."
 sidebar:
-  order: 8
+  order: 5
 ---
 
 import Property from "../../../../../components/api/Property.astro";
@@ -95,6 +95,37 @@ get_default_generator()  # the generator set above
 ```
 
 To set this once per pytest session, see [CI/CD Integration](/oss/checks/how-to/ci-cd).
+
+### Provider credentials
+
+`GISKARD_CHECKS_DEFAULT_MODEL` picks the model. The credentials for the provider in front of the `/` come from that provider's own environment variables, which are read at the point the provider is first constructed — not at import — so a missing key surfaces mid-run rather than at startup.
+
+| Model prefix | Environment variables |
+| --- | --- |
+| `openai/` | `OPENAI_API_KEY` (read by the OpenAI SDK) |
+| `anthropic/` | `ANTHROPIC_API_KEY` (read by the Anthropic SDK) |
+| `google/`, `gemini/` | `GEMINI_API_KEY`, or `GOOGLE_API_KEY` as a fallback |
+| `azure/` | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION` |
+| `azure_ai/` | `AZURE_AI_API_KEY`, `AZURE_AI_ENDPOINT`, and optionally `AZURE_AI_API_VERSION` (defaults to `2024-10-21`) |
+
+Those five prefixes are the whole registry. A model string with any other prefix raises `ValueError: Provider '<name>' is not configured and not in the registry.` For anything else, install the `litellm` extra and pass a `LiteLLMGenerator` explicitly.
+
+### Deferred environment values
+
+When you register a provider configuration yourself, any value may be written as `os.environ/VAR_NAME` instead of a literal. The string is resolved to that variable's value at the moment the provider is built, which keeps secrets out of a config file that gets committed or loaded from YAML:
+
+```python
+from giskard.llm import configure
+
+configure(
+    "my-proxy",
+    provider="openai",
+    api_key="os.environ/MY_PROXY_KEY",
+    base_url="os.environ/MY_PROXY_URL",
+)
+```
+
+The alias becomes the model prefix, so the model string is then `my-proxy/gpt-4o-mini`. An unset variable resolves to `None` rather than raising.
 
 <MethodCard name="get_default_embedding_model()" returnType="EmbeddingModel">
   Return an `EmbeddingModel` built from `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL`

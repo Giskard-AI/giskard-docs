@@ -58,53 +58,9 @@ Groundedness(
 Conformity(rule="Response must not give medical advice")
 ```
 
-## Combining Check Types
+## Combining check types
 
-Layer all three in a single scenario: run the cheap deterministic checks first, and only reach for LLM judges when you genuinely need them.
-
-```python
-from giskard.checks import Scenario, StringMatching, GreaterThan, Groundedness
-
-question = "What is the refund policy?"
-
-
-def rag_system(query: str) -> dict:
-    # Your RAG system
-    return {
-        "answer": "Refunds are processed within 5 business days.",
-        "context": "Policy §3.2",
-        "confidence": 0.9,
-    }
-
-
-tc = (
-    Scenario("rag_test")
-    .interact(inputs=question, outputs=lambda q: rag_system(q))
-    # Fast, free
-    .check(
-        GreaterThan(
-            name="has_confidence",
-            target_key="trace.last.outputs.confidence",
-            expected_value=0.5,
-        )
-    )
-    .check(
-        StringMatching(
-            name="cites_policy",
-            keyword="policy",
-            target_key="trace.last.outputs.answer",
-        )
-    )
-    # Slower, costs a few cents
-    .check(
-        Groundedness(
-            name="grounded",
-            target_key="trace.last.outputs.answer",
-            context_key="trace.last.outputs.context",
-        )
-    )
-)
-```
+Layer all three in a single scenario: add the cheap deterministic checks first, and only reach for LLM judges when you genuinely need them. Checks in a step run in order and the scenario stops at the first non-passing one, so a failing free check saves you the price of the judge behind it. For a worked example, see [Built-in checks](/oss/checks/reference/checks#combining-multiple-checks).
 
 ## Common questions
 

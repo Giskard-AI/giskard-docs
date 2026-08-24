@@ -14,16 +14,16 @@ If you would rather not write the tests at all, [the scan](/oss/solutions/scan-v
 ## Install
 
 ```bash
-pip install "giskard[openai]==3.0.0rc1"
+pip install --pre "giskard[openai]"
 ```
 
 A judge is an LLM, so a check needs a provider and a key. Register one as the default:
 
 ```python
-from giskard.agents.generators import GiskardLLMGenerator
+from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o-mini"))
+set_default_generator(Generator(model="openai/gpt-4o-mini"))
 ```
 
 See [Install & Configure](/oss/checks/installation) for other providers.
@@ -96,9 +96,18 @@ advice = (
     )
 )
 
-result = await advice.run()
-result.print_report()
+import asyncio
+
+
+async def main() -> None:
+    result = await advice.run()
+    result.print_report()
+
+
+asyncio.run(main())
 ```
+
+In a notebook, drop the wrapper and `await advice.run()` directly — a bare top-level `await` is a `SyntaxError` in a `.py` script, and `asyncio.run()` raises inside a notebook's running event loop.
 
 The report prints the verdict, the judge's reasoning when it fails, and the conversation that produced it. Write the rule the way you would explain the requirement to a colleague; a vague rule gets you a vague verdict.
 
@@ -132,22 +141,27 @@ other_customer = (
     )
 )
 
+import asyncio
+
 suite = Suite(name="northgate_support").append(advice).append(other_customer)
 
-suite_result = await suite.run(parallel=True)
-print("pass rate:", suite_result.pass_rate)
+
+async def run_suite() -> None:
+    suite_result = await suite.run(parallel=True)
+    print("pass rate:", suite_result.pass_rate)
+    suite_result.to_junit_xml("checks.xml")
+    if suite_result.failed_count:
+        raise SystemExit(1)
+
+
+asyncio.run(run_suite())
 ```
 
 `Suite.run` is serial by default; `parallel=True` runs the scenarios concurrently, which needs an agent that tolerates concurrent calls.
 
 ## Take it to CI
 
-```python
-suite_result.to_junit_xml("checks.xml")
-
-if suite_result.failed_count:
-    raise SystemExit(1)
-```
+The last two statements in `main()` above are the whole CI story: `to_junit_xml` writes the report, and a non-zero `failed_count` fails the job.
 
 That is one `<testcase>` per scenario, rendered natively by GitHub Actions, GitLab, Jenkins, and CircleCI. The judge is an LLM and can flip a borderline verdict between runs, so read a new failure before treating it as a regression.
 
@@ -159,3 +173,4 @@ That is one `<testcase>` per scenario, rendered natively by GitHub Actions, GitL
 - [Spy on internal calls](/oss/checks/how-to/spy-on-calls) to assert which tools the agent called and with what arguments
 - [Run checks in pytest](/oss/checks/how-to/run-in-pytest) to wire a suite into an existing test run
 - [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) to have the scenarios generated for you instead
+- [Troubleshooting](/oss/troubleshooting) if a run fails with an error you do not recognize

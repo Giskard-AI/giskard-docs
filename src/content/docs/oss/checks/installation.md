@@ -5,27 +5,49 @@ sidebar:
   order: 2
 ---
 
+## Prerequisites
+
+- **Python 3.12 or higher.** This is a floor, not a recommendation: the library uses language features that are not available on older versions.
+- **An API key for one LLM provider**, if you want to run judged checks. Deterministic checks (`Equals`, `StringMatching`, `RegexMatching`, `FnCheck`, `JsonValid`, `RegoPolicy`, and your own `Check` subclasses) need no key at all.
+
 ## Install the Python package
 
-Giskard requires **Python 3.12 or higher**. Install it together with the SDK for the LLM provider you will use as a judge: an LLM the library calls to grade your agent's replies.
+Install Giskard together with the SDK for the LLM provider you will use as a judge: an LLM the library calls to grade your agent's replies.
 
 ```bash
 pip install --pre "giskard[openai]"
 ```
 
+Everything in the v3 line is a pre-release, so `--pre` is required. Without it, pip resolves to the v2 series, which has none of the API documented here.
+
 No provider SDK ships with `giskard` itself, so installing it without a provider extra leaves LLM-based checks unable to reach a model.
 
-Pick the extra that matches your provider:
+## Pick your provider
 
-| Provider prefix | Install | SDK |
-| --- | --- | --- |
-| `openai/` | `pip install --pre "giskard[openai]"` | `openai` |
-| `google/` or `gemini/` | `pip install --pre "giskard[google]"` | `google-genai` |
-| `anthropic/` | `pip install --pre "giskard[anthropic]"` | `anthropic` |
-| `azure/` | `pip install --pre "giskard[azure]"` | `openai` |
-| `azure_ai/` | `pip install --pre "giskard[azure]"` | `openai` |
+Each row is the complete setup for one provider: the install command, the environment variables it reads, and the model string you pass to `Generator`.
+
+| Provider | Install | Environment variables | Example model string |
+| --- | --- | --- | --- |
+| OpenAI | `pip install --pre "giskard[openai]"` | `OPENAI_API_KEY` | `openai/gpt-4o-mini` |
+| Google Gemini | `pip install --pre "giskard[google]"` | `GEMINI_API_KEY` or `GOOGLE_API_KEY` | `gemini/gemini-2.0-flash` |
+| Anthropic | `pip install --pre "giskard[anthropic]"` | `ANTHROPIC_API_KEY` | `anthropic/claude-sonnet-4-5` |
+| Azure OpenAI | `pip install --pre "giskard[azure]"` | `AZURE_API_KEY`, `AZURE_API_BASE`, `AZURE_API_VERSION` | `azure/my-deployment` |
+| Azure AI | `pip install --pre "giskard[azure]"` | `AZURE_AI_API_KEY`, `AZURE_AI_ENDPOINT`, `AZURE_AI_API_VERSION` | `azure_ai/my-deployment` |
 
 Use `pip install --pre "giskard[all-llms]"` for all the native SDKs at once.
+
+## Extras for individual checks
+
+Two checks need a dependency that is not installed by default:
+
+| Extra | Install | Enables |
+| --- | --- | --- |
+| `all-checks` | `pip install --pre "giskard[all-checks]"` | `Readability`, which needs `textstat`. Without it the check raises `ValidationError: The 'textstat' package is required for the Readability check` |
+| `regorus` | `pip install --pre "giskard[regorus]"` | `RegoPolicy`, policy-as-code checks evaluated by Rego |
+
+:::caution
+`regorus` is not available on Windows or on linux-aarch64. On those platforms the extra installs nothing and `RegoPolicy` stays unavailable.
+:::
 
 :::note[Using LiteLLM instead]
 For unsupported providers, install `pip install --pre "giskard[litellm]"` and pass `LiteLLMGenerator` explicitly:
@@ -55,6 +77,10 @@ A judge is an LLM that reads your agent's reply and decides whether it satisfies
 
 When a judge runs, its prompt includes the test inputs and agent outputs. Those values are sent to the configured LLM provider, so use a provider and model that meet your data-handling requirements. A weak judge model can produce unreliable verdicts.
 
+:::note[Judged checks cost tokens]
+Each judged check is one LLM call per scenario run: a 50-scenario suite with two judged checks is 100 calls. `UserSimulator` costs one call per turn, up to `max_steps`. `SemanticSimilarity` needs no judge but calls an embeddings API.
+:::
+
 For OpenAI, set the `OPENAI_API_KEY` environment variable:
 
 ```bash
@@ -81,13 +107,41 @@ from giskard.checks import set_default_generator
 
 # Create a generator with giskard.agents
 # The provider prefix picks the SDK: openai/, google/, anthropic/, azure/, azure_ai/
-llm_judge = Generator(model="openai/gpt-5-mini")
+llm_judge = Generator(model="openai/gpt-4o-mini")
 
 # Configure the checks to use this judge model by default
 set_default_generator(llm_judge)
 ```
 
-`Generator` is `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`. Use a capable judge model and review failures before acting on them.
+Use a capable judge model and review failures before acting on them.
+
+:::note[Under the hood]
+`Generator` is an alias for `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`. The two names refer to the same class.
+:::
+
+## Configure Giskard from the environment
+
+If you would rather not call `set_default_generator` at all, set the model in the environment instead. These variables are read from the process environment or from a `.env` file in the working directory.
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `GISKARD_CHECKS_DEFAULT_MODEL` | `openai/gpt-4o-mini` | Model used by every judged check when no generator is configured |
+| `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL` | `text-embedding-3-small` | Model used by `SemanticSimilarity` |
+| `GISKARD_CHECKS_MAX_REPORTED_FAILURES` | unlimited | Caps how many failures a report prints, which keeps CI logs bounded |
+| `GISKARD_CHECKS_DISABLE_RICH_PRETTY` | `false` | Set it to `1` to turn off rich formatting in reports |
+
+A generator passed to `set_default_generator`, or to an individual check, always wins over the environment.
+
+## Telemetry and console output
+
+Giskard collects anonymous usage telemetry by default, and prints a short message about Giskard Enterprise the first time you import `giskard.checks`. Both can be turned off:
+
+```bash
+export GISKARD_TELEMETRY_DISABLED=1   # or the vendor-neutral DO_NOT_TRACK=1
+export GISKARD_QUIET=1                # suppress the welcome message
+```
+
+`GISKARD_TELEMETRY_DISABLE_GEOIP=1` keeps telemetry on but drops the coarse location lookup. In Python, call `disable_telemetry()` from `giskard.core.telemetry`. Set `GISKARD_TELEMETRY_DISABLED` and `GISKARD_QUIET` in CI so build logs stay clean and no data leaves the runner.
 
 ## Next Steps
 

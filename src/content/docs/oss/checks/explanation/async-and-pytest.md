@@ -31,6 +31,19 @@ result = await suite.run(parallel=True, max_concurrency=4)
 
 Checks and turns inside one scenario stay sequential.
 
+## Repeating a scenario
+
+`multiple_runs` re-executes a whole scenario, with a fresh trace each time, and is the built-in answer to a flaky judge or a non-deterministic agent. Set it on the scenario or override it per call:
+
+<!-- pyright-skip: schematic: scenario is whichever scenario the reader built above -->
+
+```python
+result = await scenario.run(multiple_runs=5)
+print(result.runs_executed, "of", result.multiple_runs)
+```
+
+The runs are sequential and every one has to pass for the next to start: execution stops on the first run that comes back FAIL, ERROR, or SKIP. It is not a retry-until-one-success loop — it tightens the bar rather than loosening it. `ScenarioResult` reports the last run executed, plus `runs_executed` so you can see where it stopped.
+
 The tradeoff of async is that you need an event loop to call `Scenario.run()`. Giskard Checks works in scripts, pytest, and notebooks, each of which provides the loop differently. See [Run Tests with pytest](/oss/checks/how-to/run-in-pytest) for the setup steps.
 
 ## Common pitfalls

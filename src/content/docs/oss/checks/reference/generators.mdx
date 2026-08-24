@@ -1,8 +1,9 @@
 ---
-title: Generators
-description: "Input generators for dynamic test data — UserSimulator, LLMGenerator, and custom InputGenerator subclasses."
+title: "Checks Input Generators"
+description: "Input generators that feed dynamic test data to scenarios: UserSimulator, LLMGenerator, DatasetInputGenerator, and custom InputGenerator subclasses."
 sidebar:
-  order: 6
+  label: "Generators"
+  order: 7
 ---
 
 import Property from "../../../../../components/api/Property.astro";
@@ -33,14 +34,14 @@ Input generators for creating dynamic test data and simulating user interactions
 <Property name="context" type="str | None" defaultValue="None">
   Optional context to customize the persona's behavior.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
   LLM generator used to simulate the user's messages. Defaults to the framework's default generator.
 </Property>
 
 Write the persona as a goal the simulated user is pursuing:
 
 ```python
-from giskard.checks.generators.user import UserSimulator
+from giskard.checks import UserSimulator
 from giskard.agents.generators import Generator
 
 user_sim = UserSimulator(
@@ -99,6 +100,58 @@ print(f"Last reply: {result.final_trace.last.outputs}")
 
 ---
 
+## `BaseLLMGenerator`
+
+<ResourceSection description="Abstract base for LLM-driven multi-turn input generators. Subclass it when neither UserSimulator nor LLMGenerator gives you the prompt you need.">
+
+**Module:** `giskard.checks.generators.base`
+
+`UserSimulator` and `LLMGenerator` are both thin subclasses of this. It owns the turn loop, the retry policy, and the structured output contract; a subclass supplies the prompt.
+
+<Property name="max_steps" type="int" defaultValue="3">
+  Maximum conversation turns to generate. Must be ≥ 0; `0` generates nothing.
+</Property>
+<Property name="max_retries" type="int" defaultValue="2">
+  Retries per turn when the model refuses or the provider blocks the request.
+  Must be ≥ 0, so each turn is attempted up to `max_retries + 1` times.
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  LLM used to produce the messages. `None` falls back to the global default,
+  which lets you drive the simulated user with a cheap model while judging with
+  a strong one.
+</Property>
+
+<MethodCard name=".get_prompt()" returnType="ChatMessage | MessageTemplate | TemplateReference">
+  Return the prompt that drives generation. Subclasses **must** override this; the base raises `NotImplementedError`.
+</MethodCard>
+
+<MethodCard name="async .get_inputs()" returnType="dict[str, Any]">
+  Return the template variables for prompt rendering. The default is `{"trace": trace}`. Override it to expose more context.
+
+  <Property name="trace" type="TraceType" required>The trace as it stands before this turn.</Property>
+</MethodCard>
+
+Each turn asks the model for an `LLMGeneratorOutput` and yields its `message`. The loop stops early when the model reports `goal_reached`, when `message` is empty, or after `max_steps` turns.
+
+```python
+from giskard.checks import BaseLLMGenerator
+from giskard.checks.core.input_generator import InputGenerator
+
+
+@InputGenerator.register("angry_customer")
+class AngryCustomer(BaseLLMGenerator):
+    order_id: str
+
+    def get_prompt(self):
+        return f"You are a customer whose order {self.order_id} never arrived."
+```
+
+**Raises:** `InputGenerationException` when a turn still fails after `max_retries + 1` attempts, whether because the model kept refusing, the provider blocked the request, or the output never fitted the requested input schema. The scenario runner wraps that in an `InteractionGenerationError` carrying the partial trace.
+
+</ResourceSection>
+
+---
+
 ## `LLMGenerator`
 
 <ResourceSection description="Generate inputs from an inline prompt or prompt template.">
@@ -126,7 +179,7 @@ print(f"Last reply: {result.final_trace.last.outputs}")
 <Property name="as_template" type="bool" defaultValue="False">
   When True, render `prompt` as a Jinja2 template with trace context.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
   LLM generator used to produce inputs.
 </Property>
 
@@ -163,6 +216,15 @@ Internal output for each `UserSimulator` or `LLMGenerator` turn. The loop yields
     The message to send. `None` when `goal_reached` is true. Cannot be set together with `schema_issue`.
   </Property>
 </TypeTable>
+
+You do not construct this yourself — the generator asks the model for it as structured output, one per turn. It matters when you subclass [`BaseLLMGenerator`](#basellmgenerator), because your prompt has to elicit these three fields:
+
+```python
+from giskard.checks.generators.base import LLMGeneratorOutput
+
+LLMGeneratorOutput(goal_reached=False, message="How long will the refund take?")
+LLMGeneratorOutput(goal_reached=True)  # stops the loop
+```
 
 ---
 
@@ -258,49 +320,14 @@ Use a custom generator when Python can determine the next message. Otherwise use
 
 ---
 
-## Usage patterns
+## See also — task guides
 
-### Compare personas
-
-Run the same target with several personas:
-
-```python
-from giskard.checks import Scenario
-from giskard.checks.generators.user import UserSimulator
-
-personas = [
-    {
-        "name": "impatient",
-        "persona": "Ask for a one-line answer.",
-    },
-    {
-        "name": "novice",
-        "persona": "Ask for plain-language explanations.",
-    },
-    {
-        "name": "pushy",
-        "persona": "Ask a follow-up question after each answer.",
-    },
-]
-
-results = {}
-for persona in personas:
-    sim = UserSimulator(persona=persona["persona"], max_steps=3)
-    scenario = Scenario(persona["name"]).interact(
-        inputs=sim, outputs=target
-    )
-    results[persona["name"]] = await scenario.run()
-
-for name, result in results.items():
-    print(f"{name}: {result.status}")
-```
-
-Each run can generate different messages. Compare results as examples, not a fixed measurement.
+Running the same target against several personas and comparing the results is an experiment-design task rather than an API detail. See [Simulate users](/oss/checks/how-to/simulate-users).
 
 ---
 
 ## See also
 
-- [Core API](/oss/checks/reference/core) -- Trace, Interaction, and InteractionSpec
-- [Scenarios](/oss/checks/reference/scenarios) -- Building multi-step test workflows
-- [Built-in Checks](/oss/checks/reference/checks) -- Validation checks for generated interactions
+- [Core API](/oss/checks/reference/core) — `Trace`, `Interact`, and `InteractionSpec`
+- [Scenarios](/oss/checks/reference/scenarios) — Building multi-step test workflows
+- [Built-in Checks](/oss/checks/reference/checks) — Validation checks for generated interactions

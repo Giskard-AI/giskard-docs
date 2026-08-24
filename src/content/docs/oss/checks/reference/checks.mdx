@@ -14,6 +14,22 @@ Ready-to-use validation checks: function-based checks, string and regex matching
 
 For the tradeoffs between rule-based checks, semantic similarity, and LLM judges, see [When to use which check](/oss/checks/explanation/when-to-use-which-check).
 
+## `MISSING` and `None`
+
+Most checks accept a value in two ways: as a static field (`keyword`, `expected_value`, `answer`, `context`, …) or as a JSONPath into the trace (`keyword_key`, `expected_value_key`, `target_key`, `context_key`, …). Those static fields default to `MISSING`, the sentinel from `pydantic.experimental.missing_sentinel`, and not to `None`:
+
+```python
+from pydantic.experimental.missing_sentinel import MISSING
+```
+
+`MISSING` means *you did not supply a value*, so the check falls back to the matching `*_key` path. Passing `None` explicitly supplies `None` **as the value** and the fallback does not happen — a static `None` is compared, matched, or judged like any other value. This is the most common source of a check that quietly evaluates the wrong thing, so leave the field out rather than passing `None` to mean "unset".
+
+You rarely need to import `MISSING` yourself. It appears in this page's default columns to show which fields behave this way.
+
+:::caution[Unknown keyword arguments are rejected]
+Every `Check` sets `extra="forbid"`, so a misspelled field name raises `ValidationError: … extra_forbidden` instead of being silently dropped. `Scenario` deliberately does the opposite and tolerates unknown keys — see [Errors](/oss/checks/reference/core#errors) for why.
+:::
+
 ## Function-based Checks
 
 ### `FnCheck`
@@ -71,7 +87,39 @@ async def fee_matches_schedule(trace) -> bool:
 check = FnCheck(fn=fee_matches_schedule, name="fee_matches_schedule")
 ```
 
-Reach for `FnCheck` when the pass condition is a predicate you can already write in Python and no built-in check expresses it. Prefer a registered [custom check](#creating-custom-checks) when you need to save the suite to disk: `FnCheck` holds a callable and is not reliably serializable.
+Reach for `FnCheck` when the pass condition is a predicate you can already write in Python and no built-in check expresses it. Prefer a registered [custom check](/oss/checks/how-to/custom-checks) when you need to save the suite to disk: `fn` is declared `Field(exclude=True)`, so it is dropped from `model_dump()` and a round-tripped `FnCheck` has no function to run.
+
+**Raises:** `TypeError` from `.run()` when `fn` returns anything other than a `bool` or a `CheckResult` (or an awaitable of one) — the message is `from_fn callable must return bool or CheckResult (or awaitable thereof), but got …`.
+
+</ResourceSection>
+
+### `from_fn`
+
+<ResourceSection description="Factory that builds an FnCheck from a callable. Same behaviour, less punctuation.">
+
+**Module:** `giskard.checks.builtin.fn`
+
+<MethodCard name="from_fn()" returnType="Check">
+  Build an `FnCheck` from a callable. Every option other than `fn` is keyword-only.
+
+  <Property name="fn" type="Callable" required>Function taking a `Trace` and returning `bool` or `CheckResult`, sync or async.</Property>
+  <Property name="name" type="str | None" defaultValue="None">Optional check name.</Property>
+  <Property name="description" type="str | None" defaultValue="None">Optional description.</Property>
+  <Property name="success_message" type="str | None" defaultValue="None">Message when the check passes.</Property>
+  <Property name="failure_message" type="str | None" defaultValue="None">Message when the check fails.</Property>
+  <Property name="details" type="dict[str, Any] | None" defaultValue="None">Details attached to the result. `None` becomes `{}`.</Property>
+</MethodCard>
+
+```python
+from giskard.checks import from_fn
+
+check = from_fn(
+    lambda trace: trace.last is not None and bool(trace.last.outputs),
+    name="has_output",
+)
+```
+
+The returned object is an `FnCheck`, so the serialization caveat above applies to it too.
 
 </ResourceSection>
 
@@ -85,13 +133,13 @@ Reach for `FnCheck` when the pass condition is a predicate you can already write
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="keyword" type="str | None">
-  Substring to search for (or use `keyword_key` to extract from trace).
+<Property name="keyword" type="str | MISSING" defaultValue="MISSING">
+  Substring to search for. Left at `MISSING`, the check reads `keyword_key`.
 </Property>
-<Property name="keyword_key" type="str | None">
-  JSONPath to extract keyword from trace.
+<Property name="keyword_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+  JSONPath to extract the keyword from the trace.
 </Property>
-<Property name="text" type="str | None">Static text to search in. If unset, the check uses `target_key`.</Property>
+<Property name="text" type="str | MISSING" defaultValue="MISSING">Static text to search in. Left at `MISSING`, the check reads `target_key`.</Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to search in.
 </Property>
@@ -100,15 +148,17 @@ Reach for `FnCheck` when the pass condition is a predicate you can already write
   Whether matching is case-sensitive.
 </Property>
 
-Require the wording compliance signed off on whenever the agent touches a savings product:
+Require an exact phrase, such as a disclaimer your legal team signed off on:
 
 ```python
 from giskard.checks import StringMatching
 
-check = StringMatching(keyword="success", target_key="trace.last.outputs")
+status_is_success = StringMatching(
+    keyword="success", target_key="trace.last.outputs"
+)
 
 # Case-insensitive
-check = StringMatching(
+carries_disclaimer = StringMatching(
     keyword="this is not financial advice",
     target_key="trace.last.outputs.answer",
     case_sensitive=False,
@@ -125,11 +175,11 @@ Use `StringMatching` when a specific phrase is required, such as a disclaimer yo
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="pattern" type="str | None">
+<Property name="pattern" type="str | MISSING" defaultValue="MISSING">
   Regular expression pattern.
 </Property>
-<Property name="pattern_key" type="str | None">JSONPath to extract the regex pattern from the trace. Provide exactly one of `pattern` or `pattern_key`.</Property>
-<Property name="text" type="str | None">Static text to match against (alternative to `target_key`).</Property>
+<Property name="pattern_key" type="JSONPathStr | MISSING" defaultValue="MISSING">JSONPath to extract the regex pattern from the trace. Provide exactly one of `pattern` or `pattern_key`.</Property>
+<Property name="text" type="str | MISSING" defaultValue="MISSING">Static text to match against. Left at `MISSING`, the check reads `target_key`.</Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to match against.
 </Property>
@@ -162,43 +212,44 @@ Validate numeric and comparable values against expected thresholds.
 
 **Module:** `giskard.checks.builtin.comparison`
 
-All comparison checks share these parameters:
+The six comparison checks take the same four fields, listed in full under each one. Provide exactly one of `expected_value` or `expected_value_key`; leaving both at `MISSING` makes the check error at run time because it has nothing to compare against.
 
-<Property name="expected_value" type="Any | None">
-  Static expected value.
-</Property>
-<Property name="expected_value_key" type="JSONPathStr | NotProvided">
-  JSONPath to extract expected value from trace.
-</Property>
-<Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
-  JSONPath to extract the target value from the trace.
-</Property>
-<Property name="normalization_form" type="str | None" defaultValue='"NFKC"'>
-  Unicode normalization: `"NFC"`, `"NFD"`, `"NFKC"`, `"NFKD"`.
-</Property>
-<Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
-  How to apply the comparison when the resolved value is a list, set, or tuple.
-  Omit it to compare the resolved value directly. `"any"` passes when at least one
-  item matches, `"all"` when every item does, `"none"` when no item does.
-</Property>
+`match` decides what happens when `target_key` resolves to several values, which any wildcard or slice path does — see [Multi-match paths](/oss/checks/explanation/jsonpath-in-checks#multi-match-paths).
 
-Provide exactly one of `expected_value` or `expected_value_key`.
+**Raises:** `ValidationError` at construction when `expected_value_key` or `target_key` does not start with `trace.`. `CheckResult.error` (not a failure) at run time when a path resolves to nothing, or when the two values are not comparable — for example `LessThan` against a string.
 
 ### `Equals`
 
-Check that extracted values equal an expected value.
+Check that the extracted value equals an expected value.
+
+<TypeTable name="Equals">
+  <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
+    Static expected value.
+  </Property>
+  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+    JSONPath to the expected value in the trace.
+  </Property>
+  <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
+    JSONPath to the value being checked.
+  </Property>
+  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+    Unicode normalization applied to both sides before comparing.
+  </Property>
+  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+    How to apply the comparison when the resolved value is a list, set, or tuple.
+    Omit it to compare the resolved value directly. `"any"` passes when at least
+    one item matches, `"all"` when every item does, `"none"` when no item does.
+  </Property>
+</TypeTable>
 
 The agent classifies each request before answering it. Assert on the classification field, not on the sentence around it:
 
 ```python
 from giskard.checks import Equals
 
-check = Equals(expected_value=42, target_key="trace.last.outputs.count")
-check = Equals(expected_value="success", target_key="trace.last.outputs.status")
-
-# Compare against another trace value
-check = Equals(
-    expected_value="balance_enquiry", target_key="trace.last.outputs.intent"
+count_is_42 = Equals(expected_value=42, target_key="trace.last.outputs.count")
+status_is_success = Equals(
+    expected_value="success", target_key="trace.last.outputs.status"
 )
 ```
 
@@ -207,7 +258,7 @@ Use `Equals` on values your agent produces as data: labels, enums, identifiers, 
 `expected_value_key` compares two points in the same trace. Ask the same question twice and require the same classification:
 
 ```python
-check = Equals(
+intent_is_stable = Equals(
     expected_value_key="trace.interactions[0].outputs.intent",
     target_key="trace.last.outputs.intent",
 )
@@ -215,41 +266,152 @@ check = Equals(
 
 ### `NotEquals`
 
-Check that extracted values do **not** equal an expected value.
+Check that the extracted value does **not** equal an expected value.
+
+<TypeTable name="NotEquals">
+  <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
+    Static value the target must differ from.
+  </Property>
+  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+    JSONPath to that value in the trace.
+  </Property>
+  <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
+    JSONPath to the value being checked.
+  </Property>
+  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+    Unicode normalization applied to both sides before comparing.
+  </Property>
+  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+    How to apply the comparison over a resolved list, set, or tuple.
+  </Property>
+</TypeTable>
 
 ```python
 from giskard.checks import NotEquals
 
-check = NotEquals(
+not_investment_advice = NotEquals(
     expected_value="investment_advice", target_key="trace.last.outputs.intent"
 )
 ```
 
 Use `NotEquals` for a single forbidden value. To forbid a condition expressed by another check, wrap that check in [`Not`](#not).
 
-### `GreaterThan` / `GreaterThanEquals`
+### `GreaterThan`
 
-Guard the retrieval quality and the sourcing of the agent's answers:
+Check that the extracted value is strictly greater than the expected value.
+
+<TypeTable name="GreaterThan">
+  <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
+    Static lower bound, exclusive.
+  </Property>
+  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+    JSONPath to that bound in the trace.
+  </Property>
+  <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
+    JSONPath to the value being checked.
+  </Property>
+  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+    Unicode normalization applied before comparing.
+  </Property>
+  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+    How to apply the comparison over a resolved list, set, or tuple.
+  </Property>
+</TypeTable>
 
 ```python
-from giskard.checks import GreaterThan, GreaterThanEquals
+from giskard.checks import GreaterThan
 
-check = GreaterThan(
+retrieval_is_confident = GreaterThan(
     expected_value=0.8, target_key="trace.last.metadata.retrieval_score"
 )
-check = GreaterThanEquals(
-    expected_value=1, target_key="trace.last.metadata.citation_count"
-)
-check = GreaterThanEquals(expected_value=100, target_key="trace.last.outputs.user_count")
 ```
 
-### `LessThan` / `LessThanEquals`
+### `GreaterThanEquals`
+
+Check that the extracted value is greater than or equal to the expected value.
+
+<TypeTable name="GreaterThanEquals">
+  <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
+    Static lower bound, inclusive.
+  </Property>
+  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+    JSONPath to that bound in the trace.
+  </Property>
+  <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
+    JSONPath to the value being checked.
+  </Property>
+  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+    Unicode normalization applied before comparing.
+  </Property>
+  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+    How to apply the comparison over a resolved list, set, or tuple.
+  </Property>
+</TypeTable>
 
 ```python
-from giskard.checks import LessThan, LessThanEquals
+from giskard.checks import GreaterThanEquals
 
-check = LessThan(expected_value=2000, target_key="trace.last.metadata.latency_ms")
-check = LessThanEquals(
+cites_a_source = GreaterThanEquals(
+    expected_value=1, target_key="trace.last.metadata.citation_count"
+)
+```
+
+### `LessThan`
+
+Check that the extracted value is strictly less than the expected value.
+
+<TypeTable name="LessThan">
+  <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
+    Static upper bound, exclusive.
+  </Property>
+  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+    JSONPath to that bound in the trace.
+  </Property>
+  <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
+    JSONPath to the value being checked.
+  </Property>
+  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+    Unicode normalization applied before comparing.
+  </Property>
+  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+    How to apply the comparison over a resolved list, set, or tuple.
+  </Property>
+</TypeTable>
+
+```python
+from giskard.checks import LessThan
+
+answers_in_time = LessThan(
+    expected_value=2000, target_key="trace.last.metadata.latency_ms"
+)
+```
+
+### `LessThanEquals`
+
+Check that the extracted value is less than or equal to the expected value.
+
+<TypeTable name="LessThanEquals">
+  <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
+    Static upper bound, inclusive.
+  </Property>
+  <Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
+    JSONPath to that bound in the trace.
+  </Property>
+  <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
+    JSONPath to the value being checked.
+  </Property>
+  <Property name="normalization_form" type='Literal["NFC", "NFD", "NFKC", "NFKD"] | None' defaultValue='"NFKC"'>
+    Unicode normalization applied before comparing.
+  </Property>
+  <Property name="match" type='Literal["any", "all", "none"] | MISSING' defaultValue="MISSING">
+    How to apply the comparison over a resolved list, set, or tuple.
+  </Property>
+</TypeTable>
+
+```python
+from giskard.checks import LessThanEquals
+
+stays_within_budget = LessThanEquals(
     expected_value=400, target_key="trace.last.metadata.output_tokens"
 )
 ```
@@ -302,6 +464,8 @@ check = JsonValid(
 ```
 
 Keep the default `parse=True` for JSON returned as text.
+
+**Raises:** `CheckResult.error` when `parse=True` and the resolved value is not a string.
 
 Use `JsonValid` when the agent is asked to produce machine-readable output and a downstream system will parse it. It says nothing about whether the content is correct, so pair it with a judge.
 
@@ -359,6 +523,8 @@ allow if {
 )
 ```
 
+**Raises:** `ValidationError` at construction when the `regorus` extra is not installed. `CheckResult.error` at run time when the rule evaluates to a non-boolean; an undefined rule is a failure, not an error.
+
 Use `RegoPolicy` when the rule already exists as policy elsewhere in your stack and you want one source of truth. For a one-off condition, [`FnCheck`](#fncheck) is less machinery.
 
 </ResourceSection>
@@ -371,11 +537,13 @@ Combine built-in or custom checks with logical operators. All composition checks
 
 ### `AllOf`
 
-<ResourceSection description="Passes only when all inner checks pass. Short-circuits on the first failure or error.">
+<ResourceSection description="Passes only when all inner checks pass. Short-circuits on the first failure or error; a skipped inner check does not stop evaluation.">
 
 <Property name="checks" type="list[Check]" required>
   Ordered list of checks to evaluate. All must pass.
 </Property>
+
+`AllOf` runs its checks in order and returns the first result that is neither a pass nor a skip, so a FAIL or an ERROR stops it. A skipped inner check is not a failure and evaluation continues past it. If **every** inner check skipped, the result is `CheckResult.skip("All checks were skipped.")` — a skip, not a pass, so an `AllOf` whose members all opted out cannot be mistaken for a green verdict.
 
 A balance answer counts as good only if the customer was authenticated and the figure was sourced:
 
@@ -400,11 +568,13 @@ Adding the same checks separately with `.check()` gives you a verdict per check,
 
 ### `AnyOf`
 
-<ResourceSection description="Passes when at least one inner check passes. Short-circuits on the first pass.">
+<ResourceSection description="Passes when at least one inner check passes. Short-circuits on the first pass or error.">
 
 <Property name="checks" type="list[Check]" required>
   Ordered list of checks to evaluate. At least one must pass.
 </Property>
+
+`AnyOf` returns the first result that passes **or errors** — an erroring inner check is surfaced immediately rather than being treated as one more failed alternative, so a broken check cannot hide behind a later passing one. If every inner check skipped, the result is `CheckResult.skip("No checks passed and all were skipped.")`.
 
 Faced with a disputed card payment, the agent may either open the dispute or ask for the details it still needs. Both are acceptable; closing the case unprompted is not:
 
@@ -424,7 +594,7 @@ check = AnyOf(
 )
 ```
 
-`AnyOf` runs checks in order and stops at the first pass or error. Put cheap known cases first, then use a judge as a fallback when needed. For "one item in a list matches", use the comparison checks' `match="any"`.
+Put cheap known cases first, then use a judge as a fallback when needed. For "one item in a list matches", use the comparison checks' `match="any"` instead.
 
 </ResourceSection>
 
@@ -456,9 +626,9 @@ check = Not(
 
 ---
 
-## LLM-based Checks
+## LLM judges
 
-Validation checks powered by Large Language Models for semantic understanding. An LLM judge is another model reading the transcript and returning a verdict. It can be wrong in both directions: read failures before you act, and do not treat a passing suite as proof the agent is safe.
+Validation checks powered by Large Language Models for semantic understanding. Each verdict costs one LLM call. An LLM judge is another model reading the transcript and returning a verdict. It can be wrong in both directions: read failures before you act, and do not treat a passing suite as proof the agent is safe.
 
 ### `BaseLLMCheck`
 
@@ -467,7 +637,7 @@ Validation checks powered by Large Language Models for semantic understanding. A
 **Module:** `giskard.checks.judges.base`
 
 <TypeTable name="BaseLLMCheck">
-  <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+  <Property name="generator" type="BaseGenerator | None" defaultValue="None">
     LLM generator for evaluation. Falls back to the global default if not
     provided.
   </Property>
@@ -549,14 +719,14 @@ Default result model for LLM-based checks. This is the structured output format 
 
 **Module:** `giskard.checks.judges.groundedness`
 
-<Property name="answer" type="str | None">
-  The answer text to evaluate (static).
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
+  The answer text to evaluate (static). Left at `MISSING`, the check reads `target_key`.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract answer from trace.
 </Property>
-<Property name="context" type="str | list[str] | None">
-  Context document(s) that should support the answer (static).
+<Property name="context" type="str | list[str] | MISSING" defaultValue="MISSING">
+  Context document(s) that should support the answer (static). Left at `MISSING`, the check reads `context_key`.
 </Property>
 <Property
   name="context_key"
@@ -565,7 +735,7 @@ Default result model for LLM-based checks. This is the structured output format 
 >
   JSONPath to extract context from trace.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
   LLM generator for evaluation.
 </Property>
 
@@ -591,6 +761,8 @@ check = Groundedness(
 )
 ```
 
+**Raises:** `CheckResult.error` when neither the static field nor its `*_key` path yields a value, and when the provider call fails.
+
 Use `Groundedness` when every claim must be supported by the context. Use [`Contradiction`](#contradiction) when you only need to catch conflicts.
 
 </ResourceSection>
@@ -603,14 +775,14 @@ Use `Groundedness` when every claim must be supported by the context. Use [`Cont
 
 **Module:** `giskard.checks.judges.contradiction`
 
-<Property name="answer" type="str | MISSING">
-  The answer text to evaluate (static).
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
+  The answer text to evaluate (static). Left at `MISSING`, the check reads `target_key`.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the answer from the trace.
 </Property>
-<Property name="context" type="str | list[str] | MISSING">
-  Context document(s) the answer is checked against (static).
+<Property name="context" type="str | list[str] | MISSING" defaultValue="MISSING">
+  Context document(s) the answer is checked against (static). Left at `MISSING`, the check reads `context_key`.
 </Property>
 <Property
   name="context_key"
@@ -619,7 +791,7 @@ Use `Groundedness` when every claim must be supported by the context. Use [`Cont
 >
   JSONPath to extract context from the trace.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
   LLM generator for evaluation.
 </Property>
 
@@ -644,14 +816,14 @@ Uses the same inputs as [`Groundedness`](#groundedness), but only reports a conf
 
 **Module:** `giskard.checks.judges.answer_relevance`
 
-<Property name="question" type="str | None" defaultValue="None">
-  Question to evaluate against. Takes priority over `question_key` when set.
+<Property name="question" type="str | MISSING" defaultValue="MISSING">
+  Question to evaluate against. Left at `MISSING`, the check reads `question_key`.
 </Property>
 <Property name="question_key" type="str" defaultValue='"trace.last.inputs"'>
   JSONPath to extract the question from the trace.
 </Property>
-<Property name="answer" type="str | None" defaultValue="None">
-  Answer to evaluate. Takes priority over `target_key` when set.
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
+  Answer to evaluate. Left at `MISSING`, the check reads `target_key`.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the answer from the trace.
@@ -663,7 +835,7 @@ Uses the same inputs as [`Groundedness`](#groundedness), but only reports a conf
   Whether earlier interactions are shown to the judge as context. Turn it off to
   score the last turn in isolation.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
   LLM generator for evaluation (falls back to default).
 </Property>
 
@@ -702,8 +874,8 @@ scenario = (
 
 **Module:** `giskard.checks.judges.toxicity`
 
-<Property name="output" type="str | None" defaultValue="None">
-  Text to evaluate. If omitted, extracted from the trace using `target_key`.
+<Property name="output" type="str | MISSING" defaultValue="MISSING">
+  Text to evaluate. Left at `MISSING`, the check reads `target_key`.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the output from the trace.
@@ -713,7 +885,7 @@ scenario = (
   `ToxicityCategory` is a `Literal` over exactly those six values; any other
   string raises a `ValidationError` when you construct the check.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
   LLM generator for evaluation (falls back to default).
 </Property>
 
@@ -747,7 +919,7 @@ Narrowing `categories` focuses the judge on what you actually care about and cut
 <Property name="rule" type="str" required>
   The rule statement to evaluate against the trace (literal text).
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
   LLM generator for evaluation (falls back to default).
 </Property>
 
@@ -790,7 +962,7 @@ Use `Conformity` for a policy you can state as a rule. If the rule keeps growing
 <Property name="prompt_path" type="str | None">
   Path to a template file (e.g. `"checks::my_template.j2"`).
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
   LLM generator for evaluation.
 </Property>
 
@@ -838,11 +1010,17 @@ check = LLMJudge(
 )
 ```
 
+**Raises:** `ValidationError` at construction unless exactly one of `prompt` or `prompt_path` is set. `CheckResult.error` at run time when the provider call fails or the model returns a blank `reason`.
+
 Reach for `LLMJudge` last. If the criterion fits [`Conformity`](#conformity), [`Groundedness`](#groundedness), or a rule-based check, those are cheaper, and the rule-based ones do not vary between runs.
 
 </ResourceSection>
 
 ---
+
+## Embedding-based checks
+
+No judge, but not free either: these call an embeddings API, so they need a configured provider and a key.
 
 ### `SemanticSimilarity`
 
@@ -850,8 +1028,8 @@ Reach for `LLMJudge` last. If the criterion fits [`Conformity`](#conformity), [`
 
 **Module:** `giskard.checks.builtin.semantic_similarity`
 
-<Property name="reference_text" type="str | None">
-  Reference text to compare against (static).
+<Property name="reference_text" type="str | MISSING" defaultValue="MISSING">
+  Reference text to compare against (static). Left at `MISSING`, the check reads `reference_text_key`.
 </Property>
 <Property
   name="reference_text_key"
@@ -870,7 +1048,7 @@ Reach for `LLMJudge` last. If the criterion fits [`Conformity`](#conformity), [`
 <Property name="threshold" type="float" defaultValue="0.95">
   Similarity threshold (0.0 to 1.0).
 </Property>
-<Property name="embedding_model" type="BaseEmbeddingModel" defaultValue="get_default_embedding_model()">Embedding model used to compute similarity scores.</Property>
+<Property name="embedding_model" type="BaseEmbeddingModel | None" defaultValue="None">Embedding model used to compute similarity scores. `None` falls back to the global default.</Property>
 
 The agent rewords the dispute procedure every run, but the procedure itself must not drift:
 
@@ -889,6 +1067,10 @@ Use it when phrasing varies but meaning must not. The default `threshold` of 0.9
 </ResourceSection>
 
 ---
+
+## Text metrics
+
+Deterministic, local, and free — no provider involved.
 
 ### `Readability`
 
@@ -928,6 +1110,8 @@ check = Readability(
 ```
 
 Readability scores measure sentence and word length, not clarity. A reply can score well and still be wrong, so pair it with a check on the content.
+
+**Raises:** `ValidationError` at construction when `min_score > max_score`, and when the optional `textstat` dependency is not installed.
 
 </ResourceSection>
 
@@ -1004,60 +1188,29 @@ A low temperature makes verdicts steadier across runs, but does not make them de
 
 ### Creating custom checks
 
-Register a check when the same domain rule appears in several suites and you want it saved with them. This one enforces that the agent only quotes fees that appear in the published schedule:
+Subclass `Check`, implement `async def run(self, trace) -> CheckResult`, and register the subclass with `@Check.register("kind")` so it survives serialization:
 
 ```python
 from giskard.checks import Check, CheckResult, Trace
 
-PUBLISHED_FEES = {
-    "current_account_monthly": 3.00,
-    "card_replacement": 0.00,
-    "sepa_transfer": 0.00,
-}
-
 
 @Check.register("quotes_published_fee")
 class QuotesPublishedFee(Check):
-    published_fees: dict[str, float] = PUBLISHED_FEES
-    min_retrieval_score: float = 0.7
+    published_fees: dict[str, float]
 
     async def run(self, trace: Trace) -> CheckResult:
         if trace.last is None:
             return CheckResult.skip(message="No interaction to check")
-        output = trace.last.outputs
-        fee_code = output.get("fee_code")
-        quoted = output.get("fee_eur")
-        score = output.get("retrieval_score", 0)
-
-        if fee_code not in self.published_fees:
-            return CheckResult.failure(
-                message=f"Quoted a fee that is not in the schedule: {fee_code}",
-                details={
-                    "fee_code": fee_code,
-                    "published": sorted(self.published_fees),
-                },
-            )
-
-        if quoted != self.published_fees[fee_code]:
-            return CheckResult.failure(
-                message=f"Quoted {quoted} for {fee_code}, schedule says {self.published_fees[fee_code]}",
-            )
-
-        if score < self.min_retrieval_score:
-            return CheckResult.failure(
-                message=f"Retrieval score {score} below {self.min_retrieval_score}",
-            )
-
-        return CheckResult.success(message=f"Quoted the published {fee_code} fee")
-
-
-check = QuotesPublishedFee(min_retrieval_score=0.85)
+        return CheckResult.success(message="Quoted a published fee")
 ```
+
+Fields are ordinary Pydantic fields, and `extra="forbid"` applies to your subclass too. For the full walkthrough — registration, metrics, composing several checks, and when to prefer [`FnCheck`](#fncheck) — see [Custom checks](/oss/checks/how-to/custom-checks).
+
 
 ---
 
 ## See also
 
-- [When to use which check](/oss/checks/explanation/when-to-use-which-check) -- Cost, latency, and reliability tradeoffs between check families
-- [Core API](/oss/checks/reference/core) -- Base classes and fundamental types
-- [Scenarios](/oss/checks/reference/scenarios) -- Multi-step workflow testing
+- [When to use which check](/oss/checks/explanation/when-to-use-which-check) — Cost, latency, and reliability tradeoffs between check families
+- [Core API](/oss/checks/reference/core) — Base classes and fundamental types
+- [Scenarios](/oss/checks/reference/scenarios) — Multi-step workflow testing

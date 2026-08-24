@@ -13,7 +13,7 @@ Entry points of the `giskard.scan` package: the two ready-made scans, the lower-
 
 This page assumes you have run a scan. If not, start with [Your First Scan](/oss/scan/tutorials/your-first-scan), and read [How the scan works](/oss/scan/explanation/how-scan-works) for what a generator, a suite, and the judge actually do.
 
-The examples call `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/scan/how-to/wrap-your-agent). The tutorial uses a garden-center assistant instead, because it runs live against a model.
+The examples call `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/scan/how-to/wrap-your-agent).
 
 ```python
 from giskard.scan import (
@@ -50,7 +50,7 @@ Build a suite from the vulnerability generator registry, run it against the targ
     BCP-47 language codes the agent is expected to handle (e.g. `["en", "fr"]`).
   </Property>
   <Property name="max_scenarios" type="int | None" defaultValue="None">
-    Total upper bound on scenarios across all vulnerability generators. `None` lets each generator apply its own default, so seven generators each contribute scenarios and the run is large. Set it low and the budget is spread thin, so some attack types get no scenarios at all and go untested. Keep it small while iterating, raise it before you trust the result.
+    Total upper bound on scenarios across all vulnerability generators. `None` lets each generator apply its own default, so seven generators each contribute scenarios and the run is large: expect 100+ scenarios, each costing one call to your agent and one to the judge, and several minutes of wall time. Set it low and the budget is spread thin, so some attack types get no scenarios at all and go untested. Keep it around 20 while iterating, raise it before you trust the result.
   </Property>
   <Property name="seed" type="int" defaultValue="42">
     Integer seed used for reproducible scenario generation. Two runs with different seeds generate different scenarios, so their pass rates are not comparable.
@@ -437,8 +437,6 @@ type ScanTool = Literal["giskard", "garak", "deepteam"]
 ```
 
 `"giskard"` is valid only for `list_scan_items`; `third_party_scan` accepts `"garak"` and `"deepteam"`.
-
-The `third_party_scan` annotation also lists `"lidar"`, a private Giskard package that is not a supported public integration.
 
 ---
 

@@ -36,7 +36,7 @@ You have two ways to drive this. Which one you want depends on whether you need 
 - **Generate and run in one call.** `vulnerability_scan` (or `quality_scan`) walks the whole chain: it generates the suite, runs it against your agent, prints the grouped report, and hands back a `SuiteResult`. This is what you want while you are exploring.
 - **Generate first, run later.** `generate_suite` stops after the suite. You get a `Suite` object you can inspect, edit, save to disk, and run whenever you like with `suite.run(target=...)`.
 
-The examples below run against `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/scan/how-to/wrap-your-agent). The tutorial uses a garden-center assistant instead, because it runs live against a model:
+The examples below run against `support_agent`, the retail-bank support agent wrapped in [Wrap your agent](/oss/scan/how-to/wrap-your-agent):
 
 ```python
 from agent import bank_agent as support_agent

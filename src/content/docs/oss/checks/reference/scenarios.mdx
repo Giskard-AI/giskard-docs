@@ -17,28 +17,48 @@ Multi-step workflow testing with scenario builders and runners.
 
 **Module:** `giskard.checks.core.scenario`
 
-Create a scenario, add interactions and checks, then call `.run()`. Each method returns the same scenario. Use `.extend()` to add existing specs or checks, or pass the scenario to `Suite.append()`.
+This is the canonical page for `Scenario`. Create one, add interactions and checks, then call `.run()`. Every builder method returns the same scenario, so they chain.
+
+A scenario is a list of **steps**. A step is a group of interaction specs followed by the checks that validate them. `.interact()` appends to the current step, or opens a new one if the current step already has checks; `.check()` adds to the current step. Steps run in order against a shared trace and execution stops at the first step that does not pass — see [Core concepts](/oss/checks/explanation/core-concepts).
+
+### Constructor
 
 <MethodCard name="Scenario()" returnType="Scenario">
-  Create a new scenario.
+  Create a new scenario. Every field is also settable after construction, most of them through a `with_*` method.
 
-  <Property name="name" type="str" defaultValue="Unnamed Scenario">Scenario name for identification. Pass the first argument positionally as in <code>Scenario("my_name")</code>.</Property>
-  <Property name="trace_type" type="type[TraceType] | None" defaultValue="None">Optional custom trace type for advanced use cases.</Property>
+  <Property name="name" type="str" defaultValue='"Unnamed Scenario"'>Scenario name for identification. Pass the first argument positionally as in <code>Scenario("my_name")</code>.</Property>
+  <Property name="steps" type="list[Step]" defaultValue="[]">Pre-built steps. The fluent methods append to this list for you; pass it directly only when you are constructing a scenario programmatically.</Property>
+  <Property name="trace_type" type="type[TraceType] | None" defaultValue="None">Custom `Trace` subclass to use. Inferred from the components when `None`.</Property>
+  <Property name="annotations" type="dict[str, Any]" defaultValue="{}">Key-value pairs merged into the trace at run start and readable as `trace.annotations`.</Property>
+  <Property name="target" type="Target | MISSING" defaultValue="MISSING">Default system under test, used for every interaction whose `outputs` is `MISSING`.</Property>
   <Property name="multiple_runs" type="int" defaultValue="1">Default cap on full scenario executions when <code>run()</code> is called without <code>multiple_runs=...</code>. Must be ≥ 1.</Property>
+  <Property name="tags" type="list[str]" defaultValue="[]">Flat `"Key:Value"` labels used for grouping results and for Hub upload. A tag without a `:` is a bare boolean label.</Property>
 </MethodCard>
+
+:::note[Unknown fields are accepted, then dropped]
+Unlike `Check`, `Scenario` does not set `extra="forbid"`, so a misspelled constructor keyword raises nothing and is silently discarded. Scenario metadata that has to survive belongs in `annotations`. See [Errors](/oss/checks/reference/core#errors) for why the two classes differ.
+:::
+
+### Builder methods
 
 <MethodCard name=".interact()" returnType="self">
   Add an interaction to the scenario. Returns self for chaining.
 
-  <Property name="inputs" type="value | Callable" required>Static value or callable `(trace) -> value`.</Property>
-  <Property name="outputs" type="value | Callable">Static value, callable `(inputs) -> value`, or `(trace, inputs) -> value`. Optional when the scenario / suite has a `target`.</Property>
-  <Property name="metadata" type="dict | None">Optional metadata dictionary.</Property>
+  <Property name="inputs" type="value | Callable | InputGenerator" required>Static value, callable `(trace) -> value`, generator, or an `InputGenerator`. A single generator can yield several turns.</Property>
+  <Property name="outputs" type="Target | MISSING" defaultValue="MISSING">Static value, callable `(inputs) -> value`, or `(inputs, trace) -> value`. Left at `MISSING`, the scenario, suite, or run target is used.</Property>
+  <Property name="metadata" type="dict | None" defaultValue="None">Optional metadata dictionary, copied onto every interaction the spec produces.</Property>
 </MethodCard>
 
 <MethodCard name=".check()" returnType="self">
-  Add a validation check to the scenario. Returns self for chaining.
+  Add one validation check to the current step. Returns self for chaining.
 
   <Property name="check" type="Check" required>A Check instance to validate the trace.</Property>
+</MethodCard>
+
+<MethodCard name=".checks()" returnType="self">
+  Add several checks to the current step at once. This is the variadic form of `.check()` — reach for it when your checks come from a list or a factory function.
+
+  <Property name="*checks" type="Check" required>Check instances to add, in order.</Property>
 </MethodCard>
 
 <MethodCard name=".add_interaction()" returnType="self">
@@ -47,19 +67,93 @@ Create a scenario, add interactions and checks, then call `.run()`. Each method 
   <Property name="interaction" type="InteractionSpec" required>The interaction spec to add.</Property>
 </MethodCard>
 
+<MethodCard name=".add_interactions()" returnType="self">
+  Add several pre-constructed interaction specs to the same step.
+
+  <Property name="*interactions" type="InteractionSpec" required>The interaction specs to add, in order.</Property>
+</MethodCard>
+
+<MethodCard name=".append()" returnType="self">
+  Add one component of either kind. Dispatches to `.check()` for a `Check` and to `.add_interaction()` for an interaction spec, which is useful when you are iterating over a mixed list.
+
+  <Property name="component" type="InteractionSpec | Check" required>The component to append.</Property>
+</MethodCard>
+
 <MethodCard name=".extend()" returnType="self">
-  Append one or more interaction specs and/or checks. Returns self for chaining.
+  Append one or more interaction specs and/or checks, in order. Calls `.append()` for each.
 
   <Property name="*components" type="InteractionSpec | Check" required>Components to append in order.</Property>
 </MethodCard>
 
-<MethodCard name=".run()" returnType="ScenarioResult">
+<MethodCard name=".with_target()" returnType="self">
+  Set the default system under test. Every interaction whose `outputs` is `MISSING` calls it. This is how you bind an agent once instead of repeating `outputs=` on each `.interact()`.
+
+  <Property name="target" type="Target" required>Callable producing outputs from inputs, and optionally the trace. See [`Target`](/oss/checks/reference/core#target).</Property>
+</MethodCard>
+
+<MethodCard name=".with_annotations()" returnType="self">
+  Replace the scenario's annotations. They are merged into the trace at run start and are readable as `trace.annotations` from checks and callables, so shared context does not have to be attached to every interaction.
+
+  <Property name="annotations" type="dict[str, Any]" required>Key-value pairs to expose on the trace.</Property>
+</MethodCard>
+
+<MethodCard name=".with_tags()" returnType="self">
+  Replace the scenario's tags. Tags are flat `"Key:Value"` strings; a tag without a `:` is a bare label. They are copied onto `ScenarioResult.tags` and are what [`SuiteResult.group_by()`](#grouping-results-by-tag) slices on.
+
+  <Property name="tags" type="list[str]" required>The tags to set.</Property>
+</MethodCard>
+
+<MethodCard name="async .run()" returnType="ScenarioResult">
   Execute the scenario against the SUT and return results.
 
-  <Property name="target" type="Callable | None" defaultValue="None">Override the scenario's default target system-under-test for this run.</Property>
-  <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
+  <Property name="target" type="Target | MISSING" defaultValue="MISSING">Override the scenario's default target for this run. Left at `MISSING`, the scenario's own `target` is used.</Property>
+  <Property name="return_exception" type="bool" defaultValue="False">If True, exceptions become `CheckResult.error` entries and a `TestCaseError` on the step instead of propagating.</Property>
   <Property name="multiple_runs" type="int | None" defaultValue="None">When set, overrides the scenario’s `multiple_runs` field: maximum full scenario executions (fresh trace each time). Each run must pass for the next to run; stops on the first FAIL, ERROR, or SKIP. Not a retry-until-success loop.</Property>
 </MethodCard>
+
+**Raises:** `InteractionGenerationError`'s underlying cause when a spec fails partway through and `return_exception` is `False`. Pass `return_exception=True` to get a result back instead, or catch it and read [`.partial_trace`](/oss/checks/reference/core#exceptions).
+
+### Binding a target
+
+`outputs` on an interaction is optional **only** when a target is bound, either on the scenario, on the suite, or on the `run()` call. Without one, generation raises `ValueError: Interaction outputs are not provided and no target was bound.`
+
+```python
+from giskard.checks import Scenario, StringMatching
+
+
+async def my_agent(inputs: str) -> str:
+    return f"Received: {inputs}"
+
+
+async def my_other_agent(inputs: str) -> str:
+    return f"Received (v2): {inputs}"
+
+
+scenario = (
+    Scenario("bound_target")
+    .with_target(my_agent)
+    .with_tags(["Category:Smoke", "Owner:platform"])
+    .interact(inputs="Hello")  # no outputs= needed
+    .checks(
+        StringMatching(keyword="Received", target_key="trace.last.outputs"),
+        StringMatching(keyword="Hello", target_key="trace.last.outputs"),
+    )
+)
+
+result = await scenario.run()
+result = await scenario.run(target=my_other_agent)  # compare two implementations
+```
+
+### Repeating a scenario
+
+`multiple_runs` re-runs the whole scenario with a fresh trace each time, which is the built-in answer to a flaky agent or a flaky judge:
+
+```python
+result = await scenario.run(multiple_runs=5)
+print(f"{result.runs_executed} of {result.multiple_runs} runs executed")
+```
+
+Every run must pass for the next to start, and execution stops on the first run that comes back FAIL, ERROR, or SKIP. It raises the bar rather than lowering it — this is **not** a retry-until-one-success mode. The returned `ScenarioResult` describes the last run executed.
 
 ### Multi-step example
 
@@ -170,7 +264,16 @@ Result of scenario execution with trace and check results.
   <Property name="runs_executed" type="int">
     How many full scenario executions ran before stopping (at most `multiple_runs`).
   </Property>
+  <Property name="tags" type="list[str]">
+    Snapshot of the scenario's tags at run time. `SuiteResult.group_by()` reads these.
+  </Property>
+  <Property name="failures_and_errors" type="list[TestCaseResult]">
+    The steps that failed or errored. Skipped steps are excluded, so this is the
+    list to iterate in CI. Property, not a field.
+  </Property>
 </TypeTable>
+
+`status` is derived from the steps, in priority order: ERROR if any step errored, FAIL if any failed, SKIP if all were skipped, PASS otherwise. A scenario with **no steps at all** is PASS.
 
 <MethodCard name=".print_report()" returnType="None">
   Print the result to the terminal with Rich, including the trace and every check verdict. Inherited from `BaseResult`, so `CheckResult`, `TestCaseResult`, and `SuiteResult` all have it.
@@ -178,21 +281,39 @@ Result of scenario execution with trace and check results.
   <Property name="console" type="Console | None" defaultValue="None">Rich `Console` to print to. Defaults to a new one writing to stdout.</Property>
 </MethodCard>
 
-Using the `scenario` built above:
+### What a report looks like
+
+A two-step scenario where the first step fails. `print_report()` writes this to the terminal, in colour:
+
+```text
+─────────────────────────────── ❌ FAILED ────────────────────────────────
+mentions_currency       PASS
+cites_account   FAIL    The answer does not contain the keyword 'account
+ending'
+mentions_savings        SKIP
+───────────────────────────────── Trace ──────────────────────────────────
+───────────────────────────── Interaction 1 ──────────────────────────────
+Inputs: 'What is my balance?'
+Outputs: 'Your balance is 1,284.50 EUR.'
+─────────────────────── 2 steps in 4ms | runs: 1/1 ───────────────────────
+```
+
+Three things to read out of it. Each row is one check: its `name`, its status, and the reason a non-passing check gives. `mentions_savings` is SKIP rather than FAIL because it belongs to the second step, and the first step failed — the second interaction never ran, which is also why the trace shows one interaction and not two. The footer counts steps, not checks, and reports how many full runs executed.
+
+Reading the same result in code:
 
 ```python
 result = await scenario.run()
 result.print_report()
 
-if result.passed:
-    print("All checks passed!")
+for step in result.failures_and_errors:
+    for message in step.format_failures():
+        print(message)
+# cites_account FAILED: The answer does not contain the keyword 'account ending'
 
-print(f"Total interactions: {len(result.final_trace.interactions)}")
-
-for i, check_result in enumerate(
-    r for step in result.steps for r in step.results
-):
-    print(f"Check {i}: {check_result.status}")
+assert result.passed, [
+    m for step in result.failures_and_errors for m in step.format_failures()
+]
 ```
 
 ---
@@ -207,8 +328,12 @@ Group multiple scenarios and run them together.
   <Property name="name" type="str" required>
     Suite identifier.
   </Property>
-  <Property name="target" type="Callable">
-    Optional suite-level target SUT.
+  <Property name="scenarios" type="list[Scenario]" defaultValue="[]">
+    Scenarios in the suite. Pass them here to build a suite in one expression, or
+    add them afterwards with `.append()`.
+  </Property>
+  <Property name="target" type="Target | MISSING" defaultValue="MISSING">
+    Suite-level target SUT. It overrides any scenario-level target.
   </Property>
 </MethodCard>
 
@@ -218,15 +343,17 @@ Group multiple scenarios and run them together.
   <Property name="scenario" type="Scenario" required>The scenario to add.</Property>
 </MethodCard>
 
-<MethodCard name=".run()" returnType="SuiteResult">
+<MethodCard name="async .run()" returnType="SuiteResult">
   Run every scenario in the suite.
 
-  <Property name="target" type="Callable">Override target for this run. Overrides both the suite-level target and any scenario-level target.</Property>
+  <Property name="target" type="Target | MISSING" defaultValue="MISSING">Override target for this run. Overrides both the suite-level target and any scenario-level target.</Property>
   <Property name="return_exception" type="bool" defaultValue="False">Return results on exceptions.</Property>
   <Property name="parallel" type="bool" defaultValue="False">Run scenarios concurrently while preserving result order. The scan helpers pass `parallel=True`; `Suite.run` on its own is serial.</Property>
   <Property name="max_concurrency" type="int | None" defaultValue="None">Cap on concurrent scenarios when `parallel=True`. `None` starts them all at once, so your provider's rate limit becomes the real cap.</Property>
   <Property name="verbose" type="bool" defaultValue="True">Show a progress bar naming the running scenario. Set to `False` in CI.</Property>
 </MethodCard>
+
+**Raises:** `TypeError` when `max_concurrency` is neither `None` nor an `int` (a `bool` is rejected too), and `ValueError` when it is below 1. Both are validated before anything runs, and **even when `parallel=False`**, where the value has no effect on scheduling.
 
 Set the target once on the suite and leave `outputs` off each interaction:
 
@@ -290,13 +417,80 @@ Aggregate result from suite execution.
   <Property name="skipped_count" type="int">
     Number of scenarios that were skipped.
   </Property>
+  <Property name="recommendation" type="str | None">
+    Markdown-friendly guidance attached by scan or suite producers. `None` for a
+    suite you built yourself.
+  </Property>
+  <Property name="suite" type="Suite | None">
+    The `Suite` that produced this result. Excluded from serialization, so it is
+    `None` after a round-trip through JSON.
+  </Property>
+  <Property name="failures_and_errors" type="list[ScenarioResult]">
+    The scenarios that failed or errored, skipped ones excluded. Property, not a field.
+  </Property>
 </TypeTable>
 
+<MethodCard name=".print_report()" returnType="None">
+  Print the suite report with Rich: a dots overview, a panel per failing scenario, a summary, and the pass rate. Long runs are truncated to `GISKARD_CHECKS_MAX_REPORTED_FAILURES` entries.
+
+  <Property name="console" type="Console | None" defaultValue="None">Rich `Console` to print to.</Property>
+  <Property name="group_by" type="str | None" defaultValue="None">Tag key to group by. When set, a per-group pass-rate table is appended.</Property>
+</MethodCard>
+
 <MethodCard name=".to_junit_xml()" returnType="str">
-  Export the suite result as a JUnit XML string. Optionally write to a file.
+  Export the suite result as a JUnit XML string. Optionally write to a file. GitHub Actions, GitLab, Jenkins, and Buildkite all render this format natively.
 
   <Property name="path" type="str | Path | None" defaultValue="None">File path to write the XML to. Returns the XML string regardless.</Property>
 </MethodCard>
+
+<MethodCard name=".to_hub_format()" returnType="dict[str, Any]">
+  Convert the result into a JSON-serializable Giskard Hub payload, ready to pass to `HubClient.evaluations.upload`. Scenario tags are what align a suite with its Hub counterpart.
+</MethodCard>
+
+<MethodCard name=".group_by()" returnType="GroupedSuiteResult">
+  Group the scenario results by a tag key and compute per-group pass rates.
+
+  <Property name="key" type="str" required>The tag key to group on, for example `"Category"` for tags like `"Category:Hallucination"`.</Property>
+</MethodCard>
+
+```python
+result = await suite.run()
+
+result.to_junit_xml("reports/giskard.xml")
+result.print_report(group_by="Category")
+
+for name, stats in result.group_by("Category").groups.items():
+    print(name, stats.pass_rate, stats.total)
+```
+
+### Grouping results by tag
+
+`group_by()` slices a run by one tag key. A scenario carrying several tags with the same key lands in **each** matching bucket — a scenario testing two vulnerabilities affects both pass rates — so the bucket totals can add up to more than the number of scenarios. Scenarios with no tag for that key go into a `None` bucket, rendered as `(untagged)`.
+
+<TypeTable name="GroupedSuiteResult">
+  <Property name="suite_result" type="SuiteResult">
+    The result this grouping was computed from.
+  </Property>
+  <Property name="key" type="str">
+    The tag key that was grouped on.
+  </Property>
+  <Property name="groups" type="dict[str | None, GroupStats]">
+    One entry per tag value, plus `None` for untagged scenarios.
+  </Property>
+</TypeTable>
+
+<TypeTable name="GroupStats">
+  <Property name="name" type="str | None">
+    The tag value for this bucket, or `None` for untagged.
+  </Property>
+  <Property name="passed" type="int">Scenarios in this bucket that passed.</Property>
+  <Property name="failed" type="int">Scenarios that failed.</Property>
+  <Property name="errored" type="int">Scenarios that errored.</Property>
+  <Property name="skipped" type="int">Scenarios that were skipped.</Property>
+  <Property name="total" type="int">All four counts added together.</Property>
+  <Property name="non_skipped" type="int">`total` minus `skipped`; the pass-rate denominator.</Property>
+  <Property name="pass_rate" type="float | None">`passed / non_skipped`, or `None` when nothing in the bucket was evaluated.</Property>
+</TypeTable>
 
 ---
 
@@ -306,11 +500,11 @@ Aggregate result from suite execution.
 
 Low-level runner for executing scenarios. Most users should use `Scenario(...).run()` instead.
 
-<MethodCard name=".run()" returnType="ScenarioResult">
+<MethodCard name="async .run()" returnType="ScenarioResult">
   <Property name="scenario" type="Scenario" required>
     The scenario to execute.
   </Property>
-  <Property name="target" type="Callable | None" defaultValue="None">
+  <Property name="target" type="Target | MISSING" defaultValue="MISSING">
     Override the scenario's target SUT.
   </Property>
   <Property name="return_exception" type="bool" defaultValue="False">
@@ -322,13 +516,21 @@ Low-level runner for executing scenarios. Most users should use `Scenario(...).r
 </MethodCard>
 
 <MethodCard name="get_runner()" returnType="ScenarioRunner">
-  Get the default process-wide singleton runner instance.
+  Get the default process-wide singleton runner instance. `Scenario.run()` calls this for you.
 </MethodCard>
+
+```python
+from giskard.checks.scenarios.runner import get_runner
+
+result = await get_runner().run(scenario, target=my_agent)
+```
+
+Reach for the runner directly only when you need to run a `Scenario` you did not build fluently, or to share one runner across a custom harness.
 
 ---
 
 ## See also
 
-- [Core API](/oss/checks/reference/core) -- Scenario, Trace, and Interaction details
-- [Built-in Checks](/oss/checks/reference/checks) -- Checks to use in scenarios
-- [Testing Utilities](/oss/checks/reference/testing-utils) -- Test runners and utilities
+- [Core API](/oss/checks/reference/core) — `Trace`, `Interact`, `Target`, and the error surface
+- [Built-in Checks](/oss/checks/reference/checks) — Checks to use in scenarios
+- [Testing Utilities](/oss/checks/reference/testing-utils) — `TestCase`, `TestCaseResult`, and `WithSpy`

@@ -10,13 +10,18 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 These guides assume you have already run a scan once and want to change something about how it runs. For the terms they use, start with [Your First Scan](/oss/scan/tutorials/your-first-scan) and the [glossary](/start/glossary).
 
-Most examples here scan a retail bank's support agent. The tutorial's BotaniBot stays where the point is the wrapper mechanics rather than the stakes.
+Most examples here scan a retail bank's support agent.
 
 <CardGrid>
   <LinkCard
-    title="Run the Scan in CI"
-    description="Generate the suite once, commit it, and replay it on every pull request."
-    href="/oss/scan/how-to/scan-in-ci"
+    title="Wrap Your Agent"
+    description="Connect the scan to your own agent with the async target contract, including stateful and history-passing wrappers."
+    href="/oss/scan/how-to/wrap-your-agent"
+  />
+  <LinkCard
+    title="Customize a Scan"
+    description="Pick which generators run with generate_suite, and extend the suite with scenarios of your own."
+    href="/oss/scan/how-to/customize-a-scan"
   />
   <LinkCard
     title="Tune a Scan Run"
@@ -24,14 +29,24 @@ Most examples here scan a retail bank's support agent. The tutorial's BotaniBot 
     href="/oss/scan/how-to/tune-scan-options"
   />
   <LinkCard
-    title="Scan With Your Own Dataset"
-    description="Replay a Hugging Face or bundled JSONL corpus with the dataset-backed scenario generators."
-    href="/oss/scan/how-to/dataset-generators"
+    title="Run the Scan in CI"
+    description="Generate the suite once, commit it, and replay it on every pull request."
+    href="/oss/scan/how-to/scan-in-ci"
   />
   <LinkCard
     title="Save and Version a Scan Suite"
     description="Serialize a generated suite, load it back safely, and version it so pass rates stay comparable."
     href="/oss/scan/how-to/save-and-version-suites"
+  />
+  <LinkCard
+    title="Scan With Your Own Dataset"
+    description="Replay a Hugging Face or bundled JSONL corpus with the dataset-backed scenario generators."
+    href="/oss/scan/how-to/dataset-generators"
+  />
+  <LinkCard
+    title="Find Hallucinations and Sycophancy"
+    description="Run quality_scan against a knowledge base of your own documents."
+    href="/oss/scan/how-to/quality-scan"
   />
   <LinkCard
     title="Run Garak and DeepTeam Scanners"

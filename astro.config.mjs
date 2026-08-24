@@ -59,24 +59,29 @@ export default defineConfig({
                 },
                 // Open Source sidebar
                 {
-                    label: 'Get Started',
+                    label: 'Open Source',
                     items: [
-                        { label: 'Giskard Library', slug: 'oss' },
+                        { label: 'Start here', slug: 'oss' },
+                        {
+                            label: 'Solutions',
+                            collapsed: false,
+                            items: [{ autogenerate: { directory: 'oss/solutions', collapsed: false } }],
+                        },
+                        {
+                            label: 'Checks',
+                            collapsed: true,
+                            items: [{ autogenerate: { directory: 'oss/checks', collapsed: true } }],
+                        },
+                        {
+                            label: 'Scan',
+                            collapsed: true,
+                            items: [{ autogenerate: { directory: 'oss/scan', collapsed: true } }],
+                        },
+                        { slug: 'oss/troubleshooting', label: 'Troubleshooting' },
+                        { slug: 'oss/migrating-from-v2', label: 'Migrating from v2' },
                         { slug: 'oss/agent-skills', label: 'Agent Skills' },
                         { slug: 'oss/contributing', label: 'Contributing' },
                     ]
-                },
-                {
-                    label: 'Solutions',
-                    items: [{ autogenerate: { directory: 'oss/solutions', collapsed: false } }],
-                },
-                {
-                    label: 'Scan',
-                    items: [{ autogenerate: { directory: 'oss/scan', collapsed: false } }],
-                },
-                {
-                    label: 'Checks',
-                    items: [{ autogenerate: { directory: 'oss/checks', collapsed: false } }],
                 },
             ],
             routeMiddleware: './src/routeData.ts',

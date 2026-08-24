@@ -8,6 +8,16 @@ sidebar:
 
 import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
+:::note[Version]
+These pages document **`giskard-checks` 1.0.2rc1**, shipped in `giskard 3.0.0rc1`. Everything in the 3.x line is a pre-release, which is why `pip install` needs `--pre` and why the API may still change between release candidates. Check what you have with:
+
+```python
+from giskard.checks import __version__
+
+print(__version__)
+```
+:::
+
 These pages document the symbols in `giskard.checks` you will use directly. They assume you have written a test already. If you have not, start with [Your First Test](/oss/checks/tutorials/your-first-test); the terms used here (scenario, check, trace, judge) are introduced in [Core Concepts](/oss/checks/explanation/core-concepts).
 
 ## API modules
@@ -58,15 +68,31 @@ from giskard.checks import (
     Check,
     CheckResult,
     CheckStatus,
+    Interact,
     Interaction,
     InteractionSpec,
+    Metric,
+    Step,
+    Target,
     Trace,
+    resolve,
     Scenario,
+    ScenarioResult,
+    ScenarioStatus,
     TestCase,
+    TestCaseError,
+    TestCaseResult,
+    TestCaseStatus,
     Suite,
     SuiteResult,
+    GroupedSuiteResult,
+    GroupStats,
+    # Mixins for custom checks
+    WithGeneratorMixin,
+    WithEmbeddingMixin,
     # Built-in checks
     FnCheck,
+    from_fn,
     StringMatching,
     RegexMatching,
     JsonValid,
@@ -100,7 +126,18 @@ from giskard.checks import (
 )
 
 # Generators
-from giskard.checks import LLMGenerator, DatasetInputGenerator, UserSimulator
+from giskard.checks import (
+    BaseLLMGenerator,
+    DatasetInputGenerator,
+    LLMGenerator,
+    UserSimulator,
+)
+
+# Exceptions
+from giskard.checks import InputGenerationException, InteractionGenerationError
+
+# Testing helpers and low-level runners
+from giskard.checks import ScenarioRunner, TestCaseRunner, WithSpy
 
 # Suite generation lives in the scan package, not in giskard.checks
 from giskard.scan import generate_suite

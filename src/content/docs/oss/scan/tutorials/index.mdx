@@ -10,11 +10,18 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 A scan writes test cases for your agent, runs them, and reports which ones it failed. You do not need prior experience with LLM evaluation or red teaming to follow these walkthroughs. Work through them with a Python file open. Each one ends with something you can run again.
 
+There are four, in order: run a first scan, turn what it found into a regression suite, scan a RAG agent against your own documents, and write a generator of your own.
+
 <CardGrid>
   <LinkCard
     title="Your First Scan"
     description="Run a vulnerability scan against BotaniBot, a garden-center assistant, read the report, and save the generated suite."
     href="/oss/scan/tutorials/your-first-scan"
+  />
+  <LinkCard
+    title="From Red-Team Finding to Regression Test"
+    description="Scan a weak agent, save the generated suite, fix the agent, and freeze the finding into a permanent regression check."
+    href="/oss/scan/tutorials/redteam-to-regression"
   />
   <LinkCard
     title="Scan a RAG Agent"

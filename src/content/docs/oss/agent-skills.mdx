@@ -41,6 +41,19 @@ This skill is **quality-focused**. For adversarial or red-teaming evaluation, us
 
 [Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/oss/checks/rag-evaluator)
 
+## Install without `npx`
+
+The `skills` CLI needs Node.js. The same repository is also a [Claude Code plugin ↗](https://code.claude.com/docs/en/plugins): clone it and point Claude Code at the directory.
+
+```bash
+git clone https://github.com/Giskard-AI/giskard-skills.git
+claude --plugin-dir ./giskard-skills
+```
+
+Run `/giskard-skills` inside Claude Code to list what the plugin provides. For any other agent, the skills are plain directories — `oss/checks/scenario-generator/` and `oss/checks/rag-evaluator/`, each a `SKILL.md` plus its supporting files — so you can copy one into whatever location your agent reads skills from.
+
+The repository also carries a Hub integration skill, `giskard-to-collibra`, under `integrations/`.
+
 ---
 
 :::note
