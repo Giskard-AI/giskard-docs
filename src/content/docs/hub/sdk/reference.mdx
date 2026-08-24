@@ -874,25 +874,25 @@ Always reassign the return value: `entity = hub.helpers.wait_for_completion(enti
 
   <Tabs>
     <TabItem label="Remote agent">
-  ```python
-  evaluation = hub.helpers.evaluate(
-      agent=my_agent, dataset=my_dataset,
-      project=my_project, name="Remote eval",
-  )
-  ```
+```python
+evaluation = hub.helpers.evaluate(
+    agent=my_agent, dataset=my_dataset,
+    project=my_project, name="Remote eval",
+)
+```
     </TabItem>
     <TabItem label="Local agent">
-  ```python
-  def my_fn(messages: list[ChatMessage]) -> str:
-      return "Hello from my local agent"
+```python
+def my_fn(messages: list[ChatMessage]) -> str:
+    return "Hello from my local agent"
 
 evaluation = hub.helpers.evaluate(
 agent=my_fn, dataset="dataset-id", name="Local eval",
 )
 
 ````
-  </TabItem>
-</Tabs>
+    </TabItem>
+  </Tabs>
 </MethodCard>
 
 <MethodCard name=".print_metrics()" returnType="None">
@@ -917,7 +917,7 @@ from giskard_hub.types import (
     KnowledgeBaseDocumentRow,
     KnowledgeBaseDocumentDetail,
 )
-```
+````
 
 <MethodCard name=".create()" returnType="KnowledgeBase">
   Create a knowledge base and upload documents. Indexing happens asynchronously after creation -- use `hub.helpers.wait_for_completion()`.
@@ -1220,7 +1220,10 @@ hub.helpers.print_metrics(scan)
   <Property name="scan_ids" type="list[str]" required>IDs of scans to delete.</Property>
 </MethodCard>
 
-<MethodCard name=".list_available_probes()" returnType="list[ScanAvailableProbe]">
+<MethodCard
+  name=".list_available_probes()"
+  returnType="list[ScanAvailableProbe]"
+>
   List all probe definitions available for scanning.
 </MethodCard>
 
@@ -1375,7 +1378,8 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
     Link to a specific evaluation result.
   </Property>
   <Property name="dataset_scenario_id" type="str | None">
-    Link to a specific scenario. The deprecated `dataset_test_case_id` alias still works.
+    Link to a specific scenario. The deprecated `dataset_test_case_id` alias
+    still works.
   </Property>
   <Property name="probe_attempt_id" type="str | None">
     Link to a specific scan probe attempt.
@@ -1872,7 +1876,10 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="output_schema" type="dict[str, Any] | None">
     JSON Schema describing the agent's expected output.
   </Property>
-  <Property name="auto_bindings" type="list[ForwardBinding | AggregateBinding] | None">
+  <Property
+    name="auto_bindings"
+    type="list[ForwardBinding | AggregateBinding] | None"
+  >
     Automatic input/output bindings.
   </Property>
   <Property name="created_at" type="datetime">
@@ -1989,7 +1996,8 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     Parent project ID.
   </Property>
   <Property name="params" type="dict[str, Any]">
-    Check-specific configuration. Shape depends on the check type — see [Check type params](#check-type-params).
+    Check-specific configuration. Shape depends on the check type — see [Check
+    type params](#check-type-params).
   </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
@@ -2061,7 +2069,8 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     End position in the response (character offset).
   </Property>
   <Property name="type" type='"output" | "context"'>
-    Whether the annotation references the agent's output or its retrieved context.
+    Whether the annotation references the agent's output or its retrieved
+    context.
   </Property>
 </TypeTable>
 
@@ -2079,7 +2088,15 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="CheckTypeParam">
   <Property name="alias" type="union">
-    `TypeAlias` for the union of the typed params dicts for all 21 built-in checks: `HubCorrectnessParamsParam`, `HubConformityParamsParam`, `HubGroundednessParamsParam`, `HubMetadataParamsParam`, `LLMJudgeParamsParam`, `ConformityParamsParam`, `GroundednessParamsParam`, `ContradictionParamsParam`, `ToxicityParamsParam`, `AnswerRelevanceParamsParam`, `SemanticSimilarityParamsParam`, `StringMatchingParamsParam`, `RegexMatchingParamsParam`, the six comparison params, `JsonValidParamsParam`, and `ReadabilityParamsParam`. See [Check type params](#check-type-params) for the concrete shapes.
+    `TypeAlias` for the union of the typed params dicts for all 21 built-in
+    checks: `HubCorrectnessParamsParam`, `HubConformityParamsParam`,
+    `HubGroundednessParamsParam`, `HubMetadataParamsParam`,
+    `LLMJudgeParamsParam`, `ConformityParamsParam`, `GroundednessParamsParam`,
+    `ContradictionParamsParam`, `ToxicityParamsParam`,
+    `AnswerRelevanceParamsParam`, `SemanticSimilarityParamsParam`,
+    `StringMatchingParamsParam`, `RegexMatchingParamsParam`, the six comparison
+    params, `JsonValidParamsParam`, and `ReadabilityParamsParam`. See [Check
+    type params](#check-type-params) for the concrete shapes.
   </Property>
 </TypeTable>
 
@@ -2221,7 +2238,11 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 </TypeTable>
 
 <TypeTable name="ScenarioOrderByParam">
-  <Property name="id" type='"created_at" | "id" | "status" | "updated_at"' required>
+  <Property
+    name="id"
+    type='"created_at" | "id" | "status" | "updated_at"'
+    required
+  >
     Column to sort by.
   </Property>
   <Property name="desc" type="bool">
@@ -2231,7 +2252,8 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="ScenarioFiltersParam">
   <Property name="alias" type="dict">
-    `Dict` mapping a column name to a filter value. Valid columns: `"metrics"`, `"status"`, `"tags"`.
+    `Dict` mapping a column name to a filter value. Valid columns: `"metrics"`,
+    `"status"`, `"tags"`.
   </Property>
 </TypeTable>
 
@@ -2340,7 +2362,10 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="results" type="list[CheckResult]">
     Per-check outcomes.
   </Property>
-  <Property name="interaction_results" type="list[InteractionResultData] | None">
+  <Property
+    name="interaction_results"
+    type="list[InteractionResultData] | None"
+  >
     Per-interaction inputs, outputs, and check results.
   </Property>
   <Property name="output" type="AgentOutput | dict | None">
@@ -2421,7 +2446,11 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 </TypeTable>
 
 <TypeTable name="ResultOrderByParam">
-  <Property name="id" type='"failure_category_name" | "id" | "sample_success" | "status" | "visibility"' required>
+  <Property
+    name="id"
+    type='"failure_category_name" | "id" | "sample_success" | "status" | "visibility"'
+    required
+  >
     Column to sort by.
   </Property>
   <Property name="desc" type="bool">
@@ -2431,7 +2460,9 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="ResultFiltersParam">
   <Property name="alias" type="dict">
-    `Dict` mapping a column name to a filter value. Valid columns: `"failure_category_name"`, `"metrics"`, `"sample_success"`, `"status"`, `"tags"`, `"visibility"`.
+    `Dict` mapping a column name to a filter value. Valid columns:
+    `"failure_category_name"`, `"metrics"`, `"sample_success"`, `"status"`,
+    `"tags"`, `"visibility"`.
   </Property>
 </TypeTable>
 
@@ -2447,7 +2478,10 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="project_id" type="str">
     Parent project ID.
   </Property>
-  <Property name="knowledge_base" type="KnowledgeBaseReference | KnowledgeBase | None">
+  <Property
+    name="knowledge_base"
+    type="KnowledgeBaseReference | KnowledgeBase | None"
+  >
     Linked knowledge base, if the scan was grounded.
   </Property>
   <Property name="grade" type='"A" | "B" | "C" | "D" | None'>
@@ -2593,8 +2627,12 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 <LiteralType name="ReviewStatus">
   <LiteralValue name="pending">Awaiting review.</LiteralValue>
   <LiteralValue name="ignored">Reviewer dismissed the finding.</LiteralValue>
-  <LiteralValue name="acknowledged">Reviewer acknowledged the finding.</LiteralValue>
-  <LiteralValue name="corrected">The underlying issue has been fixed.</LiteralValue>
+  <LiteralValue name="acknowledged">
+    Reviewer acknowledged the finding.
+  </LiteralValue>
+  <LiteralValue name="corrected">
+    The underlying issue has been fixed.
+  </LiteralValue>
 </LiteralType>
 
 <TypeTable name="ScanProbeAttemptReference">
@@ -2924,7 +2962,10 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
   <Property name="assignees" type="list[User]">
     Assigned users.
   </Property>
-  <Property name="references" type="list[ScenarioEvaluationReference | ScanProbeAttemptReference | ScenarioReference]">
+  <Property
+    name="references"
+    type="list[ScenarioEvaluationReference | ScanProbeAttemptReference | ScenarioReference]"
+  >
     Linked resources (evaluation results, scenarios, or probe attempts).
   </Property>
   <Property name="created_at" type="datetime">
@@ -2963,7 +3004,8 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     The agent that responded.
   </Property>
   <Property name="exchanges" type="list[PlaygroundExchange]">
-    Ordered exchanges. The deprecated `.messages` accessor flattens them into chat messages.
+    Ordered exchanges. The deprecated `.messages` accessor flattens them into
+    chat messages.
   </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
@@ -3084,7 +3126,11 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 </TypeTable>
 
 <TypeTable name="AuditOrderByParam">
-  <Property name="id" type='"action" | "created_at" | "entity_type" | "project_id" | "user_id"' required>
+  <Property
+    name="id"
+    type='"action" | "created_at" | "entity_type" | "project_id" | "user_id"'
+    required
+  >
     Column to sort by.
   </Property>
   <Property name="desc" type="bool">
@@ -3094,7 +3140,8 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="AuditFiltersParam">
   <Property name="alias" type="dict">
-    `Dict` mapping a column name to a filter value. Valid columns: `"action"`, `"created_at"`, `"entity_type"`, `"project_id"`, `"user_id"`.
+    `Dict` mapping a column name to a filter value. Valid columns: `"action"`,
+    `"created_at"`, `"entity_type"`, `"project_id"`, `"user_id"`.
   </Property>
 </TypeTable>
 
@@ -3195,4 +3242,3 @@ Every method accepts these optional keyword arguments for per-request customizat
 <Property name="timeout" type="float | httpx.Timeout | None">
   Override the default timeout for this request.
 </Property>
-````
