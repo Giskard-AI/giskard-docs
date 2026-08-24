@@ -3,6 +3,8 @@ title: Giskard Library
 description: "Open-source Python library for testing LLM applications, RAG systems, and AI agents with scenarios, checks, and red teaming."
 ---
 
+import { Tabs, TabItem } from "@astrojs/starlight/components";
+
 **Giskard Library** is a Python package for testing and evaluating AI applications. It provides a solid foundation for developers to ensure quality and reliability in LLM-based systems, RAG applications, and AI agents.
 
 An LLM gives a different answer every time, so you cannot assert on an exact string the way you would for ordinary code. Giskard lets you assert on behavior instead: "the answer stays on topic", "the answer is supported by the retrieved documents", "the agent refuses to reveal its system prompt".
@@ -19,7 +21,7 @@ Beyond Giskard's own generators, `third_party_scan(target, tool="garak")` and `t
 
 A judge is an LLM and is sometimes wrong in both directions. A passing suite means those scenarios did not break your agent.
 
-The examples below test a support agent for a retail bank. It answers questions about accounts, cards, payments, and disputes, and it is not allowed to give investment advice.
+The two examples below are the shortest runnable thing in each half of the library, so you can see the shape before choosing a path. They stop where a real setup begins: the [Checks quickstart](/oss/checks/quickstart) and [Your first scan](/oss/scan/tutorials/your-first-scan) take it from there. Both test a support agent for a retail bank. It answers questions about accounts, cards, payments, and disputes, and it is not allowed to give investment advice.
 
 ## A first check
 
@@ -67,7 +69,12 @@ result.print_report()
 
 ## A first scan
 
-Describe the agent in plain language, and the scan generates hostile inputs for it, runs them, and prints a report:
+Describe the agent in plain language and the scan generates its own scenarios, runs them, and prints a report. Which scan you want depends on what you are worried about.
+
+<Tabs>
+<TabItem label="Vulnerability scan">
+
+`vulnerability_scan` is for a hostile user: it generates attacks — prompt injections, jailbreaks, requests for harmful content — and reports the ones the agent did not withstand.
 
 ```python
 import asyncio
@@ -95,7 +102,45 @@ suite_result = asyncio.run(
 suite_result.print_report()
 ```
 
-The description is what the generators work from, so the constraints you write into it are the ones the scan will attack. `max_scenarios` caps how many the generators produce — leave it off and the scan runs a full budget, which is more thorough but costs more provider calls than you want on a first run.
+</TabItem>
+<TabItem label="Quality scan">
+
+`quality_scan` is for a wrong answer rather than a hostile user. It asks questions your documents can answer and judges the reply against them, which is what catches an invented policy or a refusal to answer something covered. Every quality generator is knowledge-base driven, so without `knowledge_base` the scan warns and produces nothing.
+
+```python
+import asyncio
+
+from giskard.scan import quality_scan
+
+
+async def bank_support_agent_for_scan(inputs: str) -> str:
+    # Call your own LLM app, chain, or agent here
+    return "You have 120 days from the statement date to dispute a card transaction."
+
+
+suite_result = asyncio.run(
+    quality_scan(
+        target=bank_support_agent_for_scan,
+        description=(
+            "A customer-support agent for a retail bank, answering from our published"
+            " policies."
+        ),
+        languages=["en"],
+        knowledge_base=[
+            "A disputed card transaction must be reported within 120 days of the statement date.",
+            "A card reported lost cannot be unfrozen and must be replaced.",
+            "We do not give investment or tax advice; refer the customer to an independent adviser.",
+        ],
+        max_scenarios=10,
+    )
+)
+suite_result.print_report()
+```
+
+</TabItem>
+</Tabs>
+
+The description is what the generators work from, so the constraints you write into it are the ones the scan will attack. `max_scenarios` caps how many the generators produce — leave it off and the scan runs a full budget, which is more thorough but costs more provider calls than you want on a first run. Both entry points are documented in the [Scan API](/oss/scan/reference/scan-api).
 
 v3 is a major rewrite, with new features such as [Checks](/oss/checks) and a redesigned [Scan](/oss/solutions/scan-vulnerabilities).
 
@@ -114,5 +159,7 @@ Coming from Giskard v2? Scan has shipped in v3 with a new design, see [Scan for 
 
 ## Next steps
 
+- **Checks quickstart**: Go from this snippet to a real suite in [Quickstart](/oss/checks/quickstart)
+- **Scan quickstart**: Run a full scan step by step in [Your first scan](/oss/scan/tutorials/your-first-scan)
 - **Install & Configure**: Set up the packages and your LLM provider in [Install & Configure](/oss/checks/installation)
 - **Your First Test**: Write your first scenario in [Your First Test](/oss/checks/tutorials/your-first-test)
