@@ -44,6 +44,10 @@ jobs:
       - name: Install Node deps
         run: pnpm install --frozen-lockfile
 
+      # Note: the notebook .mdx files are gitignored, so this gate only sees
+      # hand-written pages. Notebook cells are syntax-checked by
+      # tests/test_notebook_cells.py instead -- type-checking them would mean
+      # fixing ~90 pre-existing Optional-access findings first.
       - name: Check Python snippets
         run: pnpm run test:python-snippets
 
@@ -144,11 +148,14 @@ jobs:
         run: pnpm run test:redirects
 
       # The notebooks run against the Azure AI proxy behind AZURE_AI_API_BASE, whose
-      # deployment names are not public model ids. The pages therefore show
-      # openai/gpt-4o-mini -- the giskard-checks default (settings.py: DEFAULT_MODEL),
-      # which is what a reader can actually run -- and read an env var to override it,
-      # so CI can point them at a deployment that exists on the proxy. Set the
-      # DOCS_NB_MODEL repository variable to change it without touching the notebooks.
+      # deployment names are not public model ids. The pages themselves name no model:
+      # giskard-checks reads GISKARD_CHECKS_DEFAULT_MODEL on its own and otherwise uses
+      # openai/gpt-4o-mini, which is what a reader gets. OPENAI_MODEL covers the raw
+      # AsyncOpenAI calls in the example agents, which the SDK does not resolve itself.
+      # Both come from the DOCS_NB_MODEL repository variable -- set it to a deployment
+      # that exists on the proxy. Unset, it falls back to the deployment that works
+      # today and warns, so a rename surfaces in the log instead of as six mystery
+      # notebook failures.
       # Covers oss/checks and oss/scan; the full-scan notebooks are opt-in behind
       # RUN_SLOW_NOTEBOOKS=1 (see tests/test_docs_nb.py) because each costs minutes
       # and real money.
@@ -157,10 +164,15 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.AZURE_AI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.AZURE_AI_API_BASE }}
+          DOCS_NB_MODEL: ${{ vars.DOCS_NB_MODEL || 'gpt-5.4-nano' }}
           OPENAI_MODEL: ${{ vars.DOCS_NB_MODEL || 'gpt-5.4-nano' }}
           GISKARD_CHECKS_DEFAULT_MODEL: openai/${{ vars.DOCS_NB_MODEL || 'gpt-5.4-nano' }}
           OVERWRITE_NB: ${{ github.ref == 'refs/heads/main' && '1' || '0' }}
-        run: uv run pytest tests/test_docs_nb.py -v --tb=short
+        run: |
+          if [ -z "${{ vars.DOCS_NB_MODEL }}" ]; then
+            echo "::warning::DOCS_NB_MODEL is unset, falling back to gpt-5.4-nano. Set the repository variable so a deployment rename does not fail every notebook."
+          fi
+          uv run pytest tests/test_docs_nb.py -v --tb=short
 
       - name: Regenerate .mdx from updated notebooks (main only)
         if: github.ref == 'refs/heads/main'
@@ -183,7 +195,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add src/content/docs/oss/checks/
+          git add src/content/docs/oss/
           if ! git diff --staged --quiet; then
             git commit -m "chore: update notebook outputs and regenerate mdx [skip ci]"
             git remote set-url origin "https://x-access-token:${APP_TOKEN}@github.com/${REPO}.git"

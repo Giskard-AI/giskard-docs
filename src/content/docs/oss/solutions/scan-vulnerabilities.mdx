@@ -1,6 +1,6 @@
 ---
 title: "Scan Vulnerabilities"
-description: "Automatically red team your LLM-based agent for safety and security vulnerabilities with Giskard's open-source scan."
+description: "Automatically red-team your LLM-based agent for safety and security vulnerabilities with Giskard's open-source scan."
 sidebar:
   order: 1
 ---
@@ -250,6 +250,8 @@ suite_result = await vulnerability_scan(
 )
 ```
 
+Every scan entry point is a coroutine. The `await` above works as-is in a notebook; in a `.py` script, put it inside an `async def main()` and call `asyncio.run(main())`.
+
 While the suite runs, Giskard shows live progress for each scenario, with a count of how many passed and failed:
 
 ![Giskard scan running, with a progress bar over the scenarios, per-scenario rows, and a passed and failed count](/_static/images/oss/solutions/suite-run-progress.png)
@@ -290,11 +292,9 @@ suite = Suite.model_validate_json(Path("scan_suite.json").read_text())
 suite_result = await suite.run(target=my_agent)
 ```
 
-`to_junit_xml()` always returns the XML as a string. Pass `path` to write a file as well (parent directories are created). The returned string has no XML declaration; the written file does.
+Then export the result for your CI reporter. `to_junit_xml()` always returns the XML as a string; pass `path` to write a file as well (parent directories are created). The returned string has no XML declaration; the written file does.
 
 ```python
-xml = suite_result.to_junit_xml()
-
 suite_result.to_junit_xml(path="reports/scan.xml")
 ```
 

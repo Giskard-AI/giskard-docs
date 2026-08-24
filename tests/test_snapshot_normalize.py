@@ -43,6 +43,14 @@ def test_unbalanced_brackets_are_left_alone():
     assert normalize("Union[str, MISSING") == "Union[str, MISSING"
 
 
+def test_lookalike_symbols_are_not_rewritten():
+    """Only typing's own bare spelling collapses -- anything qualified or
+    suffixed is a different symbol and must survive untouched."""
+    assert normalize("x: MyUnion[A, B]") == "x: MyUnion[A, B]"
+    assert normalize("x: mymod.Optional[A]") == "x: mymod.Optional[A]"
+    assert normalize("Union[A, B] and Union[C, D]") == "A | B and C | D"
+
+
 if __name__ == "__main__":
     test_union_and_optional_collapse_to_pipe_form()
     test_nested_and_multi_argument_unions()

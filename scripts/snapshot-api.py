@@ -34,6 +34,17 @@ from typing import Any
 # every snapshot, which would make the diff worthless. Collapse the address so
 # the identity of the object still shows but the run-to-run noise does not.
 _MEMORY_ADDRESS = re.compile(r" at 0x[0-9a-fA-F]+")
+# The lookbehind keeps `MyUnion[A, B]` / `othermod.Optional[A]` intact: only the
+# bare, unqualified spelling is typing's own (`typing.` is stripped beforehand).
+_UNION = re.compile(r"(?<![\w.])Union\[")
+_OPTIONAL = re.compile(r"(?<![\w.])Optional\[")
+
+
+def _rightmost(pattern: re.Pattern[str], text: str) -> re.Match[str] | None:
+    last = None
+    for last in pattern.finditer(text):
+        pass
+    return last
 
 
 def _collapse_unions(text: str) -> str:
@@ -46,9 +57,10 @@ def _collapse_unions(text: str) -> str:
     change -- 74 phantom deltas across giskard.checks, all of them "error"
     severity, which teaches reviewers to skip the diff.
     """
-    for keyword, joiner in (("Union[", " | "), ("Optional[", None)):
-        while (start := text.rfind(keyword)) != -1:
-            open_bracket = start + len(keyword) - 1
+    for pattern, joiner in ((_UNION, " | "), (_OPTIONAL, None)):
+        while (match := _rightmost(pattern, text)) is not None:
+            start = match.start()
+            open_bracket = match.end() - 1
             depth = 0
             for index in range(open_bracket, len(text)):
                 if text[index] == "[":

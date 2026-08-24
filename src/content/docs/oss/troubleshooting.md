@@ -12,13 +12,14 @@ The errors below are the ones a first run tends to produce. Each entry quotes th
 | `WorkflowError: Step processing failed` | A judged check or a generator called an LLM and the provider call failed — most often no API key, or a model string the provider does not recognize. | [Configure a provider](#no-api-key-or-a-bad-model-string) |
 | `ValueError: Provider 'x' is not configured and not in the registry.` | `Generator` routes only to the native providers. | [Use LiteLLM](#unknown-provider) |
 | `ValidationError … Invalid JSONPath expression 'last.outputs': path must start with 'trace.'` | Every `*_key` is a JSONPath rooted at the trace. | [Prefix the path](#jsonpath-must-start-with-trace) |
-| A check ERRORs with `No value found for text key 'trace.last.outputs.zz'.` | The path is valid but matched nothing. | [Fix the path](#a-path-that-matches-nothing) |
+| A check ERRORs with `No value found for key 'trace.last.outputs.zz'` | The path is valid but matched nothing. | [Fix the path](#a-path-that-matches-nothing) |
 | `ValidationError … Extra inputs are not permitted [type=extra_forbidden]` | Checks reject unknown fields. | [Check the field name](#unknown-field-on-a-check) |
 | `TypeError: Parameter 'x' is required but not in the injection requirements.` | Callback parameter names are load-bearing. | [Rename the parameter](#wrong-callback-parameter-name) |
 | `RuntimeError: asyncio.run() cannot be called from a running event loop` | `asyncio.run` inside a notebook or another async context. | [Await instead](#asyncio-run-inside-a-running-loop) |
 | `InputGenerationException: generation failed at turn N after M attempt(s)` | A `UserSimulator` or `LLMGenerator` was refused or blocked on every retry. | [Adjust the generator](#the-user-simulator-gave-up) |
 | `TypeError: from_fn callable must return bool or CheckResult (or awaitable thereof), but got …` | A custom function check returned something else. | [Return a bool](#custom-function-returned-the-wrong-type) |
 | `ValidationError: The 'textstat' package is required for the Readability check.` | Optional dependency missing. | [Install the extra](#missing-optional-dependency) |
+| `ModuleNotFoundError: No module named 'giskard.checks'` right after a clean install | The environment is on Python 3.11 or older, so pip installed Giskard v2 instead. | [Use Python 3.12+](#pip-installed-v2-instead-of-v3) |
 | `ImportError: Package conflict detected: The legacy package 'giskard' is installed …` | Giskard v2 is installed alongside v3. | [Uninstall v2](#giskard-v2-installed-alongside-v3) |
 
 ## No API key, or a bad model string
@@ -78,8 +79,10 @@ Every `*_key` parameter is validated as a JSONPath rooted at the trace. Write `t
 A syntactically valid path that matches nothing does not raise. Extraction returns a `NoMatch` sentinel, and the check reports ERROR with a message naming the key:
 
 ```text
-ERROR   No value found for text key 'trace.last.outputs.zz'.
+ERROR   No value found for key 'trace.last.outputs.zz', expected a value equal to 'Paris'.
 ```
+
+The wording varies with the check — `StringMatching` says `text key`, `SemanticSimilarity` says `actual answer key` or `reference text key` — but the key is always quoted in full.
 
 If your outputs are a Pydantic model, remember that resolution runs against `trace.model_dump()` — it sees dicts, so the path is `trace.last.outputs.answer`, not an attribute chain on your class. Print `result.print_report()` and read the check message before assuming the assertion itself is wrong.
 
@@ -163,6 +166,21 @@ Two checks have optional dependencies:
 
 - `Readability` needs `textstat`: `pip install --pre "giskard[all-checks]"`.
 - `RegoPolicy` needs `regorus`: `pip install --pre "giskard[regorus]"`. It is unavailable on Windows and on linux/aarch64.
+
+## pip installed v2 instead of v3
+
+```text
+ModuleNotFoundError: No module named 'giskard.checks'
+```
+
+v3 declares `requires-python = ">=3.12"`. On an older interpreter pip skips it silently and resolves to the newest release that does fit, which is Giskard v2 — the install succeeds and only the import fails. Check what you actually got:
+
+```bash
+python -V
+pip show giskard
+```
+
+If the version starts with `2.`, recreate the environment on Python 3.12 or newer and reinstall.
 
 ## Giskard v2 installed alongside v3
 

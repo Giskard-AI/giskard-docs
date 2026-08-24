@@ -73,6 +73,8 @@ The parameter must be named `inputs`. Giskard injects arguments by name, and onl
 A **scenario** is one test case: what you send, and what has to hold about the reply. `Conformity` takes a rule in plain English and hands it to the judge.
 
 ```python
+import asyncio
+
 from giskard.checks import Conformity, Scenario
 
 advice = (
@@ -95,8 +97,6 @@ advice = (
         )
     )
 )
-
-import asyncio
 
 
 async def main() -> None:
@@ -140,8 +140,6 @@ other_customer = (
         )
     )
 )
-
-import asyncio
 
 suite = Suite(name="northgate_support").append(advice).append(other_customer)
 
