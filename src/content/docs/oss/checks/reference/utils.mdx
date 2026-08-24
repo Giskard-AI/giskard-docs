@@ -129,13 +129,13 @@ async def items():
     yield "second"
 
 
-async def main():
+async def stream_values():
     gen = ValueGenerator(value_or_callable=items, kwargs_keys=set())
     async for value in await gen():
         print(value)
 
 
-asyncio.run(main())
+asyncio.run(stream_values())
 ```
 
 ---
@@ -163,7 +163,7 @@ def sync_gen():
     yield 2
 
 
-async def main():
+async def normalize_to_async():
     # Static value -> yields once
     async for value in a_generator("hello"):
         print(value)
@@ -173,7 +173,7 @@ async def main():
         print(value)
 
 
-asyncio.run(main())
+asyncio.run(normalize_to_async())
 ```
 
 ---
