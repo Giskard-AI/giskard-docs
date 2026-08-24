@@ -5,39 +5,12 @@ sidebar:
   order: 2
 ---
 
-:::caution
-Giskard v3.0.0rc1 is a release candidate. APIs can still change before the stable 3.0.0 release.
-:::
-
-## Install with a coding agent
-
-Ask your coding agent to follow this page.
-
-:::tip[Paste this into your coding agent:]
-
-```
-Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md and install Giskard in my project.
-```
-
-:::
-
-### How it works
-
-1. **Paste the URL** into any coding agent (Claude Code, Cursor, Windsurf, Copilot, etc.)
-2. **The agent reads** the installation instructions from this page
-3. **The agent installs** `giskard` and configures your LLM provider
-4. **You review** the changes and start writing checks
-
-:::tip[Want a permanent Giskard expert in your agent?]
-Install the [Giskard Agent Skills](/oss/agent-skills). They give your coding agent a workflow for generating adversarial test scenarios, red-team suites, and RAG evaluation suites, triggered by prompts like _"test my agent"_, _"red-team my chatbot"_, or _"evaluate my RAG"_.
-:::
-
 ## Install the Python package
 
 Giskard requires **Python 3.12 or higher**. Install it together with the SDK for the LLM provider you will use as a judge: an LLM the library calls to grade your agent's replies.
 
 ```bash
-pip install "giskard[openai]==3.0.0rc1"
+pip install --pre "giskard[openai]"
 ```
 
 No provider SDK ships with `giskard` itself, so installing it without a provider extra leaves LLM-based checks unable to reach a model.
@@ -64,6 +37,16 @@ llm_judge = LiteLLMGenerator(model="bedrock/anthropic.claude-3-sonnet")
 ```
 
 The default `Generator` does not use LiteLLM.
+:::
+
+:::tip[Using a coding agent]
+Paste the following into your coding agent:
+
+```
+Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md and install Giskard in my project.
+```
+
+For reusable workflows that generate scenarios and evaluation suites, see [Giskard Agent Skills](/oss/agent-skills).
 :::
 
 ## Configure the default LLM judge model

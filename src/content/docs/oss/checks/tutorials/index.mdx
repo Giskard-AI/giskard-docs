@@ -10,24 +10,26 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 ## Summary
 
-These tutorials teach you the fundamental patterns of Giskard Checks through hands-on, step-by-step exercises. Follow along to build your understanding of the core concepts.
+These tutorials teach you the fundamental patterns of Giskard Checks through hands-on, step-by-step exercises. Each one is a lesson you type along with, in order. When you already know what you want to build and need one specific task done, use the [how-to guides](/oss/checks/how-to) instead.
 
-## Available Tutorials
+## Available tutorials
+
+The numbered path on the [Giskard Checks overview](/oss/checks) runs Your First Test, Your First LLM Call, then Test Suites. Multi-Turn Scenarios and Dynamic Scenarios are optional side trips you can take at any point after Your First LLM Call.
 
 <CardGrid>
   <LinkCard
     title="Your First Test"
-    description="Zero to first passing test in under 10 minutes — no API key or LLM required"
+    description="Write a test case and read its result. Under 10 minutes, no API key or LLM required"
     href="/oss/checks/tutorials/your-first-test"
   />
   <LinkCard
     title="Your First LLM Call"
-    description="Configure a generator and call a real language model — then use LLMJudge to evaluate the response"
+    description="Call a real language model and grade its answer against a rule you write in English, using LLMJudge"
     href="/oss/checks/tutorials/single-turn"
   />
   <LinkCard
     title="Multi-Turn Scenarios"
-    description="Learn how to test conversational flows and stateful interactions across multiple exchanges"
+    description="Test a conversation instead of a single message, where the agent has to remember earlier turns"
     href="/oss/checks/tutorials/multi-turn"
   />
   <LinkCard
@@ -47,16 +49,6 @@ These tutorials teach you the fundamental patterns of Giskard Checks through han
 Once you can build scenarios, extend with your own validation logic: see [Custom Checks](/oss/checks/how-to/custom-checks) to create domain-specific checks with `FnCheck`, Check subclasses, and more.
 
 **Your First Test** has no prerequisites — no API key or LLM needed. Start there if you are new to Giskard Checks.
-
-## What You'll Learn
-
-Through these tutorials, you'll learn how to:
-
-- Design effective test cases for AI applications
-- Handle both single-turn and multi-turn scenarios
-- Use dynamic inputs and outputs for context-aware interactions
-- Use LLM-as-a-judge for nuanced evaluation
-- Group scenarios into suites and run them with a single await
 
 ## Prerequisites
 
