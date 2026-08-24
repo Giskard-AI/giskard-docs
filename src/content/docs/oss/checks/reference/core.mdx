@@ -296,7 +296,7 @@ Pass `trace_type=YourTrace` on [`Scenario`](/oss/checks/reference/scenarios) whe
 
 ### Rich rendering
 
-The default `Trace.__rich_console__` prints each interaction under a titled rule. Override it on a subclass for conversation-style or domain-specific layouts. [`ScenarioResult.print_report()`](/oss/checks/reference/scenarios/#scenarioresult) renders `final_trace` with Rich using that protocol when the stored trace implements it.
+The default `Trace.__rich_console__` prints each interaction under a titled rule. Override it on a subclass for conversation-style or domain-specific layouts. [`ScenarioResult.print_report()`](/oss/checks/reference/scenarios#scenarioresult) renders `final_trace` with Rich using that protocol when the stored trace implements it.
 
 ---
 
@@ -512,7 +512,7 @@ A scenario may instead be parsed from JSONL hosted in a remote dataset repositor
 
 An ordered sequence of steps — interaction specs followed by checks — executed against one shared trace.
 
-[**Scenarios**](/oss/checks/reference/scenarios) is the canonical page for `Scenario`: the constructor fields, all eleven builder methods, `.run()`, and `ScenarioResult`. It is documented there rather than here so the two pages cannot drift apart.
+[**Scenarios**](/oss/checks/reference/scenarios) is the canonical page for `Scenario`: the constructor fields, all ten builder methods, `.run()`, and `ScenarioResult`. It is documented there rather than here so the two pages cannot drift apart.
 
 ```python
 from giskard.checks import Equals, Scenario

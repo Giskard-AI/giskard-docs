@@ -220,7 +220,7 @@ The six comparison checks take the same four fields, listed in full under each o
 
 ### `Equals`
 
-Check that the extracted value equals an expected value.
+<ResourceSection description="Check that the extracted value equals an expected value. Deterministic and free.">
 
 <TypeTable name="Equals">
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
@@ -264,9 +264,11 @@ intent_is_stable = Equals(
 )
 ```
 
+</ResourceSection>
+
 ### `NotEquals`
 
-Check that the extracted value does **not** equal an expected value.
+<ResourceSection description="Check that the extracted value does not equal an expected value. Deterministic and free.">
 
 <TypeTable name="NotEquals">
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
@@ -296,9 +298,11 @@ not_investment_advice = NotEquals(
 
 Use `NotEquals` for a single forbidden value. To forbid a condition expressed by another check, wrap that check in [`Not`](#not).
 
+</ResourceSection>
+
 ### `GreaterThan`
 
-Check that the extracted value is strictly greater than the expected value.
+<ResourceSection description="Check that the extracted value is strictly greater than the expected value. Deterministic and free.">
 
 <TypeTable name="GreaterThan">
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
@@ -326,9 +330,11 @@ retrieval_is_confident = GreaterThan(
 )
 ```
 
+</ResourceSection>
+
 ### `GreaterThanEquals`
 
-Check that the extracted value is greater than or equal to the expected value.
+<ResourceSection description="Check that the extracted value is greater than or equal to the expected value. Deterministic and free.">
 
 <TypeTable name="GreaterThanEquals">
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
@@ -356,9 +362,11 @@ cites_a_source = GreaterThanEquals(
 )
 ```
 
+</ResourceSection>
+
 ### `LessThan`
 
-Check that the extracted value is strictly less than the expected value.
+<ResourceSection description="Check that the extracted value is strictly less than the expected value. Deterministic and free.">
 
 <TypeTable name="LessThan">
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
@@ -386,9 +394,11 @@ answers_in_time = LessThan(
 )
 ```
 
+</ResourceSection>
+
 ### `LessThanEquals`
 
-Check that the extracted value is less than or equal to the expected value.
+<ResourceSection description="Check that the extracted value is less than or equal to the expected value. Deterministic and free.">
 
 <TypeTable name="LessThanEquals">
   <Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
@@ -415,6 +425,8 @@ stays_within_budget = LessThanEquals(
     expected_value=400, target_key="trace.last.metadata.output_tokens"
 )
 ```
+
+</ResourceSection>
 
 Comparison checks are free and deterministic. Put them first when you want their failures to be easy to inspect.
 

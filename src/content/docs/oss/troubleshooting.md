@@ -103,7 +103,7 @@ expected
 TypeError: Parameter 'foo' is required but not in the injection requirements.
 ```
 
-Giskard injects callback arguments **by name**. For `outputs` and `target`, the accepted names are `inputs` and `trace`; for `inputs`, it is `trace`. Any other required parameter raises. `lambda foo: ...` fails; `lambda inputs: ...` works. Parameters with defaults are left alone.
+Giskard injects callback arguments **by name**. For `outputs` (and a bound target), the accepted names are `inputs` and `trace`; for `inputs`, they are `trace` and `input_type`. Any other required parameter raises. `lambda foo: ...` fails; `lambda inputs: ...` works. Parameters with defaults are left alone.
 
 ## `asyncio.run` inside a running loop
 

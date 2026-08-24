@@ -41,7 +41,7 @@ For most use cases, use the `Scenario()` fluent API instead. `TestCase` is for a
   <Property name="return_exception" type="bool" defaultValue="False">If True, return results even when exceptions occur instead of raising.</Property>
 </MethodCard>
 
-<MethodCard name=".assert_passed()" returnType="None">
+<MethodCard name="async .assert_passed()" returnType="None">
   Run the test case and assert that all checks passed. Raises `AssertionError`
   with formatted failure messages if any check fails.
 </MethodCard>
@@ -204,7 +204,7 @@ result.assert_passed()  # raises AssertionError with those same messages
 
 Low-level runner for executing test cases. Most users should use `test_case.run()` instead.
 
-<MethodCard name=".run()" returnType="TestCaseResult">
+<MethodCard name="async .run()" returnType="TestCaseResult">
   Execute a test case's checks against its trace.
 
   <Property name="test_case" type="TestCase" required>The test case to execute.</Property>
@@ -273,7 +273,7 @@ print(spy_data["call_count"], spy_data["call_args"])
 
 ## See also — task guides
 
-These recipes used to live here. They are how-to material rather than reference, so they belong with the guides:
+Replaying and parameterizing test cases are how-to material rather than API detail:
 
 - Replaying a recorded conversation against checks, and running many replays at once — [Batch evaluation](/oss/checks/how-to/batch-evaluation)
 - Parameterizing a `TestCase` across many inputs in pytest — [Run tests with pytest](/oss/checks/how-to/run-in-pytest)

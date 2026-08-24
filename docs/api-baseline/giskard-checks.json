@@ -350,7 +350,7 @@
       "signature": "(*, role: Literal['user'] = 'user', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
     }
   },
-  "source_ref": "c661e04",
+  "source_ref": "giskard-checks/v1.0.2rc1",
   "symbols": {
     "giskard.checks.AllOf": {
       "aliases": [

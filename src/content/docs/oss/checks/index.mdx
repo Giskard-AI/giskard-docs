@@ -20,7 +20,7 @@ A judge is an LLM, so it is sometimes wrong in both directions. Read the failing
 
 ## Key features
 
-- **Checks that need no LLM call**: string and regex matching, comparisons, JSON validity, and Rego policies, so deterministic rules stay fast and free. `SemanticSimilarity` needs no judge but does call an embeddings API
+- **Checks that need no LLM call**: string and regex matching, comparisons, JSON validity, and Rego policies, so deterministic rules stay fast. `SemanticSimilarity` needs no judge but does call an embeddings API
 - **LLM judges**: `LLMJudge` for any rule you write in English, plus ready-made `Groundedness`, `AnswerRelevance`, `Contradiction`, `Toxicity`, and `Conformity`
 - **Single-turn and multi-turn scenarios**: send one message, or drive a whole conversation with `UserSimulator` to see whether the agent keeps track of what was said earlier
 - **Composition**: combine checks with `AllOf`, `AnyOf`, and `Not` instead of writing a new check per combination
@@ -36,12 +36,12 @@ Install the [Giskard Agent Skills](/oss/agent-skills) and let your coding agent 
 
 ## Start here
 
-To see the whole thing working first, [Your First Test](/oss/checks/tutorials/your-first-test) runs end to end with no API key. The [Quickstart (needs an OpenAI key)](/oss/checks/quickstart) shows the same loop with a judged check. Otherwise, work through these in order.
+To see the whole thing working first, [Your First Test](/oss/checks/tutorials/your-first-test) runs end to end. The [Quickstart](/oss/checks/quickstart) shows the same loop with a judged check. Otherwise, work through these in order.
 
 <Steps>
 
-1. [Install & Configure](/oss/checks/installation) (~5 min): get the library installed and an LLM provider configured. Giskard v3 requires Python 3.12 or newer. Judged checks call your own provider with your own key, so they cost tokens. After this you can import `giskard.checks` and run judged checks.
-2. [Your First Test](/oss/checks/tutorials/your-first-test) (~10 min): write a scenario that passes. No API key or LLM needed. After this you can write a test case and read its result.
+1. [Install & Configure](/oss/checks/installation) (~5 min): get the library installed and an LLM provider configured. Giskard v3 requires Python 3.12 or newer. After this you can import `giskard.checks` and run judged checks.
+2. [Your First Test](/oss/checks/tutorials/your-first-test) (~10 min): write a scenario that passes against a plain Python function. After this you can write a test case and read its result.
 3. [Your First LLM Call](/oss/checks/tutorials/single-turn) (~15 min): call a real model and evaluate the response with `LLMJudge`. After this you can grade an answer against a rule written in English.
 4. [Test Suites](/oss/checks/tutorials/test-suites) (~20 min): group scenarios into a suite you run with a single await. After this you can rerun the same set of tests after every change to your prompt or model.
 5. [CI/CD Integration](/oss/checks/how-to/ci-cd) (~20 min): run that suite automatically on every pull request, so a change that breaks the agent's behavior fails the build.
@@ -58,7 +58,7 @@ To see the whole thing working first, [Your First Test](/oss/checks/tutorials/yo
   />
   <LinkCard
     title="Quickstart"
-    description="Your first judged scenario in under 5 minutes. Needs an OpenAI key"
+    description="Your first judged scenario in under 5 minutes"
     href="/oss/checks/quickstart"
   />
   <LinkCard

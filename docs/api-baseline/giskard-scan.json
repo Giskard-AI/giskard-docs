@@ -338,7 +338,7 @@
       "signature": "(*, name: str, scenarios: list[giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]] = <factory>, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | MISSING = MISSING) -> None"
     }
   },
-  "source_ref": "c661e04",
+  "source_ref": "giskard-scan/v1.0.0rc1",
   "symbols": {
     "giskard.scan.AdversarialScenarioGenerator": {
       "bases": [

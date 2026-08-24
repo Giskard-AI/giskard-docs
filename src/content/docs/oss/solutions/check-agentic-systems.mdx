@@ -161,7 +161,7 @@ asyncio.run(run_suite())
 
 ## Take it to CI
 
-The last two statements in `main()` above are the whole CI story: `to_junit_xml` writes the report, and a non-zero `failed_count` fails the job.
+The last two statements in `run_suite()` above are the whole CI story: `to_junit_xml` writes the report, and a non-zero `failed_count` fails the job.
 
 That is one `<testcase>` per scenario, rendered natively by GitHub Actions, GitLab, Jenkins, and CircleCI. The judge is an LLM and can flip a borderline verdict between runs, so read a new failure before treating it as a regression.
 
