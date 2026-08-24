@@ -5,11 +5,11 @@ sidebar:
   order: 5
 ---
 
-An **Evaluation** runs an agent against all test cases in a dataset, applies the configured checks to each response, and produces a per-test-case result with a pass/fail verdict. You can also run and review evaluations from the [Hub UI evaluations page](/hub/ui/evaluations).
+An **Evaluation** runs an agent against all scenarios in a dataset, applies the configured checks to each response, and produces a per-scenario result. You can also run and review evaluations from the [Hub UI evaluations page](/hub/ui/evaluations).
 
 ## Remote evaluations
 
-A remote evaluation calls your registered agent's HTTP endpoint for every test case in the dataset.
+A remote evaluation calls your registered agent's HTTP endpoint for every scenario in the dataset.
 
 ```python
 from giskard_hub import HubClient
@@ -44,7 +44,7 @@ evaluation = hub.helpers.evaluate(
 
 ### Filter by tags
 
-Run the evaluation only against test cases with specific tags:
+Run the evaluation only against scenarios with specific tags:
 
 ```python
 evaluation = hub.evaluations.create(
@@ -58,7 +58,7 @@ evaluation = hub.evaluations.create(
 
 ### Run multiple times
 
-Set `run_count` to run each test case multiple times (useful for measuring consistency across stochastic outputs):
+Set `run_count` to run each scenario multiple times (useful for measuring consistency across stochastic outputs):
 
 ```python
 evaluation = hub.evaluations.create(
@@ -98,6 +98,29 @@ evaluation = hub.helpers.evaluate(
     name="Local evaluation",
 )
 ```
+
+---
+
+## Upload results from Giskard OSS
+
+If you already run evaluations with [Giskard OSS](/oss), you can upload a finished run to the Hub instead of re-executing it. Any `SuiteResult` works: a [checks suite](/oss/checks) run via `giskard.checks.Suite`, or a [scan](/oss/scan) run via `giskard.scan`. Export the run with `SuiteResult.to_hub_format()` and pass it to `hub.evaluations.upload()`:
+
+```python
+from giskard.checks import Suite  # or: from giskard.scan import vulnerability_scan
+
+suite = Suite(...)
+suite_result = await suite.run(my_agent)
+
+evaluation = hub.evaluations.upload(
+    project_id="project-id",
+    payload=suite_result.to_hub_format(),
+    agent_id="agent-id",  # optional: link the run to a registered agent
+    name="OSS regression run",  # optional: auto-generated when omitted
+    auto_classify_failures=True,  # optional: classify failed scenarios on upload
+)
+```
+
+The Hub stores the upload as a local evaluation. Each scenario result in the payload becomes a result with its check outcomes.
 
 ---
 
@@ -188,15 +211,15 @@ for metric in evaluation.metrics:
 
 Each `Metric` object has the following fields:
 
-| Field          | Type    | Description                                         |
-| -------------- | ------- | --------------------------------------------------- |
-| `name`         | `str`   | Check identifier (e.g. `"correctness"`, `"global"`) |
-| `display_name` | `str`   | Human-readable name                                 |
-| `passed`       | `int`   | Number of test cases that passed                    |
-| `failed`       | `int`   | Number of test cases that failed                    |
-| `errored`      | `int`   | Number of test cases that errored                   |
-| `total`        | `int`   | Total number of test cases                          |
-| `success_rate` | `float` | Pass rate as a float between 0.0 and 1.0            |
+| Field          | Type    | Description                                             |
+| -------------- | ------- | ------------------------------------------------------- |
+| `name`         | `str`   | Check identifier (e.g. `"hub_correctness"`, `"global"`) |
+| `display_name` | `str`   | Human-readable name                                     |
+| `passed`       | `int`   | Number of scenarios that passed                         |
+| `failed`       | `int`   | Number of scenarios that failed                         |
+| `errored`      | `int`   | Number of scenarios that errored                        |
+| `total`        | `int`   | Total number of scenarios                               |
+| `success_rate` | `float` | Pass rate as a float between 0.0 and 1.0                |
 
 The special `"global"` metric aggregates across all checks.
 
@@ -204,7 +227,7 @@ The special `"global"` metric aggregates across all checks.
 
 ## Rerun errored results
 
-If some test cases failed due to transient agent errors (timeouts, 5xx responses), rerun only the errored ones without triggering a full re-evaluation:
+If some scenarios failed due to transient agent errors (timeouts, 5xx responses), rerun only the errored ones without triggering a full re-evaluation:
 
 ```python
 hub.evaluations.rerun_errored_results("evaluation-id")
@@ -213,7 +236,7 @@ hub.evaluations.rerun_errored_results("evaluation-id")
 Rerun a single specific result:
 
 ```python
-hub.evaluations.results.rerun_test_case(
+hub.evaluations.results.rerun_scenario(
     "result-id", evaluation_id="evaluation-id"
 )
 ```
@@ -261,7 +284,7 @@ print("Quality gate passed.")
 
 ---
 
-## Run a single test case ad hoc
+## Run checks on a single output ad hoc
 
 You can evaluate a single (input, output) pair against a set of checks without running a full evaluation. This is useful for debugging or CI gates on individual responses:
 
@@ -279,7 +302,7 @@ results = hub.evaluations.run_single(
         )
     },
     checks=[
-        {"identifier": "tone_professional"},
+        {"identifier": "custom_tone_professional"},
     ],
 )
 
