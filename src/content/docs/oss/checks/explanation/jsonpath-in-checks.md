@@ -61,7 +61,7 @@ resolve(trace, "trace.interactions[*].outputs.x")  # [1, 2]
 resolve(trace, "trace.last.outputs.x")  # 2
 ```
 
-Comparison checks compare against that list as a whole unless you tell them how to spread the comparison over it. Set `match="any"`, `"all"`, or `"none"`:
+Comparison checks receive that list as a whole, so you have to tell them how to spread the comparison over it. Set `match="any"`, `"all"`, or `"none"`:
 
 ```python
 from giskard.checks import GreaterThan
@@ -74,7 +74,7 @@ check = GreaterThan(
 )
 ```
 
-Without `match`, the check compares `0.8` against the list object itself, which is almost never what you meant.
+Without `match`, the check tries to compare `0.8` against the list object itself, which Python cannot do. The check returns an ERROR with the message `Comparison not supported: list does not support > comparison with float`. If you see that message, you resolved a wildcard path and forgot `match`.
 
 ## NoMatch
 

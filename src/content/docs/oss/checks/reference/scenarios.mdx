@@ -306,15 +306,18 @@ Reading the same result in code:
 result = await scenario.run()
 result.print_report()
 
-for step in result.failures_and_errors:
-    for message in step.format_failures():
-        print(message)
-# cites_account FAILED: The answer does not contain the keyword 'account ending'
-
-assert result.passed, [
-    m for step in result.failures_and_errors for m in step.format_failures()
+failures = [
+    message
+    for step in result.failures_and_errors
+    for message in step.format_failures()
 ]
+print(failures)
+# ["cites_account FAILED: The answer does not contain the keyword 'account ending'"]
+
+assert result.passed, failures
 ```
+
+`failures_and_errors` is a `list[TestCaseResult]` (one per non-passing step) and `format_failures()` returns one readable string per failing check, so the assertion message names exactly what went wrong.
 
 ---
 
@@ -516,16 +519,8 @@ Low-level runner for executing scenarios. Most users should use `Scenario(...).r
 </MethodCard>
 
 <MethodCard name="get_runner()" returnType="ScenarioRunner">
-  Get the default process-wide singleton runner instance. `Scenario.run()` calls this for you.
+  Get the default process-wide singleton runner instance. `Scenario.run()` calls this for you, so you rarely need it.
 </MethodCard>
-
-```python
-from giskard.checks.scenarios.runner import get_runner
-
-result = await get_runner().run(scenario, target=my_agent)
-```
-
-Reach for the runner directly only when you need to run a `Scenario` you did not build fluently, or to share one runner across a custom harness.
 
 ---
 

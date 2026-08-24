@@ -100,7 +100,7 @@ Reach for `FnCheck` when the pass condition is a predicate you can already write
 **Module:** `giskard.checks.builtin.fn`
 
 <MethodCard name="from_fn()" returnType="Check">
-  Build an `FnCheck` from a callable. Every option other than `fn` is keyword-only.
+  Helper form of `FnCheck`: build one from a callable. Exported from `giskard.checks`. Every option other than `fn` is keyword-only.
 
   <Property name="fn" type="Callable" required>Function taking a `Trace` and returning `bool` or `CheckResult`, sync or async.</Property>
   <Property name="name" type="str | None" defaultValue="None">Optional check name.</Property>
@@ -119,7 +119,7 @@ check = from_fn(
 )
 ```
 
-The returned object is an `FnCheck`, so the serialization caveat above applies to it too.
+`from_fn` returns an `FnCheck` — it is the same check, built for you — so the serialization caveat above applies to it too.
 
 </ResourceSection>
 

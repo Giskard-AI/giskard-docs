@@ -10,29 +10,29 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 Task-oriented guides for writing tests with Giskard Checks. These guides assume you're familiar with scenarios and checks; the terms used here are introduced in [Core Concepts](/oss/checks/explanation/core-concepts). Each guide focuses on getting a specific job done.
 
-Start with [Run Tests with pytest](/oss/checks/how-to/run-in-pytest) — it opens with a test you can run before configuring any provider — and finish with [CI/CD Integration](/oss/checks/how-to/ci-cd). The guides are ordered so the ones that need no LLM API key come first; the last three call a provider and are marked below.
+Start with [Run Tests with pytest](/oss/checks/how-to/run-in-pytest) and finish with [CI/CD Integration](/oss/checks/how-to/ci-cd).
 
-For two self-contained scripts you can run straight from a checkout, see [`examples/`](https://github.com/Giskard-AI/giskard-oss/tree/main/examples) in the `giskard-oss` repository. `examples/checks_static/test_checks_static.py` is a passing test in fifteen lines and needs no API key.
+For two self-contained scripts you can run straight from a checkout, see [`examples/`](https://github.com/Giskard-AI/giskard-oss/tree/main/examples) in the `giskard-oss` repository. `examples/checks_static/test_checks_static.py` is a passing test in fifteen lines.
 
 <CardGrid>
   <LinkCard
     title="Run Tests with pytest"
-    description="Configure pytest-asyncio and write async test functions for Giskard Checks scenarios. No API key needed."
+    description="Configure pytest-asyncio and write async test functions for Giskard Checks scenarios."
     href="/oss/checks/how-to/run-in-pytest"
   />
   <LinkCard
     title="Debug with Spy"
-    description="Inspect function calls during scenario execution using WithSpy to diagnose unexpected behavior. No API key needed."
+    description="Inspect function calls during scenario execution using WithSpy to diagnose unexpected behavior."
     href="/oss/checks/how-to/spy-on-calls"
   />
   <LinkCard
     title="Testing Structured Outputs"
-    description="Validate Pydantic models, JSON objects, and nested fields using Equals, FnCheck, and JSONPath extraction. No API key needed."
+    description="Validate Pydantic models, JSON objects, and nested fields using Equals, FnCheck, and JSONPath extraction."
     href="/oss/checks/how-to/structured-output"
   />
   <LinkCard
     title="Stateful Checks"
-    description="Track uniqueness, counts, and cross-scenario consistency with checks that accumulate state across runs. No API key needed."
+    description="Track uniqueness, counts, and cross-scenario consistency with checks that accumulate state across runs."
     href="/oss/checks/how-to/stateful-checks"
   />
   <LinkCard
@@ -42,22 +42,22 @@ For two self-contained scripts you can run straight from a checkout, see [`examp
   />
   <LinkCard
     title="Custom trace types"
-    description="Subclass Trace, set trace_type and annotations, and render conversation-style transcripts with Rich. No API key needed."
+    description="Subclass Trace, set trace_type and annotations, and render conversation-style transcripts with Rich."
     href="/oss/checks/how-to/custom-trace"
   />
   <LinkCard
     title="Simulate Users"
-    description="Use UserSimulator to drive multi-turn tests with LLM-generated user inputs and personas. Requires an LLM API key."
+    description="Use UserSimulator to drive multi-turn tests with LLM-generated user inputs and personas."
     href="/oss/checks/how-to/simulate-users"
   />
   <LinkCard
     title="Batch Evaluation"
-    description="Run one scenario pattern across many inputs with Suite, then group the results by tag. Requires an LLM API key for the judged batch."
+    description="Run one scenario pattern across many inputs with Suite, then group the results by tag."
     href="/oss/checks/how-to/batch-evaluation"
   />
   <LinkCard
     title="CI/CD Integration"
-    description="Run Giskard Checks in GitHub Actions, publish a JUnit report, and keep the bill bounded. Requires an LLM API key."
+    description="Run Giskard Checks in GitHub Actions and publish a JUnit report"
     href="/oss/checks/how-to/ci-cd"
   />
 </CardGrid>

@@ -52,15 +52,25 @@ An `InteractionSpec` describes _how_ to generate an interaction and is used to d
 
 `InteractionSpec` is the abstract base class. `Interact` is the main spec used by `.interact()`. Other subclasses generate interactions differently.
 
-<!-- pyright-skip: schematic: generate_question and call_my_agent stand in for the reader's own callables -->
-
 ```python
+import random
+
 from giskard.checks import Interact
 
+
+def generate_random_question() -> str:
+    return f"What is 2 + {random.randint(0, 10)}?"
+
+
+async def generate_answer(inputs: str) -> str:
+    # Call your own agent here and return its answer.
+    return f"{inputs} The answer is 42."
+
+
 spec = Interact(
-    inputs=generate_question,  # value, callable, or input generator
-    outputs=call_my_agent,  # value or callable, or MISSING to use the target
-    metadata={"category": "math"},
+    inputs=generate_random_question,  # value, callable, or input generator
+    outputs=generate_answer,  # value or callable, or MISSING to use the target
+    metadata={"category": "math", "difficulty": "easy"},
 )
 ```
 
@@ -132,6 +142,8 @@ check = Groundedness(
 A `Scenario` is a list of steps (interactions and checks) that are executed sequentially with a shared trace. Scenarios work for both single-turn and multi-turn tests.
 
 ```python
+import asyncio
+
 from giskard.checks import Equals, Scenario, StringMatching
 
 check1 = Equals(expected_value="test output", target_key="trace.last.outputs")
@@ -144,10 +156,14 @@ test_scenario = (
     .check(check2)
 )
 
-result = await test_scenario.run()
+result = asyncio.run(test_scenario.run())
 ```
 
-`run()` is asynchronous. See [Async design & pytest](/oss/checks/explanation/async-and-pytest) for how to await it from a script, from pytest, and from a notebook.
+`run()` is asynchronous, so a script wraps it in `asyncio.run()` and an async
+context (pytest with `@pytest.mark.asyncio`, a notebook cell) uses `await
+test_scenario.run()` directly. See
+[Async design & pytest](/oss/checks/explanation/async-and-pytest) for the
+details.
 
 ## Fluent API mapping
 

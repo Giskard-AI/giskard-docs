@@ -10,7 +10,7 @@ Everyone is welcome to contribute — whether you fix bugs, improve docs, propos
 Before contributing, make sure you have:
 
 - **<a href="https://git-scm.com/" target="_blank">Git</a>** installed
-- **Python 3.12+** — the repo's `.python-version` pins 3.13, so `make setup` provisions 3.13 for the dev environment
+- **Python 3.12+**
 - **<a href="https://docs.astral.sh/uv/" target="_blank">uv</a>** — the project's package manager and workspace tool
 - **make** — used for all dev commands (on Windows, use WSL or an equivalent)
 

@@ -5,14 +5,9 @@ sidebar:
   order: 2
 ---
 
-## Prerequisites
-
-- **Python 3.12 or higher.** This is a floor, not a recommendation: the library uses language features that are not available on older versions.
-- **An API key for one LLM provider**, if you want to run judged checks. Deterministic checks (`Equals`, `StringMatching`, `RegexMatching`, `FnCheck`, `JsonValid`, `RegoPolicy`, and your own `Check` subclasses) need no key at all.
-
 ## Install the Python package
 
-Install Giskard together with the SDK for the LLM provider you will use as a judge: an LLM the library calls to grade your agent's replies.
+Giskard Checks requires Python 3.12 or higher. Install it together with the SDK for the LLM provider you will use as a judge: an LLM the library calls to grade your agent's replies.
 
 ```bash
 pip install --pre "giskard[openai]"
@@ -46,7 +41,7 @@ Two checks need a dependency that is not installed by default:
 | `regorus` | `pip install --pre "giskard[regorus]"` | `RegoPolicy`, policy-as-code checks evaluated by Rego |
 
 :::caution
-`regorus` is not available on Windows or on linux-aarch64. On those platforms the extra installs nothing and `RegoPolicy` stays unavailable.
+The `regorus` extra installs on macOS (Intel and Apple silicon) and on Linux x86_64. On other platforms — Windows and linux-aarch64 — the extra installs nothing and `RegoPolicy` stays unavailable.
 :::
 
 :::note[Using LiteLLM instead]
@@ -134,15 +129,22 @@ A generator passed to `set_default_generator`, or to an individual check, always
 
 ## Telemetry and console output
 
-Giskard collects anonymous usage telemetry by default, and prints a short message about Giskard Enterprise the first time you import `giskard.checks`. Both can be turned off:
+Giskard sends anonymous usage telemetry to PostHog by default, and prints a short message about Giskard Enterprise the first time you import `giskard.checks`. Both can be turned off:
 
 ```bash
 export GISKARD_TELEMETRY_DISABLED=1   # or the vendor-neutral DO_NOT_TRACK=1
+export GISKARD_TELEMETRY_DISABLE_GEOIP=1  # keep telemetry on, drop the location lookup
 export GISKARD_QUIET=1                # suppress the welcome message
 ```
 
-`GISKARD_TELEMETRY_DISABLE_GEOIP=1` keeps telemetry on but drops the coarse location lookup. In Python, call `disable_telemetry()` from `giskard.core.telemetry`. Set `GISKARD_TELEMETRY_DISABLED` and `GISKARD_QUIET` in CI so build logs stay clean and no data leaves the runner.
+In Python, call `disable_telemetry()`:
+
+```python
+from giskard.core.telemetry import disable_telemetry
+
+disable_telemetry()
+```
 
 ## Next Steps
 
-For a step-by-step lesson with no API key, try [Your First Test](/oss/checks/tutorials/your-first-test) first. Or head to the [Quickstart](/oss/checks/quickstart) for a single example.
+For a step-by-step lesson, try [Your First Test](/oss/checks/tutorials/your-first-test) first. Or head to the [Quickstart](/oss/checks/quickstart) for a single example.
