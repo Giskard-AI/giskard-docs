@@ -31,6 +31,7 @@ function addRule(from, to) {
 
 for (const [from, to] of Object.entries(redirects)) {
   addRule(from, to);
+  addRule(`${from}/`, to);
   addRule(`${from}.html`, to);
   addRule(`${from}/index.html`, to);
 }
@@ -67,6 +68,11 @@ for (const file of htmlFiles) {
   addRule(`${pagePath}.html`, pagePath);
   // /page/index.html → /page
   addRule(`${pagePath}/index.html`, pagePath);
+  // /page/ → /page. Without this, Cloudflare's `html_handling:
+  // "drop-trailing-slash"` strips the slash with a 307, which crawlers treat as
+  // temporary and refuse to consolidate link equity through. A 301 here wins
+  // because _redirects is evaluated before asset html_handling.
+  addRule(`${pagePath}/`, pagePath);
 }
 
 const outFile = resolve(assetsDir, "_redirects");

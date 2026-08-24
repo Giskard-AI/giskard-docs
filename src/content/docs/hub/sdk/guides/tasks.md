@@ -1,6 +1,6 @@
 ---
 title: Tasks
-description: Create and manage tasks with the Giskard SDK to track issues found during LLM agent evaluations and security scans.
+description: "Track issues found in evaluations and scans with hub.tasks: create, assign, prioritise, and resolve tasks in the Hub's built-in tracker."
 sidebar:
   order: 6
 ---

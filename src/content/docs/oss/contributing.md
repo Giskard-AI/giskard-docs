@@ -1,6 +1,6 @@
 ---
 title: Contribute to Giskard
-description: "How to contribute to the Giskard open-source project: prerequisites, workflow, and community."
+description: "Contribute to the Giskard open-source project: set up uv and Python 3.12, follow the giskard-oss workflow for bugs, docs, and checks, and find the community."
 sidebar:
   order: 2
 ---

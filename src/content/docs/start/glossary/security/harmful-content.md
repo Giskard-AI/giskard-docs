@@ -1,7 +1,8 @@
 ---
-title: "Harmful Content Generation"
+title: "What Is Harmful Content?"
 description: "Learn about LLM harmful content generation vulnerabilities and how to detect and prevent models from producing violent, illegal, or inappropriate material."
 sidebar:
+  label: "Harmful Content Generation"
   order: 3
 ---
 

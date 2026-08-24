@@ -1,7 +1,8 @@
 ---
-title: "Hallucination & Misinformation"
+title: "What Is LLM Hallucination?"
 description: "Learn about LLM hallucination vulnerabilities and how to detect and prevent models from generating false or misleading information."
 sidebar:
+  label: "Hallucination & Misinformation"
   order: 5
 ---
 

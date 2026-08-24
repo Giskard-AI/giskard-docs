@@ -1,7 +1,8 @@
 ---
-title: "Reasoning and Language Understanding Benchmarks"
+title: "Reasoning & Language Benchmarks"
 description: "Benchmarks that evaluate LLMs' ability to comprehend text, make logical inferences, and solve problems requiring multi-step reasoning."
 sidebar:
+  label: "Reasoning and Language Understanding Benchmarks"
   order: 2
 ---
 
