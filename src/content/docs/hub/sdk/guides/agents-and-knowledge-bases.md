@@ -59,7 +59,7 @@ With the default schemas, the Hub sends a POST request to `url` with a JSON body
 }
 ```
 
-The `metadata` field is optional. If returned, it can be validated using `metadata` checks (see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#metadata)).
+The `metadata` field is optional. If returned, it can be validated using `metadata` checks (see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#metadata-hub)).
 
 :::note
 Conversational agents also get a default **auto binding** that rebuilds the conversation history across turns (it aggregates previous agent responses into the `messages` array). Pass `auto_bindings=[]` if your agent is single-turn and should not receive accumulated history.
@@ -307,7 +307,7 @@ print(f"Generated dataset: {dataset.id} ({dataset.name})")
 
 The Hub samples documents from the KB, crafts questions whose answers are grounded in those documents, and creates scenarios with a `hub_groundedness` check pre-configured.
 
-See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#generate-document-based-test-cases) for more detail.
+See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#generate-scenarios-from-documents) for more detail.
 
 ---
 
