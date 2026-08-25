@@ -135,8 +135,11 @@ Each probe may generate multiple adversarial prompt attempts. Inspect them to un
 attempts = hub.scans.probes.list_attempts("probe-id")
 
 for attempt in attempts:
-    print(f"Prompt: {[m['content'] for m in attempt.input['messages']]}")
-    print(f"Response: {attempt.output['response']['content']}")
+    messages = attempt.input.get("messages") or []
+    prompt = [m.get("content") for m in messages] if messages else attempt.input
+    response = (attempt.output or {}).get("response") or attempt.output
+    print(f"Prompt: {prompt}")
+    print(f"Response: {response.get('content') if isinstance(response, dict) else response}")
     print(
         f"Severity: {attempt.severity}"
     )  # higher than 0 means the attack succeeded

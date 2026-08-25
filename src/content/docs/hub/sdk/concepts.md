@@ -39,10 +39,10 @@ A **Project** is a workspace that groups all related resources: agents, datasets
 
 An **Agent** represents your agentic application, such as LLM-based chatbots or classification services. It can be:
 
-- A **remote agent** — an HTTP endpoint that the Hub calls with a list of chat messages and expects a response from.
-- A **local agent** — a Python function you pass directly when running a local evaluation. Useful for evaluating models without exposing an HTTP endpoint.
+- A **remote agent** — an HTTP endpoint the Hub calls during evaluations and scans. Every agent has an `input_schema` and `output_schema` (JSON Schema). When omitted, they default to the conversational format: the Hub POSTs a `messages` array and expects a `response`. Custom schemas let you evaluate classifiers, extractors, and other non-chat APIs.
+- A **local agent** — a Python function you pass directly when running a local evaluation. Useful for evaluating chat models without exposing an HTTP endpoint. Local evaluations currently support single-interaction, chat-style scenarios only.
 
-Agents are configured with a URL, HTTP headers (for authentication), and the list of supported languages.
+Agents are configured with a URL, HTTP headers (for authentication), supported languages, and optionally custom schemas and `auto_bindings`.
 
 **SDK resource:** `hub.agents`
 

@@ -14,7 +14,7 @@ from giskard_hub import HubClient
 
 hub = HubClient()
 
-chats = hub.playground_chats.list(project_id="project-id")
+chats = hub.playground_chats.list(project_id="project-id", include=["agent"])
 
 for chat in chats:
     print(f"{chat.id} — agent: {chat.agent.name} — {chat.created_at}")
@@ -25,9 +25,7 @@ for chat in chats:
 ## Retrieve a chat with its messages
 
 ```python
-chat = hub.playground_chats.retrieve(
-    "chat-id",
-)
+chat = hub.playground_chats.retrieve("chat-id", include=["agent"])
 
 print(f"Chat with: {chat.agent.name}")
 

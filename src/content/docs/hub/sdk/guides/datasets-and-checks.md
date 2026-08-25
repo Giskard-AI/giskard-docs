@@ -707,8 +707,8 @@ Each rule dict supports:
 | Key                   | Type  | Description                                                      |
 | --------------------- | ----- | ---------------------------------------------------------------- |
 | `json_path`           | `str` | JSON path expression (e.g. `$.category`, `$.tools_called[0]`)    |
-| `expected_value`      | `str` | The expected value                                               |
-| `expected_value_type` | `str` | Type of the expected value (`"string"`, `"number"`, `"boolean"`) |
+| `expected_value`      | `str` / `number` / `bool` | The expected value                                               |
+| `expected_value_type` | `str`                     | Type of the expected value (`"string"`, `"number"`, `"boolean"`) |
 
 ```python
 {
@@ -722,7 +722,7 @@ Each rule dict supports:
             },
             {
                 "json_path": "$.resolved",
-                "expected_value": "true",
+                "expected_value": True,
                 "expected_value_type": "boolean",
             },
         ]

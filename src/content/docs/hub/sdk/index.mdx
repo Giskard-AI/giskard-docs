@@ -65,7 +65,7 @@ evaluation = hub.evaluations.create(
 
 ## Migrating from Hub v2?
 
-If you used the SDK to interact with the [Hub v2](/hub/ui/release-notes#251-2026-03-31), you can use the same SDK to interact with the Hub v3, with little changes. See the [Migration Guide](/hub/sdk/migration) for a complete list of breaking changes and before/after code examples.
+Hub v3 pairs with SDK **3.2.0** and the two must upgrade together (Hub first). Most resource renames (`hub.test_cases` → `hub.scenarios`, project scenarios → prompt presets) still work with a `DeprecationWarning`, but **check identifier changes are breaking** — old identifiers such as `correctness` and `metadata` are rejected with a 422. See the [Migration Guide](/hub/sdk/migration) for the full list and before/after examples.
 
 ## Need help?
 
