@@ -256,7 +256,7 @@ hub.scenarios.comments.delete("comment-id", scenario_id="scenario-id")
 
 ## Import scenarios from a file
 
-Use `hub.datasets.upload()` to import a dataset. Each record must follow the scenario schema, with an `interactions` list.
+Use `hub.datasets.upload()` to import a dataset. Pass a `name` to create a new dataset, or a `dataset_id` to import into an existing one. Each record must follow the scenario schema, with an `interactions` list.
 
 ### From a Python list (in-memory)
 
@@ -856,8 +856,12 @@ hub.checks.create(
 
 ### Manage checks
 
+By default, `hub.checks.list()` returns only your custom checks. Built-in checks are referenced directly by identifier and are not listed; pass `filter_builtin=False` to include them.
+
 ```python
 checks = hub.checks.list(project_id="project-id")
+
+all_checks = hub.checks.list(project_id="project-id", filter_builtin=False)
 
 hub.checks.update("check-id", name="Updated name")
 

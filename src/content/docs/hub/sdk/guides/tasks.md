@@ -26,7 +26,7 @@ task = hub.tasks.create(
 print(f"Task created: {task.id}")
 ```
 
-A task can be linked to the resource where the problem was found: pass `evaluation_result_id` for an evaluation result, `dataset_scenario_id` for a scenario, or `probe_attempt_id` for a scan probe attempt.
+A task must be linked to at least one resource where the problem was found: pass `evaluation_result_id` for an evaluation result, `dataset_scenario_id` for a scenario, or `probe_attempt_id` for a scan probe attempt.
 
 ### Status values
 

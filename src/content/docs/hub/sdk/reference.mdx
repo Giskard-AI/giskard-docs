@@ -513,8 +513,8 @@ from giskard_hub.types import Dataset, Scenario, TaskProgress
   <Property name="data" type="FileTypes | list[dict[str, Any]] | str" required>
     File path (`str` or `Path`), file-like object, or list of dicts. Each record should have an `interactions` list (`{"input", "output", "checks"}`). The legacy `messages`/`checks`/`demo_output` record shape is deprecated but still translated.
   </Property>
-  <Property name="dataset_id" type="str | None">Append to an existing dataset instead of creating a new one.</Property>
-  <Property name="name" type="str | None">Name for the new dataset.</Property>
+  <Property name="dataset_id" type="str | None">Dataset to import into. If omitted, a new dataset is created.</Property>
+  <Property name="name" type="str | None">Name for the new dataset. Required when `dataset_id` is omitted.</Property>
 </MethodCard>
 
 <MethodCard name=".generate_preset_based()" returnType="Dataset">
@@ -1024,8 +1024,8 @@ from giskard_hub.types import Project
   <Property name="name" type="str" required>
     Project name.
   </Property>
-  <Property name="description" type="str | None">
-    Project description.
+  <Property name="description" type="str" required>
+    Project description. Required by the Hub.
   </Property>
 </MethodCard>
 
@@ -1356,6 +1356,8 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
 ```
 
 <MethodCard name=".create()" returnType="Task">
+  Create a task. The Hub requires at least one linked resource: `evaluation_result_id`, `dataset_scenario_id`, or `probe_attempt_id`.
+
   <Property name="project_id" type="str" required>
     Project ID.
   </Property>

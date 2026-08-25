@@ -159,7 +159,7 @@ A **Scheduled Evaluation** is a recurring evaluation job. You configure the agen
 
 ## Tasks
 
-**Tasks** are a lightweight issue tracker built into the Hub. When you find a problem during an evaluation or scan, you can create a task to track the follow-up work. Each task has a title, a free-text description of what needs to be fixed, one or more assignees, a status (`open`, `in_progress`, `resolved`), and a priority (`low`, `medium`, `high`).
+**Tasks** are a lightweight issue tracker built into the Hub. When you find a problem during an evaluation or scan, you can create a task to track the follow-up work. Each task has a free-text description of what needs to be fixed, one or more assignees, a status (`open`, `in_progress`, `resolved`), and a priority (`low`, `medium`, `high`). Every task links to at least one resource: an evaluation result, a scenario, or a probe attempt.
 
 **SDK resource:** `hub.tasks`
 
