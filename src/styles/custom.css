@@ -461,3 +461,15 @@ iframe[src*="vimeo.com"] {
   width: 100%;
   height: auto;
 }
+
+.starlight-aside .starlight-aside:last-child {
+  margin-bottom: 0;
+}
+
+.starlight-aside .starlight-aside:first-of-type {
+  margin-top: 2rem;
+}
+
+.starlight-aside:has(.starlight-aside) .starlight-aside__title + .starlight-aside__content {
+  margin-top: 1.5rem;
+}

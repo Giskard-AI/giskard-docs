@@ -48,23 +48,31 @@ After configuring the check parameters, you can save the check by clicking on th
 
 Check whether all information from the reference answer is present in the agent answer without contradiction. Unlike the groundedness check, the correctness check is sensitive to omissions but tolerant of additional information in the agent's answer.
 
-:::note[Example]
-**Query**: What is the capital of France?
+| Parameter           | Type        | Description                                       |
+| ------------------- | ----------- | ------------------------------------------------- |
+| `Expected response` | `string`    | The expected agent response                       |
+| `Target key`        | `JSON path` | Trace field to evaluate<!-- TODO: link target --> |
 
-**Reference Answer**: Paris is the capital of France, it was founded around 200 BC.
+::::note[Example]
+**Input**: What is the capital of France?
 
-**Failure examples**:
+---
+
+**Expected response**: Paris is the capital of France, it was founded around 200 BC.
+
+:::caution[Failure examples]
 
 - The capital of France is Paris.
   - _Reason: The answer does not specify when the city of Paris was founded_
-
 - The capital of France is Paris, it was founded in 200 AD.
   - _Reason: The answer contradicts the reference which states that Paris was founded around 200 BC, and not 200 AD_
+:::
 
-**Success example**:
+:::tip[Success example]
 
 - The capital of France is Paris, the first settlement dates from 200 BC.
-  :::
+:::
+::::
 
 #### Conformity
 
