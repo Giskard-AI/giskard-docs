@@ -23,7 +23,8 @@ This release pairs with Hub v3 and must be upgraded together with it: upgrade th
 
 ### What's changed?
 
-- **Built-in check identifiers renamed by Hub v3**: `correctness` → `hub_correctness`, `metadata` → `hub_metadata`, `string_match` → `string_matching`. `conformity` and `groundedness` now name the open-source checks; use `hub_conformity` and `hub_groundedness` for the Hub checks. Old identifiers are rejected by the Hub.
+- **Built-in check identifiers renamed by Hub v3**: `correctness` → `hub_correctness`, `metadata` → `hub_metadata`, `string_match` → `string_matching`. `conformity` and `groundedness` now name the open-source checks; use `hub_conformity` and `hub_groundedness` for the Hub checks. The `semantic_similarity` check keeps its identifier, but its `reference` param becomes `reference_text`. Old identifiers are rejected by the Hub.
+- **Custom check identifiers now require a `custom_` prefix**. The Hub upgrade renames existing custom checks automatically (e.g. `tone_professional` becomes `custom_tone_professional`); update scripts that reference them by identifier.
 - Removed `hub.agents.detect_statefulness()` and the agent `stateful` field, which no longer exist in the Hub v3 API.
 - Deprecated (still working, with a `DeprecationWarning`): the `hub.test_cases` surface and its `test_case_*` parameters, `hub.projects.scenarios`, the flat `messages` / `demo_output` / `checks` arguments, `messages=` on `generate_completion()` and `run_single()`, and the flattened `.messages` accessors on `Scenario`, `PlaygroundChat`, and `ScanProbeAttempt`.
 

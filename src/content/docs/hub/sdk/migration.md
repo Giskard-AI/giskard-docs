@@ -65,19 +65,46 @@ hub.scenarios.create(
 `conformity` and `groundedness` **still exist but changed meaning**. They now name the open-source giskard-checks variants, not the Hub checks. The OSS `conformity` takes a single `rule: str` instead of `rules: list[str]`, so a script that keeps passing `{"identifier": "conformity", "params": {"rules": [...]}}` fails with a 422 instead of a rename tip. Switch those to `hub_conformity` and `hub_groundedness`. See [Built-in checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for the full new catalogue.
 :::
 
-### Params classes renamed
+### Check params renamed
 
-If you use the typed params classes:
+Whether you pass raw dicts or the typed params classes:
 
 - `CorrectnessParams` is removed. Use `HubCorrectnessParams` (`reference`).
 - `MetadataParams` is removed. Use `HubMetadataParams` (`json_path_rules`).
 - `StringMatchParams` is removed. Use `StringMatchingParams`.
 - `ConformityParams` now describes the OSS check (single required `rule: str`). Use `HubConformityParams` for the Hub check (`rules: list[str]`).
+- `semantic_similarity` keeps its identifier, but its `reference` param is renamed to `reference_text`. Scripts passing `{"reference": ...}` to this check get a 422.
 - Typed params classes now exist for all 21 built-in checks (e.g. `HubGroundednessParams`, `SemanticSimilarityParams`, `LLMJudgeParams`).
 
 ### Validation moved server-side
 
 The SDK no longer validates check identifiers or params locally, the Hub does. Errors that were previously raised locally as `ValueError` now surface as `UnprocessableEntityError` (HTTP 422). Wrong or unknown check params, which were previously accepted and silently dropped, are now rejected at save time and at run time. Update any `except ValueError` handling around check creation accordingly.
+
+### Custom check identifiers require a `custom_` prefix
+
+Custom check identifiers must now start with `custom_` (e.g. `custom_tone_professional`). `hub.checks.create()` and `hub.checks.update()` reject any other identifier.
+
+The Hub upgrade renames your existing custom checks automatically: `tone_professional` becomes `custom_tone_professional`. Stored scenarios keep working, since their check references are updated by the same migration. Scripts are not: any code that references a custom check by its old identifier (in scenario `checks`, `hub.evaluations.run_single()`, or uploaded dataset files) must switch to the prefixed name.
+
+```python
+# Hub v2 (SDK 3.1)
+check = hub.checks.create(
+    project_id=project_id,
+    identifier="tone_professional",
+    name="Professional tone",
+    params={"type": "conformity", "rules": ["Use formal language."]},
+)
+checks = [{"identifier": "tone_professional"}]
+
+# Hub v3 (SDK 3.2)
+check = hub.checks.create(
+    project_id=project_id,
+    identifier="custom_tone_professional",
+    name="Professional tone",
+    params={"type": "hub_conformity", "rules": ["Use formal language."]},
+)
+checks = [{"identifier": "custom_tone_professional"}]
+```
 
 ---
 
@@ -233,7 +260,8 @@ See [Projects & Prompt Presets](/hub/sdk/guides/projects#prompt-presets) for the
 If your CI started failing after the Hub upgrade, work through this checklist:
 
 1. **Pin the SDK to 3.2.0 or later** in your requirements.
-2. **Search your scripts for old check identifiers** (`correctness`, `metadata`, `string_match`) and replace them with the new names from the table above.
+2. **Search your scripts for old check identifiers** (`correctness`, `metadata`, `string_match`) and replace them with the new names from the table above. Also rename `reference` to `reference_text` on `semantic_similarity` checks.
 3. **Check every `conformity` and `groundedness` usage.** If it passes `rules=` or a fixed `context=` for the Hub behaviour, rename it to `hub_conformity` / `hub_groundedness`.
-4. **Update uploaded dataset files** (`hub.datasets.upload()` JSON/JSONL): the records may keep the legacy shape, but the identifiers inside `checks` must be the new ones.
-5. Treat any remaining `UnprocessableEntityError` (422) as a validation message from the Hub. The error body names the rejected identifier or param and often suggests the correct check.
+4. **Prefix custom check references.** The Hub renamed your existing custom checks to `custom_<identifier>`. Update scripts that reference them by the old identifier.
+5. **Update uploaded dataset files** (`hub.datasets.upload()` JSON/JSONL): the records may keep the legacy shape, but the identifiers inside `checks` must be the new ones.
+6. Treat any remaining `UnprocessableEntityError` (422) as a validation message from the Hub. The error body names the rejected identifier or param and often suggests the correct check.

@@ -663,10 +663,9 @@ hub.helpers.print_metrics(evaluation)
   <Property name="agent_info" type="MinimalAgentParam" required>
     Agent info as `{"name": str, "description": str}`.
   </Property>
-  <Property name="dataset_id" type="str | None">Dataset to evaluate against.</Property>
+  <Property name="dataset_id" type="str" required>Dataset to evaluate against.</Property>
   <Property name="name" type="str | None">Evaluation name.</Property>
   <Property name="tags" type="list[str] | None">Filter scenarios by tags.</Property>
-  <Property name="old_evaluation_id" type="str | None">Reuse a previous evaluation's dataset.</Property>
 
 :::tip
 For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handles the full local evaluation lifecycle automatically.
@@ -1321,8 +1320,6 @@ from giskard_hub.types import ScheduledEvaluation, FrequencyOption
   <Property name="day_of_week" type="int | None">Updated day of week (1--7).</Property>
   <Property name="day_of_month" type="int | None">Updated day of month (1--28).</Property>
   <Property name="run_count" type="int | None">Updated run count.</Property>
-  <Property name="last_execution_at" type="str | datetime | None">Updated last execution time.</Property>
-  <Property name="last_execution_status" type="LastExecutionStatusParam | None">Updated last execution status.</Property>
   <Property name="paused" type="bool | None">Updated paused status.</Property>
 </MethodCard>
 
