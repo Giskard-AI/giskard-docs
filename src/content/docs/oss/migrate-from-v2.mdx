@@ -30,7 +30,7 @@ Checks ships in `giskard`; the scan is the `scan` extra:
 pip install --pre "giskard[scan,openai]"
 ```
 
-The Hub moved too: the v2 ML worker and `GiskardClient` uploads are now the separate `giskard_hub` SDK, with its [own migration guide](/hub/sdk/migration).
+The Hub moved too: its workflow is not a drop-in v2 migration. Use the separate `giskard_hub` SDK and its [migration guide](/hub/sdk/migration) to plan that move.
 
 <Aside type="note" title="Which versions">
   The v2 snippets follow `giskard` 2.x as published on [legacy-docs.giskard.ai
@@ -49,13 +49,16 @@ The Hub moved too: the v2 ML worker and `GiskardClient` uploads are now the sepa
 | `test_suite.run()` (synchronous)                        | `await suite.run(target=...)`                                                     |
 | `giskard.llm.set_llm_model("gpt-4o")`                   | `set_default_generator(Generator(model="openai/gpt-4o"))`                         |
 | `giskard.llm.set_embedding_model(...)`                  | `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL`, read by `get_default_embedding_model()` |
-| `display(results)`, `results.to_html(...)`              | `result.print_report()`, `result.to_junit_xml(...)`, `result.model_dump_json()`   |
 | `giskard.testing.test_f1(...)`, the `@test` decorator   | built-in checks, `FnCheck`, or a `Check` subclass                                 |
 
-Two changes cut across everything else and are worth fixing in your head before you read further:
-
-- **Every entry point is a coroutine.** `vulnerability_scan`, `quality_scan`, `generate_suite`, and `Suite.run` must be awaited. Outside a notebook, wrap your script in `asyncio.run`.
-- **v3 targets LLM agents only.** There is no successor to `model_type="classification"` or `model_type="regression"`. If you scan tabular models, stay on v2.
+<Aside type="caution" title="Migration constraints">
+  Every v3 entry point is a coroutine: await `vulnerability_scan`,
+  `quality_scan`, `generate_suite`, and `Suite.run` (or use `asyncio.run` in a
+  script). Reports are terminal, JUnit XML, or JSON outputs; v3 does not
+  produce a standalone HTML report. v3 can test wrapped ML targets with Checks
+  and `FnCheck`, but there is no drop-in migration for v2's automatic tabular
+  scan, ML test catalog, or Hub workflow.
+</Aside>
 
 ## Wrapping your model or agent
 
@@ -181,7 +184,6 @@ result.to_junit_xml("scan_results.xml")
 Three differences bite in practice:
 
 - `description` and `languages` are **required**. The scan writes its scenarios from them, so a vague description produces a vague scan.
-- There is **no HTML report**. `print_report()` writes to the terminal, `to_junit_xml()` feeds CI, and `model_dump_json()` gives you the raw result to store. Nothing renders a standalone page.
 - Generating a suite is now its own call, `generate_suite`, which returns a `Suite` without running it. See [Save and Version a Scan Suite](/oss/scan/how-to/save-and-version-suites).
 
 ### Vulnerability categories
@@ -196,7 +198,7 @@ v2 grouped findings into fixed categories. v3 annotates each result with tags an
 | Stereotypes and Discrimination   | `threat-type:harmful-content-generation`                                                         |
 | Robustness                       | no direct equivalent: covered by the multi-turn attack generators rather than input perturbation |
 | Output Formatting                | no equivalent in the scan: assert it yourself with `JsonValid` or `RegexMatching`                |
-| Information Disclosure           | `threat-type:misguidance-and-unauthorized-advice`, depending on what is disclosed                |
+| Information Disclosure           | `threat-type:data-leak` (a tag-level analogue, not an exact category replacement)                |
 
 Results also carry `owasp:`, `probe-type:`, and `component:` tags. The full list is in the [threat taxonomy](/oss/scan/explanation/threat-taxonomy).
 
@@ -267,27 +269,28 @@ print(quality_result.recommendation)
 
 `KnowledgeBase` moved from `giskard.rag` to `giskard.scan`, and takes texts rather than a dataframe. `from_texts` is the common path; `Document` is there when you need to attach metadata. See the [knowledge base reference](/oss/scan/reference/knowledge-base).
 
-### Question generators
+### Scenario generators
 
-v2 let you choose question generators explicitly. v3 has an equivalent set, registered as **scenario generators**, and `quality_scan` runs the whole quality registry unless you build a suite yourself with `generate_suite(generators=[...])`.
+v2 question generators and v3 scenario generators are not row-for-row migrations: v3 generators create scenarios for distinct behaviors, and some use multi-turn conversations. `quality_scan` runs the quality registry unless you build a suite yourself with `generate_suite(generators=[...])`.
 
-| v2 question type | v3 scenario generator                                                             |
-| ---------------- | --------------------------------------------------------------------------------- |
-| simple           | `HallucinationScenarioGenerator`                                                  |
-| complex, double  | `SplitQuestionsScenarioGenerator`                                                 |
-| distracting      | `MultiTopicScenarioGenerator`                                                     |
-| situational      | `SycophancyScenarioGenerator`                                                     |
-| out of scope     | `OutOfScopeScenarioGenerator`                                                     |
-| conversational   | no direct equivalent: multi-turn behaviour is driven by `target_mode="multiturn"` |
+| v3 scenario generator                  | Purpose                                                                                         |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `HallucinationScenarioGenerator`       | Direct document-grounded questions and contradictions.                                          |
+| `SplitQuestionsScenarioGenerator`      | Two-message questions that depend on conversation history.                                     |
+| `MultiTopicScenarioGenerator`          | Multi-turn questions over separate knowledge-base topics, exercising retrieval and history.    |
+| `SycophancyScenarioGenerator`          | Questions biased by an assertion that is contrary to the source material.                      |
+| `OutOfScopeScenarioGenerator`          | Plausible, precise objects absent from the knowledge base and fabricated-answer behavior.      |
 
-### Metrics
+### Checks for related concerns
 
-| v2 metric                                         | v3 check                                              |
-| ------------------------------------------------- | ----------------------------------------------------- |
-| correctness                                       | `Contradiction`, or `Conformity` for a rule you write |
-| `ragas_faithfulness`                              | `Groundedness`                                        |
-| `ragas_answer_relevancy`                          | `AnswerRelevance`                                     |
-| `ragas_context_precision`, `ragas_context_recall` | **no equivalent**: v3 does not score the retriever    |
+These checks are not compatible replacements for RAGET or RAGAS metrics. RAGET evaluates a test set with aggregate metric semantics; v3 checks judge individual scenarios with different inputs and scoring, then aggregates scan results. In particular, v3 has no retriever-coverage metrics comparable to context precision or recall.
+
+| v2 concern                                         | v3 checks to compose for a related concern                      |
+| -------------------------------------------------- | --------------------------------------------------------------- |
+| correctness                                        | `Contradiction`, or `Conformity` for a rule you write           |
+| `ragas_faithfulness`                               | `Groundedness`                                                  |
+| `ragas_answer_relevancy`                           | `AnswerRelevance`                                               |
+| `ragas_context_precision`, `ragas_context_recall` | **No equivalent:** v3 does not provide retriever coverage metrics |
 
 There is no `report.correctness_by_topic()`. The equivalent is grouping the printed report on a tag, and reading `result.pass_rate`, `result.failures_and_errors`, and `result.recommendation`.
 
@@ -424,15 +427,12 @@ print(suite_result.pass_rate)
 
 `Conformity` and the other LLM judges replace the tests you would have written by hand; `FnCheck` replaces the `@test` decorator for anything deterministic. The full catalog is in the [checks reference](/oss/checks/reference/checks).
 
-There is no replacement for the performance, drift, metamorphic, and statistical test catalogs: those measured tabular models, which v3 does not evaluate.
+There is no drop-in replacement for the performance, drift, metamorphic, and statistical test catalogs. For a wrapped ML target, compose the assertions you need with Checks and `FnCheck`.
 
-## What has no v3 equivalent
+## What has no drop-in v3 equivalent
 
 Each of these silently breaks a v2 script, so check the list before you start rewriting:
 
-- **Tabular, classification, and regression models.** v3 evaluates LLM agents. `model_type="classification"`, `classification_labels`, `cat_columns`, and `target=` have no successor. Stay on v2 for those.
-- **Synchronous execution.** Everything is async. In a plain script, `asyncio.run(main())`.
-- **HTML reports.** `display(results)` and `.to_html()` have no replacement.
 - **Slicing and transformation functions, and `SuiteInput`.** Not ported.
 - **Test set files.** `QATestset.save` / `QATestset.load` become `Suite.model_dump_json()` and `Suite.model_validate_json()`. Import `giskard.scan` before loading a scan-generated suite, so its prompt namespace is registered: see [Save and Version a Scan Suite](/oss/scan/how-to/save-and-version-suites).
 - **Integrations** with MLflow, Weights & Biases, DagsHub, NeMo Guardrails, and AVID. For CI, use the JUnit export described in [Run the Scan in CI](/oss/scan/how-to/scan-in-ci).
