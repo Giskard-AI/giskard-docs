@@ -99,10 +99,6 @@ evaluation = hub.helpers.evaluate(
 )
 ```
 
-:::note
-Local evaluations support **single-interaction, chat-style** scenarios only. The callable receives `list[ChatMessage]` (not a structured input dict). Multi-turn scenarios are skipped and marked as errored — run a remote evaluation to score them. Structured (non-chat) agents should use a remote evaluation against a registered HTTP endpoint.
-:::
-
 ---
 
 ## Upload results from Giskard OSS
