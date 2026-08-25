@@ -1,8 +1,9 @@
 ---
-title: "Quickstart"
+title: "Hub SDK Quickstart"
 description: Install the Giskard Hub SDK, authenticate, and run your first agent evaluation in minutes.
 sidebar:
   order: 2
+  label: Quickstart
 ---
 
 This tutorial walks you through installing the SDK, connecting to the Hub, and running a complete evaluation against an agent — from dataset creation to reading results.
