@@ -76,7 +76,13 @@ const add = (msg) => msg && failures.push(msg);
 
 if (redirects.length === 0) add("src/redirects.json is empty (unexpected)");
 
-for (const [from, to] of redirects) add(ruleError(rules, from, to));
+for (const [from, to] of redirects) {
+  add(ruleError(rules, from, to));
+  add(ruleError(rules, `${from}/`, to));
+  if (rules.has(`${from}/`) && codes.get(`${from}/`) !== "301") {
+    add(`trailing-slash rule must be 301, got ${codes.get(`${from}/`)}: ${from}/`);
+  }
+}
 for (const [from, to] of Object.entries(CANARY)) add(ruleError(rules, from, to));
 
 for (const page of HTML_STRIP) {
