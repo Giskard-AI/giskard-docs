@@ -105,14 +105,14 @@ import asyncio
 from giskard.scan import quality_scan
 
 
-async def bank_support_agent_for_scan(inputs: str) -> str:
+async def bank_support_agent_for_quality_scan(inputs: str) -> str:
     # Call your own LLM app, chain, or agent here
     return "You have 120 days from the statement date to dispute a card transaction."
 
 
 suite_result = asyncio.run(
     quality_scan(
-        target=bank_support_agent_for_scan,
+        target=bank_support_agent_for_quality_scan,
         description=(
             "A customer-support agent for a retail bank, answering from our published"
             " policies."
