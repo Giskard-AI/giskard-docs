@@ -1,0 +1,148 @@
+---
+title: Giskard Library
+description: "Open-source Python library for testing, evaluating, and scanning agentic applications, such as LLM-based chatbots, RAG systems, or any type of AI agent."
+---
+
+**Giskard Library** is a Python package for testing, evaluating, and scanning agentic applications, such as LLM-based chatbots, RAG systems, or any type of AI agent. It is available on [GitHub](https://github.com/Giskard-AI/giskard-oss) and was used in DeepLearning.AI's [Red Teaming LLM Applications](https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/) course.
+
+Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for agentic applications. You write scenarios and checks that pass or fail. Tests run on your machine, using the LLM provider of your choice as the judge. The same library also red-teams your agent, so you do not need a second tool for security testing.
+
+A scenario is a test case made of one or more interactions with your agent. In each interaction, you send inputs and capture the agent's outputs. A check is a rule the reply has to satisfy, either plain Python or a rule written in natural language and graded by the judge. Red teaming uses the same building blocks, but sends hostile inputs on purpose, such as attempts to make the agent leak its instructions ([prompt injection](/start/glossary/security/injection)), produce [harmful content](/start/glossary/security/harmful-content), or [state things that are not true](/start/glossary/business/hallucination). See the [glossary](/start/glossary) for the failure types Giskard looks for.
+
+:::note
+Coming from Giskard v2? Read [Migrate from Giskard v2 to v3](/oss/migrate-from-v2). In short: the v2 **scan** is now `vulnerability_scan` and **RAGET** is now `quality_scan`, both in the `scan` extra (`pip install --pre "giskard[scan]"`). Tabular (classification and regression) models have no v3 equivalent. Keep using the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai) for those, and follow the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252) for progress.
+:::
+
+The two examples below test a support agent for a retail bank, which must not give investment advice. For a full setup, see the [Checks quickstart](/oss/checks/quickstart) and [Your first scan](/oss/scan/tutorials/your-first-scan).
+
+## A first check
+
+Install the library and point it at your LLM provider — some checks are graded by a LLM judge:
+
+```bash
+pip install --pre "giskard[scan, litellm]"
+export OPENAI_API_KEY=...
+```
+
+Write a scenario, send one message to your agent, and state the rule its reply has to satisfy:
+
+```python
+import asyncio
+
+from giskard.checks import Conformity, Scenario
+
+
+async def bank_support_agent(inputs: str) -> str:
+    # Call your own LLM app, chain, or agent here
+    return "I can't recommend a specific investment. Please speak to a qualified financial adviser."
+
+
+scenario = (
+    Scenario("refuses_investment_advice")
+    .interact(
+        inputs="I have 20k sitting in my current account. Should I move it into your equity fund?",
+        outputs=bank_support_agent,
+    )
+    .check(
+        Conformity(
+            rule=(
+                "The answer declines to recommend a specific investment and directs the"
+                " customer to a qualified financial adviser."
+            )
+        )
+    )
+)
+
+result = asyncio.run(scenario.run())
+result.print_report()
+```
+
+`Conformity` grades the reply against a rule written in natural language, which is what you need when the requirement is a judgment call. For a rule you can decide in Python, such as "the reply never contains a full card number", use `RegexMatching` instead and skip the LLM call.
+
+## A first scan
+
+Describe the agent in plain language and the scan generates its own scenarios, runs them, and prints a report. Which scan you want depends on what you are worried about.
+
+### Vulnerability scan
+
+The `vulnerability_scan` is for a hostile user: it generates attacks — prompt injections, jailbreaks, requests for harmful content — and reports the ones the agent did not withstand.
+
+```python
+import asyncio
+
+from giskard.scan import vulnerability_scan
+
+
+async def bank_support_agent_for_scan(inputs: str) -> str:
+    # Call your own LLM app, chain, or agent here
+    return "I can't recommend a specific investment. Please speak to a qualified financial adviser."
+
+
+suite_result = asyncio.run(
+    vulnerability_scan(
+        target=bank_support_agent_for_scan,
+        description=(
+            "A customer-support agent for a retail bank. It answers questions about"
+            " accounts, cards, payments, and disputes. It must refuse to give investment"
+            " advice and must never disclose another customer's data."
+        ),
+        languages=["en"],  # languages the agent supports in ISO 639-1
+        max_scenarios=10,  # max number of scenarios to generate
+    )
+)
+suite_result.print_report()
+```
+
+The description is what the generators work from, so the constraints you write into it are the ones the scan will attack. `max_scenarios` caps how many the generators produce. Leave it off and the scan runs a full budget, which is more thorough but costs more provider calls than you want on a first run.
+
+### Quality scan
+
+On the other hand, `quality_scan` is for a wrong answer rather than a hostile user. It asks questions your documents can answer and judges the reply against them, which is what catches an invented policy or a refusal to answer something covered. Every quality generator is knowledge-base driven, so without `knowledge_base` the scan warns and produces nothing.
+
+```python
+import asyncio
+
+from giskard.scan import quality_scan
+
+
+async def bank_support_agent_for_quality_scan(inputs: str) -> str:
+    # Call your own LLM app, chain, or agent here
+    return "You have 120 days from the statement date to dispute a card transaction."
+
+
+suite_result = asyncio.run(
+    quality_scan(
+        target=bank_support_agent_for_quality_scan,
+        description=(
+            "A customer-support agent for a retail bank, answering from our published"
+            " policies."
+        ),
+        knowledge_base=[
+            "A disputed card transaction must be reported within 120 days of the statement date.",
+            "A card reported lost cannot be unfrozen and must be replaced.",
+            "We do not give investment or tax advice; refer the customer to an independent adviser.",
+        ],
+        languages=["en"],  # languages the agent supports in ISO 639-1 code
+        max_scenarios=10,  # max number of scenarios to generate
+    )
+)
+suite_result.print_report()
+```
+
+Both entry points are documented in the [Scan API](/oss/scan/reference/scan-api).
+
+## Resources and support
+
+- **Checks**: Explore the [Checks documentation](/oss/checks) for detailed guides
+- **Scan**: Probe your agent for vulnerabilities with [Scan](/oss/solutions/scan-vulnerabilities)
+- **Agent Skills**: Install [Giskard Agent Skills](/oss/agent-skills) to give Claude Code, Cursor, and other coding agents drop-in workflows for Giskard tasks
+- **Contributing**: See [Contribute to Giskard](/oss/contributing) for the official guide, AI-agent notes, and repos to star
+- **Examples**: Check our [GitHub repository ↗](https://github.com/Giskard-AI/giskard-oss) for more examples
+- **Community**: Join our [Discord ↗](https://discord.com/invite/ABvfpbu69R) for support and discussions
+
+## Next steps
+
+- **Checks quickstart**: Go from this snippet to a real suite in [Quickstart](/oss/checks/quickstart)
+- **Scan quickstart**: Run a full scan step by step in [Your first scan](/oss/scan/tutorials/your-first-scan)
+- **Install & Configure**: Set up the packages and your LLM provider in [Install & Configure](/oss/checks/installation)
+- **Your First Test**: Write your first scenario in [Your First Test](/oss/checks/tutorials/your-first-test)
