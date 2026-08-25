@@ -47,11 +47,9 @@
   --sl-color-bg: #FFFFFF;
   --sl-color-text: #0F1729;
   --sl-color-text-accent: #0F1729;
-  /* Chrome stays navy; content links use a darkened dark-mode cyan */
+  /* Chrome stays navy; inline links use foreground + underline (Hub A11Y) */
   --sl-color-accent-high: #0F1729;
   --sl-color-accent: #0F1729;
-  --giskard-link: #0d7377;
-  --giskard-link-hover: #0a5f61;
   --sl-color-accent-low: #f1f5f9;
   /* Subtle gray for active sidebar items */
 
@@ -157,17 +155,23 @@ h6 {
 }
 
 
-/* Link colors — same cyan family in both themes; light mode is darkened for contrast on white */
+/*
+ * Inline links match Hub:
+ * - underline in both themes (do not rely on color alone)
+ * - light: foreground (navy)
+ * - dark: primary (cyan)
+ */
+.sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link):not(.sl-link-card) {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+:root:not([data-theme='dark']) .sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link):not(.sl-link-card) {
+  color: var(--sl-color-text) !important;
+}
+
 :root[data-theme='dark'] a:not([class*="astro"]):not(.sl-anchor-link):not(.whitepaper-banner-link) {
   color: var(--giskard-link) !important;
-}
-
-:root:not([data-theme='dark']) .sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link) {
-  color: var(--giskard-link) !important;
-}
-
-:root:not([data-theme='dark']) .sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link):hover {
-  color: var(--giskard-link-hover) !important;
 }
 
 /* Anchor links */
