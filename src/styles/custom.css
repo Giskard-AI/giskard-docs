@@ -47,9 +47,11 @@
   --sl-color-bg: #FFFFFF;
   --sl-color-text: #0F1729;
   --sl-color-text-accent: #0F1729;
-  /* Removed blue in light mode */
+  /* Chrome stays navy; content links use a darkened dark-mode cyan */
   --sl-color-accent-high: #0F1729;
   --sl-color-accent: #0F1729;
+  --giskard-link: #0d7377;
+  --giskard-link-hover: #0a5f61;
   --sl-color-accent-low: #f1f5f9;
   /* Subtle gray for active sidebar items */
 
@@ -70,6 +72,7 @@
 
   --sl-color-accent-high: #05d939;
   --sl-color-accent: #05d939;
+  --giskard-link: #40dedf;
   --sl-color-accent-low: #0D3636;
 
   /* Border Alignment */
@@ -154,9 +157,17 @@ h6 {
 }
 
 
-/* Link colors */
+/* Link colors — same cyan family in both themes; light mode is darkened for contrast on white */
 :root[data-theme='dark'] a:not([class*="astro"]):not(.sl-anchor-link):not(.whitepaper-banner-link) {
-  color: #40dedf !important;
+  color: var(--giskard-link) !important;
+}
+
+:root:not([data-theme='dark']) .sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link) {
+  color: var(--giskard-link) !important;
+}
+
+:root:not([data-theme='dark']) .sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link):hover {
+  color: var(--giskard-link-hover) !important;
 }
 
 /* Anchor links */
