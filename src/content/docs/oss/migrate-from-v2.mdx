@@ -273,6 +273,8 @@ print(quality_result.recommendation)
 
 v2 question generators and v3 scenario generators are not row-for-row migrations: v3 generators create scenarios for distinct behaviors, and some use multi-turn conversations. `quality_scan` runs the quality registry unless you build a suite yourself with `generate_suite(generators=[...])`.
 
+For hand-written Checks scenarios, `UserSimulator` and custom interaction generators create the user messages within a scenario. They are lower-level building blocks, not replacements for RAGET question generators. The quality `ScenarioGenerator`s below are the closest automated successor because they build complete scenarios—interactions and checks—from the knowledge base.
+
 | v3 scenario generator                  | Purpose                                                                                         |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `HallucinationScenarioGenerator`       | Direct document-grounded questions and contradictions.                                          |
