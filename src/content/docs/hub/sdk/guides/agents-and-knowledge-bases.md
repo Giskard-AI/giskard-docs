@@ -7,7 +7,9 @@ sidebar:
 
 ## Agents
 
-An **Agent** is your LLM application. The Hub calls your agent's HTTP endpoint during evaluations and scans.
+An **Agent** is your agentic application, such as LLM-based chatbots or classification services. The Hub calls your agent's HTTP endpoint during evaluations and scans.
+
+Every agent declares an **input schema** and an **output schema** (JSON Schema) that describe the request and response bodies. If you don't provide them, the agent defaults to the conversational (chat-style) format shown below, which covers most use cases. Agents with custom schemas are covered in [Structured agents](#structured-agents).
 
 ### Register a remote agent
 
@@ -28,7 +30,7 @@ agent = hub.agents.create(
 print(agent.id)
 ```
 
-The Hub sends a POST request to `url` with a JSON body containing a `messages` array. Your endpoint must return a JSON object with a `message` field.
+With the default schemas, the Hub sends a POST request to `url` with a JSON body containing a `messages` array. Your endpoint must return a JSON object with a `response` field.
 
 **Request format** (sent by the Hub to your agent):
 
@@ -57,7 +59,74 @@ The Hub sends a POST request to `url` with a JSON body containing a `messages` a
 }
 ```
 
-The `metadata` field is optional. If returned, it can be validated using `metadata` checks (see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#metadata)).
+The `metadata` field is optional. If returned, it can be validated using `hub_metadata` checks (see [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#metadata-hub)).
+
+:::note
+Conversational agents also get a default **auto binding** that rebuilds the conversation history across turns (it aggregates previous agent responses into the `messages` array). Pass `auto_bindings=[]` if your agent is single-turn and should not receive accumulated history.
+:::
+
+### Structured agents
+
+If your application is not a chatbot (for example a classifier, an extraction pipeline, or a batch API), describe its request and response bodies with custom JSON Schemas:
+
+```python
+agent = hub.agents.create(
+    project_id="project-id",
+    name="Ticket Classifier",
+    description="Classifies incoming support tickets into routing categories",
+    url="https://your-app.example.com/api/classify",
+    supported_languages=["en"],
+    headers={"Authorization": "Bearer <token>"},
+    input_schema={
+        "type": "object",
+        "properties": {
+            "ticket_text": {"type": "string"},
+        },
+        "required": ["ticket_text"],
+    },
+    output_schema={
+        "type": "object",
+        "properties": {
+            "category": {"type": "string"},
+            "confidence": {"type": "number"},
+        },
+        "required": ["category"],
+    },
+)
+```
+
+The Hub then POSTs a body that matches `input_schema` (e.g. `{"ticket_text": "..."}`) and expects a response that matches `output_schema`. Scenario interactions for this agent use the same shapes in their `input` and `output` fields.
+
+### Update an agent's schemas
+
+Use `hub.agents.update()` to change the schemas of an existing agent. This also works for conversational agents, for example to declare the structure of the `metadata` your endpoint returns:
+
+```python
+hub.agents.update(
+    "agent-id",
+    output_schema={
+        "type": "object",
+        "properties": {
+            "response": {
+                "type": "object",
+                "properties": {
+                    "role": {"type": "string"},
+                    "content": {"type": "string"},
+                },
+                "required": ["role", "content"],
+            },
+            "metadata": {
+                "type": "object",
+                "properties": {
+                    "category": {"type": "string"},
+                    "tools_called": {"type": "array", "items": {"type": "string"}},
+                },
+            },
+        },
+        "required": ["response"],
+    },
+)
+```
 
 ### Test the connection
 
@@ -65,11 +134,13 @@ Before running an evaluation, verify your agent endpoint is reachable and respon
 
 ```python
 ping = hub.agents.test_connection(
+    project_id="project-id",
+    agent_id="agent-id",
     url="https://your-app.example.com/api/chat",
     headers={"Authorization": "Bearer <token>"},
 )
 
-print(ping.response)
+print(ping["response"])
 ```
 
 ### Generate a completion
@@ -77,16 +148,20 @@ print(ping.response)
 You can invoke a registered agent directly from the SDK without running a full evaluation:
 
 ```python
-output = hub.agents.generate_completion(
+response = hub.agents.generate_completion(
     "agent-id",
-    messages=[
-        {"role": "user", "content": "What is the capital of France?"},
-    ],
+    input={
+        "messages": [
+            {"role": "user", "content": "What is the capital of France?"},
+        ]
+    }
 )
 
-print(output.response)
-print(output.metadata)  # any metadata returned by your agent
+print(response.output["response"])
+print(response.output["metadata"])  # any metadata returned by your agent
 ```
+
+For a structured agent, pass an `input` that matches its input schema instead, and read the fields of `response.output` that its output schema defines.
 
 ### Auto-generate a description
 
@@ -117,9 +192,9 @@ hub.agents.delete("agent-id")
 
 A **Knowledge Base** is an indexed collection of text documents. It has three primary uses in the Hub:
 
-1. **Document-based dataset generation**: the Hub uses your documents as source material to auto-generate realistic test cases.
+1. **Document-based dataset generation**: the Hub uses your documents as source material to auto-generate realistic scenarios.
 2. **Grounded vulnerability scans**: probes are anchored to your actual content, making attacks more realistic and specific to your domain.
-3. **Groundedness check context**: retrieve relevant documents via `hub.knowledge_bases.search_documents()` and pass them as the `context` field of a `groundedness` check assertion to verify that your agent's responses are grounded in your actual documents rather than hallucinated content.
+3. **Groundedness check context**: retrieve relevant documents via `hub.knowledge_bases.search_documents()` and pass them as the `context` field of a `hub_groundedness` check assertion to verify that your agent's responses are grounded in your actual documents rather than hallucinated content.
 
 ## Create a knowledge base
 
@@ -216,7 +291,7 @@ hub.knowledge_bases.delete("kb-id")
 
 ## Using a knowledge base for dataset generation
 
-Once your KB is ready, pass its ID to `hub.datasets.generate_document_based()` to create test cases grounded in your documents:
+Once your KB is ready, pass its ID to `hub.datasets.generate_document_based()` to create scenarios grounded in your documents:
 
 ```python
 dataset = hub.datasets.generate_document_based(
@@ -227,12 +302,13 @@ dataset = hub.datasets.generate_document_based(
     n_examples=20,
 )
 
+dataset = hub.helpers.wait_for_completion(dataset)
 print(f"Generated dataset: {dataset.id} ({dataset.name})")
 ```
 
-The Hub samples documents from the KB, crafts questions whose answers are grounded in those documents, and creates test cases with a `groundedness` check pre-configured.
+The Hub samples documents from the KB, crafts questions whose answers are grounded in those documents, and creates scenarios with a `hub_groundedness` check pre-configured.
 
-See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#generate-document-based-test-cases) for more detail.
+See [Datasets & Checks](/hub/sdk/guides/datasets-and-checks#generate-scenarios-from-documents) for more detail.
 
 ---
 

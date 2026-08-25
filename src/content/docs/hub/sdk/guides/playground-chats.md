@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-The Hub's **Playground** lets you chat with registered agents interactively from the UI. Each conversation is automatically saved as a **Playground Chat**, which you can then access programmatically for analysis, export, or import into a dataset. To create test cases manually from the UI, see the [manual dataset creation page](/hub/ui/datasets/manual).
+The Hub's **Playground** lets you chat with registered agents interactively from the UI. Each conversation is automatically saved as a **Playground Chat**, which you can then access programmatically for analysis, export, or import into a dataset. To create scenarios manually from the UI, see the [manual dataset creation page](/hub/ui/datasets/manual).
 
 ## List playground chats
 
@@ -14,7 +14,7 @@ from giskard_hub import HubClient
 
 hub = HubClient()
 
-chats = hub.playground_chats.list(project_id="project-id")
+chats = hub.playground_chats.list(project_id="project-id", include=["agent"])
 
 for chat in chats:
     print(f"{chat.id} — agent: {chat.agent.name} — {chat.created_at}")
@@ -25,44 +25,51 @@ for chat in chats:
 ## Retrieve a chat with its messages
 
 ```python
-chat = hub.playground_chats.retrieve(
-    "chat-id",
-)
+chat = hub.playground_chats.retrieve("chat-id", include=["agent"])
 
 print(f"Chat with: {chat.agent.name}")
 
-for msg in chat.messages:
-    print(f"[{msg.role}] {msg.content}")
+for exchange in chat.exchanges:
+    user_msg = exchange.input["messages"][-1]
+    print(f"[{user_msg['role']}] {user_msg['content']}")
+
+    response = exchange.output["response"]
+    print(f"[{response['role']}] {response['content']}")
 ```
 
 ---
 
 ## Export conversations to a dataset
 
-A common use case is to promote interesting playground conversations into a dataset as new test cases:
+A common use case is to promote interesting playground conversations into a dataset as new scenarios:
 
 ```python
 chats = hub.playground_chats.list(project_id="project-id")
 
 dataset = hub.datasets.create(
     project_id="project-id",
-    name="Playground-sourced test cases",
+    name="Playground-sourced scenarios",
 )
 
 for chat in chats:
-    messages = chat.messages
+    interactions = [
+        {"input": exchange.input, "output": exchange.output}
+        for exchange in chat.exchanges
+    ]
 
-    # If the conversation ends with an assistant turn, treat it as the demo_output
-    demo_output = None
-    if messages and messages[-1].role == "assistant":
-        demo_output = messages.pop()
-
-    if messages:
-        hub.test_cases.create(
+    if interactions:
+        # Attach the check to the final assistant turn.
+        interactions[-1]["checks"] = [
+            {
+                "identifier": "hub_conformity",
+                "params": {
+                    "rules": ["The agent must not produce harmful or offensive content"]
+                },
+            }
+        ]
+        hub.scenarios.create(
             dataset_id=dataset.id,
-            messages=messages,
-            demo_output=demo_output,
-            checks=[{"identifier": "no-harmful-content"}],
+            interactions=interactions,
         )
 
 print(f"Imported {len(chats)} conversations into dataset {dataset.id}")
