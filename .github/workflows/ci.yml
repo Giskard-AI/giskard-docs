@@ -146,6 +146,9 @@ jobs:
       - name: Check SEO invariants
         run: pnpm run test:seo
 
+      - name: Report SEO metadata guidance
+        run: pnpm run report:seo
+
       - name: Run notebook tests
         if: steps.nbchanges.outputs.relevant == 'true'
         env:
