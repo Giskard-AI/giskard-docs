@@ -1,6 +1,6 @@
 ---
 title: Datasets & Checks
-description: Build datasets and checks with the Giskard SDK. Create scenarios, use built-in checks, or define custom checks for LLM evaluation.
+description: Build datasets and checks with the Giskard SDK. Create scenarios, use built-in checks, or define custom checks for agent evaluation.
 sidebar:
   order: 4
 ---

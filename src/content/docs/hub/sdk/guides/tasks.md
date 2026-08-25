@@ -1,6 +1,6 @@
 ---
 title: Tasks
-description: Create and manage tasks with the Giskard SDK to track issues found during LLM agent evaluations and security scans.
+description: Create and manage tasks with the Giskard SDK to track issues found during agent evaluations and security scans.
 sidebar:
   order: 6
 ---

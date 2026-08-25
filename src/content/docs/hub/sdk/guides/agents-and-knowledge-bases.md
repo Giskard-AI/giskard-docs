@@ -7,7 +7,7 @@ sidebar:
 
 ## Agents
 
-An **Agent** is your LLM application. The Hub calls your agent's HTTP endpoint during evaluations and scans.
+An **Agent** is your agentic application, such as LLM-based chatbots or classification services. The Hub calls your agent's HTTP endpoint during evaluations and scans.
 
 Every agent declares an **input schema** and an **output schema** (JSON Schema) that describe the request and response bodies. If you don't provide them, the agent defaults to the conversational (chat-style) format shown below, which covers most use cases. Agents with custom schemas are covered in [Structured agents](#structured-agents).
 

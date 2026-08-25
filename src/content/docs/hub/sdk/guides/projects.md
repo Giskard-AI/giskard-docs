@@ -15,7 +15,7 @@ from giskard_hub import HubClient
 hub = HubClient()
 
 project = hub.projects.create(
-    name="My LLM App",
+    name="My Agent App",
     description="Evaluation workspace for the production chatbot",
 )
 

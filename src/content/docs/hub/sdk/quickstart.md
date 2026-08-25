@@ -1,11 +1,11 @@
 ---
 title: Quickstart
-description: Install the Giskard Hub SDK, authenticate, and run your first LLM evaluation in minutes.
+description: Install the Giskard Hub SDK, authenticate, and run your first agent evaluation in minutes.
 sidebar:
   order: 2
 ---
 
-This tutorial walks you through installing the SDK, connecting to the Hub, and running a complete evaluation against an LLM agent — from dataset creation to reading results.
+This tutorial walks you through installing the SDK, connecting to the Hub, and running a complete evaluation against an agent — from dataset creation to reading results.
 
 ## Install with a coding agent
 
@@ -94,7 +94,7 @@ print(f"Using project: {project.name} ({project.id})")
 
 ## 4. Register an agent
 
-An agent points to your LLM application. The Hub calls this endpoint during evaluations.
+An agent points to your agentic application. The Hub calls this endpoint during evaluations.
 
 ```python
 agent = hub.agents.create(

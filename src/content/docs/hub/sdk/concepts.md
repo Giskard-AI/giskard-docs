@@ -11,7 +11,7 @@ This page explains the mental model behind the Giskard Hub and how its resources
 
 ```
 Project
-├── Agents            (your LLM applications)
+├── Agents            (your agentic applications)
 ├── Knowledge Bases   (document collections)
 ├── Scans             (automated vulnerability probing)
 ├── Datasets          (scenario collections)
@@ -37,7 +37,7 @@ A **Project** is a workspace that groups all related resources: agents, datasets
 
 ## Agents
 
-An **Agent** represents your LLM application. It can be:
+An **Agent** represents your agentic application, such as LLM-based chatbots or classification services. It can be:
 
 - A **remote agent** — an HTTP endpoint that the Hub calls with a list of chat messages and expects a response from.
 - A **local agent** — a Python function you pass directly when running a local evaluation. Useful for evaluating models without exposing an HTTP endpoint.
