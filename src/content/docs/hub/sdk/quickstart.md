@@ -1,5 +1,5 @@
 ---
-title: Quickstart
+title: "Hub SDK Quickstart"
 description: Install the Giskard Hub SDK, authenticate, and run your first LLM evaluation in minutes.
 sidebar:
   order: 2

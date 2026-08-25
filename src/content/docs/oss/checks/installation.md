@@ -1,5 +1,5 @@
 ---
-title: Install & Configure
+title: "Install Giskard Checks"
 description: "Install Giskard Checks via pip, configure your LLM provider, and set up environment variables for LLM-based checks."
 sidebar:
   order: 2
