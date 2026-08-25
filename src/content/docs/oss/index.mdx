@@ -1,34 +1,26 @@
 ---
 title: Giskard Library
-description: "Open-source Python library for testing LLM applications, RAG systems, and AI agents with scenarios, checks, and red teaming."
+description: "Open-source Python library for testing, evaluating, and scanning agentic applications, such as LLM-based chatbots, RAG systems, or any type of AI agent."
 ---
 
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+**Giskard Library** is a Python package for testing, evaluating, and scanning agentic applications, such as LLM-based chatbots, RAG systems, or any type of AI agent. It is available on [GitHub](https://github.com/Giskard-AI/giskard-oss) and was used in DeepLearning.AI's [Red Teaming LLM Applications](https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/) course.
 
-**Giskard Library** is a Python package for testing and evaluating LLM applications, RAG systems, and AI agents.
+Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for agentic applications. You write scenarios and checks that pass or fail. Tests run on your machine, using the LLM provider of your choice as the judge. The same library also red-teams your agent, so you do not need a second tool for security testing.
 
-An LLM gives a different answer every time, so you cannot assert on an exact string the way you would for ordinary code. Giskard lets you assert on behavior instead: "the answer stays on topic", "the answer is supported by the retrieved documents", "the agent refuses to reveal its system prompt".
+A scenario is a test case made of one or more interactions with your agent. In each interaction, you send inputs and capture the agent's outputs. A check is a rule the reply has to satisfy, either plain Python or a rule written in natural language and graded by the judge. Red teaming uses the same building blocks, but sends hostile inputs on purpose, such as attempts to make the agent leak its instructions ([prompt injection](/start/glossary/security/injection)), produce [harmful content](/start/glossary/security/harmful-content), or [state things that are not true](/start/glossary/business/hallucination). See the [glossary](/start/glossary) for the failure types Giskard looks for.
 
-The library is available on [GitHub](https://github.com/Giskard-AI/giskard-oss) and was used in DeepLearning.AI's [Red Teaming LLM Applications](https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/) course.
+:::note
+Coming from Giskard v2? Read [Migrate from Giskard v2 to v3](/oss/migrate-from-v2). In short: the v2 **scan** is now `vulnerability_scan` and **RAGET** is now `quality_scan`, both in the `scan` extra (`pip install --pre "giskard[scan]"`). Tabular (classification and regression) models have no v3 equivalent. Keep using the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai) for those, and follow the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252) for progress.
+:::
 
-Giskard is pytest-native, async-first, and framework-agnostic behavioral testing for LLM apps and agents: you write scenarios and checks that pass or fail instead of metric scores, run them locally against your own LLM provider, and red-team the same agent with the same library.
-
-You write scenarios and checks. A scenario is one test case: a message, or a short conversation, to send to your agent. A check is a rule the reply has to satisfy, either plain Python or a rule written in English and graded by an LLM (a judge). Tests run under pytest and report pass or fail rather than a score you then have to interpret.
-
-Red teaming is the other half. Instead of testing that normal requests work, you send hostile ones on purpose: attempts to make the agent leak its instructions ([prompt injection](/start/glossary/security/injection)), produce [harmful content](/start/glossary/security/harmful-content), or [state things that are not true](/start/glossary/business/hallucination). See the [glossary](/start/glossary) for the failure types Giskard looks for.
-
-Beyond Giskard's own generators, `third_party_scan(target, tool="garak")` and `third_party_scan(target, tool="deepteam")` run garak's probes and deepteam's attacks against the same agent. They ship in the optional `garak` and `deepteam` extras. See [Scan for vulnerabilities](/oss/solutions/scan-vulnerabilities).
-
-A judge is an LLM and is sometimes wrong in both directions. A passing suite means those scenarios did not break your agent.
-
-The two examples below are the shortest runnable thing in each half of the library, so you can see the shape before choosing a path. They stop where a real setup begins: the [Checks quickstart](/oss/checks/quickstart) and [Your first scan](/oss/scan/tutorials/your-first-scan) take it from there. Both test a support agent for a retail bank. It answers questions about accounts, cards, payments, and disputes, and it is not allowed to give investment advice.
+The two examples below test a support agent for a retail bank, which must not give investment advice. For a full setup, see the [Checks quickstart](/oss/checks/quickstart) and [Your first scan](/oss/scan/tutorials/your-first-scan).
 
 ## A first check
 
-Install the library and point it at your LLM provider — `Conformity` is graded by a judge, so it needs a key:
+Install the library and point it at your LLM provider — some checks are graded by a LLM judge:
 
 ```bash
-pip install --pre "giskard[scan,openai]"
+pip install --pre "giskard[scan, litellm]"
 export OPENAI_API_KEY=...
 ```
 
@@ -65,16 +57,15 @@ result = asyncio.run(scenario.run())
 result.print_report()
 ```
 
-`Conformity` grades the reply against a rule written in English, which is what you need when the requirement is a judgment call. For a rule you can decide in Python, such as "the reply never contains a full card number", use `RegexMatching` instead and skip the LLM call.
+`Conformity` grades the reply against a rule written in natural language, which is what you need when the requirement is a judgment call. For a rule you can decide in Python, such as "the reply never contains a full card number", use `RegexMatching` instead and skip the LLM call.
 
 ## A first scan
 
 Describe the agent in plain language and the scan generates its own scenarios, runs them, and prints a report. Which scan you want depends on what you are worried about.
 
-<Tabs>
-<TabItem label="Vulnerability scan">
+### Vulnerability scan
 
-`vulnerability_scan` is for a hostile user: it generates attacks — prompt injections, jailbreaks, requests for harmful content — and reports the ones the agent did not withstand.
+The `vulnerability_scan` is for a hostile user: it generates attacks — prompt injections, jailbreaks, requests for harmful content — and reports the ones the agent did not withstand.
 
 ```python
 import asyncio
@@ -95,17 +86,18 @@ suite_result = asyncio.run(
             " accounts, cards, payments, and disputes. It must refuse to give investment"
             " advice and must never disclose another customer's data."
         ),
-        languages=["en"],
-        max_scenarios=10,
+        languages=["en"],  # languages the agent supports in ISO 639-1
+        max_scenarios=10,  # max number of scenarios to generate
     )
 )
 suite_result.print_report()
 ```
 
-</TabItem>
-<TabItem label="Quality scan">
+The description is what the generators work from, so the constraints you write into it are the ones the scan will attack. `max_scenarios` caps how many the generators produce. Leave it off and the scan runs a full budget, which is more thorough but costs more provider calls than you want on a first run.
 
-`quality_scan` is for a wrong answer rather than a hostile user. It asks questions your documents can answer and judges the reply against them, which is what catches an invented policy or a refusal to answer something covered. Every quality generator is knowledge-base driven, so without `knowledge_base` the scan warns and produces nothing.
+### Quality scan
+
+On the other hand, `quality_scan` is for a wrong answer rather than a hostile user. It asks questions your documents can answer and judges the reply against them, which is what catches an invented policy or a refusal to answer something covered. Every quality generator is knowledge-base driven, so without `knowledge_base` the scan warns and produces nothing.
 
 ```python
 import asyncio
@@ -125,28 +117,19 @@ suite_result = asyncio.run(
             "A customer-support agent for a retail bank, answering from our published"
             " policies."
         ),
-        languages=["en"],
         knowledge_base=[
             "A disputed card transaction must be reported within 120 days of the statement date.",
             "A card reported lost cannot be unfrozen and must be replaced.",
             "We do not give investment or tax advice; refer the customer to an independent adviser.",
         ],
-        max_scenarios=10,
+        languages=["en"],  # languages the agent supports in ISO 639-1 code
+        max_scenarios=10,  # max number of scenarios to generate
     )
 )
 suite_result.print_report()
 ```
 
-</TabItem>
-</Tabs>
-
-The description is what the generators work from, so the constraints you write into it are the ones the scan will attack. `max_scenarios` caps how many the generators produce — leave it off and the scan runs a full budget, which is more thorough but costs more provider calls than you want on a first run. Both entry points are documented in the [Scan API](/oss/scan/reference/scan-api).
-
-v3 is a major rewrite, with new features such as [Checks](/oss/checks) and a redesigned [Scan](/oss/solutions/scan-vulnerabilities).
-
-:::note
-Coming from Giskard v2? Read [Migrate from Giskard v2 to v3](/oss/migrate-from-v2). In short: the v2 **scan** is now `vulnerability_scan` and **RAGET** is now `quality_scan`, both in the `scan` extra (`pip install --pre "giskard[scan]"`). Tabular, classification, and regression models have no v3 equivalent. Keep using the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai) for those, and follow the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252) for progress.
-:::
+Both entry points are documented in the [Scan API](/oss/scan/reference/scan-api).
 
 ## Resources and support
 
