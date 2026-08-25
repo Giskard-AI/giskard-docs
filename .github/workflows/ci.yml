@@ -143,6 +143,9 @@ jobs:
       - name: Check redirects
         run: pnpm run test:redirects
 
+      - name: Check SEO invariants
+        run: pnpm run test:seo
+
       - name: Run notebook tests
         if: steps.nbchanges.outputs.relevant == 'true'
         env:
