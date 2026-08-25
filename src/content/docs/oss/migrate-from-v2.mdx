@@ -376,7 +376,7 @@ print(get_settings().default_model)
 print(get_default_embedding_model())
 ```
 
-API keys are still read from the provider's own environment variable: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_API_KEY`, `AZURE_API_KEY`, or `AZURE_AI_API_KEY`. Full detail in [Install & Configure](/oss/scan/installation) and the [settings reference](/oss/checks/reference/settings).
+API keys are still read from provider-specific environment variables, such as `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`. Full detail in [Install & Configure](/oss/scan/installation) and the [settings reference](/oss/checks/reference/settings).
 
 ## Tests you write: `giskard.testing` becomes Checks
 
