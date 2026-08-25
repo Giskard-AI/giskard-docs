@@ -1,16 +1,20 @@
 ---
 title: Migration Guide
-description: Migrate from the Giskard Hub SDK v2.x to v3.x — breaking changes, renamed resources, and updated patterns.
+description: Migrate from Hub v2 (SDK 3.1) to Hub v3 (SDK 3.2.0). Renamed resources, deprecated methods, and breaking check identifier changes.
 sidebar:
   order: 7
 ---
 
-This guide covers only the features that existed in v2.x. For new features introduced in v3, see the [Release Notes](/hub/sdk/release-notes).
+Hub v3 pairs with SDK **3.2.0**. This guide covers what changes when you move from Hub v2 (SDK 3.1.x) to Hub v3. Most SDK renames are backwards compatible and only emit a `DeprecationWarning`. The **check identifier renames are breaking**: scripts and CI pipelines that pass the old identifiers will fail against Hub v3, so read that section first.
 
-## Install v3
+:::caution
+The Hub and the SDK must upgrade together, Hub first, then the SDK. SDK 3.1.x breaks against Hub v3 (it sends old check identifiers and calls endpoints that were removed), and SDK 3.2.0 does not work against Hub v2.
+:::
+
+## Upgrade the SDK
 
 ```bash
-pip install --upgrade giskard-hub
+pip install --upgrade "giskard-hub>=3.2.0"
 ```
 
 Verify the installed version:
@@ -21,422 +25,243 @@ python -c "import giskard_hub; print(giskard_hub.__version__)"
 
 ---
 
-## Feature mapping
+## Breaking: check identifiers renamed
 
-Use this table as a quick reference for every renamed API, parameter, and pattern.
+The Hub renamed several built-in check identifiers. Requests that pass an old identifier now get a **422 error** from the Hub, usually with a "Did you mean the '...' check?" tip. This applies everywhere an identifier appears: `checks` inside scenarios, `hub.evaluations.run_single()`, custom check `params`, and uploaded dataset files.
 
-| v2.x                                                             | v3.x                                                                         |
-| ---------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `from giskard_hub.data import ChatMessage`                       | `from giskard_hub.types import ChatMessage`                                  |
-| `HubClient(url=..., token=...)`                                  | `HubClient(base_url=..., api_key=...)`                                       |
-| `GISKARD_HUB_URL` / `GISKARD_HUB_TOKEN`                          | `GISKARD_HUB_BASE_URL` / `GISKARD_HUB_API_KEY`                               |
-| `hub.models.create(...)`                                         | `hub.agents.create(...)`                                                     |
-| `model.chat(messages=[...])`                                     | `hub.agents.generate_completion(agent_id, messages=[...])`                   |
-| `hub.chat_test_cases.create(...)`                                | `hub.test_cases.create(...)`                                                 |
-| `hub.evaluate(model=, dataset=, name=)`                          | `hub.helpers.evaluate(agent=, dataset=, project=, name=)`                    |
-| `hub.evaluate(model=fn, dataset=, name=)`                        | `hub.helpers.evaluate(agent=fn, dataset=, name=)`                            |
-| `entity.wait_for_completion()`                                   | `entity = hub.helpers.wait_for_completion(entity)`                           |
-| `entity.print_metrics()`                                         | `hub.helpers.print_metrics(entity)`                                          |
-| `hub.evaluations.create(model_id=, dataset_id=)`                 | `hub.evaluations.create(agent_id=, dataset_id=, project_id=)`                |
-| `hub.scans.create(model_id=)`                                    | `hub.scans.create(agent_id=, project_id=)`                                   |
-| `hub.scheduled_evaluations.create(model_id=)`                    | `hub.scheduled_evaluations.create(agent_id=)`                                |
-| `hub.knowledge_bases.create(...)`                                | `hub.knowledge_bases.create(...)`                                            |
-| `ScanResult` / `scan_result.grade.value`                         | `Scan` / `scan.grade`                                                        |
-| `ScanResult.model`                                               | `Scan.agent`                                                                 |
-| `hub.datasets.generate_adversarial(model_id=, categories=, ...)` | `hub.datasets.generate_scenario_based(agent_id=, scenario_id=, project_id=)` |
-| `hub.datasets.generate_document_based(model_id=, n_questions=)`  | `hub.datasets.generate_document_based(agent_id=, n_examples=, project_id=)`  |
-| `dataset.chat_test_cases`                                        | `hub.datasets.search_test_cases(dataset.id)`                                 |
-| `Metric.percentage`                                              | `Metric.success_rate` (multiply by 100 for %)                                |
-
----
-
-## Features new in v3 (no v2 equivalent)
-
-The following resources have no equivalent in v2.x and require no migration -- they are purely additive:
-
-- `hub.projects.scenarios` -- scenario management and dataset generation
-- `hub.tasks` -- issue tracking
-- `hub.playground_chats` -- playground conversation access
-- `hub.audit_logs` -- audit log
-- `hub.test_cases.comments` -- test case annotations
-- `hub.scans.probes` / `hub.scans.attempts` -- granular scan probe access
-- `hub.evaluations.results.search()` -- filtered result queries
-- `hub.evaluations.run_single()` -- evaluate a single test case ad hoc
-- `hub.evaluations.rerun_errored_results()` -- rerun only errored results
-- `hub.knowledge_bases.search_documents()` -- semantic search over documents
-- `hub.datasets.upload()` -- import datasets from files
-- `AsyncHubClient` -- async client
-
----
-
-## Breaking changes
-
-### 1. Environment variables renamed
-
-| v2.x                | v3.x                   |
-| ------------------- | ---------------------- |
-| `GISKARD_HUB_URL`   | `GISKARD_HUB_BASE_URL` |
-| `GISKARD_HUB_TOKEN` | `GISKARD_HUB_API_KEY`  |
-
-Update your shell configuration, `.env` files, and CI/CD secrets accordingly.
-
-```bash
-# v2.x
-export GISKARD_HUB_URL="https://your-hub.example.com"
-export GISKARD_HUB_TOKEN="gsk_..."
-
-# v3.x
-export GISKARD_HUB_BASE_URL="https://your-hub.example.com"
-export GISKARD_HUB_API_KEY="gsk_"
-```
-
-### 2. Constructor parameter names changed
-
-| v2.x                            | v3.x                                   |
-| ------------------------------- | -------------------------------------- |
-| `HubClient(url=..., token=...)` | `HubClient(base_url=..., api_key=...)` |
+| Old identifier             | New identifier     |
+| -------------------------- | ------------------ |
+| `correctness`              | `hub_correctness`  |
+| `conformity` (Hub check)   | `hub_conformity`   |
+| `groundedness` (Hub check) | `hub_groundedness` |
+| `metadata`                 | `hub_metadata`     |
+| `string_match`             | `string_matching`  |
 
 ```python
-# main.py
-# v2.x
-from giskard_hub import HubClient
-
-hub = HubClient(url="https://...", token="gsk_...")
-
-# v3.x
-from giskard_hub import HubClient
-
-hub = HubClient(base_url="https://...", api_key="gsk_...")
-```
-
-### 3. Type import path changed
-
-In v2.x, data types were imported from `giskard_hub.data`. In v3.x, they are imported from `giskard_hub.types`:
-
-```python
-# main.py
-# v2.x
-from giskard_hub.data import ChatMessage
-
-# v3.x
-from giskard_hub.types import ChatMessage
-```
-
-### 4. `hub.models` -> `hub.agents`
-
-The resource for LLM applications was renamed from `models` to `agents`, and the corresponding type from `ModelOutput` to `AgentOutput`.
-
-```python
-# main.py
-# v2.x
-model = hub.models.create(
-    project_id=project_id,
-    name="My Bot",
-    url="https://...",
-    supported_languages=["en"],
-    headers={},
-)
-output = model.chat(messages=[...])
-print(output.message.content)
-
-# v3.x
-agent = hub.agents.create(
-    project_id=project_id,
-    name="My Bot",
-    url="https://...",
-    supported_languages=["en"],
-    headers={},
-)
-output = hub.agents.generate_completion(agent.id, messages=[...])
-print(output.response)
-```
-
-Note that `model.chat()` no longer exists as an entity method. Instead, call `hub.agents.generate_completion()` passing the agent ID.
-
-### 5. `hub.chat_test_cases` -> `hub.test_cases`
-
-The resource for creating and managing test cases was renamed.
-
-```python
-# main.py
-# v2.x
-hub.chat_test_cases.create(
-    dataset_id=dataset_id,
-    messages=[{"role": "user", "content": "Hello"}],
-    checks=[{"identifier": "correctness"}],
-)
-
-# v3.x
+# Hub v2 (SDK 3.1)
 hub.test_cases.create(
     dataset_id=dataset_id,
-    messages=[{"role": "user", "content": "Hello"}],
-    checks=[{"identifier": "correctness"}],
-)
-```
-
-### 6. `model_id` -> `agent_id` and `project_id` now required
-
-Across all resources, `model_id` was renamed to `agent_id`. In addition, `project_id` is now a required parameter for `evaluations.create` and `scans.create`.
-
-```python
-# main.py
-# v2.x
-hub.evaluations.create(model_id=model_id, dataset_id=dataset_id, ...)
-hub.scans.create(model_id=model_id, ...)
-hub.scheduled_evaluations.create(model_id=model_id, ...)
-
-# v3.x
-hub.evaluations.create(agent_id=agent_id, dataset_id=dataset_id, project_id=project_id, ...)
-hub.scans.create(agent_id=agent_id, project_id=project_id, ...)
-hub.scheduled_evaluations.create(agent_id=agent_id, ...)
-```
-
-### 7. Entity methods moved to `hub.helpers`
-
-In v2.x, `hub.evaluate()` was a top-level shortcut, and entities had `wait_for_completion()` and `print_metrics()` methods. In v3.x, all of these have been moved to `hub.helpers`:
-
-| v2.x                                   | v3.x                                                        |
-| -------------------------------------- | ----------------------------------------------------------- |
-| `hub.evaluate(model=..., dataset=...)` | `hub.helpers.evaluate(agent=..., dataset=..., project=...)` |
-| `entity.wait_for_completion()`         | `entity = hub.helpers.wait_for_completion(entity)`          |
-| `entity.print_metrics()`               | `hub.helpers.print_metrics(entity)`                         |
-
-This applies to **all** entity types that previously had these methods -- evaluations, scans, datasets, and knowledge bases.
-
-**Remote evaluations:**
-
-```python
-# main.py
-# v2.x
-remote_eval = hub.evaluate(model=my_model, dataset=my_dataset, name="eval run")
-remote_eval.wait_for_completion()
-remote_eval.print_metrics()
-
-# v3.x
-remote_eval = hub.evaluations.create(
-    name="eval run",
-    project_id=my_project.id,
-    agent_id=my_agent.id,
-    dataset_id=my_dataset.id,
-)
-remote_eval = hub.helpers.wait_for_completion(remote_eval)
-hub.helpers.print_metrics(remote_eval)
-```
-
-**Local evaluations:**
-
-```python
-# main.py
-# v2.x
-def my_agent(messages):
-    return "Hello from local model"
-
-
-local_eval = hub.evaluate(model=my_agent, dataset=my_dataset, name="local run")
-
-
-# v3.x
-def my_agent(messages):
-    return "Hello from local model"
-
-
-local_eval = hub.helpers.evaluate(
-    agent=my_agent, dataset=my_dataset, name="local run"
-)
-```
-
-**Knowledge bases:**
-
-```python
-# main.py
-# v2.x
-kb = hub.knowledge_bases.create(...)
-kb.wait_for_completion()
-
-# v3.x
-kb = hub.knowledge_bases.create(...)
-kb = hub.helpers.wait_for_completion(kb)
-```
-
-:::note
-`hub.helpers.wait_for_completion()` **returns** the refreshed entity. Always reassign the result: `entity = hub.helpers.wait_for_completion(entity)`.
-:::
-
-### 8. Scan type and access patterns changed
-
-The scan result type was renamed from `ScanResult` to `Scan`. Several properties and access patterns changed:
-
-| v2.x                                           | v3.x                                                                             |
-| ---------------------------------------------- | -------------------------------------------------------------------------------- |
-| `ScanResult`                                   | `Scan`                                                                           |
-| `scan_result.model`                            | `scan.agent`                                                                     |
-| `scan_result.grade.value`                      | `scan.grade`                                                                     |
-| `scan_result.wait_for_completion(timeout=600)` | `scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)` |
-| `scan_result.print_metrics()`                  | `hub.helpers.print_metrics(scan)`                                                |
-
-```python
-# main.py
-# v2.x
-scan_result = hub.scans.create(model_id=model_id)
-scan_result.wait_for_completion(timeout=600)
-print(scan_result.grade.value)
-print(scan_result.model.name)
-scan_result.print_metrics()
-
-# v3.x
-scan = hub.scans.create(agent_id=agent_id, project_id=project_id)
-scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)
-print(scan.grade)
-print(scan.agent.name)
-hub.helpers.print_metrics(scan)
-```
-
-:::tip
-In v2.x, `wait_for_completion(timeout=600)` accepted a single timeout in seconds. In v3.x, use `poll_interval` (seconds between polling) and `max_retries` to control the total timeout. For example, `poll_interval=5, max_retries=120` gives a 10-minute timeout (5s x 120 = 600s).
-:::
-
-### 9. Dataset generation methods changed
-
-#### `generate_adversarial` removed
-
-The `hub.datasets.generate_adversarial()` method has been removed. Use `hub.datasets.generate_scenario_based()` instead. Note that the new method takes a `scenario_id` instead of `categories`:
-
-```python
-# main.py
-# v2.x
-dataset = hub.datasets.generate_adversarial(
-    model_id=model_id,
-    categories=["prompt_injection", "harmful_content"],
-    description="Security test cases",
-    dataset_name="Adversarial Suite",
+    messages=[{"role": "user", "content": "What is your refund policy?"}],
+    checks=[{"identifier": "correctness", "params": {"reference": "30 days."}}],
 )
 
-# v3.x — use generate_scenario_based instead
-dataset = hub.datasets.generate_scenario_based(
-    agent_id=agent_id,
-    project_id=project_id,
-    scenario_id=scenario_id,
-    dataset_name="Adversarial Suite",
-    n_examples=20,
-)
-```
-
-See [Projects & Scenarios](/hub/sdk/guides/projects#scenarios) for how to create scenarios.
-
-#### `generate_document_based` parameters changed
-
-```python
-# main.py
-# v2.x
-dataset = hub.datasets.generate_document_based(
-    model_id=model_id,
-    knowledge_base_id=kb_id,
-    n_questions=20,
-    dataset_name="KB suite",
-)
-
-# v3.x
-dataset = hub.datasets.generate_document_based(
-    agent_id=agent_id,
-    project_id=project_id,
-    knowledge_base_id=kb_id,
-    n_examples=20,  # renamed from n_questions
-    dataset_name="KB suite",
-)
-```
-
-#### `dataset.chat_test_cases` property removed
-
-The convenience property for accessing a dataset's test cases was removed. Use the resource method instead:
-
-```python
-# main.py
-# v2.x
-test_cases = dataset.chat_test_cases
-
-# v3.x
-test_cases = hub.datasets.search_test_cases(dataset.id)
-```
-
-#### `dataset.wait_for_completion()` moved to helpers
-
-```python
-# main.py
-# v2.x
-dataset = hub.datasets.generate_document_based(...)
-dataset.wait_for_completion()
-
-# v3.x
-dataset = hub.datasets.generate_document_based(...)
-dataset = hub.helpers.wait_for_completion(dataset)
-```
-
-### 10. Response objects are now Pydantic models
-
-In v2.x, most responses were plain Python objects with simple attribute access. In v3.x, responses are `pydantic.BaseModel` instances:
-
-```python
-# main.py
-# v2.x
-project = hub.projects.retrieve(project_id)
-print(project.name)
-
-# v3.x — attribute access works the same
-project = hub.projects.retrieve(project_id)
-print(project.name)
-
-# v3.x — new Pydantic methods available
-print(project.model_dump()["name"])
-print(project.model_dump_json())
-```
-
-All data objects are now Pydantic models. This means you have access to convenient methods like `.model_dump()`, `.model_dump_json()`, and the full range of Pydantic introspection features. Note that you cannot access properties using square bracket syntax (e.g., `my_object["key"]`); instead, use `.model_dump()` to convert the object to a dictionary if you need key-based access.
-
-### 11. Knowledge base creation -- CSV support removed (since v2.0.0)
-
-CSV files are no longer accepted when creating knowledge bases. Use JSON/JSONL or a list of dicts:
-
-```python
-# main.py
-# v2.x (CSV no longer supported even in v2.0.0+)
-# hub.knowledge_bases.create(..., data="my_kb.csv")  # removed
-
-# v3.x — from a Python list
-hub.knowledge_bases.create(
-    project_id=project_id,
-    name="My KB",
-    data=[
-        {"text": "Document text here.", "topic": "Topic A"},
+# Hub v3 (SDK 3.2)
+hub.scenarios.create(
+    dataset_id=dataset_id,
+    interactions=[
+        {
+            "input": {
+                "messages": [{"role": "user", "content": "What is your refund policy?"}]
+            },
+            "checks": [
+                {"identifier": "hub_correctness", "params": {"reference": "30 days."}}
+            ],
+        }
     ],
 )
+```
 
-# v3.x — from a file on disk
-hub.knowledge_bases.create(
+:::caution
+`conformity` and `groundedness` **still exist but changed meaning**. They now name the open-source giskard-checks variants, not the Hub checks. The OSS `conformity` takes a single `rule: str` instead of `rules: list[str]`, so a script that keeps passing `{"identifier": "conformity", "params": {"rules": [...]}}` fails with a 422 instead of a rename tip. Switch those to `hub_conformity` and `hub_groundedness`. See [Built-in checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for the full new catalogue.
+:::
+
+### Check params renamed
+
+Whether you pass raw dicts or the typed params classes:
+
+- `CorrectnessParams` is removed. Use `HubCorrectnessParams` (`reference`).
+- `MetadataParams` is removed. Use `HubMetadataParams` (`json_path_rules`).
+- `StringMatchParams` is removed. Use `StringMatchingParams`.
+- `ConformityParams` now describes the OSS check (single required `rule: str`). Use `HubConformityParams` for the Hub check (`rules: list[str]`).
+- `semantic_similarity` keeps its identifier, but its `reference` param is renamed to `reference_text`. Scripts passing `{"reference": ...}` to this check get a 422.
+- Typed params classes now exist for all 21 built-in checks (e.g. `HubGroundednessParams`, `SemanticSimilarityParams`, `LLMJudgeParams`).
+
+### Validation moved server-side
+
+The SDK no longer validates check identifiers or params locally, the Hub does. Errors that were previously raised locally as `ValueError` now surface as `UnprocessableEntityError` (HTTP 422). Wrong or unknown check params, which were previously accepted and silently dropped, are now rejected at save time and at run time. Update any `except ValueError` handling around check creation accordingly.
+
+### Custom check identifiers require a `custom_` prefix
+
+Custom check identifiers must now start with `custom_` (e.g. `custom_tone_professional`). `hub.checks.create()` and `hub.checks.update()` reject any other identifier.
+
+The Hub upgrade renames your existing custom checks automatically: `tone_professional` becomes `custom_tone_professional`. Stored scenarios keep working, since their check references are updated by the same migration. Scripts are not: any code that references a custom check by its old identifier (in scenario `checks`, `hub.evaluations.run_single()`, or uploaded dataset files) must switch to the prefixed name.
+
+```python
+# Hub v2 (SDK 3.1)
+check = hub.checks.create(
     project_id=project_id,
-    name="My KB",
-    data="documents.json",
+    identifier="tone_professional",
+    name="Professional tone",
+    params={"type": "conformity", "rules": ["Use formal language."]},
+)
+checks = [{"identifier": "tone_professional"}]
+
+# Hub v3 (SDK 3.2)
+check = hub.checks.create(
+    project_id=project_id,
+    identifier="custom_tone_professional",
+    name="Professional tone",
+    params={"type": "hub_conformity", "rules": ["Use formal language."]},
+)
+checks = [{"identifier": "custom_tone_professional"}]
+```
+
+---
+
+## Deprecated: chat-shaped arguments become structured input/output
+
+Hub v3 supports agents with arbitrary input and output schemas, so the SDK moved from chat-only arguments to structured `input` / `output` dicts. The old chat-shaped arguments still work with a `DeprecationWarning` and are translated for you.
+
+### Scenario creation: `messages` / `demo_output` / `checks` become `interactions`
+
+The flat scenario shape maps into a single interaction. `messages` becomes `input["messages"]`, `demo_output` becomes `output` (a plain string is wrapped as an assistant `response`, a dict's `metadata` key is split out), and `checks` attach to the interaction:
+
+```python
+# Hub v2 (SDK 3.1) — deprecated, still works
+hub.test_cases.create(
+    dataset_id=dataset_id,
+    messages=[{"role": "user", "content": "What is your refund policy?"}],
+    demo_output={
+        "role": "assistant",
+        "content": "We offer a 30-day return policy.",
+        "metadata": {"category": "returns"},
+    },
+    checks=[{"identifier": "hub_correctness", "params": {"reference": "30 days."}}],
+)
+
+# Hub v3 (SDK 3.2)
+hub.scenarios.create(
+    dataset_id=dataset_id,
+    interactions=[
+        {
+            "input": {
+                "messages": [{"role": "user", "content": "What is your refund policy?"}]
+            },
+            "output": {
+                "response": {
+                    "role": "assistant",
+                    "content": "We offer a 30-day return policy.",
+                },
+                "metadata": {"category": "returns"},
+            },
+            "checks": [
+                {"identifier": "hub_correctness", "params": {"reference": "30 days."}}
+            ],
+        }
+    ],
 )
 ```
 
-### 12. `Metric.percentage` -> `Metric.success_rate`
+You cannot mix `interactions=` with the legacy arguments in one call. The same applies to `scenarios.update()`.
 
-In v2.x, `eval_run.metrics` was a list of `Metric` objects with a `.percentage` field. In v3.x, the field was renamed to `.success_rate` (a float between 0 and 1):
+### `datasets.upload()` records
+
+Records in the legacy `{messages, demo_output, checks}` shape are still translated on upload, with a `DeprecationWarning`. Use the new `{"interactions": [{"position", "input", "output", "checks"}]}` shape, and remember the check identifiers inside must use the new names either way.
+
+### `agents.generate_completion()`: `messages` becomes `input`
 
 ```python
-# main.py
-# v2.x
-eval_run.wait_for_completion()
+# Hub v2 (SDK 3.1) — deprecated, still works
+output = hub.agents.generate_completion(agent_id, messages=[{"role": "user", "content": "Hi"}])
+print(output.response.content)
 
-for metric in eval_run.metrics:
-    print(f"{metric.name}: {metric.percentage}%")
-
-eval_run.print_metrics()
-
-# v3.x
-eval_run = hub.helpers.wait_for_completion(eval_run)
-
-for metric in eval_run.metrics:
-    print(f"{metric.name}: {metric.success_rate * 100}%")
-
-hub.helpers.print_metrics(eval_run)
+# Hub v3 (SDK 3.2)
+output = hub.agents.generate_completion(
+    agent_id, input={"messages": [{"role": "user", "content": "Hi"}]}
+)
+print(output.output["response"]["content"])
 ```
+
+The `GenerateCompletionOutput.response` and `.message` accessors are deprecated. Read the structured `output` dict directly.
+
+### `evaluations.run_single()`: `messages` becomes `input_data`
+
+```python
+# Hub v2 (SDK 3.1) — deprecated, still works
+hub.evaluations.run_single(project_id=project_id, messages=[...], agent_output=..., checks=[...])
+
+# Hub v3 (SDK 3.2)
+hub.evaluations.run_single(project_id=project_id, input_data={"messages": [...]}, agent_output=..., checks=[...])
+```
+
+### Deprecated flattened accessors
+
+These model properties still work but emit a `DeprecationWarning`. They flatten structured data back into chat messages, which loses information for non-chat agents:
+
+| Deprecated accessor         | Read instead                          |
+| --------------------------- | ------------------------------------- |
+| `Scenario.messages`         | `scenario.interactions[i].input`      |
+| `PlaygroundChat.messages`   | `chat.exchanges` (`input` / `output`) |
+| `ScanProbeAttempt.messages` | `attempt.input` / `attempt.output`    |
+
+---
+
+## Deprecated: test cases renamed to scenarios
+
+The Hub renamed test cases to **scenarios**. The old SDK surface still works and maps to the new endpoints, but every call emits a `DeprecationWarning`. Update at your own pace:
+
+| Deprecated (still works)                       | Use instead                                  |
+| ---------------------------------------------- | -------------------------------------------- |
+| `hub.test_cases.*`                             | `hub.scenarios.*`                            |
+| `hub.test_cases.comments`                      | `hub.scenarios.comments`                     |
+| `hub.datasets.list_test_cases()`               | `hub.datasets.list_scenarios()`              |
+| `hub.datasets.search_test_cases()`             | `hub.datasets.search_scenarios()`            |
+| `hub.evaluations.results.rerun_test_case()`    | `hub.evaluations.results.rerun_scenario()`   |
+| `test_case_ids=` (bulk operations)             | `scenario_ids=`                              |
+| `include=["test_case"]` (results)              | `include=["scenario"]`                       |
+| `set_test_case_draft=`                         | `set_scenario_draft=`                        |
+| `dataset_test_case_id=` (`hub.tasks.create`)   | `dataset_scenario_id=`                       |
+| `set_test_case_status=` (`hub.tasks.update`)   | `set_scenario_status=`                       |
+| `result.test_case` / `result.test_case_exists` | `result.scenario` / `result.scenario_exists` |
+
+The legacy flat scenario shape (`messages=`, `checks=`, `demo_output=`) is also deprecated in favour of `interactions=`. See [chat-shaped arguments](#deprecated-chat-shaped-arguments-become-structured-inputoutput) above for the mapping.
+
+In audit logs, the endpoint accepts `entity_type="scenario"` and `"scenario_evaluation"`, while stored events keep the values `"test_case"` and `"test_case_evaluation"` in search results.
+
+---
+
+## Deprecated: project scenarios renamed to prompt presets
+
+The project-level "Scenarios" (persona and behaviour templates) are now **Prompt Presets**. The old Hub endpoints were removed, which is why SDK 3.1.x breaks against Hub v3. In SDK 3.2, the old methods still work against the new endpoints with a `DeprecationWarning`:
+
+| Deprecated (still works)                             | Use instead                                             |
+| ---------------------------------------------------- | ------------------------------------------------------- |
+| `hub.projects.scenarios.*`                           | `hub.projects.prompt_presets.*`                         |
+| `hub.datasets.generate_scenario_based(scenario_id=)` | `hub.datasets.generate_preset_based(prompt_preset_id=)` |
+
+```python
+# Hub v2 (SDK 3.1)
+dataset = hub.datasets.generate_scenario_based(
+    project_id=project_id,
+    agent_id=agent_id,
+    scenario_id=scenario_id,
+    dataset_name="Generated suite",
+    n_examples=10,
+)
+
+# Hub v3 (SDK 3.2)
+dataset = hub.datasets.generate_preset_based(
+    project_id=project_id,
+    agent_id=agent_id,
+    prompt_preset_id=prompt_preset_id,
+    dataset_name="Generated suite",
+    n_examples=10,
+)
+```
+
+`types.Scenario` now means the dataset item (formerly the test case). The prompt preset types are `PromptPreset` and `PromptPresetPreview`. The `DatasetGenerateScenarioBasedParams` type is removed, import `DatasetGeneratePresetBasedParams` instead.
+
+See [Projects & Prompt Presets](/hub/sdk/guides/projects#prompt-presets) for the new API.
+
+---
+
+## Fixing a broken CI pipeline
+
+If your CI started failing after the Hub upgrade, work through this checklist:
+
+1. **Pin the SDK to 3.2.0 or later** in your requirements.
+2. **Search your scripts for old check identifiers** (`correctness`, `metadata`, `string_match`) and replace them with the new names from the table above. Also rename `reference` to `reference_text` on `semantic_similarity` checks.
+3. **Check every `conformity` and `groundedness` usage.** If it passes `rules=` or a fixed `context=` for the Hub behaviour, rename it to `hub_conformity` / `hub_groundedness`.
+4. **Prefix custom check references.** The Hub renamed your existing custom checks to `custom_<identifier>`. Update scripts that reference them by the old identifier.
+5. **Update uploaded dataset files** (`hub.datasets.upload()` JSON/JSONL): the records may keep the legacy shape, but the identifiers inside `checks` must be the new ones.
+6. Treat any remaining `UnprocessableEntityError` (422) as a validation message from the Hub. The error body names the rejected identifier or param and often suggests the correct check.
