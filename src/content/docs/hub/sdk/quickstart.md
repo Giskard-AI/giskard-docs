@@ -1,5 +1,5 @@
 ---
-title: "Hub SDK Quickstart"
+title: "Quickstart"
 description: Install the Giskard Hub SDK, authenticate, and run your first agent evaluation in minutes.
 sidebar:
   order: 2

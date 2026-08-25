@@ -3,6 +3,7 @@ title: "Hub SDK Core Concepts"
 description: Understand the building blocks of the Giskard Hub SDK — Projects, Agents, Datasets, Evaluations, Scans, and more.
 sidebar:
   order: 3
+  label: Core Concepts
 ---
 
 This page explains the mental model behind the Giskard Hub and how its resources relate to each other. Reading this before diving into the how-to guides will make everything click faster.

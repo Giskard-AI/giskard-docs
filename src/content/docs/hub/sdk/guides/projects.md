@@ -1,5 +1,5 @@
 ---
-title: Projects
+title: "Projects"
 description: Create and manage projects with the Giskard Hub Python SDK. Projects organize agents, datasets, evaluations, and scans.
 sidebar:
   order: 1
