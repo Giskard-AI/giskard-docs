@@ -161,12 +161,12 @@ h6 {
  * - light: foreground (navy)
  * - dark: primary (cyan)
  */
-.sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link):not(.sl-link-card) {
+.sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link):not(.sl-link-card):not([role="tab"]) {
   text-decoration: underline;
   text-underline-offset: 0.18em;
 }
 
-:root:not([data-theme='dark']) .sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link):not(.sl-link-card) {
+:root:not([data-theme='dark']) .sl-markdown-content a:not(.sl-anchor-link):not(.whitepaper-banner-link):not(.sl-link-card):not([role="tab"]) {
   color: var(--sl-color-text) !important;
 }
 
@@ -177,6 +177,10 @@ h6 {
 /* Anchor links */
 :root[data-theme='dark'] .sl-anchor-link {
   color: #ffffff !important;
+}
+
+.sl-markdown-content .sl-link-card a {
+  text-decoration: none !important;
 }
 
 :root[data-theme='dark'] .sl-link-card {
