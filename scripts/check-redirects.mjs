@@ -30,6 +30,7 @@ function builtPageExists(target) {
 
 function parseRules(text) {
   const rules = new Map();
+  const codes = new Map();
   const errors = [];
   for (const raw of text.split("\n")) {
     const line = raw.trim();
@@ -45,8 +46,9 @@ function parseRules(text) {
     if (from.startsWith("/client/")) errors.push(`"from" leaks the /client/ assets dir: "${line}"`);
     if (!/^30[1278]$/.test(code)) errors.push(`non-redirect status "${code}": "${line}"`);
     rules.set(from, to);
+    codes.set(from, code);
   }
-  return { rules, errors };
+  return { rules, codes, errors };
 }
 
 function ruleError(rules, from, expected) {
@@ -66,7 +68,7 @@ if (!existsSync(redirectsFile)) {
   process.exit(1);
 }
 
-const { rules, errors } = parseRules(readFileSync(redirectsFile, "utf-8"));
+const { rules, codes, errors } = parseRules(readFileSync(redirectsFile, "utf-8"));
 const redirects = Object.entries(JSON.parse(readFileSync(resolve(root, "src", "redirects.json"), "utf-8")));
 
 const failures = [...errors];
@@ -74,7 +76,13 @@ const add = (msg) => msg && failures.push(msg);
 
 if (redirects.length === 0) add("src/redirects.json is empty (unexpected)");
 
-for (const [from, to] of redirects) add(ruleError(rules, from, to));
+for (const [from, to] of redirects) {
+  add(ruleError(rules, from, to));
+  add(ruleError(rules, `${from}/`, to));
+  if (rules.has(`${from}/`) && codes.get(`${from}/`) !== "301") {
+    add(`trailing-slash rule must be 301, got ${codes.get(`${from}/`)}: ${from}/`);
+  }
+}
 for (const [from, to] of Object.entries(CANARY)) add(ruleError(rules, from, to));
 
 for (const page of HTML_STRIP) {
@@ -83,6 +91,13 @@ for (const page of HTML_STRIP) {
   } else {
     add(ruleError(rules, `${page}.html`, page));
     add(ruleError(rules, `${page}/index.html`, page));
+    // Trailing-slash variants must be OUR 301, not Cloudflare's implicit 307 from
+    // `html_handling: "drop-trailing-slash"` — a 307 is temporary, so crawlers
+    // keep both URLs in the index instead of consolidating onto the canonical one.
+    add(ruleError(rules, `${page}/`, page));
+    if (rules.has(`${page}/`) && codes.get(`${page}/`) !== "301") {
+      add(`trailing-slash rule must be 301, got ${codes.get(`${page}/`)}: ${page}/`);
+    }
   }
 }
 

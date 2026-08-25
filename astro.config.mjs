@@ -63,6 +63,7 @@ export default defineConfig({
                     items: [
                         { label: 'Giskard Library', slug: 'oss' },
                         { slug: 'oss/troubleshooting', label: 'Troubleshooting' },
+                        { slug: 'oss/migrate-from-v2', label: 'Migrate from v2 to v3' },
                         { slug: 'oss/agent-skills', label: 'Agent Skills' },
                         { slug: 'oss/contributing', label: 'Contributing' },
                     ]

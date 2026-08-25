@@ -15,6 +15,7 @@
     "format:code": "node scripts/format-code-blocks.mjs",
     "test:tables": "node scripts/check-mdx-tables.mjs",
     "test:redirects": "node scripts/check-redirects.mjs",
+    "test:seo": "node scripts/check-seo.mjs",
     "test:python-snippets": "node scripts/check-python-snippets.mjs"
   },
   "dependencies": {

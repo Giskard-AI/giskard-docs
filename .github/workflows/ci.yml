@@ -147,6 +147,9 @@ jobs:
       - name: Check redirects
         run: pnpm run test:redirects
 
+      - name: Check SEO invariants
+        run: pnpm run test:seo
+
       # The notebooks run against the Azure AI proxy behind AZURE_AI_API_BASE, whose
       # deployment names are not public model ids. The pages themselves name no model:
       # giskard-checks reads GISKARD_CHECKS_DEFAULT_MODEL on its own and otherwise uses
