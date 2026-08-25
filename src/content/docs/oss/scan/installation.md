@@ -1,8 +1,7 @@
 ---
-title: "Install Giskard Scan"
+title: Install & Configure
 description: "Install the Giskard scan, pick a provider for the generator and judge model, and add the optional third-party scanner extras."
 sidebar:
-  label: "Install & Configure"
   order: 1
 ---
 

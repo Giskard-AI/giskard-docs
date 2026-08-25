@@ -1,6 +1,6 @@
 ---
 title: "Moderation Issues"
-description: "Understand moderation issues, the LLM business failure where over-restrictive content filters block valid queries, and how to spot and fix them in an agent."
+description: "Detect LLM moderation failures where models apply overly restrictive content filters to valid business queries."
 sidebar:
   order: 6
 ---

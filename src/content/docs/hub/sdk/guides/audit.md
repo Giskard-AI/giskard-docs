@@ -1,6 +1,6 @@
 ---
 title: Audit Logs
-description: Query Hub audit log events with hub.audit_logs.search and list_entities for compliance reporting, change history, and debugging.
+description: Search and retrieve audit log events for compliance reporting, change history, and debugging.
 sidebar:
   order: 8
 ---

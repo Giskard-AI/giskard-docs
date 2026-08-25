@@ -1,8 +1,7 @@
 ---
 title: "Hub SDK Core Concepts"
-description: Understand how Projects, Agents, Datasets, Checks, Evaluations, and Scans fit together in the Giskard Hub SDK, and when to use each one.
+description: Understand the building blocks of the Giskard Hub SDK — Projects, Agents, Datasets, Evaluations, Scans, and more.
 sidebar:
-  label: "Core Concepts"
   order: 3
 ---
 

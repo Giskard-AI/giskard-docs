@@ -1,8 +1,7 @@
 ---
-title: "Metrics & Failure Categories"
+title: "Understand metrics, failure categories and tags"
 description: "Organize and analyze test cases using tags, metrics, and failure categories. Structure datasets and interpret LLM evaluation results."
 sidebar:
-  label: "Understand metrics, failure categories and tags"
   order: 2
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Giskard Library
-description: "Open-source Python library for testing LLM applications, RAG systems, and AI agents: write pass-or-fail checks, then red-team the same agent."
+description: "Open-source Python library for testing and evaluating LLM applications, RAG systems, and AI agents."
 ---
 
 **Giskard Library** is a Python package for testing and evaluating LLM applications, RAG systems, and AI agents.

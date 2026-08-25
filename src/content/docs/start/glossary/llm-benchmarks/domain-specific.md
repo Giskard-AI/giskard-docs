@@ -1,6 +1,6 @@
 ---
 title: "Domain-Specific Benchmarks"
-description: "Compare benchmarks that test LLMs in healthcare, finance, and law, including MultiMedQA, FinBen, LegalBench, and the Berkeley Function-Calling Leaderboard."
+description: "Specialized benchmarks that evaluate LLMs' performance in fields such as healthcare, finance, law, and medicine."
 sidebar:
   order: 7
 ---

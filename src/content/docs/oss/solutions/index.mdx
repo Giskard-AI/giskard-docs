@@ -10,8 +10,6 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 Two ways to test an LLM agent with the open-source library, depending on whether you want the test cases generated or written.
 
-Start with **Scan Vulnerabilities** if you do not yet know how your agent fails: you describe what it does, the scan writes hostile inputs, runs them, and reports the ones that got through, mapped to categories such as prompt injection, harmful content, and information disclosure. Move to **Check Agentic Systems** once you know which behaviours matter and want them pinned down: you write the rule in plain English, an LLM judge decides pass or fail, and the suite runs in CI. Most teams end up using both — the scan to discover failures, checks to keep them fixed.
-
 <CardGrid>
   <LinkCard
     title="Scan Vulnerabilities"

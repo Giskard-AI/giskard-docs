@@ -1,6 +1,6 @@
 ---
 title: "Giskard Scan Tutorials"
-description: "Hands-on walkthroughs: run your first vulnerability scan, scan a RAG agent against a knowledge base, and write your own scenario generator."
+description: "Guided, hands-on lessons for running the Giskard scan against your own agent."
 sidebar:
   order: 0
   label: Overview
@@ -9,8 +9,6 @@ sidebar:
 import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 A scan writes test cases for your agent, runs them, and reports which ones it failed. You do not need prior experience with LLM evaluation or red teaming to follow these walkthroughs. Work through them with a Python file open. Each one ends with something you can run again.
-
-Start with **Your First Scan**, which runs a vulnerability scan against a small garden-center assistant, walks through the report, and saves the generated suite so you can replay it. **Scan a RAG Agent** goes next if your agent answers from documents: it builds a knowledge base and runs a quality scan that looks for hallucination, out-of-scope answers, and sycophancy. **Write a Custom Scenario Generator** is the last step, for risks specific to your domain that the built-in generators do not cover.
 
 <CardGrid>
   <LinkCard

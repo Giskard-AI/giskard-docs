@@ -1,6 +1,6 @@
 ---
 title: "Review test results"
-description: "Review evaluation results in Giskard Hub: read check outcomes, understand why a test failed, inspect the conversation flow, and decide what to fix next."
+description: "Review evaluation results and understand test failures. Follow the business workflow to analyze check results, understand reasons, and take appropriate actions."
 sidebar:
   order: 4
 ---

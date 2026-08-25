@@ -1,6 +1,6 @@
 ---
 title: "Setup agents"
-description: "Connect AI agents to Giskard Hub: endpoint and authentication settings, custom chatbot formats, and stateful mode, ready for evaluation and red teaming."
+description: "Create and configure AI agents in Giskard Hub. Cover authentication, custom chatbot formats, stateful mode, and connection settings for evaluation and red teaming."
 sidebar:
   order: 3
 ---

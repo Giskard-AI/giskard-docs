@@ -1,6 +1,6 @@
 ---
 title: Vulnerability Scanning
-description: Run adversarial vulnerability scans on your agents covering the OWASP LLM Top 10 and Giskard's extra categories, then review probe results.
+description: Run automated vulnerability scans against your agents covering OWASP LLM Top 10 and additional custom categories, review probe results, and assess your security posture.
 sidebar:
   order: 3
 ---

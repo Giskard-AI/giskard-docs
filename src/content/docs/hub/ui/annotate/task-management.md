@@ -1,8 +1,7 @@
 ---
-title: "Distribute Review Tasks"
-description: "Distribute review work with Tasks in Giskard Hub: assign scan results, evaluation runs, and test cases to teammates, then track them through to completion."
+title: "Distribute tasks to organize your review work"
+description: "Manage and distribute work among team members with Tasks. Assign tasks for reviewing scan results, evaluation runs, and test cases to ensure quality and collaboration."
 sidebar:
-  label: "Distribute tasks to organize your review work"
   order: 3
 ---
 

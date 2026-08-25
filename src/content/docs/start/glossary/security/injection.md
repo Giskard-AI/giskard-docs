@@ -1,8 +1,7 @@
 ---
-title: "What Is Prompt Injection?"
-description: "Understand how prompt injection works, the direct and indirect forms it takes, and the practices that stop an agent following attacker instructions."
+title: "Prompt Injection"
+description: "Learn about LLM prompt injection vulnerabilities and how to detect and prevent malicious input manipulation."
 sidebar:
-  label: "Prompt Injection"
   order: 2
 ---
 

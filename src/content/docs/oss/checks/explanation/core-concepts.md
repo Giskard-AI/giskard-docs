@@ -1,8 +1,7 @@
 ---
-title: "Checks Core Concepts"
-description: "How Interaction, Trace, Check, and Scenario fit together at runtime, and what each primitive contributes while a Giskard Checks test runs."
+title: Core Concepts
+description: "The key primitives of Giskard Checks — Interaction, Trace, Check, and Scenario — and how they work together at runtime."
 sidebar:
-  label: "Core Concepts"
   order: 1
 ---
 

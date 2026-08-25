@@ -1,8 +1,7 @@
 ---
 title: "Hub SDK Quickstart"
-description: Install the Giskard Hub SDK, authenticate with an API key, create a dataset, and run your first LLM agent evaluation end to end.
+description: Install the Giskard Hub SDK, authenticate, and run your first LLM evaluation in minutes.
 sidebar:
-  label: "Quickstart"
   order: 2
 ---
 
