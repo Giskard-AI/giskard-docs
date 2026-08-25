@@ -184,6 +184,7 @@ result.to_junit_xml("scan_results.xml")
 Three differences bite in practice:
 
 - `description` and `languages` are **required**. The scan writes its scenarios from them, so a vague description produces a vague scan.
+- The entry point is asynchronous: call it with `await`, or wrap it in `asyncio.run()` in a script.
 - Generating a suite is now its own call, `generate_suite`, which returns a `Suite` without running it. See [Save and Version a Scan Suite](/oss/scan/how-to/save-and-version-suites).
 
 ### Vulnerability categories
@@ -198,7 +199,8 @@ v2 grouped findings into fixed categories. v3 annotates each result with tags an
 | Stereotypes and Discrimination   | `threat-type:harmful-content-generation`                                                         |
 | Robustness                       | no direct equivalent: covered by the multi-turn attack generators rather than input perturbation |
 | Output Formatting                | no equivalent in the scan: assert it yourself with `JsonValid` or `RegexMatching`                |
-| Information Disclosure           | `threat-type:data-leak` (a tag-level analogue, not an exact category replacement)                |
+| Information Disclosure           | `threat-type:prompt-injection` (the tag on disclosure-attempt scenarios)                         |
+| Unauthorized Advice              | `threat-type:misguidance-and-unauthorized-advice` (a tag-level analogue, not an exact category replacement) |
 
 Results also carry `owasp:`, `probe-type:`, and `component:` tags. The full list is in the [threat taxonomy](/oss/scan/explanation/threat-taxonomy).
 
@@ -347,7 +349,7 @@ set_default_generator(Generator(model="openai/gpt-4o"))
 
 `Generator` calls each provider's native SDK, so install the matching extra: `pip install --pre "giskard[openai]"`, `[google]`, `[anthropic]`, `[azure]`, or `[all-llms]`.
 
-For a provider without a native integration, ask for LiteLLM explicitly after installing `giskard[litellm]`:
+For a provider without a native integration, ask for LiteLLM explicitly after installing `pip install --pre "giskard[litellm]"`:
 
 ```python
 from giskard.agents.generators import LiteLLMGenerator
@@ -374,7 +376,7 @@ print(get_settings().default_model)
 print(get_default_embedding_model())
 ```
 
-API keys are still read from the provider's own environment variable: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`. Full detail in [Install & Configure](/oss/scan/installation) and the [settings reference](/oss/checks/reference/settings).
+API keys are still read from the provider's own environment variable: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `GOOGLE_API_KEY`, `AZURE_API_KEY`, or `AZURE_AI_API_KEY`. Full detail in [Install & Configure](/oss/scan/installation) and the [settings reference](/oss/checks/reference/settings).
 
 ## Tests you write: `giskard.testing` becomes Checks
 
