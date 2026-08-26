@@ -13,10 +13,6 @@ Giskard requires **Python 3.12 or higher**. Install it together with the SDK for
 pip install "giskard[openai]"
 ```
 
-:::note
-To install a release candidate, beta, or alpha (not a stable release), add `--pre`.
-:::
-
 No provider SDK ships with `giskard` itself, so installing it without a provider extra leaves LLM-based checks unable to reach a model.
 
 Pick the extra that matches your provider:

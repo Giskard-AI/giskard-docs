@@ -19,10 +19,6 @@ pip install "giskard[scan]"
 uv pip install "giskard[scan]"
 ```
 
-:::note
-To install a release candidate, beta, or alpha (not a stable release), add `--pre` to pip or `--prerelease=allow` to uv.
-:::
-
 ## Configure a model
 
 The scan calls an LLM twice: once to invent attack scenarios from your description, and once to **judge** the answers your agent gives back, meaning to read each conversation and decide pass or fail. Both use the default generator, so nothing runs until you set one.
