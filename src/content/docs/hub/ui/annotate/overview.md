@@ -474,6 +474,13 @@ Each rule supports:
 We recommend using a tool like [json-path-evaluator](https://mockoon.com/tools/json-object-path-evaluator/) to evaluate the JSON path rules.
 :::
 
+:::tip[Matching items without knowing their position]
+When the value you're checking sits inside a list whose order or length can vary (e.g. a list of tool calls), use a filter expression instead of a fixed index. It matches an item by its content rather than its position.
+
+- `$.tools_called[0].name` only works if the tool is always first.
+- `$.sources[?(@.tool_name=="query_engine")].is_error` matches the entry where `tool_name` equals `query_engine`, wherever it appears in the list.
+:::
+
 ::::note[Example]
 **Input**: Hi, my name is John, can you look up my account?
 
