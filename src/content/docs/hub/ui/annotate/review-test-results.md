@@ -181,6 +181,12 @@ Each check provides an explanation of why it passed or failed. This explanation 
 - Why the scenario passed or failed
 - What specific aspects of the agent's response caused the result
 
+#### Review the check settings
+
+Each check also has a **Settings** section, collapsed by default. Expand it to see the parameters the check was configured with, for example a custom check's pattern or rule, and the target key it read from the trace. Reviewing these settings alongside the failure reason often makes it clear why a check passed or failed.
+
+![Failed Regex Matching check with the Settings section expanded, showing the pattern and target key used](/_static/images/hub/review-check-settings.png)
+
 :::tip
 For more information about checks and how to enable/disable them, see the "Enable/Disable checks" section in [Modify scenarios](/hub/ui/annotate/modify-test-cases). For comprehensive information about all check types, see [Overview](/hub/ui/annotate/overview).
 :::
@@ -206,56 +212,52 @@ When a test fails, it is categorized based on the type of failure. Understanding
 You can change the categories used for classification but before doing so, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
 :::
 
-## Review the flow of the conversation
+## Review the flow of the scenario
 
-Understanding the conversation flow helps you assess whether the scenario structure is appropriate and whether the agent's response makes sense in context.
+Understanding the flow of a scenario helps you assess whether its structure is appropriate and whether the agent's response makes sense in context.
 
-When reviewing the conversation flow, consider:
+When reviewing the flow, consider:
 
-- Whether the conversation structure makes sense
-- Whether the user messages are clear and unambiguous
-- Whether the conversation history provides necessary context
-- Whether the scenario accurately represents the scenario you want to test
+- Whether the interaction structure makes sense
+- Whether the input at each interaction is clear and unambiguous
+- Whether earlier interactions provide the necessary context
+- Whether the scenario accurately represents the behavior you want to test
 
-### Conversation structure
+### Scenario structure
 
-A conversation, or scenario, is composed of a sequence of messages between the **user** and the **assistant**, alternating between each role. When designing your scenarios, you can provide conversation history by adding multiple turns (multi-turn), but the conversation should always end with a **user** message. The agent's next **assistant** completion will be generated and evaluated at scenario time.
+A scenario is composed of one or more **interactions**. Each interaction represents a single turn, and checks can be attached to any interaction to evaluate the agent's response at that point. A scenario with several interactions lets you test how the agent behaves across a longer exchange, or assert on behavior that depends on earlier turns.
 
-### Simple conversation
+What an interaction looks like depends on the agent type:
 
-In the simplest scenario, a conversation consists of a single message from the user. For example:
+- **Chat agents** — the legacy mode. Each interaction shows a **User** message and the **Assistant**'s response.
+- **Structured agents** — each interaction shows an **Input** and an **Output** JSON object instead of message bubbles.
 
-**User:** Hello, which language is your open-source library written in?
+For a chat agent, you author the **User** message at each interaction; for a structured agent, you author the **Input**. In both cases, the agent's response, the **Assistant** message or the **Output**, is generated and evaluated at scenario time, and the agent can rely on the history of earlier interactions in the same scenario when producing that response.
 
-### Multi-turn conversation
+![Chat agent scenario result showing user/assistant message bubbles across interactions](/_static/images/hub/review-chat-interaction.png)
+_Chat agent: interactions are shown as User / Assistant message bubbles._
 
-To test multi-turn capabilities or provide more context, you can add several alternating messages. For instance:
-
-**User:** Hello, I wanted to have more information about your open-source library.
-
-**Assistant:** Hello! I'm happy to help you learn more about our library. What would you like to know?
-
-**User:** Which language is it written in?
-
-You can add as many turns as needed, but always ensure the conversation ends with a user message, since the assistant's reply will be evaluated at runtime.
-
-### Conversation Answer Examples
-
-You can also provide an "answer example" for each scenario. This answer example is not used during evaluation runs, but helps when annotating the dataset or validating your evaluation criteria. For example, you might want to:
-
-1. Import answer examples together with conversations by providing a `demo_output` field in your dataset.
-2. Generate the agent's answer by replacing the assistant message directly in the interface.
-3. Write your own answer example to check specific behaviors or validation rules.
-
-If you do not provide an answer example, the Hub will automatically use the assistant reply generated during the first evaluation run as the default example.
+![Structured agent scenario result showing Input and Output JSON editors for an interaction](/_static/images/hub/review-structured-interaction.png)
+_Structured agent: interactions are shown as Input / Output JSON objects._
 
 :::tip
-For more detailed information about creating and managing conversations, see [Manual datasets](/hub/ui/datasets/manual).
+For information on creating and structuring scenarios, see [Manual datasets](/hub/ui/datasets/manual).
 :::
 
-### Conversation metadata
+### Evaluation stops on the first failed check
 
-The conversation metadata provides additional information about the agent's response, which a developer decided to pass along with the answer, such as:
+Checks are evaluated interaction by interaction, in order. As soon as a check fails, the evaluation stops: any interactions after that point are skipped and not executed.
+
+![Checks panel showing subsequent interactions were skipped after a failed check](/_static/images/hub/review-check-skipped.png)
+
+### Metadata
+
+The metadata provides additional information about the agent's response, which a developer decided to pass along with the answer. Where you find it depends on the agent type:
+
+- **Chat agents** — metadata is available on the turn itself, alongside the assistant message.
+- **Structured agents** — metadata may be included as part of the output response.
+
+Metadata can include things like:
 
 - Tool calls that were made
 - System flags or status indicators
@@ -264,7 +266,7 @@ The conversation metadata provides additional information about the agent's resp
 
 Reviewing metadata helps you understand:
 
-- What actions the agent took during the conversation
+- What actions the agent took
 - Whether the agent followed expected workflows
 - Whether system-level requirements were met
 - Whether the response structure matches expectations
