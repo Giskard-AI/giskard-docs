@@ -235,22 +235,136 @@ The raw giskard-checks variant of groundedness. Instead of a fixed context strin
 :::
 ::::
 
+#### Contradiction
+
+Checks that the response does not directly contradict a reference context. Omissions and unsupported additions are tolerated unless they conflict with the context. Uses an LLM judge.
+
+| Parameter    | Type  | Description                          |
+| ------------ | ----- | --------------------------------------- |
+| `Context`    | `str` | Reference context provided directly  |
+| `Target key` | `str` | Trace path of the value under test   |
+
+::::note[Example]
+**Context**: Our return window is 30 days.
+
+:::caution[Failure example]
+
+- We can make an exception and extend your return window to 60 days for this order.
+  - _Reason: The answer contradicts the context, which states the return window is 30 days_
+:::
+
+:::tip[Success example]
+
+- Unfortunately we can't extend your return window beyond the standard 30 days, but I can help troubleshoot the issue instead.
+:::
+::::
+
+#### Toxicity
+
+Checks that the response does not contain toxic, harmful, or offensive content. Uses an LLM judge.
+
+| Parameter    | Type        | Description                                                                                                    |
+| ------------ | ----------- | ----------------------------------------------------------------------------------------------------------------- |
+| `Categories` | `list[str]` | Safety categories to check: `hate_speech`, `harassment`, `threats`, `self_harm`, `sexual_content`, `violence`  |
+
+::::note[Example]
+**Categories**: `hate_speech`, `threats`
+
+:::caution[Failure example]
+
+- If you don't stop bothering us, we'll make sure you regret it.
+  - _Reason: The answer contains a threat, which falls under the `threats` category_
+:::
+
+:::tip[Success example]
+
+- I understand your frustration, let's find a solution together.
+:::
+::::
+
+#### Answer Relevance
+
+Checks that the response directly and appropriately addresses the user question. Uses an LLM judge.
+
+| Parameter    | Type  | Description                                                        |
+| ------------ | ----- | ---------------------------------------------------------------------- |
+| `Question`   | `str` | The question to evaluate relevance against                        |
+| `Context`    | `str` | Optional domain context describing the chatbot's purpose or scope |
+| `Target key` | `str` | Trace path of the value under test                                 |
+
+::::note[Example]
+**Question**: How do I reset my password?
+
+---
+
+**Context**: This is a chatbot that answers questions about our SaaS platform's account settings.
+
+:::caution[Failure example]
+
+- Our platform supports two-factor authentication for extra security.
+  - _Reason: The answer does not address how to reset a password, which is what the question asked_
+:::
+
+:::tip[Success example]
+
+- Go to Account Settings > Security and click "Reset Password", then follow the link sent to your email.
+:::
+::::
+
+#### Semantic Similarity
+
+Check whether the agent's response is semantically similar to the reference. This is useful when you want to allow for some variation in wording while ensuring the core meaning is preserved. Does **not** use an LLM judge.
+
+| Parameter    | Type    | Description                                       |
+| ------------ | ------- | ----------------------------------------------------- |
+| `Reference`  | `str`   | The reference text to compare the output with     |
+| `Threshold`  | `float` | The threshold for the semantic similarity          |
+| `Target key` | `str`   | Trace path of the value under test                 |
+
+::::note[Example]
+**Input**: What is the capital of France?
+
+---
+
+**Reference**: Paris is the capital of France.
+
+**Threshold**: 0.8
+
+:::caution[Failure example]
+
+- France is a country in Western Europe known for its cuisine, history, and culture.
+  - _Reason: The answer doesn't name the capital, so its embedding is too far from the reference to meet the threshold_
+:::
+
+:::tip[Success example]
+
+- France's capital city is Paris.
+:::
+::::
+
 #### String Matching
 
-Check whether the given keyword or sentence is present in the agent answer.
+Check whether the given keyword or sentence is present in the agent answer. Does **not** use an LLM judge.
 
-:::note[Example]
+| Parameter    | Type  | Description                                            |
+| ------------ | ----- | ----------------------------------------------------------- |
+| `Keyword`    | `str` | The exact text that the agent response should contain |
+| `Target key` | `str` | Trace path of the value under test                      |
+
+::::note[Example]
 **Keyword**: "Hello"
 
-**Failure example**:
+:::caution[Failure example]
 
 - Hi, can I help you?
   - _Reason: The agent answer does not contain the keyword 'Hello'_
+:::
 
-**Success example**:
+:::tip[Success example]
 
 - Hello, how may I help you today?
-  :::
+:::
+::::
 
 #### Metadata
 
@@ -288,22 +402,6 @@ We recommend using a tool like [json-path-evaluator](https://mockoon.com/tools/j
 **Success example**:
 
 - Metadata: `{"output": {"success": true}}`
-  :::
-
-#### Semantic Similarity
-
-Check whether the agent's response is semantically similar to the reference. This is useful when you want to allow for some variation in wording while ensuring the core meaning is preserved.
-
-:::note[Example]
-**Query**: What is the capital of France?
-
-**Reference Answer**: "The capital of France is Paris, which is located in the northern part of the country."
-
-**Threshold**: 0.8
-
-**Failure example**:
-
-- The capital of France is Paris, which is located in the southern part of the country.
   :::
 
 #### Custom Checks
