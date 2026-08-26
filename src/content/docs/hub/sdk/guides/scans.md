@@ -1,6 +1,6 @@
 ---
 title: Vulnerability Scanning
-description: Run automated vulnerability scans against your agents covering OWASP LLM Top 10 and additional custom categories, review probe results, and assess your security posture.
+description: Run automated vulnerability scans against your agents with the Giskard Hub SDK, covering the OWASP LLM Top 10, and review the probe results.
 sidebar:
   order: 3
 ---
