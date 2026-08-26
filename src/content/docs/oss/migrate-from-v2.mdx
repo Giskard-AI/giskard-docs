@@ -27,7 +27,7 @@ v2 was one package with one entry point per job. v3 splits into two layers, and 
 Checks ships in `giskard`; the scan is the `scan` extra:
 
 ```bash
-pip install --pre "giskard[scan,openai]"
+pip install "giskard[scan,openai]"
 ```
 
 The Hub moved too: its workflow is not a drop-in v2 migration. Use the separate `giskard_hub` SDK and its [migration guide](/hub/sdk/migration) to plan that move.
@@ -35,7 +35,7 @@ The Hub moved too: its workflow is not a drop-in v2 migration. Use the separate 
 <Aside type="note" title="Which versions">
   The v2 snippets follow `giskard` 2.x as published on [legacy-docs.giskard.ai
   ↗](https://legacy-docs.giskard.ai/en/stable/). The v3 snippets follow the
-  current pre-release. Giskard v3 requires **Python 3.12 or higher**.
+  current stable release. Giskard v3 requires **Python 3.12 or higher**.
 </Aside>
 
 ## What changed, at a glance
@@ -345,9 +345,9 @@ from giskard.checks import set_default_generator
 set_default_generator(Generator(model="openai/gpt-4o"))
 ```
 
-`Generator` calls each provider's native SDK, so install the matching extra: `pip install --pre "giskard[openai]"`, `[google]`, `[anthropic]`, `[azure]`, or `[all-llms]`.
+`Generator` calls each provider's native SDK, so install the matching extra: `pip install "giskard[openai]"`, `[google]`, `[anthropic]`, `[azure]`, or `[all-llms]`.
 
-For a provider without a native integration, ask for LiteLLM explicitly after installing `pip install --pre "giskard[litellm]"`:
+For a provider without a native integration, ask for LiteLLM explicitly after installing `pip install "giskard[litellm]"`:
 
 ```python
 from giskard.agents.generators import LiteLLMGenerator
