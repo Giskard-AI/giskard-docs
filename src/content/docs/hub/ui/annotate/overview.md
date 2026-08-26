@@ -3,6 +3,8 @@ title: "Understand metrics, failure categories and tags"
 description: "Organize and analyze test cases using tags, metrics, and failure categories. Structure datasets and interpret LLM evaluation results."
 sidebar:
   order: 2
+tableOfContents:
+  maxHeadingLevel: 4
 ---
 
 This page provides an overview of the key concepts for organizing and analyzing your test cases: **metrics**, **failure categories**, and **tags**. Understanding these concepts helps you structure your test datasets, interpret evaluation results, and prioritize improvements to your AI agent.
