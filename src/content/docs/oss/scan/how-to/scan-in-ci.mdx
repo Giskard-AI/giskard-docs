@@ -1,6 +1,6 @@
 ---
 title: "Run the Scan in CI"
-description: "Generate the scan suite once, commit it, and replay it on every pull request with a JUnit XML report."
+description: "Generate the scan suite once, commit it, and replay it on every pull request in CI, with a JUnit XML report your pipeline can consume."
 sidebar:
   order: 4
 ---
@@ -54,12 +54,11 @@ import asyncio
 from pathlib import Path
 
 import giskard.scan  # noqa: F401  # registers the scan types the saved suite uses
-from giskard.agents.generators import GiskardLLMGenerator
 from giskard.checks import Suite, set_default_generator
 
 from my_app.agent import support_agent
 
-set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o-mini"))
+set_default_generator("openai/gpt-4o-mini")
 
 
 async def run_suite():

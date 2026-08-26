@@ -34,15 +34,14 @@ pip install "giskard[scan,openai]"
 Then register the model as the default:
 
 ```python
-from giskard.agents.generators import GiskardLLMGenerator
 from giskard.checks import set_default_generator
 
-set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o"))
+set_default_generator("openai/gpt-4o")
 ```
 
 `openai`, `anthropic`, and `google` are the first-party extras. For anything else, install the `litellm` extra and pass any [LiteLLM-supported ↗](https://docs.litellm.ai/docs/providers) model string, such as `"mistral/mistral-large-latest"`, `"azure/gpt-4o"`, or `"ollama/llama3"`.
 
-Each provider reads its own API key from the environment (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`). Keep them in a `.env` file and load it before you build the generator:
+Each provider reads its own API key from the environment (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`). Keep them in a `.env` file and load it before you call `set_default_generator`:
 
 ```bash
 pip install python-dotenv

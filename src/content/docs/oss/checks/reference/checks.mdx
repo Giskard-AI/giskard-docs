@@ -987,7 +987,7 @@ The last check calls an LLM provider, so this scenario sends the trace off your 
 Set the judge model once instead of passing it to every LLM check:
 
 ```python
-from giskard.agents.generators import Generator
+from giskard.agents import Generator
 from giskard.checks import Conformity, Groundedness, set_default_generator
 
 set_default_generator(
