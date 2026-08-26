@@ -470,6 +470,10 @@ iframe[src*="vimeo.com"] {
   margin-top: 2rem;
 }
 
-.starlight-aside:has(.starlight-aside) .starlight-aside__title + .starlight-aside__content {
+.starlight-aside:has(.starlight-aside) > .starlight-aside__title + .starlight-aside__content {
   margin-top: 1.5rem;
+}
+
+.starlight-aside .starlight-aside > .starlight-aside__title + .starlight-aside__content {
+  margin-top: 1rem;
 }

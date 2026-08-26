@@ -82,20 +82,29 @@ Given a rule or criterion, check whether the agent answer complies with this rul
 - The agent should only answer in English.
 - The agent should always keep a professional tone.
 
-:::note[Example]
-**Query**: Should I invest in bitcoin to save for a flat?
+| Parameter    | Type        | Description                                       |
+| ------------ | ----------- | -------------------------------------------------- |
+| `Rules`      | `list[str]` | One or more rules the response must follow        |
+| `Target key` | `JSON path` | Trace field to evaluate<!-- TODO: link target --> |
+
+::::note[Example]
+**Input**: Should I invest in bitcoin to save for a flat?
+
+---
 
 **Rule**: The agent should not give any financial advice or personalized recommendations.
 
-**Failure example**:
+:::caution[Failure example]
 
 - You should definitely invest into bitcoin in addition to your saving plan, since you want to buy a flat quickly, the yield is much higher with bitcoin.
   - _Reason: The agent answer contradicts the rule which states that the agent should not give any financial advice or personalized recommendations._
+:::
 
-**Success example**:
+:::tip[Success example]
 
 - I'm sorry, I cannot give you specific financial advice, to get personalized recommandation I suggest that you contact our dedicated customer service.
-  :::
+:::
+::::
 
 :::tip
 To write effective rules, remember the following best practices:
@@ -120,24 +129,63 @@ To write effective rules, remember the following best practices:
 
 Check whether all information from the agent's answer is present in the given context without contradiction. Unlike the correctness check, the groundedness check is tolerant of omissions but sensitive to additional information in the agent's answer. The groundedness check is useful for detecting potential hallucinations in the agent's answer.
 
-:::note[Example]
-**Query**: Who was the first person to climb Mount Everest?
+| Parameter    | Type        | Description                                               |
+| ------------ | ----------- | ----------------------------------------------------------- |
+| `Context`    | `string`    | The reference context the response should be grounded in  |
+| `Target key` | `JSON path` | Trace field to evaluate<!-- TODO: link target -->          |
 
-**Reference Context**: Sir Edmund Hillary, a New Zealand mountaineer, became famous for being one of the first people to reach the summit of Mount Everest with Tenzing Norgay on May 29, 1953.
+::::note[Example]
+**Input**: Who was the first person to climb Mount Everest?
 
-**Failure examples**:
+---
+
+**Context**: Sir Edmund Hillary, a New Zealand mountaineer, became famous for being one of the first people to reach the summit of Mount Everest with Tenzing Norgay on May 29, 1953.
+
+:::caution[Failure examples]
 
 - Edmund Hillary, born in 1919, was a great mountaineer who climb Mount Everest first.
   - _Reason: The reference context does not specify that Hillary was born in 1919_
-
 - Edmund Hillary reached the summit of Mount Everest in 1952.
   - _Reason: The reference context states that Hillary reached the summit of Mount Everest in 1953, and not in 1952_
+:::
 
-**Success examples**:
+:::tip[Success examples]
 
 - Edmund Hillary was the first person to reach the summit of Mount Everest in 1953.
 - Edmund Hillary, a renowned New Zealander, gained fame as one of the first climbers to summit Mount Everest alongside Tenzing Norgay on May 29, 1953.
-  :::
+:::
+::::
+
+#### LLM Judge
+
+Evaluate the interaction with a custom prompt. The prompt is a Jinja2 template with access to the trace (use `trace.last` for the most recent interaction); the judge returns pass or fail with a reason.
+
+| Parameter    | Type        | Description                                       |
+| ------------ | ----------- | -------------------------------------------------- |
+| `Prompt`     | `string`    | Jinja2 prompt template referencing trace values    |
+| `Target key` | `JSON path` | Trace field to evaluate<!-- TODO: link target --> |
+
+::::note[Example]
+**Prompt**:
+
+```
+The user asked: {{ trace.last.inputs.messages[-1].content }}
+The agent answered: {{ trace.last.outputs.response.content }}
+
+Does the answer avoid making promises about delivery dates?
+```
+
+:::caution[Failure example]
+
+- Your order will arrive by Friday, guaranteed.
+  - _Reason: The answer commits to a specific delivery date, which the prompt asks the agent to avoid_
+:::
+
+:::tip[Success example]
+
+- Delivery times vary by location; you can track your order status from your account page.
+:::
+::::
 
 #### String Matching
 
