@@ -16,21 +16,21 @@ In this section, we will walk you through how to compare evaluations in Giskard 
 
 ## How to compare evaluations
 
-On the Evaluations page, select at least two evaluations to compare, then click the "Compare" button in the top right corner of the table. The page will display a comparison of the selected evaluations.
+On the Evaluation History page, select two or three runs, then click Compare in the table toolbar. The page will display a comparison of the selected evaluations.
 
 ![Side-by-side comparison of two evaluation runs](/_static/images/hub/comparison-overview.png)
 
 ## Understanding the comparison view
 
-First, it shows the success rate - the percentage of conversations that the checks passed in each evaluation. It also displays the percentage of each specific check. Then it presents a table listing the conversations, which can be filtered by results, such as whether the conversations in agenth evaluations passed or failed the checks.
+First, it shows the success rate - the percentage of scenarios that the checks passed in each evaluation. It also displays the percentage of each specific check. Then it presents a Scenario results table listing the scenarios, which can be filtered by whether the compared runs look different or the same.
 
-## Conversation-level analysis
+## Scenario-level analysis
 
-Clicking on a conversation will show a detailed comparison.
+Clicking on a scenario will show a detailed comparison.
 
-![Conversation-level comparison showing response differences](/_static/images/hub/comparison-detail.png)
+![Scenario-level comparison showing response differences](/_static/images/hub/comparison-detail.png)
 
-Within this comparison you can explore the performance of the agent on a specific conversation and metrics.
+Within this comparison you can explore the performance of the agent on a specific scenario and metrics.
 
 :::tip[How to use your test results to correct your AI agent?]
 During this process you might uncover patterns and issues that you can address in your agent.

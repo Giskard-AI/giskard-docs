@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-On the Evaluations page, click on "Run evaluation" button in the upper right corner of the screen.
+On the Evaluation History page, click on the "Run evaluation" button in the upper right corner of the screen.
 
 ![Evaluation runs list with run evaluation button](/_static/images/hub/evaluation-list.png)
 
@@ -13,17 +13,21 @@ On the Evaluations page, click on "Run evaluation" button in the upper right cor
 
 Next, set the parameters for the evaluation:
 
+- `Name`: A generated name is filled in for you; you can change it.
+
 - `Agent`: Select the agent you wish to evaluate.
 
 - `Dataset`: Choose the dataset you want to use for the evaluation.
 
 - `Tags` (optional): Limit the evaluation to a specific subset of the dataset by applying tags.
 
+- `Number of runs per scenario`: Choose how many times to run each scenario (1–5). The evaluation stops at the first failure; if all runs pass, the scenario is considered successful.
+
 ![Evaluation configuration form with agent and dataset selection](/_static/images/hub/evaluation-run.png)
 
 ## Checks used in the evaluation
 
-The evaluation run is automatically named and assessed against the checks (built-in and custom ones) that were enabled in each conversation. The built-in checks include:
+The evaluation is assessed against the checks (built-in and custom ones) that were enabled in each scenario. The built-in checks include:
 
 - **Correctness**: Verifies if the agent's response matches the expected output (reference answer).
 
@@ -43,7 +47,7 @@ For detailed information about these checks, including examples and how they wor
 
 ## Review evaluation results
 
-When you open an evaluation run, you can review the overall results before diving into individual test cases. This high-level view helps you understand the evaluation performance at a glance and identify areas that need attention.
+When you open an evaluation run, you can review the overall results before diving into individual scenarios. This high-level view helps you understand the evaluation performance at a glance and identify areas that need attention.
 
 :::tip[How to use your test results to correct your AI agent?]
 During the development phase, it is essential to diagnose issues and implement corrections to improve the agent's performance.
@@ -55,9 +59,9 @@ During the development phase, it is essential to diagnose issues and implement c
 
 ### Metrics view
 
-The metrics view displays performance statistics for each check that was used in the evaluation. This view is particularly useful when you have custom checks, as it allows you to see how each check performed across all test cases.
+The metrics view displays performance statistics for each check that was used in the evaluation. This view is particularly useful when you have custom checks, as it allows you to see how each check performed across all scenarios.
 
-The pie chart below displays the number of evaluations that passed, failed, or were unexecuted.
+The chart below displays the number of scenarios that passed, failed, errored, or were not executed.
 
 ![Evaluation metrics view showing pass/fail rates per check](/_static/images/hub/evaluation-metrics.png)
 
@@ -75,7 +79,7 @@ You can read about metric definitions in [Annotate overview](/hub/ui/annotate/ov
 
 The failure categories view groups test failures by their failure category. This view is useful to understand the root cause of your failures and identify patterns in how your agent is failing. You can also manually update the failure category to a different one.
 
-The pie chart below displays the number of evaluations that passed, failed, or were unexecuted.
+The chart below displays the number of scenarios that passed, failed, errored, or were not executed.
 
 ![Failure categories view grouping test results by root cause](/_static/images/hub/evaluation-categories.png)
 
@@ -109,36 +113,38 @@ You can read about tag definitions in [Annotate overview](/hub/ui/annotate/overv
 
 #### Understanding evaluation columns
 
-The evaluation run table displays test cases with several columns that provide important information:
+The evaluation run table displays scenarios with several columns that provide important information:
 
 ![Evaluation results table with status, metrics, and failure columns](/_static/images/hub/evaluation-columns.png)
 
 These columns help you:
 
-- Quickly identify which test cases need review
+- Quickly identify which scenarios need review
 - Filter and sort results to focus on specific issues
 - Navigate efficiently through large evaluation runs
-- Make informed decisions about which test cases require action
+- Make informed decisions about which scenarios require action
 
-Underneath, you can see the types of columns that are displayed for each test case:
+Underneath, you can see the types of columns that are displayed for each scenario:
 
-- **Sample success** - The overall result of the test case:
-  - **Pass** - The test case met all evaluation criteria
-  - **Fail** - The test case did not meet one or more evaluation criteria
+- **Scenario success** - The overall result of the scenario:
+  - **Pass** - The scenario met all evaluation criteria
+  - **Fail** - The scenario did not meet one or more evaluation criteria
   - **Error** - An error occurred during evaluation
-  - **Skipped** - The test case was not evaluated (typically because required checks or annotations are missing)
+  - **Skipped** - The scenario was not evaluated (typically because required checks or annotations are missing)
 
-- **Metrics** - The metrics that were calculated for the test case
+- **Metrics** - The metrics that were calculated for the scenario
 
-- **Status** - The status of the test case:
-  - **Running** - The test case is being evaluated
-  - **Finished** - The test case has been evaluated
+- **Status** - The status of the scenario:
+  - **Running** - The scenario is being evaluated
+  - **Finished** - The scenario has been evaluated
   - **Error** - An error occurred during evaluation
-  - **Skipped** - The test case was not evaluated (typically because the test case is in draft status as part of a task)
+  - **Skipped** - The scenario was not evaluated (typically because the scenario is in draft status as part of a task)
 
-- **Failure category** - The category assigned to failed test cases (if applicable)
+- **Failure category** - The category assigned to failed scenarios (if applicable)
 
-- **Tags** - Tags associated with the test case for filtering and organization
+- **Visibility** - Whether the result is visible or hidden. Hidden results are excluded from the evaluation metrics.
+
+- **Tags** - Tags associated with the scenario for filtering and organization
 
 ## Next steps
 
