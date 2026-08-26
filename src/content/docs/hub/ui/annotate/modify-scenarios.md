@@ -59,7 +59,7 @@ You can look at understanding the overview of evaluations in [Create evaluations
 
 ## Rerun the scenario
 
-After modifying a scenario or its checks, you should rerun the test to validate your changes.
+After modifying a scenario or its checks, you should rerun it to validate your changes. From the scenario screen, there are two ways to do this: **Run scenario**, which reruns everything, and **Run check**, which reruns a single check.
 
 **When to rerun:**
 
@@ -69,12 +69,26 @@ After modifying a scenario or its checks, you should rerun the test to validate 
 - After modifying check requirements
 - After making any changes that could affect the test result
 
-**How to rerun:**
+### Run scenario
 
-1. Make your modifications to the scenario
-2. Use the "Test" option to run the scenario in isolation
-3. Review the results to see if your changes had the intended effect
-4. Continue iterating if needed
+The **Run scenario** button sits in the fixed toolbar at the top of the scenario screen, so it stays available as you scroll through interactions.
+
+![Run scenario button in the fixed toolbar above the interactions list](/_static/images/hub/scenario-run-scenario-button.png)
+
+Clicking it regenerates the trace for every interaction and then runs all of their checks. Use it when you've changed the conversation itself, or when you want a full, up-to-date result across every check.
+
+### Run check
+
+Each check also has its own **Run check** button, next to its enable/disable toggle.
+
+![Run check button next to a single check](/_static/images/hub/scenario-run-check-button.png)
+
+This is more granular:
+
+- If the interaction's trace hasn't been generated yet, it's generated first, then only the clicked check is processed.
+- If the trace already exists, it's reused as-is and only the clicked check runs — sibling checks on the same interaction are left untouched.
+
+Use **Run check** when you're iterating on a single check's configuration. It's especially useful once a scenario has many interactions or checks, since rerunning the whole scenario each time you tweak one check is much slower than rerunning just that check.
 
 Rerunning helps you:
 
