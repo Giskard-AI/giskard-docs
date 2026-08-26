@@ -366,43 +366,145 @@ Check whether the given keyword or sentence is present in the agent answer. Does
 :::
 ::::
 
-#### Metadata
+#### Regex Matching
+
+Check whether the agent's response matches a regular expression pattern. Does **not** use an LLM judge.
+
+| Parameter    | Type  | Description                          |
+| ------------ | ----- | ----------------------------------------- |
+| `Pattern`    | `str` | The regular expression to match with |
+| `Target key` | `str` | Trace path of the value under test    |
+
+::::note[Example]
+**Pattern**: `#\d{5}`
+
+:::caution[Failure example]
+
+- Please contact support for more details about your request.
+  - _Reason: The agent answer does not contain a match for the pattern `#\d{5}`_
+:::
+
+:::tip[Success example]
+
+- Your ticket #12345 has been created.
+:::
+::::
+
+#### Comparison Checks
+
+Six rule-based checks compare a value extracted from the trace against an expected value: `equals`, `not_equals`, `greater_than`, `greater_than_equals`, `less_than`, `less_than_equals`. They are the natural fit for structured agent outputs and numeric metadata.
+
+| Parameter        | Type     | Description                        |
+| ----------------- | -------- | --------------------------------------- |
+| `Expected value` | `scalar` | The value to compare against       |
+| `Target key`      | `str`    | Trace path of the value under test  |
+
+::::note[Example]
+**Expected value**: `billing`
+
+:::caution[Failure example]
+
+- `trace.last.outputs.category` resolves to `refund`
+  - _Reason: The extracted value does not equal the expected value `billing`_
+:::
+
+:::tip[Success example]
+
+- `trace.last.outputs.category` resolves to `billing`
+:::
+::::
+
+#### Metadata (Hub)
 
 Check whether the agent answer contains the expected value at the specified JSON path. This check is useful to verify that the agent answer contains the expected metadata (e.g. whether a tool is called). The metadata check can be used to check for specific values in the metadata of agent answer, such as a specific date or a specific name.
+
+| Parameter          | Type         | Description                                                                        |
+| ------------------- | ------------ | ------------------------------------------------------------------------------------ |
+| `JSON path rules`  | `list[dict]` | List of rules, each with a `JSON path`, `Expected value type`, and `Expected value`  |
+
+Each rule supports:
+
+| Key                     | Type                      | Description                                                       |
+| ------------------------ | -------------------------- | -------------------------------------------------------------------- |
+| `JSON path`             | `str`                     | JSON path expression (e.g. `$.category`, `$.tools_called[0]`)     |
+| `Expected value type`  | `str`                     | Type of the expected value: `string (contains the value)`, `number`, or `boolean`  |
+| `Expected value`       | `str` / `number` / `bool` | The expected value                                                 |
 
 :::tip
 We recommend using a tool like [json-path-evaluator](https://mockoon.com/tools/json-object-path-evaluator/) to evaluate the JSON path rules.
 :::
 
-:::note[Example - string value]
-**JSON Path rule**: Expecting `John` (string) at `$.user.name`
+::::note[Example]
+**JSON path rule**: Expecting `John` (`string (contains the value)`) at `$.user.name`
 
-**Failure examples**:
+:::caution[Failure example]
 
 - Metadata: `{"user": {"name": "Doe"}}`
   - _Reason: Expected_ `John` _at_ `$.user.name` _but got_ `Doe`
+:::
 
-**Success examples**:
+:::tip[Success example]
 
 - Metadata: `{"user": {"name": "John"}}`
-- Metadata: `{"user": {"name": "John Doe"}}`
-  :::
+:::
+::::
 
-:::note[Example - boolean value]
-**JSON Path rule**: Expecting `true` (boolean) at `$.output.success`
+:::note
+Metadata checks operate on the `metadata` field of the agent's response (`AgentOutput.metadata`), not on the message content. Your agent endpoint must return metadata in its response for this check to work.
+:::
 
-**Failure examples**:
+#### JSON Valid
 
-- Metadata: `{"output": {"success": false}}`
-  - _Reason: Expected_ `true` _at_ `$.output.success` _but got_ `false`
+Checks that a value extracted from the trace is valid JSON and, optionally, that it conforms to a JSON Schema. Does **not** use an LLM judge.
 
-- Metadata: `{"output": {}}`
-  - _Reason: JSON path_ `$.output.success` _does not exist in metadata_
+| Parameter     | Type   | Description                                       |
+| ------------- | ------ | ---------------------------------------------------- |
+| `Parse`       | `bool` | Parse the value from a string before validating   |
+| `JSON Schema` | `dict` | JSON Schema the value must conform to (optional)   |
+| `Target key`  | `str`  | Trace path of the value under test                  |
 
-**Success example**:
+::::note[Example]
+**Parse**: `false`
 
-- Metadata: `{"output": {"success": true}}`
-  :::
+:::caution[Failure example]
+
+- Response: `Sure, I can help with that!`
+  - _Reason: The value is not valid JSON_
+:::
+
+:::tip[Success example]
+
+- Response: `{"category": "billing", "resolved": true}`
+:::
+::::
+
+#### Readability
+
+Checks that the response satisfies readability score thresholds for a selected metric. Does **not** use an LLM judge.
+
+| Parameter        | Type    | Description                                                                                                                                              |
+| ----------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Metric`         | `str`   | One of `flesch_reading_ease`, `flesch_kincaid_grade`, `gunning_fog`, `automated_readability_index`, `coleman_liau_index`, `dale_chall_readability_score` |
+| `Minimum score`  | `float` | Minimum acceptable score (optional)                                                                                                                      |
+| `Maximum score`  | `float` | Maximum acceptable score (optional)                                                                                                                      |
+| `Target key`     | `str`   | Trace path of the value under test                                                                                                                        |
+
+::::note[Example]
+**Metric**: `flesch reading ease`
+
+**Minimum score**: `60`
+
+:::caution[Failure example]
+
+- The aforementioned discrepancy necessitates a comprehensive reassessment of the underlying methodological framework prior to implementation.
+  - _Reason: The Flesch reading ease score falls below the minimum of 60_
+:::
+
+:::tip[Success example]
+
+- Please try restarting the app. If that doesn't work, contact our support team.
+:::
+::::
 
 #### Custom Checks
 
