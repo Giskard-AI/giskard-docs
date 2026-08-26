@@ -45,7 +45,7 @@ After, you can configure the check parameters which depends on the check type. T
 Once configured, save the scenario to make sure the check configuration is saved. The full list of check configuration parameters can be found below.
 
 :::tip
-Before creating or changing a check, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
+Before creating or changing a check, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 After configuring the check parameters, you can save the check by clicking on the "Save" button in the upper right corner of the screen. A full check configuration paramters can be found below.
@@ -602,7 +602,7 @@ When a test fails, a failure category is assigned to the test automatically, how
 ![Failure category selector on a failed scenario](/_static/images/hub/failure-categories.png)
 
 :::tip
-You can read about modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
+You can read about modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 ### Defining the right failure categories
@@ -667,7 +667,7 @@ To create a tag, first open a conversation and click on the "Add tag" button in 
 ![Add tag button in the conversation properties panel](/_static/images/hub/tags-create.png)
 
 :::tip
-Before creating a tag, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
+Before creating a tag, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 ### Choosing the right tag structure
@@ -721,5 +721,5 @@ To choose a tag, it is good to stick to a naming convention that you agreed on b
 Now that you understand the fundamentals of test organization, you can:
 
 - **Review test results** - [Review test results](/hub/ui/annotate/review-test-results)
-- **Modify scenarios** - [Modify scenarios](/hub/ui/annotate/modify-test-cases)
+- **Modify scenarios** - [Modify scenarios](/hub/ui/annotate/modify-scenarios)
 - **Run evaluations** - [Create evaluations](/hub/ui/evaluations/create)

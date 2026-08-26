@@ -188,7 +188,7 @@ Once tasks are created, follow the review process:
 5. **Undraft the conversation** - Once all tasks are resolved, you can undraft the conversation to make it available for future evaluation runs
 
 :::tip
-You can find a full example of the review process in the [Modify scenarios](/hub/ui/annotate/modify-test-cases) documentation.
+You can find a full example of the review process in the [Modify scenarios](/hub/ui/annotate/modify-scenarios) documentation.
 :::
 
 ## Communicate with your team
@@ -239,4 +239,4 @@ To add a comment:
 Now that you understand how to distribute tasks, you can:
 
 - **Review test results** - Follow the business workflow to review evaluation results [Review test results](/hub/ui/annotate/review-test-results)
-- **Modify scenarios** - Follow the product owner workflow to refine scenarios [Modify scenarios](/hub/ui/annotate/modify-test-cases)
+- **Modify scenarios** - Follow the product owner workflow to refine scenarios [Modify scenarios](/hub/ui/annotate/modify-scenarios)

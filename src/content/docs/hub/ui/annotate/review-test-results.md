@@ -29,7 +29,7 @@ graph LR
     B -->|Don't Know| E[<a href="/hub/ui/annotate/task-management" target="_self">Put in Draft<br/>Open Task<br/>Assign to Domain Expert</a>]
     F -->|Yes| G{Can Answer<br/>Questions?}
     F -->|No| H[<a href="/hub/ui/annotate/task-management" target="_self">Draft Scenario<br/>Create Task<br/>Assign to PO</a>]
-    G -->|Yes| I[<a href="/hub/ui/annotate/modify-test-cases" target="_self">Rewrite Test<br/>Retest<br/>Save</a>]
+    G -->|Yes| I[<a href="/hub/ui/annotate/modify-scenarios" target="_self">Rewrite Test<br/>Retest<br/>Save</a>]
     G -->|No| J{Has Value?}
     J -->|No| K[Remove Test]
     J -->|Yes| H
@@ -82,7 +82,7 @@ If you can answer at least one of these questions:
 - **Remove it from the dataset**
 
 :::tip
-For detailed information about modifying scenarios, see [Modify scenarios](/hub/ui/annotate/modify-test-cases).
+For detailed information about modifying scenarios, see [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 #### If you don't know, there needs to be a discussion
@@ -165,7 +165,7 @@ When reviewing a scenario, the first thing to check is whether the scenario pass
 To understand why a scenario failed, you need to review the specific checks that were applied.
 
 :::tip
-For detailed information about checks and how they work, see [Overview](/hub/ui/annotate/overview). For information on enabling/disabling checks, see the "Enable/Disable checks" section in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
+For detailed information about checks and how they work, see [Overview](/hub/ui/annotate/overview). For information on enabling/disabling checks, see the "Enable/Disable checks" section in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 ### Check failure reason
@@ -188,7 +188,7 @@ Each check also has a **Settings** section, collapsed by default. Expand it to s
 ![Failed Regex Matching check with the Settings section expanded, showing the pattern and target key used](/_static/images/hub/review-check-settings.png)
 
 :::tip
-For more information about checks and how to enable/disable them, see the "Enable/Disable checks" section in [Modify scenarios](/hub/ui/annotate/modify-test-cases). For comprehensive information about all check types, see [Overview](/hub/ui/annotate/overview).
+For more information about checks and how to enable/disable them, see the "Enable/Disable checks" section in [Modify scenarios](/hub/ui/annotate/modify-scenarios). For comprehensive information about all check types, see [Overview](/hub/ui/annotate/overview).
 :::
 
 ### Check failure category
@@ -209,7 +209,7 @@ When a test fails, it is categorized based on the type of failure. Understanding
 - **String matching failure** - Required keywords or phrases are missing
 
 :::tip
-You can change the categories used for classification but before doing so, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
+You can change the categories used for classification but before doing so, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 ## Review the flow of the scenario
@@ -285,5 +285,5 @@ For more information about metadata checks and other check types, see [Overview]
 
 Now that you understand how to review test results, you can:
 
-- **Modify scenarios** - Learn how to refine scenarios and checks [Modify scenarios](/hub/ui/annotate/modify-test-cases)
+- **Modify scenarios** - Learn how to refine scenarios and checks [Modify scenarios](/hub/ui/annotate/modify-scenarios)
 - **Distribute tasks** - Create and manage tasks to organize review work [Task management](/hub/ui/annotate/task-management)
