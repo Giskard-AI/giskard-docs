@@ -15,7 +15,7 @@ These pages document the symbols in `giskard.checks` you will use directly. They
 <CardGrid>
   <LinkCard
     title="Core"
-    description="Base classes and fundamental types: Check, Trace, Interaction, Scenario, TestCase"
+    description="Base classes and types: Check, Trace, mixins, InteractionGenerationError, Scenario, TestCase"
     href="/oss/checks/reference/core"
   />
   <LinkCard
@@ -25,17 +25,17 @@ These pages document the symbols in `giskard.checks` you will use directly. They
   />
   <LinkCard
     title="Scenarios"
-    description="Multi-step workflow testing with scenario builders and runners"
+    description="Scenario builders, tags, SuiteResult grouping, and Hub export"
     href="/oss/checks/reference/scenarios"
   />
   <LinkCard
     title="Testing Utilities"
-    description="Testing utilities: test runners, spies, and debugging helpers"
+    description="TestCase, TestCaseResult, TestCaseError, spies, and debugging helpers"
     href="/oss/checks/reference/testing-utils"
   />
   <LinkCard
     title="Generators"
-    description="Input generators for creating dynamic test data and scenarios"
+    description="UserSimulator, LLMGenerator, DatasetInputGenerator, and custom InputGenerator subclasses"
     href="/oss/checks/reference/generators"
   />
   <LinkCard
@@ -60,11 +60,19 @@ from giskard.checks import (
     CheckStatus,
     Interaction,
     InteractionSpec,
+    InteractionGenerationError,
     Trace,
     Scenario,
+    ScenarioStatus,
     TestCase,
+    TestCaseError,
+    TestCaseStatus,
     Suite,
     SuiteResult,
+    GroupedSuiteResult,
+    GroupStats,
+    WithGeneratorMixin,
+    WithEmbeddingMixin,
     # Built-in checks
     FnCheck,
     StringMatching,

@@ -1,6 +1,6 @@
 ---
 title: Scenarios
-description: "Multi-step workflow testing with Scenario builders, runners, and interaction chaining."
+description: "Multi-step workflow testing with Scenario builders, runners, tags, grouping, and Hub export."
 sidebar:
   order: 4
 ---
@@ -25,6 +25,7 @@ Create a scenario, add interactions and checks, then call `.run()`. Each method 
   <Property name="name" type="str" defaultValue="Unnamed Scenario">Scenario name for identification. Pass the first argument positionally as in <code>Scenario("my_name")</code>.</Property>
   <Property name="trace_type" type="type[TraceType] | None" defaultValue="None">Optional custom trace type for advanced use cases.</Property>
   <Property name="multiple_runs" type="int" defaultValue="1">Default cap on full scenario executions when <code>run()</code> is called without <code>multiple_runs=...</code>. Must be ≥ 1.</Property>
+  <Property name="tags" type="list[str]" defaultValue="[]">Labels for grouping and Hub upload. Strings in <code>Key:Value</code> form; tags without <code>:</code> are bare labels.</Property>
 </MethodCard>
 
 <MethodCard name=".interact()" returnType="self">
@@ -53,6 +54,12 @@ Create a scenario, add interactions and checks, then call `.run()`. Each method 
   <Property name="*components" type="InteractionSpec | Check" required>Components to append in order.</Property>
 </MethodCard>
 
+<MethodCard name=".with_tags()" returnType="self">
+  Set scenario tags for grouping and Hub upload. Replaces any tags already set. Returns self for chaining.
+
+  <Property name="tags" type="list[str]" required>Flat strings in <code>Key:Value</code> format. Tags without <code>:</code> are bare labels.</Property>
+</MethodCard>
+
 <MethodCard name=".run()" returnType="ScenarioResult">
   Execute the scenario against the SUT and return results.
 
@@ -70,6 +77,7 @@ from giskard.checks import Scenario, FnCheck, Equals
 
 result = await (
     Scenario("two_step_example")
+    .with_tags(["example:multi-step"])
     .interact(
         inputs="Find item 42",
         outputs={"answer": "Which collection?", "found": False},
@@ -170,6 +178,9 @@ Result of scenario execution with trace and check results.
   <Property name="runs_executed" type="int">
     How many full scenario executions ran before stopping (at most `multiple_runs`).
   </Property>
+  <Property name="tags" type="list[str]">
+    Snapshot of the scenario's tags at run time. Used by `SuiteResult.group_by()` and Hub upload.
+  </Property>
 </TypeTable>
 
 <MethodCard name=".print_report()" returnType="None">
@@ -193,6 +204,28 @@ for i, check_result in enumerate(
     r for step in result.steps for r in step.results
 ):
     print(f"Check {i}: {check_result.status}")
+```
+
+---
+
+## `ScenarioStatus`
+
+**Module:** `giskard.checks.core.result` (also exported from `giskard.checks`)
+
+Outcome categories for a scenario execution. Derived from the scenario's steps: ERROR if any step errored, else FAIL if any step failed, else SKIP if every step was skipped, else PASS. An empty scenario is PASS.
+
+| Status  | Value   | Description                                          |
+| ------- | ------- | ---------------------------------------------------- |
+| `PASS`  | `"pass"`  | All steps passed, or the scenario has no steps     |
+| `FAIL`  | `"fail"`  | At least one step failed and none errored          |
+| `ERROR` | `"error"` | At least one step errored                          |
+| `SKIP`  | `"skip"`  | All steps were skipped                             |
+
+```python
+from giskard.checks import ScenarioStatus
+
+if result.status == ScenarioStatus.PASS:
+    print("Success!")
 ```
 
 ---
@@ -240,7 +273,9 @@ def target(inputs: str) -> str:
 
 suite = Suite(name="examples", target=target)
 suite.append(
-    Scenario("contains_received").interact(
+    Scenario("contains_received")
+    .with_tags(["example:greeting"])
+    .interact(
         inputs="Hello"
     ).check(
         StringMatching(
@@ -249,7 +284,7 @@ suite.append(
     )
 )
 suite.append(
-    Scenario("another_input").interact(inputs="Goodbye")
+    Scenario("another_input").with_tags(["example:greeting"]).interact(inputs="Goodbye")
 )
 
 result = await suite.run()
@@ -290,13 +325,97 @@ Aggregate result from suite execution.
   <Property name="skipped_count" type="int">
     Number of scenarios that were skipped.
   </Property>
+  <Property name="suite" type="Suite | None" defaultValue="None">
+    The `Suite` that produced this result. Excluded from serialization (`None` after a serialize/deserialize round-trip).
+  </Property>
+  <Property name="recommendation" type="str | None" defaultValue="None">
+    Optional Markdown-friendly guidance attached by scan or suite producers. Rendered in `print_report()` when set.
+  </Property>
 </TypeTable>
+
+<MethodCard name=".group_by()" returnType="GroupedSuiteResult">
+  Group results by a tag key. A scenario may appear in multiple buckets if it carries several tags with the same key; totals across buckets can exceed the number of scenarios. Scenarios with no matching tag go into the `None` bucket.
+
+  <Property name="key" type="str" required>Tag key to group by (the part before <code>:</code>, e.g. <code>"threat-type"</code>).</Property>
+</MethodCard>
+
+<MethodCard name=".print_report()" returnType="None">
+  Print the suite report. Overrides `BaseResult.print_report()` with an optional grouped pass-rate table.
+
+  <Property name="console" type="Console | None" defaultValue="None">Rich `Console` to print to. Defaults to a new one writing to stdout.</Property>
+  <Property name="group_by" type="str | None" defaultValue="None">Tag key to group by. When set, appends a per-group pass-rate table after the standard report.</Property>
+</MethodCard>
+
+<MethodCard name=".to_hub_format()" returnType="dict[str, Any]">
+  Convert the suite result into a JSON-serializable Giskard Hub payload. Pass the dict to `giskard_hub.HubClient.evaluations.upload()`.
+</MethodCard>
 
 <MethodCard name=".to_junit_xml()" returnType="str">
   Export the suite result as a JUnit XML string. Optionally write to a file.
 
   <Property name="path" type="str | Path | None" defaultValue="None">File path to write the XML to. Returns the XML string regardless.</Property>
 </MethodCard>
+
+```python
+grouped = result.group_by("example")
+result.print_report(group_by="example")
+payload = result.to_hub_format()
+```
+
+---
+
+## `GroupStats`
+
+**Module:** `giskard.checks.core.result` (also exported from `giskard.checks`)
+
+Pass/fail counts for one tag-value bucket. Mirrors Hub's Metric shape.
+
+<TypeTable name="GroupStats">
+  <Property name="name" type="str | None">
+    Tag value for this bucket, or `None` for untagged scenarios.
+  </Property>
+  <Property name="passed" type="int">
+    Scenarios in this bucket that passed.
+  </Property>
+  <Property name="failed" type="int">
+    Scenarios in this bucket that failed.
+  </Property>
+  <Property name="errored" type="int">
+    Scenarios in this bucket that errored.
+  </Property>
+  <Property name="skipped" type="int" defaultValue="0">
+    Scenarios in this bucket that were skipped.
+  </Property>
+  <Property name="total" type="int">
+    `passed + failed + errored + skipped`.
+  </Property>
+  <Property name="non_skipped" type="int">
+    Scenarios counted toward pass rate (`total - skipped`).
+  </Property>
+  <Property name="pass_rate" type="float | None">
+    Fraction passed out of `non_skipped`. `None` when `non_skipped == 0`.
+  </Property>
+</TypeTable>
+
+---
+
+## `GroupedSuiteResult`
+
+**Module:** `giskard.checks.core.result` (also exported from `giskard.checks`)
+
+`SuiteResult` grouped by a tag key, with per-group stats. Returned by `SuiteResult.group_by()`. Rich rendering prints the suite report, then a pass-rate table titled with that key. Untagged buckets display as `(untagged)`; an empty tag value displays as `true`.
+
+<TypeTable name="GroupedSuiteResult">
+  <Property name="suite_result" type="SuiteResult">
+    The original ungrouped suite result.
+  </Property>
+  <Property name="key" type="str">
+    Tag key used for grouping.
+  </Property>
+  <Property name="groups" type="dict[str | None, GroupStats]">
+    Per-value stats. The `None` key holds scenarios with no matching tag.
+  </Property>
+</TypeTable>
 
 ---
 
@@ -329,6 +448,6 @@ Low-level runner for executing scenarios. Most users should use `Scenario(...).r
 
 ## See also
 
-- [Core API](/oss/checks/reference/core) -- Scenario, Trace, and Interaction details
+- [Core API](/oss/checks/reference/core) -- Scenario, Trace, mixins, and InteractionGenerationError
 - [Built-in Checks](/oss/checks/reference/checks) -- Checks to use in scenarios
-- [Testing Utilities](/oss/checks/reference/testing-utils) -- Test runners and utilities
+- [Testing Utilities](/oss/checks/reference/testing-utils) -- TestCaseResult, TestCaseError, and runners
