@@ -1,6 +1,6 @@
 ---
 title: "Scan Vulnerabilities"
-description: "Automatically red team your LLM-based agent for safety and security vulnerabilities with Giskard's open-source scan."
+description: "Automatically red team your LLM-based agent for safety and security vulnerabilities with the open-source Giskard scan, and review the findings."
 sidebar:
   order: 1
 ---
@@ -57,11 +57,9 @@ pip install "giskard[scan,openai]"
 ```
 
 ```python
-from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-llm_judge = Generator(model="openai/gpt-4o")
-set_default_generator(llm_judge)
+set_default_generator("openai/gpt-4o")
 ```
 
 Set `OPENAI_API_KEY` in your environment.
@@ -74,11 +72,9 @@ pip install "giskard[scan,anthropic]"
 ```
 
 ```python
-from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-llm_judge = Generator(model="anthropic/claude-sonnet-4-20250514")
-set_default_generator(llm_judge)
+set_default_generator("anthropic/claude-sonnet-4-20250514")
 ```
 
 Set `ANTHROPIC_API_KEY` in your environment.
@@ -91,11 +87,9 @@ pip install "giskard[scan,google]"
 ```
 
 ```python
-from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-llm_judge = Generator(model="gemini/gemini-2.5-flash")
-set_default_generator(llm_judge)
+set_default_generator("gemini/gemini-2.5-flash")
 ```
 
 Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment.

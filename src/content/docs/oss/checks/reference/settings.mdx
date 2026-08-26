@@ -1,6 +1,6 @@
 ---
 title: Settings
-description: "Default LLM generator, embedding model, and environment-backed configuration for Giskard Checks."
+description: "Reference for the default LLM generator, the embedding model, and the environment-backed configuration options for Giskard Checks."
 sidebar:
   order: 8
 ---
@@ -77,7 +77,7 @@ LLM-backed checks such as `LLMJudge`, `Groundedness`, and `Toxicity` use this ge
 <MethodCard name="set_default_generator()" returnType="None">
   Set the process-wide default LLM generator.
 
-  <Property name="generator" type="BaseGenerator" required>Generator used by LLM checks that do not receive one explicitly.</Property>
+  <Property name="generator" type="BaseGenerator | str" required>A generator instance, or a model identifier string (e.g. `"openai/gpt-4o-mini"`) wrapped in `Generator` automatically. Used by LLM checks that do not receive one explicitly.</Property>
 </MethodCard>
 
 <MethodCard name="get_default_generator()" returnType="BaseGenerator">
@@ -86,10 +86,9 @@ LLM-backed checks such as `LLMJudge`, `Groundedness`, and `Toxicity` use this ge
 </MethodCard>
 
 ```python
-from giskard.agents.generators import Generator
 from giskard.checks import get_default_generator, set_default_generator
 
-set_default_generator(Generator(model="openai/gpt-5-mini"))
+set_default_generator("openai/gpt-5-mini")
 
 get_default_generator()  # the generator set above
 ```
@@ -116,6 +115,6 @@ from giskard.checks.settings import (
 
 ## See also
 
-- [Generators](/oss/checks/reference/generators) — generator classes you pass to `set_default_generator`
+- [Generators](/oss/checks/reference/generators) — generator classes you can pass to `set_default_generator` (or pass a model id string instead)
 - [Install & Configure](/oss/checks/installation) — provider API keys and first-time setup
 - [CI/CD Integration](/oss/checks/how-to/ci-cd) — setting the generator once per test session

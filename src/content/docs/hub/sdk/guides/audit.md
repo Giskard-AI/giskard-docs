@@ -1,6 +1,6 @@
 ---
 title: Audit Logs
-description: Search and retrieve audit log events for compliance reporting, change history, and debugging.
+description: Search and retrieve Giskard Hub event logs with the Python SDK for compliance reporting, security reviews, change history, and debugging.
 sidebar:
   order: 8
 ---

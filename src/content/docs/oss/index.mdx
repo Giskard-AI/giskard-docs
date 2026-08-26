@@ -10,7 +10,7 @@ Giskard is pytest-native, async-first, and framework-agnostic behavioral testing
 A scenario is a test case made of one or more interactions with your agent. In each interaction, you send inputs and capture the agent's outputs. A check is a rule the reply has to satisfy, either plain Python or a rule written in natural language and graded by the judge. Red teaming uses the same building blocks, but sends hostile inputs on purpose, such as attempts to make the agent leak its instructions ([prompt injection](/start/glossary/security/injection)), produce [harmful content](/start/glossary/security/harmful-content), or [state things that are not true](/start/glossary/business/hallucination). See the [glossary](/start/glossary) for the failure types Giskard looks for.
 
 :::note
-Coming from Giskard v2? Read [Migrate from Giskard v2 to v3](/oss/migrate-from-v2). In short: the v2 **scan** is now `vulnerability_scan` and **RAGET** is now `quality_scan`, both in the `scan` extra (`pip install --pre "giskard[scan]"`). Tabular (classification and regression) models have no v3 equivalent. Keep using the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai) for those, and follow the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252) for progress.
+Coming from Giskard v2? Read [Migrate from Giskard v2 to v3](/oss/migrate-from-v2). In short: the v2 **scan** is now `vulnerability_scan` and **RAGET** is now `quality_scan`, both in the `scan` extra (`pip install "giskard[scan]"`). Tabular (classification and regression) models have no v3 equivalent. Keep using the [Giskard v2 documentation ↗](https://legacy-docs.giskard.ai) for those, and follow the [v3 roadmap ↗](https://github.com/Giskard-AI/giskard-oss/issues/2252) for progress.
 :::
 
 The two examples below test a support agent for a retail bank, which must not give investment advice. For a full setup, see the [Checks quickstart](/oss/checks/quickstart) and [Your first scan](/oss/scan/tutorials/your-first-scan).
@@ -20,7 +20,7 @@ The two examples below test a support agent for a retail bank, which must not gi
 Install the library and point it at your LLM provider — some checks are graded by a LLM judge:
 
 ```bash
-pip install --pre "giskard[scan, litellm]"
+pip install "giskard[scan, litellm]"
 export OPENAI_API_KEY=...
 ```
 

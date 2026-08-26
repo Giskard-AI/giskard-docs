@@ -1,6 +1,6 @@
 ---
 title: "Install Giskard Checks"
-description: "Install Giskard Checks via pip, configure your LLM provider, and set up environment variables for LLM-based checks."
+description: "Install Giskard Checks with pip, configure your LLM provider, and set the environment variables that LLM-based checks use to call the judge."
 sidebar:
   order: 2
 ---
@@ -10,7 +10,7 @@ sidebar:
 Giskard requires **Python 3.12 or higher**. Install it together with the SDK for the LLM provider you will use as a judge: an LLM the library calls to grade your agent's replies.
 
 ```bash
-pip install --pre "giskard[openai]"
+pip install "giskard[openai]"
 ```
 
 No provider SDK ships with `giskard` itself, so installing it without a provider extra leaves LLM-based checks unable to reach a model.
@@ -19,16 +19,16 @@ Pick the extra that matches your provider:
 
 | Provider prefix | Install | SDK |
 | --- | --- | --- |
-| `openai/` | `pip install --pre "giskard[openai]"` | `openai` |
-| `google/` or `gemini/` | `pip install --pre "giskard[google]"` | `google-genai` |
-| `anthropic/` | `pip install --pre "giskard[anthropic]"` | `anthropic` |
-| `azure/` | `pip install --pre "giskard[azure]"` | `openai` |
-| `azure_ai/` | `pip install --pre "giskard[azure]"` | `openai` |
+| `openai/` | `pip install "giskard[openai]"` | `openai` |
+| `google/` or `gemini/` | `pip install "giskard[google]"` | `google-genai` |
+| `anthropic/` | `pip install "giskard[anthropic]"` | `anthropic` |
+| `azure/` | `pip install "giskard[azure]"` | `openai` |
+| `azure_ai/` | `pip install "giskard[azure]"` | `openai` |
 
-Use `pip install --pre "giskard[all-llms]"` for all the native SDKs at once.
+Use `pip install "giskard[all-llms]"` for all the native SDKs at once.
 
 :::note[Using LiteLLM instead]
-For unsupported providers, install `pip install --pre "giskard[litellm]"` and pass `LiteLLMGenerator` explicitly:
+For unsupported providers, install `pip install "giskard[litellm]"` and pass `LiteLLMGenerator` explicitly:
 
 ```python
 from giskard.agents.generators import LiteLLMGenerator
@@ -76,18 +76,13 @@ load_dotenv()  # loads .env from the current directory
 Then you can set your preferred LLM judge model like this:
 
 ```python
-from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-# Create a generator with giskard.agents
 # The provider prefix picks the SDK: openai/, google/, anthropic/, azure/, azure_ai/
-llm_judge = Generator(model="openai/gpt-5-mini")
-
-# Configure the checks to use this judge model by default
-set_default_generator(llm_judge)
+set_default_generator("openai/gpt-5-mini")
 ```
 
-`Generator` is `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`. Use a capable judge model and review failures before acting on them.
+A model identifier string is wrapped in `Generator` automatically. Pass a `Generator` instance when you need further configuration. Use a capable judge model and review failures before acting on them.
 
 ## Next Steps
 
