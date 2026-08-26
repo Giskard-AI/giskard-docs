@@ -1,6 +1,6 @@
 ---
 title: "Install Giskard Checks"
-description: "Install Giskard Checks via pip, configure your LLM provider, and set up environment variables for LLM-based checks."
+description: "Install Giskard Checks with pip, configure your LLM provider, and set the environment variables that LLM-based checks use to call the judge."
 sidebar:
   order: 2
 ---
