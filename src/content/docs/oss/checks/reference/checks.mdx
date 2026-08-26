@@ -318,7 +318,7 @@ Use `JsonValid` when the agent is asked to produce machine-readable output and a
 **Module:** `giskard.checks.builtin.rego_policy`
 
 :::note[Optional dependency]
-Requires the `regorus` extra: `pip install --pre 'giskard[regorus]'` (installs the [Regorus](https://github.com/microsoft/regorus) `celine-regorus` wheel; import as `regorus`).
+Requires the `regorus` extra: `pip install 'giskard[regorus]'` (installs the [Regorus](https://github.com/microsoft/regorus) `celine-regorus` wheel; import as `regorus`).
 :::
 
 <Property name="policy" type="str" required>
@@ -897,7 +897,7 @@ Use it when phrasing varies but meaning must not. The default `threshold` of 0.9
 **Module:** `giskard.checks.builtin.nlp_metrics`
 
 :::note[Optional dependency]
-Requires the `textstat` dependency, which ships with the `all-checks` extra: `pip install --pre 'giskard[all-checks]'`.
+Requires the `textstat` dependency, which ships with the `all-checks` extra: `pip install 'giskard[all-checks]'`.
 :::
 
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>

@@ -35,8 +35,8 @@ SCAN_BASELINE = REPO / "docs" / "api-baseline" / "giskard-scan.json"
 # source ref together so a refresh cannot accidentally snapshot a different
 # package while leaving plausible-looking JSON behind.
 API_BASELINES = (
-    (BASELINE, "giskard.checks", "giskard-checks", "giskard-checks/v1.0.2rc1"),
-    (SCAN_BASELINE, "giskard.scan", "giskard-scan", "giskard-scan/v1.0.0rc1"),
+    (BASELINE, "giskard.checks", "giskard-checks", "giskard-checks/v1.0.2"),
+    (SCAN_BASELINE, "giskard.scan", "giskard-scan", "giskard-scan/v1.0.0"),
 )
 
 

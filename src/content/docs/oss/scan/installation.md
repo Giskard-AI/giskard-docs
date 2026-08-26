@@ -12,11 +12,11 @@ The Giskard scan needs two things before it can run: the Python package, and an 
 The scan requires **Python 3.12 or higher**:
 
 ```bash
-pip install --pre "giskard[scan]"
+pip install "giskard[scan]"
 ```
 
 ```bash
-uv pip install --prerelease=allow "giskard[scan]"
+uv pip install "giskard[scan]"
 ```
 
 ## Configure a model
@@ -28,7 +28,7 @@ Those calls send your agent's description and its replies to whichever provider 
 Install the provider extra alongside the scan:
 
 ```bash
-pip install --pre "giskard[scan,openai]"
+pip install "giskard[scan,openai]"
 ```
 
 Then register the model as the default:
@@ -61,8 +61,8 @@ Pick a capable model here. The generator writes the attacks and the judge decide
 `third_party_scan` runs external red-teaming tools in-process through lazily imported adapters. They are not installed by default:
 
 ```bash
-pip install --pre "giskard[garak]"
-pip install --pre "giskard[deepteam]"
+pip install "giskard[garak]"
+pip install "giskard[deepteam]"
 ```
 
 Install only the ones you plan to run; both pull in large dependency trees. See [`third_party_scan`](/oss/scan/reference/scan-api) for the arguments each tool accepts. A **probe** there is one canned attack that tool knows how to run, the equivalent of a Giskard generator.

@@ -10,7 +10,7 @@ sidebar:
 Giskard requires **Python 3.12 or higher**. Install it together with the SDK for the LLM provider you will use as a judge: an LLM the library calls to grade your agent's replies.
 
 ```bash
-pip install --pre "giskard[openai]"
+pip install "giskard[openai]"
 ```
 
 No provider SDK ships with `giskard` itself, so installing it without a provider extra leaves LLM-based checks unable to reach a model.
@@ -19,16 +19,16 @@ Pick the extra that matches your provider:
 
 | Provider prefix | Install | SDK |
 | --- | --- | --- |
-| `openai/` | `pip install --pre "giskard[openai]"` | `openai` |
-| `google/` or `gemini/` | `pip install --pre "giskard[google]"` | `google-genai` |
-| `anthropic/` | `pip install --pre "giskard[anthropic]"` | `anthropic` |
-| `azure/` | `pip install --pre "giskard[azure]"` | `openai` |
-| `azure_ai/` | `pip install --pre "giskard[azure]"` | `openai` |
+| `openai/` | `pip install "giskard[openai]"` | `openai` |
+| `google/` or `gemini/` | `pip install "giskard[google]"` | `google-genai` |
+| `anthropic/` | `pip install "giskard[anthropic]"` | `anthropic` |
+| `azure/` | `pip install "giskard[azure]"` | `openai` |
+| `azure_ai/` | `pip install "giskard[azure]"` | `openai` |
 
-Use `pip install --pre "giskard[all-llms]"` for all the native SDKs at once.
+Use `pip install "giskard[all-llms]"` for all the native SDKs at once.
 
 :::note[Using LiteLLM instead]
-For unsupported providers, install `pip install --pre "giskard[litellm]"` and pass `LiteLLMGenerator` explicitly:
+For unsupported providers, install `pip install "giskard[litellm]"` and pass `LiteLLMGenerator` explicitly:
 
 ```python
 from giskard.agents.generators import LiteLLMGenerator
