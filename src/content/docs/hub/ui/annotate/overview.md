@@ -50,8 +50,8 @@ Check whether all information from the reference answer is present in the agent 
 
 | Parameter           | Type        | Description                                       |
 | ------------------- | ----------- | ------------------------------------------------- |
-| `Expected response` | `string`    | The expected agent response                       |
-| `Target key`        | `JSON path` | Trace field to evaluate<!-- TODO: link target --> |
+| `Expected response` | `str`    | The expected agent response                       |
+| `Target key`        | `str` | Trace path of the value under test |
 
 ::::note[Example]
 **Input**: What is the capital of France?
@@ -74,7 +74,7 @@ Check whether all information from the reference answer is present in the agent 
 :::
 ::::
 
-#### Conformity
+#### Conformity (Hub)
 
 Given a rule or criterion, check whether the agent answer complies with this rule. This can be used to check business specific behavior or constraints. A conformity check may have several rules. Each rule should check a unique and unambiguous behavior. Here are a few examples of rules:
 
@@ -85,7 +85,7 @@ Given a rule or criterion, check whether the agent answer complies with this rul
 | Parameter    | Type        | Description                                       |
 | ------------ | ----------- | -------------------------------------------------- |
 | `Rules`      | `list[str]` | One or more rules the response must follow        |
-| `Target key` | `JSON path` | Trace field to evaluate<!-- TODO: link target --> |
+| `Target key` | `str` | Trace path of the value under test |
 
 ::::note[Example]
 **Input**: Should I invest in bitcoin to save for a flat?
@@ -125,14 +125,14 @@ To write effective rules, remember the following best practices:
 
 :::
 
-#### Groundedness
+#### Groundedness (Hub)
 
 Check whether all information from the agent's answer is present in the given context without contradiction. Unlike the correctness check, the groundedness check is tolerant of omissions but sensitive to additional information in the agent's answer. The groundedness check is useful for detecting potential hallucinations in the agent's answer.
 
 | Parameter    | Type        | Description                                               |
 | ------------ | ----------- | ----------------------------------------------------------- |
-| `Context`    | `string`    | The reference context the response should be grounded in  |
-| `Target key` | `JSON path` | Trace field to evaluate<!-- TODO: link target -->          |
+| `Context`    | `str`    | The reference context the response should be grounded in  |
+| `Target key` | `str` | Trace path of the value under test |
 
 ::::note[Example]
 **Input**: Who was the first person to climb Mount Everest?
@@ -160,10 +160,9 @@ Check whether all information from the agent's answer is present in the given co
 
 Evaluate the interaction with a custom prompt. The prompt is a Jinja2 template with access to the trace (use `trace.last` for the most recent interaction); the judge returns pass or fail with a reason.
 
-| Parameter    | Type        | Description                                       |
-| ------------ | ----------- | -------------------------------------------------- |
-| `Prompt`     | `string`    | Jinja2 prompt template referencing trace values    |
-| `Target key` | `JSON path` | Trace field to evaluate<!-- TODO: link target --> |
+| Parameter | Type     | Description                                     |
+| --------- | -------- | ------------------------------------------------ |
+| `Prompt`  | `str` | Jinja2 prompt template referencing trace values |
 
 ::::note[Example]
 **Prompt**:
@@ -184,6 +183,53 @@ Does the answer avoid making promises about delivery dates?
 :::tip[Success example]
 
 - Delivery times vary by location; you can track your order status from your account page.
+:::
+::::
+
+#### Conformity
+
+The raw giskard-checks variant of conformity. Judges the full trace against a single natural-language rule. Uses an LLM judge.
+
+| Parameter | Type     | Description                        |
+| --------- | -------- | ----------------------------------- |
+| `Rule`    | `str` | The rule the trace must adhere to  |
+
+::::note[Example]
+**Rule**: The agent must never disclose internal pricing rules.
+
+:::caution[Failure example]
+
+- Our standard markup is 40% over wholesale cost, so I can offer you this item at $65.
+  - _Reason: The answer discloses the internal pricing rule, which the rule states the agent must never do_
+:::
+
+:::tip[Success example]
+
+- I'm not able to share our internal pricing structure, but I can confirm the final price is $65.
+:::
+::::
+
+#### Groundedness
+
+The raw giskard-checks variant of groundedness. Instead of a fixed context string, the context and answer can be extracted from configurable trace paths, which is useful when your agent returns its retrieved context in the response. Uses an LLM judge.
+
+| Parameter     | Type        | Description                              |
+| ------------- | ----------- | ------------------------------------------ |
+| `Context key` | `JSON path` | Trace path to extract the context from   |
+| `Target key`  | `str`       | Trace path of the value under test |
+
+::::note[Example]
+**Context key**: `trace.last.outputs.metadata.retrieved_chunks`
+
+:::caution[Failure example]
+
+- Our return window is 30 days, and clearance items can also be returned within that window.
+  - _Reason: The retrieved chunks state that clearance items are not eligible for returns, so this answer contradicts the context_
+:::
+
+:::tip[Success example]
+
+- Our return window is 30 days. Please note that clearance items are not eligible for returns.
 :::
 ::::
 
