@@ -354,7 +354,6 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "giskard", extra = ["openai", "scan"] },
-    { name = "giskard-checks" },
 ]
 
 [package.dev-dependencies]
@@ -365,10 +364,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "giskard", extras = ["scan", "openai"], specifier = "==3.0.0" },
-    { name = "giskard-checks", specifier = "==1.0.3" },
-]
+requires-dist = [{ name = "giskard", extras = ["scan", "openai"], specifier = "==3.0.0" }]
 
 [package.metadata.requires-dev]
 dev = [
