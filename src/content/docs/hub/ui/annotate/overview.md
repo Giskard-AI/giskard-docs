@@ -28,15 +28,21 @@ Metrics provide quantitative measurements of your agent's performance across dif
 
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/VLejoLvDy-o?si=FXzYphE06Oi1fiBH" title="How to create and configure evaluation checks in Giskard Hub" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-### Create a check
+### Configure a built-in check
 
-To create a check, click on the "Create a new check" button in the upper right corner of the screen.
+Within an existing or new scenario, click on the "Add check" button.
 
-![Checks page with create new check button](/_static/images/hub/checks-create.png)
+![Interaction with no check yet, showing the Add check button](/_static/images/hub/checks-built-in-creation-placeholder.png)
+
+Pick an available built-in check from the list, or a custom check if you have previously created one.
+
+![Add checks dialog listing available built-in and custom checks](/_static/images/hub/checks-built-in-pick.png)
 
 After, you can configure the check parameters which depends on the check type. This will look something like this:
 
-![Check configuration form with type and parameter fields](/_static/images/hub/checks-create-configure.png)
+![Correctness check configured with an expected response and target key](/_static/images/hub/checks-built-in-created.png)
+
+Once configured, save the scenario to make sure the check configuration is saved. The full list of check configuration parameters can be found below.
 
 :::tip
 Before creating or changing a check, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
