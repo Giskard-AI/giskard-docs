@@ -1,6 +1,6 @@
 ---
 title: Playground Chats
-description: Access, export, and analyze playground chat conversations from the Giskard Hub using the Python SDK for LLM testing.
+description: Access, export, and analyze playground chat conversations from the Giskard Hub using the Python SDK, and turn real chats into scenarios.
 sidebar:
   order: 7
 ---
