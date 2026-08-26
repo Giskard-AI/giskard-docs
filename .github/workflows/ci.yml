@@ -83,7 +83,7 @@ jobs:
     environment: docs-deploy
     permissions:
       contents: read # checkout
-      pull-requests: read # list PR files via the gh api call below
+      pull-requests: write # list PR files and upsert the sticky SEO report comment
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -145,6 +145,18 @@ jobs:
 
       - name: Check SEO invariants
         run: pnpm run test:seo
+
+      - name: Report SEO metadata guidance
+        run: pnpm --silent run report:seo | tee seo-report.md
+
+      # Same-repo PRs only: fork PRs get a read-only token and cannot comment.
+      - name: Post SEO report as sticky PR comment
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: bash scripts/post-sticky-comment.sh seo-metadata-advisory seo-report.md
 
       - name: Run notebook tests
         if: steps.nbchanges.outputs.relevant == 'true'

@@ -1,6 +1,6 @@
 ---
-title: Introduction
-description: Python SDK for the Giskard Hub — evaluate, scan, and monitor your LLM agents programmatically.
+title: "Introduction"
+description: Python SDK for the Giskard Hub. Evaluate, scan, and monitor your AI agents programmatically, and automate agent testing from Python or CI.
 sidebar:
   order: 1
 ---
@@ -57,15 +57,15 @@ evaluation = hub.evaluations.create(
 
 ## Key capabilities
 
-- **Evaluate** -- run your LLM agent against datasets of test cases with configurable checks (LLM judge, embedding similarity, rule-based)
+- **Evaluate** -- run your agent against datasets of scenarios with configurable checks (LLM judge, embedding similarity, rule-based, etc.)
 - **Scan** -- automated red-teaming covering the [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/) and additional threat categories
-- **Generate** -- auto-generate test cases from scenarios, knowledge bases, or playground conversations
+- **Generate** -- auto-generate scenarios from prompt presets or knowledge bases, or promote playground conversations into datasets
 - **Schedule** -- set up recurring evaluations (daily, weekly, monthly) for continuous quality monitoring
-- **Track** -- create tasks from failed results, annotate test cases with comments, and audit every change
+- **Track** -- create tasks from failed results, annotate scenarios with comments, and audit every change
 
-## Migrating from v2?
+## Migrating from Hub v2?
 
-If you're upgrading from v2.x, see the [Migration Guide](/hub/sdk/migration) for a complete list of breaking changes and before/after code examples.
+If you used the SDK to interact with the [Hub v2](/hub/ui/release-notes#251-2026-03-31), you can use the same SDK to interact with the Hub v3, with little changes. See the [Migration Guide](/hub/sdk/migration) for a complete list of breaking changes and before/after code examples.
 
 ## Need help?
 

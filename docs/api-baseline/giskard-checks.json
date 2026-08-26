@@ -350,7 +350,7 @@
       "signature": "(*, role: Literal['user'] = 'user', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
     }
   },
-  "source_ref": "giskard-checks/v1.0.2rc1",
+  "source_ref": "giskard-checks/v1.0.3",
   "symbols": {
     "giskard.checks.AllOf": {
       "aliases": [
@@ -2587,8 +2587,8 @@
     "giskard.checks.set_default_generator": {
       "doc_summary": "Set the default LLM generator for all checks.",
       "kind": "function",
-      "signature": "(generator: giskard.agents.generators.base.BaseGenerator) -> None"
+      "signature": "(generator: giskard.agents.generators.base.BaseGenerator | str) -> None"
     }
   },
-  "version": "1.0.2rc1"
+  "version": "1.0.3"
 }

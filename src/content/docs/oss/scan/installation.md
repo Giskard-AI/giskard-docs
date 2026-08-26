@@ -12,11 +12,11 @@ The Giskard scan needs two things before it can run: the Python package, and an 
 The scan requires **Python 3.12 or higher**:
 
 ```bash
-pip install --pre "giskard[scan]"
+pip install "giskard[scan]"
 ```
 
 ```bash
-uv pip install --prerelease=allow "giskard[scan]"
+uv pip install "giskard[scan]"
 ```
 
 ## Configure a model
@@ -28,21 +28,20 @@ Those calls send your agent's description and its replies to whichever provider 
 Install the provider extra alongside the scan:
 
 ```bash
-pip install --pre "giskard[scan,openai]"
+pip install "giskard[scan,openai]"
 ```
 
 Then register the model as the default:
 
 ```python
-from giskard.agents.generators import GiskardLLMGenerator
 from giskard.checks import set_default_generator
 
-set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o"))
+set_default_generator("openai/gpt-4o")
 ```
 
 `openai`, `anthropic`, and `google` are the first-party extras. For anything else, install the `litellm` extra and pass any [LiteLLM-supported ↗](https://docs.litellm.ai/docs/providers) model string, such as `"mistral/mistral-large-latest"`, `"azure/gpt-4o"`, or `"ollama/llama3"`.
 
-Each provider reads its own API key from the environment (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`). Keep them in a `.env` file and load it before you build the generator:
+Each provider reads its own API key from the environment (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`). Keep them in a `.env` file and load it before you call `set_default_generator`:
 
 ```bash
 pip install python-dotenv
@@ -61,8 +60,8 @@ Pick a capable model here. The generator writes the attacks and the judge decide
 `third_party_scan` runs external red-teaming tools in-process through lazily imported adapters. They are not installed by default:
 
 ```bash
-pip install --pre "giskard[garak]"
-pip install --pre "giskard[deepteam]"
+pip install "giskard[garak]"
+pip install "giskard[deepteam]"
 ```
 
 Install only the ones you plan to run; both pull in large dependency trees. See [`third_party_scan`](/oss/scan/reference/scan-api) for the arguments each tool accepts. A **probe** there is one canned attack that tool knows how to run, the equivalent of a Giskard generator.

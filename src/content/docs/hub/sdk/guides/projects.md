@@ -1,6 +1,6 @@
 ---
-title: Projects
-description: Create and manage projects with the Giskard Hub Python SDK. Projects organize agents, datasets, evaluations, and scans.
+title: "Projects"
+description: Create and manage projects with the Giskard Hub Python SDK. Projects organize your agents, datasets, evaluations, and scans in one workspace.
 sidebar:
   order: 1
 ---
@@ -15,7 +15,7 @@ from giskard_hub import HubClient
 hub = HubClient()
 
 project = hub.projects.create(
-    name="My LLM App",
+    name="My Agent App",
     description="Evaluation workspace for the production chatbot",
 )
 
@@ -42,14 +42,14 @@ hub.projects.delete("project-id")
 
 ---
 
-## Scenarios
+## Prompt Presets
 
-**Scenarios** are reusable templates that describe a persona, a topic, or a behaviour pattern within a project. They are used as input when generating scenario-based datasets via `hub.datasets.generate_scenario_based()`.
+**Prompt Presets** are reusable templates that describe a persona, a topic, or a behaviour pattern within a project. They are used as input when generating preset-based datasets via `hub.datasets.generate_preset_based()`.
 
-### Create a scenario
+### Create a prompt preset
 
 ```python
-scenario = hub.projects.scenarios.create(
+prompt_preset = hub.projects.prompt_presets.create(
     "project-id",
     name="Angry customer asking for refund",
     description="The user is frustrated and demands an immediate refund for a defective product.",
@@ -58,31 +58,31 @@ scenario = hub.projects.scenarios.create(
     ],
 )
 
-print(scenario.id)
+print(prompt_preset.id)
 ```
 
-### Preview generated questions from a scenario
+### Preview generated questions from a prompt preset
 
-Before generating a full dataset, you can preview a single sample conversation that a scenario would produce:
+Before generating a full dataset, you can preview a single sample conversation that a prompt preset would produce:
 
 ```python
-preview = hub.projects.scenarios.preview(
+preview = hub.projects.prompt_presets.preview(
     "project-id",
     agent_id="agent-id",
     description="The user is frustrated and demands an immediate refund for a defective product.",
 )
 
-print(preview.conversation)
+print(preview.inputs)
 ```
 
-### List and manage scenarios
+### List and manage prompt presets
 
 ```python
-scenarios = hub.projects.scenarios.list("project-id")
+prompt_presets = hub.projects.prompt_presets.list("project-id")
 
-hub.projects.scenarios.update(
-    "scenario-id", project_id="project-id", name="Updated name"
+hub.projects.prompt_presets.update(
+    "prompt-preset-id", project_id="project-id", name="Updated name"
 )
 
-hub.projects.scenarios.delete("scenario-id", project_id="project-id")
+hub.projects.prompt_presets.delete("prompt-preset-id", project_id="project-id")
 ```
