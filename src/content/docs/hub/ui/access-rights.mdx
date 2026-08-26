@@ -9,7 +9,7 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 This section provides guidance on managing users in the Hub.
 
-The Hub allows you to set access rights at two levels: global and scoped for both users and groups. To begin, click the Settings icon on the left panel, then open **User Management**.
+The Hub allows you to set access rights at two levels: global and scoped for both users and groups. To begin, click on the "Settings" icon on the left panel, then open **User Management**.
 
 ## Configure users and groups
 
@@ -25,11 +25,11 @@ The Hub allows you to set access rights at two levels: global and scoped for bot
 
     ![Groups settings page with the Create group button and group cards](/_static/images/hub/access-settings-group.png)
 
-    After creating a group, go back to **Users**. Open the three-dot menu on a user card and click **Edit groups**.
+    After creating a group and users, you can then navigate back to the **Users** tab from the left panel. You can then select a user you want to add to a group, click the three vertical dots on the right side of the user box, and click on **Edit groups**.
 
     ![User list with the overflow menu open on Edit groups](/_static/images/hub/access-settings-group-user.png)
 
-    This opens a dialog titled **Editing groups for** the user, where you select the groups to assign.
+    This will open a dialog titled **Editing groups for** the user, where you can select the group you want to add the user to.
 
     ![Group assignment dialog for adding a user to a group](/_static/images/hub/access-settings-group-assign.png)
 
@@ -40,7 +40,7 @@ The Hub allows you to set access rights at two levels: global and scoped for bot
 
 ## Configure Global Permissions
 
-Global permissions apply to all projects. You can configure Create, Read, Edit, and Delete for Project, Check, Dataset, Agent, Knowledge Base, Evaluation, Scan, Task, and User Management. For Playground, API Key Authentication, and Audit, you can enable or disable Use.
+Global permissions apply access rights across all projects. You can configure Create, Read, Edit, and Delete permissions for each entity. This is available for: Project, Check, Dataset, Agent, Knowledge Base, Evaluation, Scan, Task, and User Management. Additionally, for features like the Playground, API Key Authentication, and Audit, you can enable or disable the users' right to use it.
 
 The rights are as follows:
 
@@ -54,6 +54,6 @@ The rights are as follows:
 
 ## Configure Scoped Permissions
 
-Scoped permissions allow for granular control. For each project, you can specify which entities users can access — a project, a dataset, or an agent. An example of where this may be useful is if you want users to read everything in a project but only allow a few people to edit the dataset.
+Scoped permissions allow for granular control. For each project, you can specify which pages or entities users are allowed to access. An example of where this may be useful is if you want your users to read everything in a project but only allow a few people to edit the dataset.
 
 ![Scoped permissions in the Edit permissions dialog](/_static/images/hub/access-scope.png)
