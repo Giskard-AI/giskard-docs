@@ -76,18 +76,13 @@ load_dotenv()  # loads .env from the current directory
 Then you can set your preferred LLM judge model like this:
 
 ```python
-from giskard.agents.generators import Generator
 from giskard.checks import set_default_generator
 
-# Create a generator with giskard.agents
 # The provider prefix picks the SDK: openai/, google/, anthropic/, azure/, azure_ai/
-llm_judge = Generator(model="openai/gpt-5-mini")
-
-# Configure the checks to use this judge model by default
-set_default_generator(llm_judge)
+set_default_generator("openai/gpt-5-mini")
 ```
 
-`Generator` is `GiskardLLMGenerator`, which routes the `provider/model` string to that provider's native SDK through `giskard-llm`. Use a capable judge model and review failures before acting on them.
+A model identifier string is wrapped in `Generator` automatically. Pass a `Generator` instance when you need further configuration. Use a capable judge model and review failures before acting on them.
 
 ## Next Steps
 

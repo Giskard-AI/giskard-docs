@@ -20,10 +20,9 @@ pip install "giskard[openai]"
 A judge is an LLM, so a check needs a provider and a key. Register one as the default:
 
 ```python
-from giskard.agents.generators import GiskardLLMGenerator
 from giskard.checks import set_default_generator
 
-set_default_generator(GiskardLLMGenerator(model="openai/gpt-4o-mini"))
+set_default_generator("openai/gpt-4o-mini")
 ```
 
 See [Install & Configure](/oss/checks/installation) for other providers.

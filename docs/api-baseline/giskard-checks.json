@@ -350,7 +350,7 @@
       "signature": "(*, role: Literal['user'] = 'user', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
     }
   },
-  "source_ref": "giskard-checks/v1.0.2",
+  "source_ref": "giskard-checks/v1.0.3",
   "symbols": {
     "giskard.checks.AllOf": {
       "aliases": [
@@ -396,13 +396,13 @@
       "doc_summary": "LLM-based check that evaluates whether the model's answer is relevant to the question.",
       "fields": {
         "answer": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "context": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "description": {
@@ -423,8 +423,8 @@
           "required": false
         },
         "question": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "question_key": {
@@ -456,7 +456,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, question: str | <MISSING> = <MISSING>, question_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.inputs', answer: str | <MISSING> = <MISSING>, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | <MISSING> = <MISSING>, include_history: bool = True) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, question: str | MISSING = MISSING, question_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.inputs', answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | MISSING = MISSING, include_history: bool = True) -> None"
     },
     "giskard.checks.AnyOf": {
       "aliases": [
@@ -732,13 +732,13 @@
       "doc_summary": "LLM-based check that fails only on clear contradictions with context.",
       "fields": {
         "answer": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "context": {
-          "annotation": "str | list[str] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | list[str] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "context_key": {
@@ -782,7 +782,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | <MISSING> = <MISSING>, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | <MISSING> = <MISSING>, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | MISSING = MISSING, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
     },
     "giskard.checks.DatasetInputGenerator": {
       "bases": [
@@ -820,18 +820,18 @@
           "required": false
         },
         "expected_value": {
-          "annotation": "ExpectedType | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "expected_value_key": {
-          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "match": {
-          "annotation": "typing.Literal['any', 'all', 'none'] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "name": {
@@ -851,7 +851,7 @@
       },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | <MISSING> = <MISSING>, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING> = <MISSING>, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | <MISSING> = <MISSING>) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.FnCheck": {
       "aliases": [
@@ -914,18 +914,18 @@
           "required": false
         },
         "expected_value": {
-          "annotation": "ExpectedType | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "expected_value_key": {
-          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "match": {
-          "annotation": "typing.Literal['any', 'all', 'none'] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "name": {
@@ -945,7 +945,7 @@
       },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | <MISSING> = <MISSING>, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING> = <MISSING>, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | <MISSING> = <MISSING>) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.GreaterThanEquals": {
       "aliases": [
@@ -962,18 +962,18 @@
           "required": false
         },
         "expected_value": {
-          "annotation": "ExpectedType | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "expected_value_key": {
-          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "match": {
-          "annotation": "typing.Literal['any', 'all', 'none'] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "name": {
@@ -993,7 +993,7 @@
       },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | <MISSING> = <MISSING>, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING> = <MISSING>, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | <MISSING> = <MISSING>) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.Groundedness": {
       "aliases": [
@@ -1006,13 +1006,13 @@
       "doc_summary": "LLM-based check that validates answers are grounded in context.",
       "fields": {
         "answer": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "context": {
-          "annotation": "str | list[str] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | list[str] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "context_key": {
@@ -1056,7 +1056,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | <MISSING> = <MISSING>, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | <MISSING> = <MISSING>, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | MISSING = MISSING, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
     },
     "giskard.checks.GroupStats": {
       "bases": [
@@ -1152,8 +1152,8 @@
           "required": false
         },
         "outputs": {
-          "annotation": "Target[InputType, OutputType, TraceType] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "Target[InputType, OutputType, TraceType] | MISSING",
+          "default": "MISSING",
           "required": false
         }
       },
@@ -1172,10 +1172,10 @@
         "set_outputs": {
           "doc_summary": "Update the outputs of the interact and recompute the injection mappings. Returns self for chaining.",
           "kind": "method",
-          "signature": "(self, outputs: Target[InputType, OutputType, TraceType] | <MISSING>) -> 'Interact[InputType, OutputType, TraceType]'"
+          "signature": "(self, outputs: Target[InputType, OutputType, TraceType] | MISSING) -> 'Interact[InputType, OutputType, TraceType]'"
         }
       },
-      "signature": "(*, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: Target[InputType, OutputType, TraceType] | <MISSING> = <MISSING>, metadata: dict[str, typing.Any] = <factory>) -> None"
+      "signature": "(*, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: Target[InputType, OutputType, TraceType] | MISSING = MISSING, metadata: dict[str, typing.Any] = <factory>) -> None"
     },
     "giskard.checks.Interaction": {
       "bases": [
@@ -1403,18 +1403,18 @@
           "required": false
         },
         "expected_value": {
-          "annotation": "ExpectedType | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "expected_value_key": {
-          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "match": {
-          "annotation": "typing.Literal['any', 'all', 'none'] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "name": {
@@ -1434,7 +1434,7 @@
       },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | <MISSING> = <MISSING>, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING> = <MISSING>, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | <MISSING> = <MISSING>) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.LessThanEquals": {
       "aliases": [
@@ -1451,18 +1451,18 @@
           "required": false
         },
         "expected_value": {
-          "annotation": "ExpectedType | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "expected_value_key": {
-          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "match": {
-          "annotation": "typing.Literal['any', 'all', 'none'] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "name": {
@@ -1482,7 +1482,7 @@
       },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | <MISSING> = <MISSING>, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING> = <MISSING>, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | <MISSING> = <MISSING>) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.Metric": {
       "bases": [
@@ -1551,18 +1551,18 @@
           "required": false
         },
         "expected_value": {
-          "annotation": "ExpectedType | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "ExpectedType | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "expected_value_key": {
-          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "match": {
-          "annotation": "typing.Literal['any', 'all', 'none'] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Literal['any', 'all', 'none'] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "name": {
@@ -1582,7 +1582,7 @@
       },
       "kind": "class",
       "members": {},
-      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | <MISSING> = <MISSING>, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING> = <MISSING>, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | <MISSING> = <MISSING>) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', expected_value: ExpectedType | MISSING = MISSING, expected_value_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', match: Literal['any', 'all', 'none'] | MISSING = MISSING) -> None"
     },
     "giskard.checks.Readability": {
       "aliases": [
@@ -1660,13 +1660,13 @@
           "required": false
         },
         "pattern": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "pattern_key": {
-          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "target_key": {
@@ -1675,8 +1675,8 @@
           "required": false
         },
         "text": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         }
       },
@@ -1693,7 +1693,7 @@
           "signature": "(self) -> Self"
         }
       },
-      "signature": "(*, name: str | None = None, description: str | None = None, text: str | <MISSING> = <MISSING>, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', pattern: str | <MISSING> = <MISSING>, pattern_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING> = <MISSING>, match_timeout_seconds: Annotated[float, Gt(gt=0)] = 2.0) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, text: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', pattern: str | MISSING = MISSING, pattern_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, match_timeout_seconds: Annotated[float, Gt(gt=0)] = 2.0) -> None"
     },
     "giskard.checks.RegoPolicy": {
       "aliases": [
@@ -1780,8 +1780,8 @@
           "required": false
         },
         "target": {
-          "annotation": "Target[InputType, OutputType, TraceType] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "Target[InputType, OutputType, TraceType] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "trace_type": {
@@ -1824,12 +1824,12 @@
         "interact": {
           "doc_summary": "Add an interaction to the scenario.",
           "kind": "method",
-          "signature": "(self, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: Target[InputType, OutputType, TraceType] | <MISSING> = <MISSING>, metadata: dict[str, object] | None = None) -> Self"
+          "signature": "(self, inputs: giskard.checks.core.input_generator.InputGenerator[TypeVar] | GeneratorType[[], InputType, None] | GeneratorType[[TraceType], InputType, TraceType], outputs: Target[InputType, OutputType, TraceType] | MISSING = MISSING, metadata: dict[str, object] | None = None) -> Self"
         },
         "run": {
           "doc_summary": "Execute the scenario via the default runner, with optional multiple runs.",
           "kind": "method",
-          "signature": "(self, target: Target[InputType, OutputType, TraceType] | <MISSING> = <MISSING>, return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
+          "signature": "(self, target: Target[InputType, OutputType, TraceType] | MISSING = MISSING, return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
         },
         "with_annotations": {
           "doc_summary": "Set scenario-level annotations.",
@@ -1847,7 +1847,7 @@
           "signature": "(self, target: Target[InputType, OutputType, TraceType]) -> Self"
         }
       },
-      "signature": "(name: str | None = None, /, *, steps: list[giskard.checks.core.scenario.Step[TypeVar, TypeVar, TypeVar]] = <factory>, trace_type: type[TraceType] | None = None, annotations: dict[str, typing.Any] = <factory>, target: Target[InputType, OutputType, TraceType] | <MISSING> = <MISSING>, multiple_runs: Annotated[int, Strict(strict=True), Ge(ge=1)] = 1, tags: list[str] = <factory>) -> None"
+      "signature": "(name: str | None = None, /, *, steps: list[giskard.checks.core.scenario.Step[TypeVar, TypeVar, TypeVar]] = <factory>, trace_type: type[TraceType] | None = None, annotations: dict[str, typing.Any] = <factory>, target: Target[InputType, OutputType, TraceType] | MISSING = MISSING, multiple_runs: Annotated[int, Strict(strict=True), Ge(ge=1)] = 1, tags: list[str] = <factory>) -> None"
     },
     "giskard.checks.ScenarioResult": {
       "bases": [
@@ -1925,7 +1925,7 @@
         "run": {
           "doc_summary": "Execute a scenario up to N times, stopping on the first non-passing run.",
           "kind": "method",
-          "signature": "(self, scenario: giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, TypeVar], target: Target[InputType, OutputType, TraceType] | <MISSING> = <MISSING>, return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
+          "signature": "(self, scenario: giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, TypeVar], target: Target[InputType, OutputType, TraceType] | MISSING = MISSING, return_exception: bool = False, multiple_runs: int | None = None) -> giskard.checks.core.result.ScenarioResult[TypeVar]"
         }
       },
       "signature": "()"
@@ -1964,8 +1964,8 @@
           "required": false
         },
         "reference_text": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "reference_text_key": {
@@ -1997,7 +1997,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, embedding_model: giskard.agents.embeddings.base.BaseEmbeddingModel | None = None, name: str | None = None, description: str | None = None, threshold: float = 0.95, reference_text: str | <MISSING> = <MISSING>, reference_text_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.reference_text', target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs') -> None"
+      "signature": "(*, embedding_model: giskard.agents.embeddings.base.BaseEmbeddingModel | None = None, name: str | None = None, description: str | None = None, threshold: float = 0.95, reference_text: str | MISSING = MISSING, reference_text_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.reference_text', target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs') -> None"
     },
     "giskard.checks.Step": {
       "bases": [
@@ -2041,13 +2041,13 @@
           "required": false
         },
         "keyword": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "keyword_key": {
-          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "typing.Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "name": {
@@ -2065,8 +2065,8 @@
           "required": false
         },
         "text": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         }
       },
@@ -2083,7 +2083,7 @@
           "signature": "(self) -> Self"
         }
       },
-      "signature": "(*, name: str | None = None, description: str | None = None, text: str | <MISSING> = <MISSING>, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', keyword: str | <MISSING> = <MISSING>, keyword_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | <MISSING> = <MISSING>, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', case_sensitive: bool = True) -> None"
+      "signature": "(*, name: str | None = None, description: str | None = None, text: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', keyword: str | MISSING = MISSING, keyword_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] | MISSING = MISSING, normalization_form: Literal['NFC', 'NFD', 'NFKC', 'NFKD'] | None = 'NFKC', case_sensitive: bool = True) -> None"
     },
     "giskard.checks.Suite": {
       "bases": [
@@ -2102,8 +2102,8 @@
           "required": false
         },
         "target": {
-          "annotation": "Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | MISSING",
+          "default": "MISSING",
           "required": false
         }
       },
@@ -2117,10 +2117,10 @@
         "run": {
           "doc_summary": "Run all scenarios in the suite.",
           "kind": "method",
-          "signature": "(self, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | <MISSING> = <MISSING>, return_exception: bool = False, parallel: bool = False, max_concurrency: int | None = None, verbose: bool = True) -> giskard.checks.core.result.SuiteResult"
+          "signature": "(self, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | MISSING = MISSING, return_exception: bool = False, parallel: bool = False, max_concurrency: int | None = None, verbose: bool = True) -> giskard.checks.core.result.SuiteResult"
         }
       },
-      "signature": "(*, name: str, scenarios: list[giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]] = <factory>, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | <MISSING> = <MISSING>) -> None"
+      "signature": "(*, name: str, scenarios: list[giskard.checks.core.scenario.Scenario[TypeVar, TypeVar, Trace[Any, Any]]] = <factory>, target: Target[InputType, OutputType, giskard.checks.core.interaction.trace.Trace[Any, Any]] | MISSING = MISSING) -> None"
     },
     "giskard.checks.SuiteResult": {
       "bases": [
@@ -2384,8 +2384,8 @@
           "required": false
         },
         "output": {
-          "annotation": "str | <MISSING>",
-          "default": "<MISSING>",
+          "annotation": "str | MISSING",
+          "default": "MISSING",
           "required": false
         },
         "target_key": {
@@ -2412,7 +2412,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, output: str | <MISSING> = <MISSING>, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', categories: list[typing.Literal['hate_speech', 'harassment', 'threats', 'self_harm', 'sexual_content', 'violence']] = <factory>) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, output: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', categories: list[typing.Literal['hate_speech', 'harassment', 'threats', 'self_harm', 'sexual_content', 'violence']] = <factory>) -> None"
     },
     "giskard.checks.Trace": {
       "bases": [
@@ -2587,8 +2587,8 @@
     "giskard.checks.set_default_generator": {
       "doc_summary": "Set the default LLM generator for all checks.",
       "kind": "function",
-      "signature": "(generator: giskard.agents.generators.base.BaseGenerator) -> None"
+      "signature": "(generator: giskard.agents.generators.base.BaseGenerator | str) -> None"
     }
   },
-  "version": "1.0.2"
+  "version": "1.0.3"
 }
