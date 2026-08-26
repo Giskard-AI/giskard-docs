@@ -157,8 +157,8 @@ Registered kind: `"dataset_input"`.
 <Property name="prompt" type="str" required>
   Fixed dataset prompt, used verbatim. Must be non-empty (`min_length=1`).
 </Property>
-<Property name="generator" type="BaseGenerator | None" defaultValue="get_default_generator()">
-  LLM used only when the target input type is structured (not `str`). Unused when the input type is `str`.
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  LLM used only when the target input type is structured (not `str`). Unused when the input type is `str`. `None` resolves to `get_default_generator()` at use time.
 </Property>
 
 For a `str` target the prompt is yielded as-is (no LLM). For a structured target the prompt is injected into an LLM-resolved, schema-only template; the LLM never sees the prompt itself.

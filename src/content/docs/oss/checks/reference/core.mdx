@@ -252,7 +252,7 @@ Immutable history of all interactions in a scenario. Passed to checks for valida
 </TypeTable>
 
 <MethodCard name="Trace.for_target()" returnType="Trace">
-  Class method that returns an empty trace whose type is inferred from `target`. Returns `Trace()` when the trace type cannot be inferred.
+  Class method that returns an empty trace whose type is inferred from `target`. When the type cannot be inferred, it returns an empty instance of the class it is called on.
 
   <Property name="target" type="Target" required>Callable whose input, output, and trace types are inferred.</Property>
 </MethodCard>
