@@ -1,6 +1,6 @@
 ---
 title: Testing Utilities
-description: "Testing utilities: TestCase, TestCaseResult, TestCaseError, assert_passed(), and debugging helpers."
+description: "Testing utilities: TestCase, TestCaseResult, TestCaseError, TestCaseStatus, assert_passed(), spies, and debugging helpers."
 sidebar:
   order: 5
 ---
@@ -168,7 +168,7 @@ else:
             print(f"Failed: {check_result.message}")
 
 # Assert (raises if failed)
-await result.assert_passed()
+result.assert_passed()
 ```
 
 ---

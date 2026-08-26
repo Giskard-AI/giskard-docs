@@ -166,16 +166,13 @@ For a `str` target the prompt is yielded as-is (no LLM). For a structured target
 ```python
 from giskard.checks import DatasetInputGenerator, Scenario
 
-
-def target(inputs: str) -> str:
-    return f"Received: {inputs}"
-
-
 gen = DatasetInputGenerator(
     prompt="What is the monthly fee on my current account?"
 )
 
-scenario = Scenario("dataset_row").interact(inputs=gen, outputs=target)
+scenario = Scenario("dataset_row").interact(
+    inputs=gen, outputs=lambda inputs: f"Received: {inputs}"
+)
 ```
 
 </ResourceSection>
