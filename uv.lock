@@ -316,7 +316,7 @@ wheels = [
 
 [[package]]
 name = "giskard-checks"
-version = "1.0.2"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "giskard-agents" },
@@ -330,9 +330,9 @@ dependencies = [
     { name = "regex" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/12/e0/51ba6329882bab8b2820b5a9b5d98a455b0ff8e7869521b32721655fb33d/giskard_checks-1.0.2.tar.gz", hash = "sha256:ef2c03e6746cc89ab8bfe4b5db744d00fe3312532f9871655b7a59e39657d22b", size = 74780, upload-time = "2026-08-26T00:57:03.5Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/87/47/e5bc80cb0e05066906d2112ce893caff10c42cc4e15ed70540d946f9ea27/giskard_checks-1.0.3.tar.gz", hash = "sha256:2d47d7f6123f3578f03d1fe54a39e71ff75b663b08bd6292a00a8b2d3394c8f5", size = 74938, upload-time = "2026-08-26T08:39:17.301Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/09/25/2050fd546d52f776af26949d4bd904f34c45fc88e57b80e3fe71289bd1dd/giskard_checks-1.0.2-py3-none-any.whl", hash = "sha256:8c8b5e448e0a754384807e313f071d83cb7e93a07078d0c3ce6b16ad6421337d", size = 105295, upload-time = "2026-08-26T00:57:02.093Z" },
+    { url = "https://files.pythonhosted.org/packages/29/7e/850d2e65890d594d108b86651b695edd686dd7c8933d92487dab7887f245/giskard_checks-1.0.3-py3-none-any.whl", hash = "sha256:2c9e73bf9d9a3b75279a4cce2083abe37da5f21ec8e34fd0d4fa4a6ef1814167", size = 105475, upload-time = "2026-08-26T08:39:16.229Z" },
 ]
 
 [[package]]
