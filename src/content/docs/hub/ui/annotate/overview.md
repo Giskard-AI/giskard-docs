@@ -30,6 +30,8 @@ Metrics provide quantitative measurements of your agent's performance across dif
 
 ### Configure a built-in check
 
+#### Add a check
+
 Within an existing or new scenario, click on the "Add check" button.
 
 ![Interaction with no check yet, showing the Add check button](/_static/images/hub/checks-built-in-creation-placeholder.png)
@@ -44,11 +46,34 @@ After, you can configure the check parameters which depends on the check type. T
 
 Once configured, save the scenario to make sure the check configuration is saved. The full list of check configuration parameters can be found below.
 
+#### Target key
+
+:::note
+Not every check has a `Target key`. Whether one is available depends on the check type (see the parameter table for each check below).
+
+`Target key` is a path that links the check to the specific field of the trace it should evaluate.
+
+- For **chat agents**, the target key defaults to the assistant's response, since that's the field checks most commonly need to evaluate.
+- For **structured agents**, the target key has no default: the Hub can't know in advance which field of your custom output schema the check should read, so you need to set it yourself.
+
+Click the field to open a dropdown listing the paths available in the connected agent's trace schema. Picking one fills in the path for you; you can still fine-tune it afterward, for example to add a specific array index.
+:::
+
+#### Value or key mode
+
+Some parameters can be set to either a static value or a dynamic trace path. Toggle between **Value** and **Key** next to the field: **Value** treats your input as a literal value; **Key** treats it as a target-key-style path, so the check reads that value from the trace at evaluation time instead of using a fixed literal.
+
+![Expected value field with a toggle between Value and Key mode](/_static/images/hub/checks-value-key-toggle.png)
+
+This toggle is only available on specific parameters where comparing against a dynamic trace value makes sense. It's not present on every field.
+
+#### Save the check
+
+After configuring the check parameters, you can save the check by clicking on the "Save" button in the upper right corner of the screen.
+
 :::tip
 Before creating or changing a check, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
-
-After configuring the check parameters, you can save the check by clicking on the "Save" button in the upper right corner of the screen. A full check configuration paramters can be found below.
 
 ### Available checks
 
