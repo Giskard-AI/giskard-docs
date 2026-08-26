@@ -188,7 +188,7 @@ For more information about iterating on checks, see [Overview](/hub/ui/annotate/
 
 Tags are optional but highly recommended labels that help you organize and filter your scenarios. Tags help you analyze evaluation results by allowing you to:
 
-- **Filter results** - Focus on specific scenarios or scenarios
+- **Filter results** - Focus on specific scenarios or test categories
 - **Compare performance** - See how your agent performs across different test categories
 - **Identify weak areas** - Discover which types of tests have higher failure rates
 - **Organize reviews** - Review scenarios by category or domain
