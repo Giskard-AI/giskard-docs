@@ -167,6 +167,10 @@ Evaluate the interaction with a custom prompt. The prompt is a Jinja2 template w
 | `Prompt`  | `str` | Jinja2 prompt template referencing trace values |
 
 ::::note[Example]
+**Input**: When will my order arrive?
+
+---
+
 ![LLM Judge check configured with a prompt](/_static/images/hub/checks-example-llm-judge.png)
 
 :::caution[Failure example]
@@ -190,6 +194,10 @@ The raw giskard-checks variant of conformity. Judges the full trace against a si
 | `Rule`    | `str` | The rule the trace must adhere to  |
 
 ::::note[Example]
+**Input**: How much does this item cost, and how do you calculate that price?
+
+---
+
 ![Conformity check configured with a rule](/_static/images/hub/checks-example-conformity.png)
 
 :::caution[Failure example]
@@ -214,6 +222,10 @@ The raw giskard-checks variant of groundedness. Instead of a fixed context strin
 | `Target key`  | `str`       | Trace path of the value under test |
 
 ::::note[Example]
+**Input**: Can I return a clearance item?
+
+---
+
 ![Groundedness check configured with a context key](/_static/images/hub/checks-example-groundedness.png)
 
 :::caution[Failure example]
@@ -238,6 +250,10 @@ Checks that the response does not directly contradict a reference context. Omiss
 | `Target key` | `str` | Trace path of the value under test   |
 
 ::::note[Example]
+**Input**: Can I get more time to return this item?
+
+---
+
 ![Contradiction check configured with a context](/_static/images/hub/checks-example-contractiction.png)
 
 :::caution[Failure example]
@@ -261,6 +277,10 @@ Checks that the response does not contain toxic, harmful, or offensive content. 
 | `Categories` | `list[str]` | Safety categories to check: `hate_speech`, `harassment`, `threats`, `self_harm`, `sexual_content`, `violence`  |
 
 ::::note[Example]
+**Input**: This service is terrible and I'm never using it again.
+
+---
+
 ![Toxicity check configured with safety categories](/_static/images/hub/checks-example-toxicity.png)
 
 :::caution[Failure example]
@@ -286,6 +306,10 @@ Checks that the response directly and appropriately addresses the user question.
 | `Target key` | `str` | Trace path of the value under test                                 |
 
 ::::note[Example]
+**Input**: How do I reset my password?
+
+---
+
 ![Answer Relevance check configured with a question and context](/_static/images/hub/checks-example-answer-relevance.png)
 
 :::caution[Failure example]
@@ -339,6 +363,10 @@ Check whether the given keyword or sentence is present in the agent answer. Does
 | `Target key` | `str` | Trace path of the value under test                      |
 
 ::::note[Example]
+**Input**: Hi, I'd like some help please.
+
+---
+
 ![String Matching check configured with a keyword](/_static/images/hub/checks-example-string-matching.png)
 
 :::caution[Failure example]
@@ -363,6 +391,10 @@ Check whether the agent's response matches a regular expression pattern. Does **
 | `Target key` | `str` | Trace path of the value under test    |
 
 ::::note[Example]
+**Input**: I have an issue with my last order, can you check on it?
+
+---
+
 ![Regex Matching check configured with a pattern](/_static/images/hub/checks-example-regex-matching.png)
 
 :::caution[Failure example]
@@ -387,17 +419,32 @@ Six rule-based checks compare a value extracted from the trace against an expect
 | `Target key`      | `str`    | Trace path of the value under test  |
 
 ::::note[Example]
+**Input**:
+
+```json
+{
+  "input": {
+    "confirmed": true,
+    "loan_type": "personal",
+    "loan_amount": 1000,
+    "annual_income": 1000
+  }
+}
+```
+
+---
+
 ![Comparison check configured with an expected value](/_static/images/hub/checks-example-comparison-equal.png)
 
 :::caution[Failure example]
 
-- `trace.last.outputs.category` resolves to `refund`
-  - _Reason: The extracted value does not equal the expected value `billing`_
+- `trace.last.outputs.output.status` resolves to `pending_review`
+  - _Reason: The extracted value does not equal the expected value `offer_generated`_
 :::
 
 :::tip[Success example]
 
-- `trace.last.outputs.category` resolves to `billing`
+- `trace.last.outputs.output.status` resolves to `offer_generated`
 :::
 ::::
 
@@ -422,6 +469,10 @@ We recommend using a tool like [json-path-evaluator](https://mockoon.com/tools/j
 :::
 
 ::::note[Example]
+**Input**: Hi, my name is John, can you look up my account?
+
+---
+
 ![Metadata (Hub) check configured with a JSON path rule](/_static/images/hub/checks-example-metadata-hub.png)
 
 :::caution[Failure example]
@@ -451,6 +502,10 @@ Checks that a value extracted from the trace is valid JSON and, optionally, that
 | `Target key`  | `str`  | Trace path of the value under test                  |
 
 ::::note[Example]
+**Input**: What's the status of ticket #482?
+
+---
+
 ![JSON Valid check configured with parse unchecked](/_static/images/hub/checks-example-json-valid.png)
 
 :::caution[Failure example]
@@ -461,7 +516,7 @@ Checks that a value extracted from the trace is valid JSON and, optionally, that
 
 :::tip[Success example]
 
-- Response: `{"category": "billing", "resolved": true}`
+- Response: `{"answer": "Ticket #482 is in progress.", "resolved": false}`
 :::
 ::::
 
@@ -477,11 +532,15 @@ Checks that the response satisfies readability score thresholds for a selected m
 | `Target key`     | `str`   | Trace path of the value under test                                                                                                                        |
 
 ::::note[Example]
+**Input**: My app keeps crashing, what should I do?
+
+---
+
 ![Readability check configured with a metric and minimum score](/_static/images/hub/checks-example-readability.png)
 
 :::caution[Failure example]
 
-- The aforementioned discrepancy necessitates a comprehensive reassessment of the underlying methodological framework prior to implementation.
+- The recurring termination anomaly you are experiencing is likely attributable to an unresolved memory allocation conflict within the application's runtime environment, necessitating a diagnostic reinstallation to remediate the underlying instability.
   - _Reason: The Flesch reading ease score falls below the minimum of 60_
 :::
 
