@@ -191,6 +191,10 @@ Evaluate the interaction with a custom prompt. The prompt is a Jinja2 template w
 :::
 ::::
 
+:::tip[Inserting trace paths into the prompt]
+The bracket button next to the `Prompt` field opens a list of paths available in the selected agent's trace schema. Click one to insert its Jinja2 expression at the cursor position, instead of typing it out by hand.
+:::
+
 #### Conformity
 
 The raw giskard-checks variant of conformity. Judges the full trace against a single natural-language rule. Uses an LLM judge.
