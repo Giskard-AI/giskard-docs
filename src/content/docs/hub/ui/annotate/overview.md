@@ -571,18 +571,14 @@ Next, set the parameters for the check:
 - `Name`: Give your check a name.
 - `Identifier`: A unique identifier for the check. It should be a string without spaces.
 - `Description`: A brief description of the check.
-- `Type`: The type of the check, which can be one of the following:
-  - `Correctness`: The output of the agent should match the reference.
-- `Conformity`: The conversation should follow a set of rules.
-- `Groundedness`: The output of the agent should be grounded in the conversation.
-- `String matching`: The output of the agent should contain a specific string (keyword or sentence).
-- `Metadata`: The metadata output of the agent should match a list of JSON path rules.
-- `Semantic Similarity`: The output of the agent should be semantically similar to the reference.
-- And a set of parameters specific to the check type. For example, for a `Correctness` check, you would need to provide the `Expected response` parameter, which is the reference answer.
+- `Type`: The type of the check. See the available checks listed above.
+- A set of parameters specific to the check type.
 
 ![Custom check setup with name, identifier, and type selection](/_static/images/hub/checks-create-configure.png)
 
-Once you have created a custom check, you can apply it to conversations in your dataset. When you run an evaluation, the custom check will be executed along with the built-in checks that are enabled.
+Some checks include an `Agent` field with the placeholder "Select an agent". Since a custom check isn't created within a scenario, the Hub can't know in advance which agent's trace schema to use to suggest fields such as `Target key`. Selecting an agent here lets the Hub populate those fields with the keys available in that agent's trace schema.
+
+Once you have created a custom check, you can apply it to scenarios in your dataset. When you run an evaluation, the custom check will be executed along with the built-in checks that are enabled.
 
 ## Failure categories
 
