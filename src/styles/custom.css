@@ -477,3 +477,7 @@ iframe[src*="vimeo.com"] {
 .starlight-aside .starlight-aside > .starlight-aside__title + .starlight-aside__content {
   margin-top: 1rem;
 }
+
+.starlight-aside:has(.starlight-aside) img {
+  border-radius: 8px;
+}
