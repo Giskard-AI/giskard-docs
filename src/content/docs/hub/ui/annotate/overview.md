@@ -1,23 +1,23 @@
 ---
 title: "Understand metrics, failure categories and tags"
-description: "Organize and analyze test cases using tags, metrics, and failure categories. Structure datasets and interpret LLM evaluation results."
+description: "Organize and analyze scenarios using tags, metrics, and failure categories. Structure datasets and interpret LLM evaluation results."
 sidebar:
   order: 2
 tableOfContents:
   maxHeadingLevel: 4
 ---
 
-This page provides an overview of the key concepts for organizing and analyzing your test cases: **metrics**, **failure categories**, and **tags**. Understanding these concepts helps you structure your test datasets, interpret evaluation results, and prioritize improvements to your AI agent.
+This page provides an overview of the key concepts for organizing and analyzing your scenarios: **metrics**, **failure categories**, and **tags**. Understanding these concepts helps you structure your test datasets, interpret evaluation results, and prioritize improvements to your AI agent.
 
 1. **Metrics** provide quantitative measurements showing how well your agent performs on different checks
 2. **Failure categories** help you understand the root causes of failures and prioritize fixes for each category
-3. **Tags** help you organize and filter your test cases by business context, user type, or scenario
+3. **Tags** help you organize and filter your scenarios by business context, user type, or scenario
 
 By combining these three concepts, you can:
 
 - Understand which checks (metrics) are failing most often
 - Determine the root causes (failure categories) of those failures
-- Identify which types of test cases (tags) have the highest failure rates
+- Identify which types of scenarios (tags) have the highest failure rates
 - Prioritize fixes for each failure category
 
 You can then focus on improving your agent's compliance with business rules specifically for customer support scenarios.
@@ -39,7 +39,7 @@ After, you can configure the check parameters which depends on the check type. T
 ![Check configuration form with type and parameter fields](/_static/images/hub/checks-create-configure.png)
 
 :::tip
-Before creating or changing a check, we recommend you to read about the best practices for modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+Before creating or changing a check, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
 :::
 
 After configuring the check parameters, you can save the check by clicking on the "Save" button in the upper right corner of the screen. A full check configuration paramters can be found below.
@@ -590,10 +590,10 @@ To add or edit failure categories, go to **Settings** -> **Project Settings**. A
 
 When a test fails, a failure category is assigned to the test automatically, however you can manually update the failure category to a different one.
 
-![Failure category selector on a failed test case](/_static/images/hub/failure-categories.png)
+![Failure category selector on a failed scenario](/_static/images/hub/failure-categories.png)
 
 :::tip
-You can read about modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+You can read about modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
 :::
 
 ### Defining the right failure categories
@@ -644,7 +644,7 @@ Failure categories help you understand the root cause of test failures and ident
 
 ## Tags
 
-Tags are optional but highly recommended labels that help you organize and filter your test cases. Tags help you analyze evaluation results by allowing you to:
+Tags are optional but highly recommended labels that help you organize and filter your scenarios. Tags help you analyze evaluation results by allowing you to:
 
 - **Filter results** - Focus on specific test types or scenarios
 - **Compare performance** - See how your agent performs across different test categories
@@ -658,7 +658,7 @@ To create a tag, first open a conversation and click on the "Add tag" button in 
 ![Add tag button in the conversation properties panel](/_static/images/hub/tags-create.png)
 
 :::tip
-Before creating a tag, we recommend you to read about the best practices for modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+Before creating a tag, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
 :::
 
 ### Choosing the right tag structure
@@ -712,5 +712,5 @@ To choose a tag, it is good to stick to a naming convention that you agreed on b
 Now that you understand the fundamentals of test organization, you can:
 
 - **Review test results** - [Review test results](/hub/ui/annotate/review-test-results)
-- **Modify test cases** - [Modify test cases](/hub/ui/annotate/modify-test-cases)
+- **Modify scenarios** - [Modify scenarios](/hub/ui/annotate/modify-test-cases)
 - **Run evaluations** - [Create evaluations](/hub/ui/evaluations/create)

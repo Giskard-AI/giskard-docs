@@ -28,7 +28,7 @@ graph LR
     B -->|Yes| F{Rewrite Now?}
     B -->|Don't Know| E[<a href="/hub/ui/annotate/task-management" target="_self">Put in Draft<br/>Open Task<br/>Assign to Domain Expert</a>]
     F -->|Yes| G{Can Answer<br/>Questions?}
-    F -->|No| H[<a href="/hub/ui/annotate/task-management" target="_self">Draft Test Case<br/>Create Task<br/>Assign to PO</a>]
+    F -->|No| H[<a href="/hub/ui/annotate/task-management" target="_self">Draft Scenario<br/>Create Task<br/>Assign to PO</a>]
     G -->|Yes| I[<a href="/hub/ui/annotate/modify-test-cases" target="_self">Rewrite Test<br/>Retest<br/>Save</a>]
     G -->|No| J{Has Value?}
     J -->|No| K[Remove Test]
@@ -53,8 +53,8 @@ If the agent is correct and the test was too strict, you need to rewrite the tes
 
 **Option 1: You want to do it later**
 
-- **Draft the test case** - Mark the test case as draft to prevent it from being used in evaluations
-- **Open a task** where you can track that this test case needs to be modified
+- **Draft the scenario** - Mark the scenario as draft to prevent it from being used in evaluations
+- **Open a task** where you can track that this scenario needs to be modified
 - **Assign the product owner** to the task
 - Navigate to the "Distribute tasks" workflow [Task management](/hub/ui/annotate/task-management)
 
@@ -66,7 +66,7 @@ If the agent is correct and the test was too strict, you need to rewrite the tes
 
 If you can answer at least one of these questions:
 
-- **Go to the linked test case** in the dataset
+- **Go to the linked scenario** in the dataset
 - **Rewrite the test requirement:**
   - If question 1 is true: Enable correctness check by putting the minimum info as reference
   - If question 2 is true: Enable groundedness check and put the block of info as context
@@ -74,7 +74,7 @@ If you can answer at least one of these questions:
 
 - **Retest various times** until the result is always PASS (regenerate a agent answer, and retest)
 - **Save** the changes
-- **If the test case was in draft, undraft it**
+- **If the scenario was in draft, undraft it**
 - **You can also set the task as closed** (if applicable)
 
 **Option 3: The test does not have value**
@@ -82,14 +82,14 @@ If you can answer at least one of these questions:
 - **Remove it from the dataset**
 
 :::tip
-For detailed information about modifying test cases, see [Modify test cases](/hub/ui/annotate/modify-test-cases).
+For detailed information about modifying scenarios, see [Modify scenarios](/hub/ui/annotate/modify-test-cases).
 :::
 
 #### If you don't know, there needs to be a discussion
 
 If you don't know if the agent answers correctly or not and there needs to be a discussion:
 
-- **Put in draft** - Mark the test case as draft to prevent it from being used in evaluations
+- **Put in draft** - Mark the scenario as draft to prevent it from being used in evaluations
 - **Open a task** and assign the domain expert
 - Navigate to the "Distribute tasks" workflow [Task management](/hub/ui/annotate/task-management)
 - Create a task with your questions and concerns, then assign it to the domain expert who can make this determination
@@ -147,25 +147,25 @@ If you don't know if the agent answers correctly or not and there needs to be a 
 
 ### Check pass/fail
 
-When reviewing a test case, the first thing to check is whether the test case passed or failed. By opening the test case, you can see the metrics along with the failure category and tags on the right side of the screen.
+When reviewing a scenario, the first thing to check is whether the scenario passed or failed. By opening the scenario, you can see the metrics along with the failure category and tags on the right side of the screen.
 
-![Test case review showing check results and failure category](/_static/images/hub/review-test-metrics.png)
+![Scenario review showing check results and failure category](/_static/images/hub/review-test-metrics.png)
 
 **PASS:**
 
-- The test case met all the evaluation criteria (checks)
-- All checks that were enabled on the test case passed
+- The scenario met all the evaluation criteria (checks)
+- All checks that were enabled on the scenario passed
 - The agent's response was acceptable according to the validation rules
 
 **FAIL:**
 
-- The test case did not meet one or more evaluation criteria
-- At least one check that was enabled on the test case failed
+- The scenario did not meet one or more evaluation criteria
+- At least one check that was enabled on the scenario failed
 
-To understand why a test case failed, you need to review the specific checks that were applied.
+To understand why a scenario failed, you need to review the specific checks that were applied.
 
 :::tip
-For detailed information about checks and how they work, see [Overview](/hub/ui/annotate/overview). For information on enabling/disabling checks, see the "Enable/Disable checks" section in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+For detailed information about checks and how they work, see [Overview](/hub/ui/annotate/overview). For information on enabling/disabling checks, see the "Enable/Disable checks" section in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
 :::
 
 ### Check failure reason
@@ -178,11 +178,11 @@ Each check provides an explanation of why it passed or failed. This explanation 
 
 - What the check was evaluating
 - What criteria were applied
-- Why the test case passed or failed
+- Why the scenario passed or failed
 - What specific aspects of the agent's response caused the result
 
 :::tip
-For more information about checks and how to enable/disable them, see the "Enable/Disable checks" section in [Modify test cases](/hub/ui/annotate/modify-test-cases). For comprehensive information about all check types, see [Overview](/hub/ui/annotate/overview).
+For more information about checks and how to enable/disable them, see the "Enable/Disable checks" section in [Modify scenarios](/hub/ui/annotate/modify-test-cases). For comprehensive information about all check types, see [Overview](/hub/ui/annotate/overview).
 :::
 
 ### Check failure category
@@ -203,23 +203,23 @@ When a test fails, it is categorized based on the type of failure. Understanding
 - **String matching failure** - Required keywords or phrases are missing
 
 :::tip
-You can change the categories used for classification but before doing so, we recommend you to read about the best practices for modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+You can change the categories used for classification but before doing so, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
 :::
 
 ## Review the flow of the conversation
 
-Understanding the conversation flow helps you assess whether the test case structure is appropriate and whether the agent's response makes sense in context.
+Understanding the conversation flow helps you assess whether the scenario structure is appropriate and whether the agent's response makes sense in context.
 
 When reviewing the conversation flow, consider:
 
 - Whether the conversation structure makes sense
 - Whether the user messages are clear and unambiguous
 - Whether the conversation history provides necessary context
-- Whether the test case accurately represents the scenario you want to test
+- Whether the scenario accurately represents the scenario you want to test
 
 ### Conversation structure
 
-A conversation, or test case, is composed of a sequence of messages between the **user** and the **assistant**, alternating between each role. When designing your test cases, you can provide conversation history by adding multiple turns (multi-turn), but the conversation should always end with a **user** message. The agent's next **assistant** completion will be generated and evaluated at test case time.
+A conversation, or scenario, is composed of a sequence of messages between the **user** and the **assistant**, alternating between each role. When designing your scenarios, you can provide conversation history by adding multiple turns (multi-turn), but the conversation should always end with a **user** message. The agent's next **assistant** completion will be generated and evaluated at scenario time.
 
 ### Simple conversation
 
@@ -241,7 +241,7 @@ You can add as many turns as needed, but always ensure the conversation ends wit
 
 ### Conversation Answer Examples
 
-You can also provide an "answer example" for each test case. This answer example is not used during evaluation runs, but helps when annotating the dataset or validating your evaluation criteria. For example, you might want to:
+You can also provide an "answer example" for each scenario. This answer example is not used during evaluation runs, but helps when annotating the dataset or validating your evaluation criteria. For example, you might want to:
 
 1. Import answer examples together with conversations by providing a `demo_output` field in your dataset.
 2. Generate the agent's answer by replacing the assistant message directly in the interface.
@@ -276,12 +276,12 @@ For more information about metadata checks and other check types, see [Overview]
 - **Review thoroughly** - Take time to understand all aspects of the test result before making a decision
 - **Document your findings** - Add comments to tasks to help others understand your review
 - **Use appropriate actions** - Close tasks when results are correct, assign modification work when changes are needed
-- **Collaborate effectively** - Work with product owners and other team members to ensure test cases are accurate
+- **Collaborate effectively** - Work with product owners and other team members to ensure scenarios are accurate
 - **Maintain quality** - Only close tasks when you're confident the test results are correct
 
 ## Next steps
 
 Now that you understand how to review test results, you can:
 
-- **Modify test cases** - Learn how to refine test cases and checks [Modify test cases](/hub/ui/annotate/modify-test-cases)
+- **Modify scenarios** - Learn how to refine scenarios and checks [Modify scenarios](/hub/ui/annotate/modify-test-cases)
 - **Distribute tasks** - Create and manage tasks to organize review work [Task management](/hub/ui/annotate/task-management)

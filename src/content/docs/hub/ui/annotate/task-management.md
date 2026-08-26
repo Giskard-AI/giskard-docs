@@ -1,6 +1,6 @@
 ---
 title: "Distribute tasks to organize your review work"
-description: "Manage and distribute work among team members with Tasks. Assign tasks for reviewing scan results, evaluation runs, and test cases to ensure quality and collaboration."
+description: "Manage and distribute work among team members with Tasks. Assign tasks for reviewing scan results, evaluation runs, and scenarios to ensure quality and collaboration."
 sidebar:
   order: 3
 ---
@@ -11,7 +11,7 @@ Tasks allow you to manage and distribute work among you and your coworkers.
 
 Tasks provide several key benefits for managing evaluation workflows:
 
-- **Quality assurance** - Ensure all test cases are reviewed before being used in evaluations
+- **Quality assurance** - Ensure all scenarios are reviewed before being used in evaluations
 - **Priority management** - Set the priority of the task based on the importance of the work to be done
 - **Team collaboration** - Distribute work among team members based on their expertise
 - **Traceability** - Track and change the status of the task and when work is completed
@@ -23,7 +23,7 @@ This feature is particularly useful when you need to:
 - Ask an AI developer to correct the agent if there's a failure
 - Ask business experts to review the rules of a check
 - Coordinate review workflows for scan results and evaluation runs
-- Ensure quality control before publishing test cases
+- Ensure quality control before publishing scenarios
 
 ## Two personas, two workflows
 
@@ -38,11 +38,11 @@ The annotation workflow involves two distinct personas with different responsibi
 
 **Product Owner Persona (Modification Workflow):**
 
-- Modifies test cases based on review feedback
-- Drafts/undrafts test cases
+- Modifies scenarios based on review feedback
+- Drafts/undrafts scenarios
 - Enables/disables checks
 - Modifies check requirements
-- Validates checks and structures test cases
+- Validates checks and structures scenarios
 
 ## Find your tasks
 
@@ -62,7 +62,7 @@ The Hub UI provides a comprehensive overview of all your tasks, including:
 You can create tasks from two main sources: evaluation runs and scan results. Tasks help you track and assign work items to the appropriate team members.
 
 :::tip
-Tasks can be linked to test cases (conversations) from datasets. For information on creating and managing datasets, see [Datasets](/hub/ui/datasets).
+Tasks can be linked to scenarios (conversations) from datasets. For information on creating and managing datasets, see [Datasets](/hub/ui/datasets).
 :::
 
 :::tip
@@ -71,9 +71,9 @@ Tasks can be linked to test cases (conversations) from datasets. For information
 Create tasks when you need to:
 
 - Track work items that require review or modification
-- Assign specific test cases or scan results to team members
+- Assign specific scenarios or scan results to team members
 - Coordinate review workflows across your team
-- Ensure quality control before publishing test cases
+- Ensure quality control before publishing scenarios
   :::
 
 ### From scan results
@@ -99,7 +99,7 @@ To create a task from a scan result:
 
 ### From evaluation runs
 
-You can create tasks when reviewing evaluation runs. This is useful for tracking test cases that need attention after an evaluation.
+You can create tasks when reviewing evaluation runs. This is useful for tracking scenarios that need attention after an evaluation.
 
 :::tip
 To create a task from an evaluation run, you first need to run an evaluation. For information on how to run evaluations, see [Create evaluations](/hub/ui/evaluations/create).
@@ -108,13 +108,13 @@ To create a task from an evaluation run, you first need to run an evaluation. Fo
 To create a task from an evaluation run:
 
 1. Open an evaluation run
-2. Navigate to a specific test case in the evaluation run and opening it
+2. Navigate to a specific scenario in the evaluation run and opening it
 3. Create a new task by pressing "Add task" on the top right corner of the screen:
    - **Priority** - Set the task priority level
    - **Status** - Set the initial status
    - **Assignees** - Select one or more team members
    - **Description** - Provide a clear description of what needs to be done
-   - **Draft** - Chose to set the linked failed test case to draft status, excluding it from the evaluation run.
+   - **Draft** - Chose to set the linked failed scenario to draft status, excluding it from the evaluation run.
 
 ![Create a task from an evaluation run](/_static/images/hub/tasks-from-run.png)
 
@@ -132,7 +132,7 @@ Select one or more team members to assign the task to. This ensures that the rig
 
 - **Data Scientist** - For fixing the agent or improving the model
 - **Knowledge Base Manager** - For updating the knowledge base if information is missing or incorrect
-- **Product Owner** - For modifying test cases or checks
+- **Product Owner** - For modifying scenarios or checks
 - **Business Expert** - For reviewing business rules and requirements
 
 ### Put description
@@ -172,7 +172,7 @@ An important feature related to tasks is the ability to set conversations to dra
   - Helping to maintain unbiased evaluation metrics
   - Ensuring quality control is upheld throughout the review process
 
-When you go to the conversation linked to an evaluation run and create a task, you can set the linked failed test case to draft status. Before using it again, you need to resolve all associated tasks.
+When you go to the conversation linked to an evaluation run and create a task, you can set the linked failed scenario to draft status. Before using it again, you need to resolve all associated tasks.
 Similarly, you can select a conversation from a dataset and set it to draft status.
 
 ![Draft status toggle excluding conversation from evaluations](/_static/images/hub/tasks-draft.png)
@@ -188,12 +188,12 @@ Once tasks are created, follow the review process:
 5. **Undraft the conversation** - Once all tasks are resolved, you can undraft the conversation to make it available for future evaluation runs
 
 :::tip
-You can find a full example of the review process in the [Modify test cases](/hub/ui/annotate/modify-test-cases) documentation.
+You can find a full example of the review process in the [Modify scenarios](/hub/ui/annotate/modify-test-cases) documentation.
 :::
 
 ## Communicate with your team
 
-You can add additional structure and context to your tasks and test cases to better understand the work to be done.
+You can add additional structure and context to your tasks and scenarios to better understand the work to be done.
 
 ### Update task descriptions
 
@@ -208,23 +208,23 @@ You can add a description to a task to communicate:
 For more information about task descriptions, see [Task management](/hub/ui/annotate/task-management).
 :::
 
-### Comment on a test case
+### Comment on a scenario
 
-Comments allow you to add notes and insights about a test case:
+Comments allow you to add notes and insights about a scenario:
 
 - Review findings and observations
 - Document modifications and their reasons
 - Share context with team members
-- Track the evolution of a test case
+- Track the evolution of a scenario
 
 To add a comment:
 
-1. Open the test case in the dataset
+1. Open the scenario in the dataset
 2. Press the "Add a comment" button in the bottom right corner of the screen
 3. Add your comment
 4. Press the "Post comment" button
 
-![Adding a comment to a test case for team review](/_static/images/hub/comment-create.png)
+![Adding a comment to a scenario for team review](/_static/images/hub/comment-create.png)
 
 ## Best practices
 
@@ -239,4 +239,4 @@ To add a comment:
 Now that you understand how to distribute tasks, you can:
 
 - **Review test results** - Follow the business workflow to review evaluation results [Review test results](/hub/ui/annotate/review-test-results)
-- **Modify test cases** - Follow the product owner workflow to refine test cases [Modify test cases](/hub/ui/annotate/modify-test-cases)
+- **Modify scenarios** - Follow the product owner workflow to refine scenarios [Modify scenarios](/hub/ui/annotate/modify-test-cases)
