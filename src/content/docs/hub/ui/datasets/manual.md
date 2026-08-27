@@ -3,6 +3,9 @@ title: "Create manual scenarios"
 description: "Build test datasets manually with custom scenarios from the red teaming playground for specific LLM agent use cases."
 sidebar:
   order: 2
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 4
 ---
 
 You can create scenarios manually for fine-grained control. This is particularly useful when you want to create scenarios with full control over the scenario creation process. There are two ways to manually create scenarios:
@@ -51,34 +54,69 @@ After creating the dataset, you can add individual scenarios to it.
 
 ### Create a manual scenario
 
-A scenario is a list of messages, alternating between **user** messages and **assistant** roles.
-When designing your scenarios, you can decide to provide a conversation history by adding multiple turns.
-Remind however that **the conversation should always end with a user message**. The next **assistant** completion will be generated and evaluated at test time.
+A scenario is a sequence of one or more **interactions**. Each interaction is a single turn: something you provide, and the agent's response to it. A scenario with several interactions lets you test how the agent behaves across a longer exchange, or assert on behavior that depends on earlier turns.
 
-To add a scenario, click the "Add scenario" button in the upper right corner of the screen.
+What an interaction looks like depends on the schema the dataset is bound to:
 
-![Add scenario interface with message and check fields](/_static/images/hub/add-conversation.png)
+- **Chat** datasets: each interaction has a **User** message that you write, and the agent replies with an **Assistant** message. This is the format Giskard has always supported, now explicitly named "chat".
+- **Structured** datasets: each interaction has an **Input** and an **Output** JSON object, edited in a JSON editor. The **Input** editor is prefilled with the dataset's input schema, so you fill in the values rather than copy the structure yourself.
 
-A scenario consists of the following components:
+To add a scenario, click the "Add scenario" button in the upper right corner of the screen. Every new scenario starts with one empty interaction; use **Add interaction** to append more turns.
 
-- `Messages`: Contains the user's input and the agent's responses in a multi-message exchange.
-- `Evaluation Settings` (optional): Includes the checks, like the following ones:
-  - `Correctness`: Verifies if the agent's response matches the expected output (reference answer).
-  - `Conformity`: Ensures the agent's response adheres to the rules, such as "The agent must be polite."
-  - `Groundedness`: Ensures the agent's response is grounded in the conversation.
-  - `String matching`: Checks if the agent's response contains a specific string, keyword, or sentence.
-  - `Metadata`: Verifies the presence of specific (tool calls, user information, etc.) metadata in the agent's response.
-  - `Semantic Similarity`: Verifies that the agent's response is semantically similar to the expected output.
-  - And any custom checks you may have defined.
-- `Properties`:
-  - `Dataset`: Specifies where the scenarios should be saved.
-  - `Tags` (optional): Enables better organization and filtering of scenarios.
+The selector at the top of the interactions panel controls which agent the scenario runs against. It only lists agents whose schema matches the dataset's.
+
+#### Chat scenarios
+
+Write the **User** message for each interaction.
+
+![Chat scenario with an empty User message field and an empty Checks section](/_static/images/hub/manual-scenario-chat-empty.png)
+_Chat scenario, initial state._
+
+#### Structured scenarios
+
+Fill in the values of the **Input (JSON)** editor. It is prefilled from the dataset's input schema, so the keys are already in place and you only provide the values. A live linter flags invalid JSON as you type.
+
+![Structured scenario with the Input JSON editor prefilled from the schema and an empty Checks section](/_static/images/hub/manual-scenario-structured-empty.png)
+_Structured scenario, initial state._
+
+#### Generate the output trace
+
+The agent's response is not stored when you enter the input, you generate it. Click **Run scenario** at the top of the interactions panel to run every interaction against the selected agent and produce its **Output trace**. The output trace is the agent's output in both cases, and its shape follows the schema:
+
+- For a **chat** scenario, the output trace is the **Assistant** message, with an expandable **Metadata** section.
+- For a **structured** scenario, the output trace is an **Output (JSON)** editor.
+
+![Chat scenario after running, showing the Assistant message in the Output trace section](/_static/images/hub/manual-scenario-chat-trace.png)
+_Chat scenario, after Run scenario._
+
+![Structured scenario after running, showing the Output JSON in the Output trace section](/_static/images/hub/manual-scenario-structured-trace.png)
+_Structured scenario, after Run scenario._
+
+Once you save the scenario, its output trace is kept with it. Run the scenario again at any time to regenerate it.
+
+#### Checks
+
+Checks are the evaluation criteria applied to the agent's response. Each interaction has its own **Checks** section, click **Add check** to attach one or more:
+
+- `Correctness`: Verifies if the agent's response matches the expected output (reference answer).
+- `Conformity`: Ensures the agent's response adheres to the rules, such as "The agent must be polite."
+- `Groundedness`: Ensures the agent's response is grounded in the provided context.
+- `String matching`: Checks if the agent's response contains a specific string, keyword, or sentence.
+- `Metadata`: Verifies the presence of specific (tool calls, user information, etc.) metadata in the agent's response.
+- `Semantic Similarity`: Verifies that the agent's response is semantically similar to the expected output.
+- And any custom checks you may have defined.
 
 :::tip
 For detailed information about checks like correctness, conformity, groundedness, string matching, metadata, and semantic similarity, including examples and how they work, see [Annotation overview](/hub/ui/annotate/overview).
 :::
 
-After the scenario is created, you can add the required information to it. For example, you can add the expected output and rules to the scenario.
+#### Scenario properties
+
+The side panel of the scenario also holds:
+
+- **Dataset**: the dataset the scenario belongs to.
+- **Tags** (optional): labels to organize and filter scenarios.
+- **Comments**: a thread to discuss the scenario with your team.
 
 ![Iteratively design your scenarios using a business-centric & interactive interface.](/_static/images/hub/annotation-studio.png)
 
