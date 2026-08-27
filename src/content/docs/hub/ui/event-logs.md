@@ -43,7 +43,7 @@ Each change is recorded with:
 To view the event history for a specific entity in the Event Log:
 
 1. Find the row for the entity you want to inspect (e.g., a check, dataset, or scenario)
-2. Click **History**
+2. Click on the button in the **History** column
 3. Review the list of changes in the **Change History** drawer
 
 ![Change History drawer with a timeline of modifications](/_static/images/hub/event-logs-history.png)
