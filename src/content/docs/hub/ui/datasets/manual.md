@@ -1,6 +1,6 @@
 ---
 title: "Create manual scenarios"
-description: "Build test datasets manually with custom scenarios from the red teaming playground for specific LLM agent use cases."
+description: "Build test datasets manually with custom chat or structured scenarios, authored directly or captured from the red teaming playground."
 sidebar:
   order: 2
 tableOfContents:

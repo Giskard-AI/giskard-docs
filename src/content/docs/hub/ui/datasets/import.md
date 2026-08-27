@@ -1,6 +1,6 @@
 ---
 title: "Import scenarios"
-description: "Import existing scenarios into Giskard Hub from JSONL or CSV files to build evaluation datasets."
+description: "Import existing scenarios into Giskard Hub from a JSON, JSONL, or CSV file exported from another tool to build chat or structured evaluation datasets."
 sidebar:
   order: 3
 tableOfContents:

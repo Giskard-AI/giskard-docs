@@ -1,6 +1,6 @@
 ---
 title: "Generate prompt preset scenarios"
-description: "Create business-specific scenarios using prompt presets. Test LLM agents with custom personas and business rules."
+description: "Create business-specific scenarios using prompt presets. Test LLM agents against custom personas, topics, and business rules without editing the agent."
 sidebar:
   order: 4
 ---
