@@ -1,13 +1,13 @@
 ---
-title: "Import tests"
-description: "Import existing test data into Giskard Hub from conversations, CSV files, and JSONL formats to build evaluation datasets."
+title: "Import scenarios"
+description: "Import existing scenarios into Giskard Hub from JSONL or CSV files to build evaluation datasets."
 sidebar:
   order: 3
 ---
 
-You can import existing test datasets from a file. This is particularly useful when you already have a dataset that you want to use for evaluation.
+You can import existing scenario datasets from a file. This is particularly useful when you already have a dataset that you want to use for evaluation.
 
-In this section, we will walk you through how to import existing datasets from a JSONL or CSV file, obtained from another tool, like Giskard Open Source.
+In this section, we will walk you through how to import existing scenario datasets from a JSONL or CSV file, obtained from another tool, like Giskard Open Source.
 
 ## Create a new dataset
 
@@ -15,27 +15,27 @@ On the Datasets page, click on "New dataset" button in the upper right corner of
 
 ![New dataset creation dialog with name and description](/_static/images/hub/create-dataset.png)
 
-After creating the dataset, you can either import multiple conversations or add individual conversations to it.
+After creating the dataset, you can either import multiple scenarios or add individual scenarios to it.
 
-## Import a dataset of conversations
+## Import a dataset of scenarios
 
-To import conversations, click the "Import" button in the upper right corner of the screen.
+To import scenarios, click the "Import" button in the upper right corner of the screen.
 
-![Dataset conversations list with import button](/_static/images/hub/import-conversations.png)
+![Dataset scenarios list with import button](/_static/images/hub/import-conversations.png)
 
-You can import data in **JSON or JSONL format**, containing an array of conversations (or a conversation object per line, if JSONL).
+You can import data in **JSON or JSONL format**, containing an array of scenarios (or a scenario object per line, if JSONL).
 
-Each conversation must be defined as a JSON object with a `messages` field containing the chat messages in OpenAI format. You can also specify these optional attributes:
+Each scenario must be defined as a JSON object with a `messages` field containing the chat messages in OpenAI format. You can also specify these optional attributes:
 
 - `demo_output`: an object presenting the output of the agent at some point
-- `tags`: a list of tags to categorize the conversation
-- `checks`: a list of checks to evaluate the conversation, they can be built-in or custom ones
+- `tags`: a list of tags to categorize the scenario
+- `checks`: a list of checks to evaluate the scenario, they can be built-in or custom ones
 
 :::tip
 For detailed information about built-in checks like correctness, conformity, groundedness, string matching, metadata, and semantic similarity, including examples and how they work, see [Annotation overview](/hub/ui/annotate/overview).
 :::
 
-![Conversation import interface for JSON test data](/_static/images/hub/import-conversations-detail.png)
+![Scenario import interface for JSON test data](/_static/images/hub/import-conversations-detail.png)
 
 Here's an example of the structure and content in a dataset:
 
@@ -106,6 +106,6 @@ Hi agent!,How can I help you?,greetings,assistance,How can I help you?,The agent
 ## Next steps
 
 - **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
-- **Generate knowledge base tests** - Try [Knowledge base tests](/hub/ui/datasets/knowledge-base)
-- **Generate scenario tests** - Try [Scenario tests](/hub/ui/datasets/scenario)
-- **Review test case** - Make sure to [Annotate](/hub/ui/annotate)
+- **Generate knowledge base scenarios** - Try [Knowledge base scenarios](/hub/ui/datasets/knowledge-base)
+- **Generate prompt preset scenarios** - Try [Prompt preset scenarios](/hub/ui/datasets/prompt-preset)
+- **Review scenarios** - Make sure to [Annotate](/hub/ui/annotate)

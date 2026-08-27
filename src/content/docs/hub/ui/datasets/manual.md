@@ -1,38 +1,65 @@
 ---
-title: "Create manual tests"
-description: "Build test datasets manually with custom test cases and scenarios from the red teaming playground for specific LLM agent use cases."
+title: "Create manual scenarios"
+description: "Build test datasets manually with custom scenarios from the red teaming playground for specific LLM agent use cases."
 sidebar:
   order: 2
 ---
 
-You can create test datasets manually for fine-grained control. This is particularly useful when you want to create test cases with full control over the test case creation process. There are two ways to manually create test cases:
+You can create scenarios manually for fine-grained control. This is particularly useful when you want to create scenarios with full control over the scenario creation process. There are two ways to manually create scenarios:
 
 - **Manual in a dataset:** You create both the user questions and the expected responses yourself.
 - **Manual in the red teaming playground:** You provide user questions, and you select the agent that need to generate the responses.
 
-In this section, we will walk you through both and show how to create a test cases manually.
+In this section, we will walk you through both and show how to create scenarios manually.
 
-## Create manual tests from a dataset
+## Create manual scenarios from a dataset
 
 ### Create a new dataset
 
-On the Datasets page, click on "New dataset" button in the upper right corner of the screen. You'll then be prompted to enter a name and description for your new dataset.
+On the Datasets page, click the "New dataset" button in the upper-right corner of the screen. Creating a dataset is a two-step flow: you fill in its settings, then bind it to a schema.
 
-![New dataset creation dialog with name and description](/_static/images/hub/create-dataset.png)
+![Datasets list with the New dataset button](/_static/images/hub/datasets-list.png)
 
-After creating the dataset, you can add individual conversations to it.
+#### Step 1: Settings
 
-### Create a manual test
+Enter a **name** and an optional **description** for the dataset, then click "Next".
 
-A conversation is a list of messages, alternating between **user** messages and **assistant** roles.
-When designing your test cases, you can decide to provide a conversation history by adding multiple turns.
+![New dataset dialog, step 1: name and description](/_static/images/hub/new-dataset-settings.png)
+
+#### Step 2: Schema
+
+Choose the schema the dataset is bound to. The schema sets the shape that every scenario in the dataset must follow, and it cannot be changed once the dataset is created.
+
+- **Chat**: the standard format, a sequence of alternating user and assistant messages. There is nothing else to configure, click "Create" to finish.
+- **Structured**: any format whose schema is not a chat, defined as custom JSON input and output.
+
+![New dataset dialog, step 2: choosing between Chat and Structured](/_static/images/hub/new-dataset-schema.png)
+
+When you pick **Structured**, an **Input schema (JSON)** editor and an **Output schema (JSON)** editor appear. Define both to describe the shape of each scenario's input and output.
+
+To save time, select an agent from the **Linked agent** dropdown to prefill both editors from that agent's definition. The agent must be a **structured** agent that belongs to the current project. Linking an agent is optional: you can write both schemas by hand, even before any structured agent exists. When the schemas are ready, click "Create".
+
+![New dataset dialog, step 2 with Structured selected: linked agent and input/output schema editors](/_static/images/hub/new-dataset-schema-structured.png)
+
+#### Review a dataset's schema
+
+Once the dataset exists, its header shows a small pill with the bound schema, either **chat** or **structured**. Click the pill to reopen the schema in a read-only version of the same dialog, where you can review the input and output schemas without editing them.
+
+![Dataset header showing the clickable schema pill](/_static/images/hub/dataset-schema-pill.png)
+
+After creating the dataset, you can add individual scenarios to it.
+
+### Create a manual scenario
+
+A scenario is a list of messages, alternating between **user** messages and **assistant** roles.
+When designing your scenarios, you can decide to provide a conversation history by adding multiple turns.
 Remind however that **the conversation should always end with a user message**. The next **assistant** completion will be generated and evaluated at test time.
 
-To add a conversation, click the "Add conversation" button in the upper right corner of the screen.
+To add a scenario, click the "Add scenario" button in the upper right corner of the screen.
 
-![Add conversation interface with message and check fields](/_static/images/hub/add-conversation.png)
+![Add scenario interface with message and check fields](/_static/images/hub/add-conversation.png)
 
-A conversation consists of the following components:
+A scenario consists of the following components:
 
 - `Messages`: Contains the user's input and the agent's responses in a multi-message exchange.
 - `Evaluation Settings` (optional): Includes the checks, like the following ones:
@@ -44,34 +71,34 @@ A conversation consists of the following components:
   - `Semantic Similarity`: Verifies that the agent's response is semantically similar to the expected output.
   - And any custom checks you may have defined.
 - `Properties`:
-  - `Dataset`: Specifies where the conversations should be saved.
-  - `Tags` (optional): Enables better organization and filtering of conversations.
+  - `Dataset`: Specifies where the scenarios should be saved.
+  - `Tags` (optional): Enables better organization and filtering of scenarios.
 
 :::tip
 For detailed information about checks like correctness, conformity, groundedness, string matching, metadata, and semantic similarity, including examples and how they work, see [Annotation overview](/hub/ui/annotate/overview).
 :::
 
-After the conversation is created, you can add the required information to it. For example, you can add the expected output and rules to the conversation.
+After the scenario is created, you can add the required information to it. For example, you can add the expected output and rules to the scenario.
 
-![Iteratively design your test cases using a business-centric & interactive interface.](/_static/images/hub/annotation-studio.png)
+![Iteratively design your scenarios using a business-centric & interactive interface.](/_static/images/hub/annotation-studio.png)
 
 :::tip
 To understand more about how to write an expected response and rules, check out the [Annotate](/hub/ui/annotate) section.
 :::
 
-## Create manual tests from the red teaming playground
+## Create manual scenarios from the red teaming playground
 
 ### The red teaming playground
 
-You can create manual tests in the red teaming playground. Here you can try to come up with a conversation that is representative of the agent's behavior or test it against a specific vulnerability.
+You can create manual scenarios in the red teaming playground. Here you can try to come up with a scenario that is representative of the agent's behavior or test it against a specific vulnerability.
 
 ![Red teaming playground chat interface for testing AI agents](/_static/images/hub/playground.png)
 
 The Chat section is where you can query and talk to the agent. You write your message on the agent part of the screen.
 
-The right panel displays all your conversations. You can have as many conversations as you need. To add a new one, click the "New conversation" button. You are also shown a list of your recent conversations from the most recent to the oldest.
+The right panel displays all your scenarios. You can have as many scenarios as you need. To add a new one, click the "New scenario" button. You are also shown a list of your recent scenarios from the most recent to the oldest.
 
-We recommend you to try different approaches to create conversations, for example:
+We recommend you to try different approaches to create scenarios, for example:
 
 - Adversarial questions, designed to mislead the agent
 - Legitimate questions that you think your users may ask the agent
@@ -79,15 +106,15 @@ We recommend you to try different approaches to create conversations, for exampl
 
 We will give some examples below. If you're interested in learning new ways to test your agents and LLM applications, we also recommend you to check out our free course on [Red Teaming LLM Applications](https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/) on DeepLearningAI.
 
-### Create a manual test
+### Create a manual scenario
 
-Once you've captured a conversation that adequately tests your desired functionality, you can save it to a dataset. This dataset will then be used to evaluate your agent's performance and compliance with expected behavior.
+Once you've captured a scenario that adequately tests your desired functionality, you can save it to a dataset. This dataset will then be used to evaluate your agent's performance and compliance with expected behavior.
 
-![Save conversation to a dataset from the Playground](/_static/images/hub/playground-save.png)
+![Save scenario to a dataset from the Playground](/_static/images/hub/playground-save.png)
 
 The screen above shows three sections:
 
-- `Messages`: the conversation you want to save to the dataset. Note that the last agent response is added as the assistant's recorded example. Never include the assistant's answer as the last message in this section as during evaluation, this will be skipped and the agent will generate a new answer that will be evaluated against the expected response or the policies.
+- `Messages`: the scenario you want to save to the dataset. Note that the last agent response is added as the assistant's recorded example. Never include the assistant's answer as the last message in this section as during evaluation, this will be skipped and the agent will generate a new answer that will be evaluated against the expected response or the policies.
 - `Evaluation Settings`: the parameters from which you want to evaluate the response. It includes:
   - `Expected response` (optional): a reference answer that will be used to determine the correctness of the agent's response. There can only be one expected response. If it is not provided, we do not check for the Correctness metric.
   - `Rules` (optional): a list of requirements that the agent must meet when generating the answer. There can be one or more rules. If it is not provided, we do not check for the Conformity metric.
@@ -96,8 +123,8 @@ The screen above shows three sections:
   - `Metadata` (optional): JSON path rules to verify specific metadata in the agent's response. If it is not provided, we do not check for the Metadata metric.
   - `Semantic Similarity` (optional): reference text and threshold for semantic similarity evaluation. If it is not provided, we do not check for the Semantic Similarity metric.
   - And any custom checks you may have defined.
-- `Dataset`: where the conversations are saved
-- `Tags` (optional): allows for better organization and filtering conversations
+- `Dataset`: where the scenarios are saved
+- `Tags` (optional): allows for better organization and filtering scenarios
 
 ### Approaches for Red Teaming AI Agents
 
@@ -193,11 +220,11 @@ The important thing is to remember that once you have tested what you wanted, yo
 - Test out-of-scope questions to ensure the agent appropriately handles unknown queries.
 - Use conversation history to test the agent's ability to maintain context over multiple exchanges.
 - Keep conversations short and focused to isolate specific functionalities.
-- Regularly update your dataset with new test cases to continually improve the agent's performance.
+- Regularly update your dataset with new scenarios to continually improve the agent's performance.
   :::
 
 ## Next steps
 
 - **Agentic vulnerability detection** - Try [Vulnerability Scanner](/hub/ui/scan)
-- **Generate test cases** - Try [Knowledge base tests](/hub/ui/datasets/knowledge-base) or [Scenario tests](/hub/ui/datasets/scenario)
-- **Review test case** - Make sure to [Annotate](/hub/ui/annotate)
+- **Generate more scenarios** - Try [Knowledge base scenarios](/hub/ui/datasets/knowledge-base) or [Prompt preset scenarios](/hub/ui/datasets/prompt-preset)
+- **Review scenarios** - Make sure to [Annotate](/hub/ui/annotate)
