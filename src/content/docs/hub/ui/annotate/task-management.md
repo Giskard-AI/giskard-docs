@@ -1,6 +1,6 @@
 ---
-title: "Distribute tasks to organize your review work"
-description: "Manage and distribute work among team members with Tasks. Assign tasks for reviewing scan results, evaluation runs, and scenarios to ensure quality and collaboration."
+title: "Distribute review work with tasks"
+description: "Distribute work among team members with Tasks. Assign reviews of scan results, evaluation runs, and scenarios to keep quality and collaboration high."
 sidebar:
   order: 3
 ---

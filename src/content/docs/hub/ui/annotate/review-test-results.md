@@ -1,6 +1,6 @@
 ---
 title: "Review test results"
-description: "Review evaluation results and understand test failures. Follow the business workflow to analyze check results, understand reasons, and take appropriate actions."
+description: "Review evaluation results and understand test failures. Follow the workflow to analyze check results, understand the reasons, and take action."
 sidebar:
   order: 4
 ---

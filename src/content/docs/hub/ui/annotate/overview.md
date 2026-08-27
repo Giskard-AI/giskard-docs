@@ -1,5 +1,5 @@
 ---
-title: "Understand metrics, failure categories and tags"
+title: "Metrics, failure categories and tags"
 description: "Organize and analyze scenarios using tags, metrics, and failure categories. Structure datasets and interpret LLM evaluation results."
 sidebar:
   order: 2
