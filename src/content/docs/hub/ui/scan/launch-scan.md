@@ -57,7 +57,7 @@ The scan supports both chat and structured agents. For a chat agent, the generat
 }
 ```
 
-For a structured agent, the scan converts the same attack to fit the expected input format of your agent. For example with a mail agent that expects a `topic` and `body` fields:
+For a structured agent, the scan converts the same attack to fit the expected input format of your agent. For example with a mail agent that expects `topic` and `body` fields:
 
 ```json
 {
