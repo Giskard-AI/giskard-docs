@@ -20,26 +20,28 @@ By moving from generic stress testing to rule-driven scenarios, you get higher q
 
 ## Getting started
 
-To begin, navigate to the Datasets page and click **Generate** in the upper-right corner of the screen. This will open a modal with two options: Knowledge Base and Prompt preset. Select the **Prompt preset** option.
+To begin, navigate to the Datasets page and click **Generate** in the upper-right corner of the screen. This opens the **Pick your generation type** modal with two options: Prompt preset and Knowledge base. Select the **Prompt preset** option.
 
 ![Select prompt preset option from generation modal](/_static/images/hub/scenario-select.png)
 
-## Select or create a persona
+Starting from the Datasets page, the modal also asks for a **Dataset name**: the scenarios land in a new dataset created on the fly. Starting the generation from within an existing dataset skips this and adds the scenarios to that dataset.
 
-You'll see a subset of all the personas that you've defined---the user personas that might interact with your bots. You can select an existing one or create a new one.
+## Select or create a prompt preset
 
-![Persona selection interface for prompt preset testing](/_static/images/hub/scenario-persona-choose.png)
+Generation runs as a two-step flow. In step 1, **Choose or create**, you pick a prompt preset: a reusable bundle of personas, topics, tone, and rules that shapes the scenarios. Select one of the built-in presets or create your own.
 
-When creating a new persona, it's always nice to have:
+![Prompt preset selection interface](/_static/images/hub/scenario-persona-choose.png)
 
-- **A descriptive name**: This helps identify the persona quickly
-- **A description**: This helps with the generation understanding and ensures the generated scenarios align with your intended persona
+When creating a new prompt preset, it's always nice to have:
+
+- **A descriptive name**: This helps identify the preset quickly
+- **A description**: This guides the generation and keeps the scenarios aligned with your intended personas
 
 ## Define rules
 
 You can then add specific rules that define behaviors your agent should respect and that are at risk of being broken when interacting with the selected personas. These rules help evaluate different persona situations and will be used to generate scenarios that specifically test whether your agent maintains these behaviors.
 
-![Persona configuration form with name, description, and rules](/_static/images/hub/scenario-persona-create.png)
+![Add prompt preset form with name, description, and rules](/_static/images/hub/scenario-persona-create.png)
 
 For example:
 
@@ -49,18 +51,19 @@ For example:
 - **Persona**: Crypto investor seeking investment advice
 - **Rules**: Refuse to provide unauthorized financial advice and avoid making specific investment recommendations
 
-After defining a set of rules, you can add them to the prompt preset.
+After defining a set of rules, click **Add** to save the prompt preset.
 
 ## Generate scenarios
 
-Once you've configured your persona and rules, you can:
+Step 2, **Review**, shows the selected preset and its rules. Set:
 
-- **Select your agent**: Choose the agent you want to test (e.g., Zephyr Bank multilingual agent)
-- **Set the number of scenarios**: Specify how many scenarios you want to generate
+- **Agent**: the agent you want to test.
+- **Target key**: the output field the generated checks evaluate. It defaults to the assistant response for a chat agent, or to the first available path in the schema for a structured agent, and you can point it elsewhere. The preset's rules are turned into a conformity check on this key. See [Annotate](/hub/ui/annotate) for how target keys and checks work.
+- **Number of scenarios**: how many scenarios to generate.
 
-![Prompt preset generation settings with agent and scenario count](/_static/images/hub/scenario-generate.png)
+![Prompt preset generation settings with agent, target key, and scenario count](/_static/images/hub/scenario-generate.png)
 
-Start running the generation, which will be relatively quick. After running the generation, you'll have high-quality evaluated datasets.
+Click **Generate**. It runs relatively quickly, and you end up with a high-quality, evaluated dataset.
 
 ## Review and evaluate
 
