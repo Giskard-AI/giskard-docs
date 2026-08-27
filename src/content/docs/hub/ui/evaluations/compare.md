@@ -35,8 +35,8 @@ Within this comparison you can explore the performance of the agent on a specifi
 :::tip[How to use your test results to correct your AI agent?]
 During this process you might uncover patterns and issues that you can address in your agent.
 
-For example, if you created a custom check to verify whether the agent starts with "I'm sorry," it is useful to know how many conversations fail this requirement.
-If the failure rate is high, you can chose to adjust the evaluation, create more representative test cases or adjust your Agent deployment.
+For example, if you created a custom check to verify whether the agent starts with "I'm sorry," it is useful to know how many scenarios fail this requirement.
+If the failure rate is high, you can chose to adjust the evaluation, create more representative scenarios or adjust your Agent deployment.
 
 If you need more information on setting up efficient evaluations for your agent, check out the [Annotate](/hub/ui/annotate) section.
 :::

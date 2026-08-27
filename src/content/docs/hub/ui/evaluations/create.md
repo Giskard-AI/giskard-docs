@@ -52,7 +52,7 @@ When you open an evaluation run, you can review the overall results before divin
 :::tip[How to use your test results to correct your AI agent?]
 During the development phase, it is essential to diagnose issues and implement corrections to improve the agent's performance.
 
-- **Failure rate per check:** Identifying the checks with the highest failure rate makes it easier to apply targeted corrections. For example, if you created a custom check to verify whether the agent starts with "I'm sorry," it is useful to know how many conversations fail this requirement. If the failure rate is high, you can develop mitigation strategies such as prompt engineering, implementing guardrails, or using routers to address the issue.
+- **Failure rate per check:** Identifying the checks with the highest failure rate makes it easier to apply targeted corrections. For example, if you created a custom check to verify whether the agent starts with "I'm sorry," it is useful to know how many scenarios fail this requirement. If the failure rate is high, you can develop mitigation strategies such as prompt engineering, implementing guardrails, or using routers to address the issue.
 - **Failure rate per category:** Measuring failure rates across different vulnerability categories (e.g., hallucination, prompt injection) helps prioritize mitigation strategies for the AI agent.
 - **Failure rate per tag:** Measuring failure rates across different tags (e.g., customer-support, technical-support) helps prioritize mitigation strategies for the AI agent.
   :::
@@ -91,7 +91,7 @@ Using failure categories helps you:
 - **Track improvements** - Monitor how failure rates change over time
 
 :::tip
-You can read about failure category changes in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+You can read about failure category changes in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
 :::
 
 ### Tags view
