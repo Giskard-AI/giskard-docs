@@ -120,7 +120,11 @@ You can create manual scenarios in the red teaming playground. Here you can try 
 
 ![Red teaming playground chat interface for testing AI agents](/_static/images/hub/playground.png)
 
-The Chat section is where you can query and talk to the agent. You write your message on the agent part of the screen.
+The toolbar at the top shows which agent the scenario runs against and its schema. With a **chat** agent, you type a message in the box at the bottom and the agent replies with an assistant message.
+
+With a **structured** agent, the message box is replaced by the agent's **Input** schema, prefilled as JSON. Edit the values and send the object, and the agent returns an **Output** object shaped by its schema.
+
+![Red teaming playground with a structured agent: a prefilled Input JSON editor and a JSON Output](/_static/images/hub/playground-structured.png)
 
 The right panel displays all your scenarios. You can have as many scenarios as you need. To add a new one, click the "New scenario" button. You are also shown a list of your recent scenarios from the most recent to the oldest.
 
@@ -132,7 +136,7 @@ We recommend you to try different approaches to create scenarios, for example:
 
 We will give some examples below. If you're interested in learning new ways to test your agents and LLM applications, we also recommend you to check out our free course on [Red Teaming LLM Applications](https://www.deeplearning.ai/short-courses/red-teaming-llm-applications/) on DeepLearningAI.
 
-### Create a manual scenario
+### Save the scenario to a dataset
 
 Once you've captured a scenario that adequately tests your desired functionality, you can save it to a dataset, where it will be used to evaluate your agent's performance and compliance with expected behavior.
 
@@ -140,7 +144,7 @@ The action sits behind the more actions (**⋮**) button in the playground toolb
 
 ![The more actions menu in the playground toolbar, with the Send to dataset option](/_static/images/hub/playground-toolbar-more-actions.png)
 
-This opens the **Save scenario to dataset** dialog. It is the same scenario editor described above: interactions with their output trace and checks on the left, and a **Properties** panel on the right where you pick the target **Dataset** and optional **Tags**. Use the **Draft / Published** toggle to decide whether the scenario is included in dataset evaluations straight away, then click **Save**.
+This opens the **Save scenario to dataset** dialog. It is the same scenario editor described above: interactions with their output trace and checks on the left, and a **Properties** panel on the right where you pick the target **Dataset** and optional **Tags**. For a scenario built with a structured agent, the interactions show the **Input** and **Output** JSON editors instead of message fields. Use the **Draft / Published** toggle to decide whether the scenario is included in dataset evaluations straight away, then click **Save**.
 
 ![Save scenario to dataset dialog, with the interactions on the left and the dataset selector on the right](/_static/images/hub/playground-save.png)
 
