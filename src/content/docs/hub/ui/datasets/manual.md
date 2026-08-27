@@ -96,18 +96,10 @@ Once you save the scenario, its output trace is kept with it. Run the scenario a
 
 #### Checks
 
-Checks are the evaluation criteria applied to the agent's response. Each interaction has its own **Checks** section, click **Add check** to attach one or more:
-
-- `Correctness`: Verifies if the agent's response matches the expected output (reference answer).
-- `Conformity`: Ensures the agent's response adheres to the rules, such as "The agent must be polite."
-- `Groundedness`: Ensures the agent's response is grounded in the provided context.
-- `String matching`: Checks if the agent's response contains a specific string, keyword, or sentence.
-- `Metadata`: Verifies the presence of specific (tool calls, user information, etc.) metadata in the agent's response.
-- `Semantic Similarity`: Verifies that the agent's response is semantically similar to the expected output.
-- And any custom checks you may have defined.
+Checks are the evaluation criteria applied to the agent's response. Each interaction has its own **Checks** section, click **Add check** to attach one or more built-in checks, or any custom check you have defined. All checks work with both schema types.
 
 :::tip
-For detailed information about checks like correctness, conformity, groundedness, string matching, metadata, and semantic similarity, including examples and how they work, see [Annotation overview](/hub/ui/annotate/overview).
+For the full list of built-in checks and how each one works, see [Available checks](/hub/ui/annotate/overview#available-checks).
 :::
 
 #### Scenario properties
@@ -119,10 +111,6 @@ The side panel of the scenario also holds:
 - **Comments**: a thread to discuss the scenario with your team.
 
 ![Iteratively design your scenarios using a business-centric & interactive interface.](/_static/images/hub/annotation-studio.png)
-
-:::tip
-To understand more about how to write an expected response and rules, check out the [Annotate](/hub/ui/annotate) section.
-:::
 
 ## Create manual scenarios from the red teaming playground
 
@@ -146,23 +134,15 @@ We will give some examples below. If you're interested in learning new ways to t
 
 ### Create a manual scenario
 
-Once you've captured a scenario that adequately tests your desired functionality, you can save it to a dataset. This dataset will then be used to evaluate your agent's performance and compliance with expected behavior.
+Once you've captured a scenario that adequately tests your desired functionality, you can save it to a dataset, where it will be used to evaluate your agent's performance and compliance with expected behavior.
 
-![Save scenario to a dataset from the Playground](/_static/images/hub/playground-save.png)
+The action sits behind the more actions (**⋮**) button in the playground toolbar. Open the menu and choose **Send to dataset**.
 
-The screen above shows three sections:
+![The more actions menu in the playground toolbar, with the Send to dataset option](/_static/images/hub/playground-toolbar-more-actions.png)
 
-- `Messages`: the scenario you want to save to the dataset. Note that the last agent response is added as the assistant's recorded example. Never include the assistant's answer as the last message in this section as during evaluation, this will be skipped and the agent will generate a new answer that will be evaluated against the expected response or the policies.
-- `Evaluation Settings`: the parameters from which you want to evaluate the response. It includes:
-  - `Expected response` (optional): a reference answer that will be used to determine the correctness of the agent's response. There can only be one expected response. If it is not provided, we do not check for the Correctness metric.
-  - `Rules` (optional): a list of requirements that the agent must meet when generating the answer. There can be one or more rules. If it is not provided, we do not check for the Conformity metric.
-  - `Context` (optional): the context of the conversation. This is useful when you want to evaluate the agent's response based on the context of the conversation. If it is not provided, we do not check for the Groundedness metric.
-  - `Keyword` (optional): a keyword that the agent's response must contain. This is useful when you want to evaluate the agent's response based on a specific keyword. If it is not provided, we do not check for the String matching metric.
-  - `Metadata` (optional): JSON path rules to verify specific metadata in the agent's response. If it is not provided, we do not check for the Metadata metric.
-  - `Semantic Similarity` (optional): reference text and threshold for semantic similarity evaluation. If it is not provided, we do not check for the Semantic Similarity metric.
-  - And any custom checks you may have defined.
-- `Dataset`: where the scenarios are saved
-- `Tags` (optional): allows for better organization and filtering scenarios
+This opens the **Save scenario to dataset** dialog. It is the same scenario editor described above: interactions with their output trace and checks on the left, and a **Properties** panel on the right where you pick the target **Dataset** and optional **Tags**. Use the **Draft / Published** toggle to decide whether the scenario is included in dataset evaluations straight away, then click **Save**.
+
+![Save scenario to dataset dialog, with the interactions on the left and the dataset selector on the right](/_static/images/hub/playground-save.png)
 
 ### Approaches for Red Teaming AI Agents
 
