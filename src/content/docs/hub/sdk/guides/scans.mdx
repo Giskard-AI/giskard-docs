@@ -5,6 +5,8 @@ sidebar:
   order: 3
 ---
 
+import { TabItem, Tabs } from "@astrojs/starlight/components";
+
 A **Scan** runs a set of automated adversarial probes against your agent to detect security and safety vulnerabilities. You can also launch and review scans from the [Hub UI scan page](/hub/ui/scan). Giskard covers the [OWASP LLM Top 10 (2025)](https://owasp.org/www-project-top-10-for-large-language-model-applications/) as well as additional categories that go beyond the OWASP framework — Harmful Content Generation, Brand Damaging & Reputation, Legal & Financial Risk, and Misguidance & Unauthorized Advice. See the full [attack category catalogue](https://docs.giskard.ai/hub/ui/scan/vulnerability-categories/index.html) for details.
 
 ## Launch a scan
@@ -29,6 +31,10 @@ print(f"Scan complete. Grade: {scan.grade}")
 
 The `grade` property gives an overall security posture rating: **A** (best) through **D** (worst). It is `None` if not enough data was collected.
 
+:::note[Structured agents]
+When you scan an agent with a custom input schema, the Hub adapts each generated attack to that schema before calling the agent. This conversion happens in the Hub, not in the Python SDK. The SDK launches the scan and returns the resolved structured requests and responses in each attempt's `input` and `output` fields.
+:::
+
 :::tip
 Scans can take several minutes. The default `wait_for_completion` timeout is 30 minutes (`poll_interval=5`, `max_retries=360`). To set a custom timeout, for example 10 minutes:
 
@@ -40,11 +46,14 @@ scan = hub.helpers.wait_for_completion(scan, poll_interval=5, max_retries=120)
 
 ---
 
-## Scope scans with tags
+## Choose categories or individual probes
 
-Use tags to focus the scan on specific vulnerability categories. Giskard covers a subset of the [OWASP LLM Top 10 (2025)](https://genai.owasp.org/llm-top-10/) as well as additional categories that go beyond the OWASP framework.
+<Tabs>
+<TabItem label="By category">
 
-| Tag                                                     | Category                          | OWASP mapping (2025) |
+Use category IDs to focus the scan on one or more vulnerability categories:
+
+| Category ID                                             | Category                          | OWASP mapping (2025) |
 | ------------------------------------------------------- | --------------------------------- | -------------------- |
 | `gsk:threat-type='prompt-injection'`                    | Prompt Injection                  | LLM01                |
 | `gsk:threat-type='data-privacy-exfiltration'`           | Data Privacy & Exfiltration       | LLM05                |
@@ -68,16 +77,45 @@ scan = hub.scans.create(
     ],
 )
 ```
-
-### Discover available categories
-
-Use `hub.scans.list_categories()` to retrieve the authoritative, up-to-date list of all available categories and their tags at runtime:
+### Discover available categories 
+Use `list_categories()` to retrieve the up-to-date list of all available categories. It returns each category's `id`, `title`, `description`, and optional `owasp_id`. Use their `id` as tags to select the categories when launching a scan.
 
 ```python
-categories = hub.scans.list_categories()
-for cat in categories:
-    print(cat.title, cat.owasp_id)
+for category in hub.scans.list_categories():
+    print(category.id, category.title, category.owasp_id)
 ```
+
+Giskard covers a subset of the [OWASP LLM Top 10 (2025)](https://genai.owasp.org/llm-top-10/) and additional categories outside that framework.
+
+</TabItem>
+<TabItem label="By individual probe">
+
+Pass the IDs of the probes you want to run through `probe_ids`. For example:
+
+```python
+scan = hub.scans.create(
+    project_id="project-id",
+    agent_id="agent-id",
+    probe_ids=[
+        "controversial-topics:1.0",
+        "hijacking:1.0",
+        "ascii-smuggling:1.0",
+    ],
+)
+```
+
+### Discover available probes
+Retrieve the full, up-to-date list of probe IDs with `list_available_probes()`:
+
+```python
+for probe in hub.scans.list_available_probes():
+    print(probe.id, probe.name, probe.tags)
+```
+
+Selecting individual probes is useful for targeted testing or rerunning specific probes without running their entire vulnerability categories.
+
+</TabItem>
+</Tabs>
 
 ---
 
@@ -129,7 +167,12 @@ print(probe.description)
 
 ### List individual probe attempts
 
-Each probe may generate multiple adversarial prompt attempts. Inspect them to understand exactly what the agent was asked and how it responded:
+Each probe may generate multiple adversarial prompt attempts. The `input` and `output` of each attempt are dictionaries that match the selected agent's input and output schemas.
+
+<Tabs>
+<TabItem label="Chat agent">
+
+Attempts for chat agents contain message objects with `role` and `content` fields. The input has the shape `{"messages": [{"role": "user", "content": "..."}]}`, while the output has the shape `{"response": {"role": "assistant", "content": "..."}, "metadata": {...}}`.
 
 ```python
 attempts = hub.scans.probes.list_attempts("probe-id")
@@ -142,6 +185,28 @@ for attempt in attempts:
     )  # higher than 0 means the attack succeeded
     print("---")
 ```
+
+</TabItem>
+<TabItem label="Structured agent">
+
+Attempts for structured agents contain the resolved objects sent to and received from the agent. Their fields match the agent's input and output schemas:
+
+```python
+attempts = hub.scans.probes.list_attempts("probe-id")
+
+for attempt in attempts:
+    print("Input:", attempt.input)
+    print("Output:", attempt.output)
+    print("Severity:", attempt.severity)
+    print("---")
+```
+
+</TabItem>
+</Tabs>
+
+:::caution
+`attempt.messages` is deprecated. Read `attempt.input` and `attempt.output` directly. For structured agents, `attempt.messages` flattens the input and output objects into text and loses their original structure.
+:::
 
 ### Mark an attempt as reviewed
 
