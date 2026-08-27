@@ -1,6 +1,6 @@
 ---
 title: "Setup knowledge bases"
-description: "Create and manage knowledge bases in Giskard Hub. Upload domain documents to generate targeted test cases for LLM agent evaluation."
+description: "Create and manage knowledge bases in Giskard Hub. Upload domain documents to generate targeted scenarios for AI agent evaluation."
 sidebar:
   order: 4
 ---
@@ -51,7 +51,7 @@ Each object in your JSON or JSONL file should have the following structure:
 - If the `text` has a value but the `topic` is blank, the `topic` will be set to 'Others'. However, if all topics are blank, the `topic` will be automatically generated.
 - If both the `text` and `topic` are blank, or if the `text` is blank but the `topic` has a value, the entry will not be imported.
 
-The interface below displays information about the knowledge base and its content with corresponding topics. As mentioned above, if no topics were uploaded with the knowledge base, Giskard Hub will also identify and generate them for you. In the example below, the knowledge base is ready to be used with over 1200 documents and 7 topics.
+The interface below displays information about the knowledge base and its content with corresponding topics. As mentioned above, if no topics were uploaded with the knowledge base, Giskard Hub will also identify and generate them for you. In the example below, the knowledge base is ready to be used with over 200 documents and 5 topics.
 
 ![Imported knowledge base showing document count and topics](/_static/images/hub/import-kb-success.png)
 
@@ -61,5 +61,5 @@ Now that you have created a project, you can start setting up your agents and kn
 
 - **Setup agents** - [Setup agents](/hub/ui/setup/agents)
 - **Manage users and groups** - [Manage users and groups](/hub/ui/access-rights)
-- **Create test cases and datasets** - [Create test cases and datasets](/hub/ui/datasets)
+- **Create scenarios and datasets** - [Create scenarios and datasets](/hub/ui/datasets)
 - **Launch vulnerability scans** - [Launch vulnerability scans](/hub/ui/scan)

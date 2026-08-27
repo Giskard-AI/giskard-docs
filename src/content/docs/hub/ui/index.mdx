@@ -1,6 +1,6 @@
 ---
-title: "LLM Agent Testing Platform"
-description: "Giskard Hub enterprise platform for LLM agent evaluation, continuous red teaming, vulnerability scanning, and team collaboration."
+title: "AI Agent Testing & Scanning Platform"
+description: "Giskard Hub enterprise platform for scanning, testing, and evaluating AI agents and agentic applications, with continuous red teaming and team collaboration."
 sidebar:
   order: 1
   label: Quickstart
@@ -11,11 +11,11 @@ sidebar:
 
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-**Giskard Hub is our enterprise platform for LLM agent testing with team collaboration and continuous red teaming.** The Hub provides a comprehensive user interface for performing LLM evaluations in production environments with enterprise-grade security and collaboration features.
+**Giskard Hub is our enterprise platform for scanning, testing, and evaluating AI agents and agentic applications with team collaboration and continuous red teaming.** The Hub provides a comprehensive user interface for these workflows in production environments with enterprise-grade security and collaboration features.
 
-The Hub is the user interface from which you can perform LLM evaluations. It implements the following 4-step workflow:
+The Hub is the user interface from which you can scan, test, and evaluate agentic applications, including LLM-based chatbots, RAGs and classification systems. It implements the following 4-step workflow:
 
-![Giskard Hub 4-step workflow: setup, scan, create test cases, evaluate](/_static/images/hub/hub-workflow.png)
+![Giskard Hub 4-step workflow: setup, scan, create scenarios, evaluate](/_static/images/hub/hub-workflow.png)
 
 <CardGrid>
   <LinkCard
@@ -29,13 +29,13 @@ The Hub is the user interface from which you can perform LLM evaluations. It imp
     href="/hub/ui/scan"
   />
   <LinkCard
-    title="Create test cases and datasets"
-    description="Create test cases and datasets manually or using synthetic data generation."
+    title="Create scenarios and datasets"
+    description="Create scenarios and datasets manually or using synthetic data generation."
     href="/hub/ui/datasets"
   />
   <LinkCard
-    title="Review and refine test cases and metrics"
-    description="Review and refine test cases and metrics with humans in the loop."
+    title="Review and refine scenarios and metrics"
+    description="Review and refine scenarios and metrics with humans in the loop."
     href="/hub/ui/annotate"
   />
   <LinkCard
@@ -50,11 +50,11 @@ The Hub is the user interface from which you can perform LLM evaluations. It imp
   />
 </CardGrid>
 
-## Agent testing workflow
+## Agent testing and scanning workflow
 
 ```mermaid
 graph LR
-    B[<a href="/hub/ui/scan" target="_self">Red Team Scan</a>] -->  D[<a href="/hub/ui/datasets" target="_self">Create Test Cases</a>]
+    B[<a href="/hub/ui/scan" target="_self">Scan</a>] -->  D[<a href="/hub/ui/datasets" target="_self">Create Scenarios</a>]
     D --> F[<a href="/hub/ui/annotate" target="_self">Annotate & Assign Checks</a>]
     F --> G[<a href="/hub/ui/evaluations" target="_self">Run Evaluations</a>]
     G --> H[<a href="/hub/ui/evaluations" target="_self">Review Results</a>]
@@ -62,49 +62,33 @@ graph LR
     H --> B
 ```
 
-:::tip
-Throughout this user guide, we'll use a banking app called Zephyr Bank, designed by data scientists. The app's agent provides customer service support on their website, offering knowledge about the bank's products, services, and more.
-:::
-
 ## The dashboard
 
-The Dashboard is the first page you'll see upon logging in. It provides an overview of your project, displaying the number of agents, datasets, evaluations, and knowledge bases.
+The Dashboard is the first page you'll see upon logging in. It provides an overview of your project, displaying the number of agents, datasets, evaluations, and knowledge bases, along with scheduled evaluations of the agent's performance over time and a summary of recent scans.
 
-It also features a graph showing the agent's performance over time, measured by the average success rate of the evaluations. The success rate is calculated based on some evaluation metrics, such as Conformity, Correctness, Groundedness, String Matching, Metadata, Semantic Similarity, and more. We'll delve into these metrics in more detail in the Evaluations section.
-
-:::tip
-For detailed information about evaluation metrics and checks, including examples and how they work, see [Annotate](/hub/ui/annotate).
-:::
-
-Additionally, the dashboard lists your most recent evaluations and datasets for quick access.
-
-![Giskard Hub project dashboard showing agent performance graph](/_static/images/hub/dashboard.png)
+![Giskard Hub project dashboard showing stats, scheduled evaluations, and scans](/_static/images/hub/dashboard.png)
 
 ## Create a project
 
-In this section, you will learn how to create a project.
+To create a project, click the Settings icon on the left panel. This page lets you manage your projects and users (if you have the proper access rights).
 
-First, click on the "Settings" icon on the left panel, this page allows you to manage your projects and users (if you have the proper access rights).
-
-In the Projects tab, click on "Create project" button. A modal will appear where you can enter your project's name and description.
+In Projects, click "Create project". A modal appears where you can enter the project's name and description.
 
 ![Create project dialog with name and description fields](/_static/images/hub/create-project.png)
 
-Once the project is created, you can access its dashboard by clicking on it in the list. Alternatively, use the dropdown menu in the upper left corner of the screen to select the project you want to work on.
+Once the project is created, clicking it in the list opens project settings. Alternatively, use the dropdown menu in the upper left corner of the screen to select the project you want to work on.
 
 ## Setup an agent
 
-This section guides you through creating a new agent.
+To create an agent, open the Agents page and click "New Agent".
 
 :::tip
-Agents are configured through an API endpoint. They can be evaluated against datasets.
+Agents are configured through an API endpoint. They can be scanned for vulnerabilities and evaluated against datasets.
 :::
-
-On the Agents page, click on the "New agent" button.
 
 ![Agent list page with new agent button](/_static/images/hub/setup-agent-list.png)
 
-The interface below displays the agent details that need to be filled out.
+Fill in the agent details:
 
 ![Agent configuration form with API endpoint and header settings](/_static/images/hub/setup-agent-detail.png)
 
@@ -114,9 +98,9 @@ The interface below displays the agent details that need to be filled out.
 - `Connection Settings`:
   - `Agent API Endpoint`: The URL of your agent's API endpoint. This is where requests are sent to interact with your agent.
   - `Headers`: These are useful for authentication and other custom headers.
-  - `Stateful mode`: Controls how the Hub handles conversation history when calling your agent.
+- `Mode`: `Chat` or `Structured`. Chat agents send and receive a message list. Structured agents use a custom JSON input and output.
 
-In the default (stateless) mode, the endpoint should expect an object with the following structure:
+In Chat mode, the endpoint should expect an object with the following structure:
 
 ```python
 {
@@ -137,39 +121,19 @@ And the response should have the following structure:
 }
 ```
 
-In stateful mode, the Hub sends only the latest user message along with a `thread_id` in `metadata`, and your agent is responsible for storing the conversation history server-side. After the first turn, requests and responses look like this:
-
-```python
-{
-    "messages": [
-        {"role": "user", "content": "What color is an orange?"},
-    ],
-    "metadata": {"thread_id": "abc-123"},
-}
-```
-
-```python
-{
-    "response": {"role": "assistant", "content": "An orange is orange."},
-    "metadata": {"thread_id": "abc-123"},
-}
-```
-
-The Hub also supports authenticated endpoints and chatbots whose native API doesn't match this canonical shape, and the Giskard team will help you configure these during onboarding. For details on authentication, connecting custom chatbot formats, and stateful conversations, see [Setup agents](/hub/ui/setup/agents).
+The Hub also supports authenticated endpoints and agents whose native API doesn't match this canonical shape, and the Giskard team will help you configure these during onboarding. For details on authentication, connecting custom chatbot or structured-agent formats, and chat vs structured agents, see [Setup agents](/hub/ui/setup/agents).
 
 ## Import a knowledge base
 
-This section guides you through importing your custom knowledge base.
+To import a knowledge base, open Knowledge Bases and click "Add Knowledge Base".
 
 :::tip
 A **Knowledge Base** is a domain-specific collection of information. You can have several knowledge bases for different areas of your business.
 :::
 
-On the Knowledge Bases, click on "Add Knowledge Base" button.
-
 ![Knowledge base list with add knowledge base button](/_static/images/hub/import-kb-list.png)
 
-The interface below displays the knowledge base details that need to be filled out.
+Fill in the knowledge base details:
 
 ![Knowledge base import form with name and file upload fields](/_static/images/hub/import-kb-detail.png)
 
@@ -197,7 +161,7 @@ Each object in your JSON or JSONL file should have the following structure:
 - If the `text` has a value but the `topic` is blank, the `topic` will be set to 'Others'. However, if all topics are blank, the `topic` will be automatically generated.
 - If both the `text` and `topic` are blank, or if the `text` is blank but the `topic` has a value, the entry will not be imported.
 
-The interface below displays information about the knowledge base and its content with corresponding topics. As mentioned above, if no topics were uploaded with the knowledge base, Giskard Hub will also identify and generate them for you. In the example below, the knowledge base is ready to be used with over 1200 documents and 7 topics.
+Once imported, the knowledge base shows its documents and topics. If no topics were uploaded, Giskard Hub identifies and generates them. In the example below, the knowledge base is ready with 206 documents and 5 topics.
 
 ![Imported knowledge base showing document count and topics](/_static/images/hub/import-kb-success.png)
 
