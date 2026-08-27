@@ -5,6 +5,8 @@ sidebar:
   order: 3
 ---
 
+import { TabItem, Tabs } from "@astrojs/starlight/components";
+
 Understand your AI agent's security vulnerabilities and take action to fix them.
 
 ## Understanding your security grade
@@ -28,7 +30,23 @@ Scroll to any vulnerability category to see the specific attacks that were teste
 
 Click **Review** next to any probe to see detailed attack results:
 
-![Attack detail showing prompt, agent response, and vulnerability](/_static/images/hub/scan/attempt-successful.png)
+<Tabs>
+  <TabItem label="Chat agent">
+    For a chat agent, the attack details show the conversation sent to the agent
+    and the response it returned.
+
+    ![Attack detail for a chat agent showing the prompt, response, and vulnerability](/_static/images/hub/scan/attempt-successful.png)
+
+  </TabItem>
+  <TabItem label="Structured agent">
+    For a structured agent, the layout displays the JSON objects sent to and
+    received from the agent. This lets you inspect how the generated attack was
+    adapted to the agent's input schema and review its structured response.
+
+    ![Attack detail for a structured agent showing its JSON input and output](/_static/images/hub/scan/structured-scan-attack.png)
+
+  </TabItem>
+</Tabs>
 
 This shows you:
 
