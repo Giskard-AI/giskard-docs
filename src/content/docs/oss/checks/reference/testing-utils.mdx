@@ -131,7 +131,7 @@ Result of test case execution with check outcomes.
     Results from all checks.
   </Property>
   <Property name="passed" type="bool">
-    True if all checks passed.
+    True when status is PASS: no failures or errors, and not all checks skipped (or empty).
   </Property>
   <Property name="failed" type="bool">
     True if any check failed.
@@ -177,11 +177,11 @@ result.assert_passed()
 
 **Module:** `giskard.checks.core.result` (also exported from `giskard.checks`)
 
-Outcome categories for a test case execution. Derived from the case's check results (and `error`, if set).
+Outcome categories for a test case execution. Derived from the case's check results (and `error`, if set): ERROR if `error` is set or any check errored, else FAIL if any check failed, else SKIP if every check was skipped, else PASS. An empty test case is PASS.
 
 | Status  | Value     | Description                                         |
 | ------- | --------- | --------------------------------------------------- |
-| `PASS`  | `"pass"`  | All checks passed, or the case has no checks        |
+| `PASS`  | `"pass"`  | No failures or errors; not all checks skipped (or empty) |
 | `FAIL`  | `"fail"`  | At least one check failed and none errored          |
 | `ERROR` | `"error"` | At least one check errored, or `error` is set       |
 | `SKIP`  | `"skip"`  | All checks were skipped                             |

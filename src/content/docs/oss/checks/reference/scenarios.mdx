@@ -158,7 +158,7 @@ Result of scenario execution with trace and check results.
     Complete trace of all interactions.
   </Property>
   <Property name="passed" type="bool">
-    True when the aggregated status is PASS (no failures or errors; not the all-skipped case).
+    True when the aggregated status is PASS: no failures or errors, and not all steps skipped (or empty).
   </Property>
   <Property name="failed" type="bool">
     True when at least one step failed and none errored.
@@ -216,7 +216,7 @@ Outcome categories for a scenario execution. Derived from the scenario's steps: 
 
 | Status  | Value   | Description                                          |
 | ------- | ------- | ---------------------------------------------------- |
-| `PASS`  | `"pass"`  | All steps passed, or the scenario has no steps     |
+| `PASS`  | `"pass"`  | No failures or errors; not all steps skipped (or empty) |
 | `FAIL`  | `"fail"`  | At least one step failed and none errored          |
 | `ERROR` | `"error"` | At least one step errored                          |
 | `SKIP`  | `"skip"`  | All steps were skipped                             |
