@@ -15,7 +15,7 @@ Tasks provide several key benefits for managing evaluation workflows:
 - **Priority management** - Set the priority of the task based on the importance of the work to be done
 - **Team collaboration** - Distribute work among team members based on their expertise
 - **Traceability** - Track and change the status of the task and when work is completed
-- **Dataset reliability** - Prevent biased evaluation metrics by ensuring conversations are properly reviewed
+- **Dataset reliability** - Prevent biased evaluation metrics by ensuring scenarios are properly reviewed
 - **Workflow control** - Manage the review process systematically without missing any evaluations
 
 This feature is particularly useful when you need to:
@@ -33,7 +33,7 @@ The annotation workflow involves two distinct personas with different responsibi
 
 - Reviews test results from evaluation runs or tasks
 - Understands check results and failure reasons
-- Reviews conversation flow and metadata
+- Reviews the interaction flow and metadata
 - Takes action: closes tasks if results are acceptable, or assigns modification work to the product owner
 
 **Product Owner Persona (Modification Workflow):**
@@ -62,7 +62,7 @@ The Hub UI provides a comprehensive overview of all your tasks, including:
 You can create tasks from two main sources: evaluation runs and scan results. Tasks help you track and assign work items to the appropriate team members.
 
 :::tip
-Tasks can be linked to scenarios (conversations) from datasets. For information on creating and managing datasets, see [Datasets](/hub/ui/datasets).
+Tasks can be linked to scenarios from datasets. For information on creating and managing datasets, see [Datasets](/hub/ui/datasets).
 :::
 
 :::tip
@@ -164,18 +164,18 @@ Set the task priority level to help team members focus on the most important wor
 
 ### Draft/undraft
 
-An important feature related to tasks is the ability to set conversations to draft. This workflow ensures that:
+An important feature related to tasks is the ability to set scenarios to draft. This workflow ensures that:
 
-- Conversations set to draft are:
+- Scenarios set to draft are:
   - Not reused in subsequent evaluation runs until they are ready
   - Excluded from dashboards, reports, scheduled runs, and success rates--keeping production metrics clean while you experiment
   - Helping to maintain unbiased evaluation metrics
   - Ensuring quality control is upheld throughout the review process
 
-When you go to the conversation linked to an evaluation run and create a task, you can set the linked failed scenario to draft status. Before using it again, you need to resolve all associated tasks.
-Similarly, you can select a conversation from a dataset and set it to draft status.
+When you go to the scenario linked to an evaluation run and create a task, you can set it to draft status. Before using it again, you need to resolve all associated tasks.
+Similarly, you can select a scenario from a dataset and set it to draft status.
 
-![Draft status toggle excluding conversation from evaluations](/_static/images/hub/tasks-draft.png)
+![Draft status toggle excluding scenario from evaluations](/_static/images/hub/tasks-draft.png)
 
 ## Follow the review process
 
@@ -185,7 +185,7 @@ Once tasks are created, follow the review process:
 2. **Add your input** - Provide feedback, comments, or additional context in the description of the task
 3. **Assign the right people** - Make sure the task is assigned to the appropriate team members
 4. **Close the task** - When the work is complete
-5. **Undraft the conversation** - Once all tasks are resolved, you can undraft the conversation to make it available for future evaluation runs
+5. **Undraft the scenario** - Once all tasks are resolved, you can undraft the scenario to make it available for future evaluation runs
 
 :::tip
 You can find a full example of the review process in the [Modify scenarios](/hub/ui/annotate/modify-scenarios) documentation.
@@ -231,7 +231,7 @@ To add a comment:
 - **Set clear priorities** - Use task priorities to help team members focus on the most important work first
 - **Provide detailed descriptions** - Include enough context in task descriptions so assignees understand what needs to be done
 - **Assign appropriately** - Match tasks to team members based on their expertise (DS for technical issues, business experts for domain knowledge, etc.)
-- **Resolve before publishing** - Always resolve all tasks before undrafting conversations to maintain dataset quality
+- **Resolve before publishing** - Always resolve all tasks before undrafting scenarios to maintain dataset quality
 - **Regular review** - Check task status regularly to ensure the review process is progressing
 
 ## Next steps
