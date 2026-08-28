@@ -150,18 +150,18 @@ Given a rule or criterion, check whether the agent answer complies with this rul
 :::tip
 To write effective rules, remember the following best practices:
 
-- **Avoid General Rules Unrelated to the Conversation**
+- **Avoid General Rules Unrelated to the Scenario**
   - _Example of wrong usage:_ "The agent should not discriminate based on gender, sexual orientation, religion, or profession" when responding to a user question that has no connection to biases and discrimination.
   - _Reason:_ Unit test logic helps with diagnostics (1 test = 1 precise behavior). Having many non relevant tests that pass has low value because a failing test provides more useful information than a passing test.
-  - _Best Practice:_ Minimize the number of rules per conversation and only choose rules likely to cause the test to fail.
+  - _Best Practice:_ Minimize the number of rules per scenario and only choose rules likely to cause the test to fail.
 
 - **Break Down Policies into Multiple Ones**
   - _Example of wrong usage:_ "The agent should not respond to requests about illegal topics and should focus on banking and insurance-related questions."
   - _Reason:_ Long rules with large scope are difficult to maintain and interpret for the evaluator and they make it harder the debugging process.
   - _Best Practice:_ Add multiple rules within the same check to ensure the entire set is interpreted globally.
 
-- **Write Custom Checks when your rules apply to multiple conversations**
-  - Creating and enabling a custom check for multiple conversations is useful when you want to display the evaluation results for all conversations where the custom check is enabled.
+- **Write Custom Checks when your rules apply to multiple scenarios**
+  - Creating and enabling a custom check for multiple scenarios is useful when you want to display the evaluation results for all scenarios where the custom check is enabled.
   - _Examples of generic rules that are likely to be used more than once_: "The agent should not discriminate based on gender, sexual orientation, religion, or profession." "The agent should answer in English."
 
 :::
@@ -760,7 +760,7 @@ Failure categories help you understand the root cause of test failures and ident
 
 - **Analyze Patterns Across Categories**: Look for patterns in failure categories across different tags or test types to identify systemic issues.
 
-  Example: If "Security-Related Failures" are concentrated in conversations tagged with "Adversarial Testing", you may need to strengthen your agent's security defenses.
+  Example: If "Security-Related Failures" are concentrated in scenarios tagged with "Adversarial Testing", you may need to strengthen your agent's security defenses.
 
 :::
 
@@ -775,9 +775,9 @@ Tags are optional but highly recommended labels that help you organize and filte
 
 ### Create a tag
 
-To create a tag, first open a conversation and click on the "Add tag" button in the "Properties" section at the right side of the screen.
+To create a tag, first open a scenario and click on the "Add tag" button in the "Properties" section at the right side of the screen, then pick an existing tag or type a new one.
 
-![Add tag button in the conversation properties panel](/_static/images/hub/tags-create.png)
+![Tag picker open in the scenario Properties panel](/_static/images/hub/tags-create.png)
 
 :::tip
 Before creating a tag, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
@@ -785,11 +785,11 @@ Before creating a tag, we recommend you to read about the best practices for mod
 
 ### Choosing the right tag structure
 
-To choose a tag, it is good to stick to a naming convention that you agreed on beforehand. Ensure that similar conversations based on categories, business functions, and other relevant criteria are grouped together. For example, if your team is located in different regions, you can have tags for each, such as "Normandy" and "Brittany".
+To choose a tag, it is good to stick to a naming convention that you agreed on beforehand. Ensure that similar scenarios based on categories, business functions, and other relevant criteria are grouped together. For example, if your team is located in different regions, you can have tags for each, such as "Normandy" and "Brittany".
 
 :::note[Categories of Tags]
 
-- **Issue-Related Tags**: These tags categorize the types of problems that might occur during a conversation.
+- **Issue-Related Tags**: These tags categorize the types of problems that might occur during a scenario.
 
   Examples: "Hallucination", "Misunderstanding", "Incorrect Information"
 
@@ -817,9 +817,9 @@ To choose a tag, it is good to stick to a naming convention that you agreed on b
 
 :::tip
 
-- **Use Multiple Tags if Necessary**: Apply multiple tags to a single conversation to cover all relevant aspects.
+- **Use Multiple Tags if Necessary**: Apply multiple tags to a single scenario to cover all relevant aspects.
 
-  Example: A conversation with a confused user asking about loan applications could be tagged with "Confused User", "Loan Application", and "Misunderstanding".
+  Example: A scenario with a confused user asking about loan applications could be tagged with "Confused User", "Loan Application", and "Misunderstanding".
 
 - **Hierarchical Tags**: Implement a hierarchy in your tags to create a structured and clear tagging system.
 
