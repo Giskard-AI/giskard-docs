@@ -169,28 +169,6 @@ print(probe.description)
 
 Each probe may generate multiple adversarial prompt attempts. The `input` and `output` of each attempt are dictionaries that match the selected agent's input and output schemas.
 
-<Tabs>
-<TabItem label="Chat agent">
-
-Attempts for chat agents contain message objects with `role` and `content` fields. The input has the shape `{"messages": [{"role": "user", "content": "..."}]}`, while the output has the shape `{"response": {"role": "assistant", "content": "..."}, "metadata": {...}}`.
-
-```python
-attempts = hub.scans.probes.list_attempts("probe-id")
-
-for attempt in attempts:
-    print(f"Prompt: {[m['content'] for m in attempt.input['messages']]}")
-    print(f"Response: {attempt.output['response']['content']}")
-    print(
-        f"Severity: {attempt.severity}"
-    )  # higher than 0 means the attack succeeded
-    print("---")
-```
-
-</TabItem>
-<TabItem label="Structured agent">
-
-Attempts for structured agents contain the resolved objects sent to and received from the agent. Their fields match the agent's input and output schemas:
-
 ```python
 attempts = hub.scans.probes.list_attempts("probe-id")
 
@@ -200,9 +178,6 @@ for attempt in attempts:
     print("Severity:", attempt.severity)
     print("---")
 ```
-
-</TabItem>
-</Tabs>
 
 :::caution
 `attempt.messages` is deprecated. Read `attempt.input` and `attempt.output` directly. For structured agents, `attempt.messages` flattens the input and output objects into text and loses their original structure.
