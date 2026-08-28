@@ -1,6 +1,6 @@
 ---
 title: "Checks Input Generators"
-description: "Input generators for dynamic test data — UserSimulator, LLMGenerator, and custom InputGenerator subclasses."
+description: "Input generators for dynamic test data: UserSimulator, LLMGenerator, DatasetInputGenerator, and custom InputGenerator subclasses."
 sidebar:
   order: 6
 ---
@@ -141,6 +141,39 @@ gen = LLMGenerator(prompt_path="giskard.scan::scenarios/llm01_injection.j2")
 ```
 
 Use `UserSimulator` for a multi-turn persona. Use `LLMGenerator` when you need a custom prompt.
+
+</ResourceSection>
+
+---
+
+## `DatasetInputGenerator`
+
+<ResourceSection description="Yield a fixed dataset prompt as the next target input.">
+
+**Module:** `giskard.checks.generators.dataset` (also exported from `giskard.checks`)
+
+Registered kind: `"dataset_input"`.
+
+<Property name="prompt" type="str" required>
+  Fixed dataset prompt, used verbatim. Must be non-empty (`min_length=1`).
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  LLM used only when the target input type is structured (not `str`). Unused when the input type is `str`. `None` resolves to `get_default_generator()` at use time.
+</Property>
+
+For a `str` target the prompt is yielded as-is (no LLM). For a structured target the prompt is injected into an LLM-resolved, schema-only template; the LLM never sees the prompt itself.
+
+```python
+from giskard.checks import DatasetInputGenerator, Scenario
+
+gen = DatasetInputGenerator(
+    prompt="What is the monthly fee on my current account?"
+)
+
+scenario = Scenario("dataset_row").interact(
+    inputs=gen, outputs=lambda inputs: f"Received: {inputs}"
+)
+```
 
 </ResourceSection>
 
@@ -301,6 +334,6 @@ Each run can generate different messages. Compare results as examples, not a fix
 
 ## See also
 
-- [Core API](/oss/checks/reference/core) -- Trace, Interaction, and InteractionSpec
+- [Core API](/oss/checks/reference/core) -- Trace, Interaction, InteractionSpec, and mixins
 - [Scenarios](/oss/checks/reference/scenarios) -- Building multi-step test workflows
 - [Built-in Checks](/oss/checks/reference/checks) -- Validation checks for generated interactions

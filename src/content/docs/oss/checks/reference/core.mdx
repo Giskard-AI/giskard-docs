@@ -1,6 +1,6 @@
 ---
 title: Core API
-description: "Base classes and fundamental types of Giskard Checks: Check, CheckResult, Trace, Interaction, Scenario, and how to create custom checks."
+description: "Base classes and types of Giskard Checks: Check, Trace, mixins, InteractionGenerationError, Scenario, and how to create custom checks."
 sidebar:
   order: 2
 ---
@@ -64,6 +64,34 @@ class RetrievalConfidence(Check):
 :::tip[Best Practice]
 Use the `@Check.register()` decorator to make your check discoverable and enable polymorphic serialization. This allows checks to be saved, loaded, and shared across your testing suite.
 :::
+
+---
+
+## `WithGeneratorMixin`
+
+**Module:** `giskard.checks.core.mixin` (also exported from `giskard.checks`)
+
+Public mixin for custom checks and generators that call an LLM. `BaseLLMCheck`, `LLMGenerator`, `UserSimulator`, and `DatasetInputGenerator` include it. When `generator` is omitted, `_generator` resolves to `get_default_generator()` at use time (not at construction), so a later `set_default_generator()` is visible.
+
+<TypeTable name="WithGeneratorMixin">
+  <Property name="generator" type="BaseGenerator | None" defaultValue="None">
+    Generator for LLM evaluation. `None` uses the process-wide default.
+  </Property>
+</TypeTable>
+
+---
+
+## `WithEmbeddingMixin`
+
+**Module:** `giskard.checks.core.mixin` (also exported from `giskard.checks`)
+
+Public mixin for custom checks that embed text. `SemanticSimilarity` includes it. When `embedding_model` is omitted, `_embedding_model` resolves to `get_default_embedding_model()` at use time.
+
+<TypeTable name="WithEmbeddingMixin">
+  <Property name="embedding_model" type="BaseEmbeddingModel | None" defaultValue="None">
+    Embedding model. `None` uses the process-wide default.
+  </Property>
+</TypeTable>
 
 ---
 
@@ -223,6 +251,12 @@ Immutable history of all interactions in a scenario. Passed to checks for valida
   </Property>
 </TypeTable>
 
+<MethodCard name="Trace.for_target()" returnType="Trace">
+  Class method that returns an empty trace whose type is inferred from `target`. When the type cannot be inferred, it returns an empty instance of the class it is called on.
+
+  <Property name="target" type="Target" required>Callable whose input, output, and trace types are inferred.</Property>
+</MethodCard>
+
 ```python
 from giskard.checks import Check, CheckResult, Trace
 
@@ -250,6 +284,30 @@ Pass `trace_type=YourTrace` on [`Scenario`](/oss/checks/reference/scenarios) whe
 ### Rich rendering
 
 The default `Trace.__rich_console__` prints each interaction under a titled rule. Override it on a subclass for conversation-style or domain-specific layouts. [`ScenarioResult.print_report()`](/oss/checks/reference/scenarios/#scenarioresult) renders `final_trace` with Rich using that protocol when the stored trace implements it.
+
+`Trace.with_interaction()` and `Trace.with_interactions()` raise [`InteractionGenerationError`](#interactiongenerationerror) when a generator fails, with completed progress in `partial_trace` and the original error chained as `__cause__`.
+
+---
+
+## `InteractionGenerationError`
+
+**Module:** `giskard.checks.core.exceptions` (also exported from `giskard.checks`)
+
+Raised when an interaction generator fails. The error that stopped the generator is chained as `__cause__`.
+
+<TypeTable name="InteractionGenerationError">
+  <Property name="partial_trace" type="Trace">
+    Trace containing every interaction completed before the failure.
+  </Property>
+</TypeTable>
+
+```python
+from giskard.checks import InteractionGenerationError
+
+
+def progress_from(error: InteractionGenerationError):
+    return error.partial_trace, error.__cause__
+```
 
 ---
 
@@ -300,7 +358,7 @@ scenario = (
 
 **Module:** `giskard.checks.core.scenario`
 
-Ordered sequence of interaction specs and checks with shared trace. Provides a fluent API for building multi-step test workflows.
+Ordered sequence of interaction specs and checks with shared trace. Provides a fluent API for building multi-step test workflows. Tags are set with `.with_tags()`; the full constructor, including `tags`, is on [Scenarios](/oss/checks/reference/scenarios).
 
 <MethodCard name=".interact()" returnType="self">
   Add an interaction spec to the scenario.
