@@ -1,6 +1,6 @@
 ---
 title: "Setup projects"
-description: "Create and switch projects in Giskard Hub. Organize agents, datasets, and scans in a dedicated workspace."
+description: "Create and switch projects in Giskard Hub, then open project settings to organize agents, datasets, scans, and team access in a dedicated workspace."
 sidebar:
   order: 2
 ---
