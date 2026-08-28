@@ -11,7 +11,7 @@ tableOfContents:
 You can create scenarios manually for fine-grained control. This is particularly useful when you want to create scenarios with full control over the scenario creation process. There are two ways to manually create scenarios:
 
 - **Manual in a dataset:** You create both the user questions and the expected responses yourself.
-- **Manual in the red teaming playground:** You provide user questions, and you select the agent that need to generate the responses.
+- **Manual in the red teaming playground:** You provide user questions, and you select the agent that needs to generate the responses.
 
 In this section, we will walk you through both and show how to create scenarios manually.
 

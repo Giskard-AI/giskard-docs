@@ -64,7 +64,7 @@ Once you click on "Generate," you receive a dataset where:
 - The **correctness check** is initially disabled, but the expected answer (reference output) is automatically prefilled by the Hub. To evaluate your agent with the correctness check, you can enable it manually for individual scenarios or in bulk by selecting multiple scenarios in the Dataset tab and enabling the correctness check for all of them.
 
 :::tip
-For detailed information about checks like groundedness, correctness, conformity, metadata, and semantic similarity, including examples and how they work, see [Annotation overview](/hub/ui/annotate/overview).
+For detailed information about checks like groundedness, correctness, conformity, metadata, and semantic similarity, including examples and how they work, see [Annotation overview](/hub/ui/annotate/overview#available-checks).
 :::
 
 ## Next steps
