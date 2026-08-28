@@ -8,7 +8,7 @@ sidebar:
 This section guides you through the product owner workflow for modifying scenarios. This workflow is designed for product owners and technical team members who need to refine scenarios, adjust validation rules, and structure datasets based on review feedback.
 
 :::tip
-Scenarios (conversations) are part of datasets. For information on creating and managing datasets, see [Datasets](/hub/ui/datasets).
+Scenarios are part of datasets. For information on creating and managing datasets, see [Datasets](/hub/ui/datasets).
 :::
 
 :::tip
@@ -36,7 +36,7 @@ Setting a scenario to draft status:
 
 To draft a scenario:
 
-1. Open the scenario (conversation) you want to draft
+1. Open the scenario you want to draft
 2. Set it to draft status using the draft toggle or option
 3. The scenario will be excluded from future evaluation runs until it is undrafted
 
@@ -63,7 +63,7 @@ After modifying a scenario or its checks, you should rerun it to validate your c
 
 **When to rerun:**
 
-- After modifying the conversation structure
+- After modifying the interactions structure
 - After updating the answer example
 - After enabling or disabling checks
 - After modifying check requirements
@@ -75,7 +75,7 @@ The **Run scenario** button sits in the fixed toolbar at the top of the scenario
 
 ![Run scenario button in the fixed toolbar above the interactions list](/_static/images/hub/scenario-run-scenario-button.png)
 
-Clicking it regenerates the trace for every interaction and then runs all of their checks. Use it when you've changed the conversation itself, or when you want a full, up-to-date result across every check.
+Clicking it regenerates the trace for every interaction and then runs all of their checks. Use it when you've changed the scenario itself, or when you want a full, up-to-date result across every check.
 
 ### Run check
 
