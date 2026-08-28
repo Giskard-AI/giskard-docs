@@ -8,9 +8,9 @@ sidebar:
 
 import { LinkCard, CardGrid, Steps } from "@astrojs/starlight/components";
 
-The Giskard scan writes the tests for you. Describe your agent in a sentence, and it builds test cases tailored to that description, runs them against your agent, and reports which ones broke it.
+The Giskard scan writes the tests for you. Describe your agent in a sentence, and it builds scenarios tailored to that description, runs them against your agent, and reports which ones broke it.
 
-Most of those test cases are **red teaming**: attacking your own agent on purpose to find out how it fails before a user or an attacker does. For a bank's customer-support agent, that means asking it for investment advice it should refuse, hiding an instruction inside a pasted statement to see if it obeys, or talking it out of its own rules over several turns.
+Most of those scenarios are **red teaming**: attacking your own agent on purpose to find out how it fails before a user or an attacker does. For a bank's customer-support agent, that means asking it for investment advice it should refuse, hiding an instruction inside a pasted statement to see if it obeys, or talking it out of its own rules over several turns.
 
 Two scans ship in the library. `vulnerability_scan` red teams your agent with hostile scenarios. `quality_scan` checks its answers against a knowledge base of your own documents, to catch answers it invented.
 
