@@ -1,16 +1,15 @@
 ---
 title: Agent Skills
-description: "Drop-in skills for Claude Code and other coding agents that automate Giskard workflows."
+description: "Drop-in agent skills for Claude Code, Cursor, and other coding agents that automate Giskard workflows, from test generation to Collibra export."
 ---
 
 import { Badge } from "@astrojs/starlight/components";
 
 **Giskard Agent Skills** are drop-in workflows for coding agents (Claude Code, Cursor, and more), installable via the [`skills` CLI](https://www.npmjs.com/package/skills). Install a skill once and your agent knows how to handle Giskard-specific tasks automatically, no hand-crafted elaborated prompts required.
 
-## Scenario Generator <Badge text="v1.0.0" variant="tip" />
+## Scenario Generator <Badge text="v1.1.0" variant="tip" />
 
 Turns your coding agent into an expert red-teamer for [Giskard Checks](/oss/checks). Describe your agent and the failure modes you worry about, and the skill produces a complete, runnable `giskard.checks` test suite with adversarial scenarios and layered checks.
-
 ```bash
 npx skills add Giskard-AI/giskard-skills --skill scenario-generator
 ```
@@ -23,10 +22,9 @@ My customer support bot available on @support_bot.py must never leak customer PI
 
 [Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/oss/checks/scenario-generator)
 
-## RAG Evaluator <Badge text="v1.0.0" variant="tip" />
+## RAG Evaluator <Badge text="v1.1.0" variant="tip" />
 
 Turns your coding agent into an expert RAG evaluation engineer for [Giskard Checks](/oss/checks). Describe a Q&A bot grounded in documents and the skill produces a quality-focused `giskard.checks` evaluation suite covering groundedness, answer relevance, retrieval quality, hallucination, citation accuracy, and out-of-scope handling.
-
 ```bash
 npx skills add Giskard-AI/giskard-skills --skill rag-evaluator
 ```
@@ -40,6 +38,33 @@ My knowledge-base assistant in @assistant.py answers questions from documents un
 This skill is **quality-focused**. For adversarial or red-teaming evaluation, use [Scenario Generator](#scenario-generator) instead. The two are complementary and most RAG projects benefit from both.
 
 [Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/oss/checks/rag-evaluator)
+
+## Giskard to Collibra <Badge text="v1.0.0" variant="tip" />
+
+Exports Giskard Hub scan results into [Collibra AI Governance ↗](https://www.collibra.com/products/ai-governance). The skill finds the scan in [Giskard Hub](/hub/ui), creates or updates the AI Agent asset hierarchy in Collibra (re-runs are idempotent), and pushes per-probe pass/fail metrics to the Quality tab. It requires a Collibra instance with AI Governance.
+
+```bash
+npx skills add Giskard-AI/giskard-skills --skill giskard-to-collibra
+```
+
+It activates on prompts like _"export my scan to Collibra"_, _"push results to Collibra"_, or _"send the latest scan of this project to Collibra"_. For example:
+
+```text title="Sample prompt" wrap
+Retrieve the latest scan of the Zephyr project and send it to Collibra.
+```
+
+[Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/integrations/giskard-to-collibra)
+
+## Install as a Claude Code plugin
+
+The repository also works as a [Claude Code plugin ↗](https://code.claude.com/docs/en/plugins). Clone it and start Claude Code with the `--plugin-dir` flag:
+
+```bash
+git clone https://github.com/Giskard-AI/giskard-skills
+claude --plugin-dir ./giskard-skills
+```
+
+Once Claude Code is running, use the `/giskard-skills` command to list the available skills.
 
 ---
 
