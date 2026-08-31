@@ -1,21 +1,23 @@
 ---
-title: "Understand metrics, failure categories and tags"
-description: "Organize and analyze test cases using tags, metrics, and failure categories. Structure datasets and interpret LLM evaluation results."
+title: "Metrics, failure categories and tags"
+description: "Organize and analyze scenarios using tags, metrics, and failure categories. Structure datasets and interpret LLM evaluation results."
 sidebar:
   order: 2
+tableOfContents:
+  maxHeadingLevel: 5
 ---
 
-This page provides an overview of the key concepts for organizing and analyzing your test cases: **metrics**, **failure categories**, and **tags**. Understanding these concepts helps you structure your test datasets, interpret evaluation results, and prioritize improvements to your AI agent.
+This page provides an overview of the key concepts for organizing and analyzing your scenarios: **metrics**, **failure categories**, and **tags**. Understanding these concepts helps you structure your test datasets, interpret evaluation results, and prioritize improvements to your AI agent.
 
 1. **Metrics** provide quantitative measurements showing how well your agent performs on different checks
 2. **Failure categories** help you understand the root causes of failures and prioritize fixes for each category
-3. **Tags** help you organize and filter your test cases by business context, user type, or scenario
+3. **Tags** help you organize and filter your scenarios by business context, user type, or prompt preset
 
 By combining these three concepts, you can:
 
 - Understand which checks (metrics) are failing most often
 - Determine the root causes (failure categories) of those failures
-- Identify which types of test cases (tags) have the highest failure rates
+- Identify which types of scenarios (tags) have the highest failure rates
 - Prioritize fixes for each failure category
 
 You can then focus on improving your agent's compliance with business rules specifically for customer support scenarios.
@@ -26,47 +28,91 @@ Metrics provide quantitative measurements of your agent's performance across dif
 
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/VLejoLvDy-o?si=FXzYphE06Oi1fiBH" title="How to create and configure evaluation checks in Giskard Hub" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-### Create a check
+### Configure a built-in check
 
-To create a check, click on the "Create a new check" button in the upper right corner of the screen.
+#### Add a check
 
-![Checks page with create new check button](/_static/images/hub/checks-create.png)
+Within an existing or new scenario, click on the "Add check" button.
+
+![Interaction with no check yet, showing the Add check button](/_static/images/hub/checks-built-in-creation-placeholder.png)
+
+Pick a built-in check from the list. Any custom checks you created earlier also appear here under **User checks**, but their parameters are fixed at creation time, so the configuration steps below apply to built-in checks only.
+
+![Add checks dialog listing available built-in and custom checks](/_static/images/hub/checks-built-in-pick.png)
 
 After, you can configure the check parameters which depends on the check type. This will look something like this:
 
-![Check configuration form with type and parameter fields](/_static/images/hub/checks-create-configure.png)
+![Correctness check configured with an expected response and target key](/_static/images/hub/checks-built-in-created.png)
 
-:::tip
-Before creating or changing a check, we recommend you to read about the best practices for modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+Once configured, save the scenario to make sure the check configuration is saved. The full list of check configuration parameters can be found below.
+
+#### Target key
+
+`Target key` is a path that links the check to the specific field of the trace it should evaluate.
+
+- For **chat agents**, the target key defaults to the assistant's response, since that's the field checks most commonly need to evaluate.
+- For **structured agents**, the target key has no default: the Hub can't know in advance which field of your custom output schema the check should read, so you need to set it yourself.
+
+Click the field to open a dropdown listing the paths available in the connected agent's trace schema. Picking one fills in the path for you; you can still fine-tune it afterward, for example to add a specific array index.
+
+:::note
+Not every check has a `Target key`. Whether one is available depends on the check type (see the parameter table for each check below).
 :::
 
-After configuring the check parameters, you can save the check by clicking on the "Save" button in the upper right corner of the screen. A full check configuration paramters can be found below.
+#### Value or key mode
+
+Some parameters can be set to either a static value or a dynamic trace path. Toggle between **Value** and **Key** next to the field: **Value** treats your input as a literal value; **Key** treats it as a target-key-style path, so the check reads that value from the trace at evaluation time instead of using a fixed literal.
+
+![Expected value field with a toggle between Value and Key mode](/_static/images/hub/checks-value-key-toggle.png)
+
+This toggle is only available on specific parameters where comparing against a dynamic trace value makes sense. It's not present on every field.
+
+#### Save the check
+
+After configuring the check parameters, you can save the check by clicking on the "Save" button in the upper right corner of the screen.
+
+:::tip
+Before creating or changing a check, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
+:::
 
 ### Available checks
 
-#### Correctness
+#### Built-in checks
+
+##### Correctness
 
 Check whether all information from the reference answer is present in the agent answer without contradiction. Unlike the groundedness check, the correctness check is sensitive to omissions but tolerant of additional information in the agent's answer.
 
-:::note[Example]
-**Query**: What is the capital of France?
+| Parameter           | Type  | Description                        |
+| ------------------- | ----- | ---------------------------------- |
+| `Expected response` | `str` | The expected agent response        |
+| `Target key`        | `str` | Trace path of the value under test |
 
-**Reference Answer**: Paris is the capital of France, it was founded around 200 BC.
+::::note[Example]
+**Input**: What is the capital of France?
 
-**Failure examples**:
+---
+
+![Correctness check configured with an expected response](/_static/images/hub/checks-example-correctness.png)
+
+:::caution[Failure examples]
 
 - The capital of France is Paris.
   - _Reason: The answer does not specify when the city of Paris was founded_
-
 - The capital of France is Paris, it was founded in 200 AD.
   - _Reason: The answer contradicts the reference which states that Paris was founded around 200 BC, and not 200 AD_
 
-**Success example**:
+:::
+
+:::tip[Success example]
 
 - The capital of France is Paris, the first settlement dates from 200 BC.
-  :::
 
-#### Conformity
+:::
+
+::::
+
+##### Conformity (Hub)
 
 Given a rule or criterion, check whether the agent answer complies with this rule. This can be used to check business specific behavior or constraints. A conformity check may have several rules. Each rule should check a unique and unambiguous behavior. Here are a few examples of rules:
 
@@ -74,139 +120,565 @@ Given a rule or criterion, check whether the agent answer complies with this rul
 - The agent should only answer in English.
 - The agent should always keep a professional tone.
 
-:::note[Example]
-**Query**: Should I invest in bitcoin to save for a flat?
+| Parameter    | Type        | Description                                |
+| ------------ | ----------- | ------------------------------------------ |
+| `Rules`      | `list[str]` | One or more rules the response must follow |
+| `Target key` | `str`       | Trace path of the value under test         |
 
-**Rule**: The agent should not give any financial advice or personalized recommendations.
+::::note[Example]
+**Input**: Should I invest in bitcoin to save for a flat?
 
-**Failure example**:
+---
+
+![Conformity (Hub) check configured with a rule](/_static/images/hub/checks-example-conformity-hub.png)
+
+:::caution[Failure example]
 
 - You should definitely invest into bitcoin in addition to your saving plan, since you want to buy a flat quickly, the yield is much higher with bitcoin.
   - _Reason: The agent answer contradicts the rule which states that the agent should not give any financial advice or personalized recommendations._
 
-**Success example**:
+:::
+
+:::tip[Success example]
 
 - I'm sorry, I cannot give you specific financial advice, to get personalized recommandation I suggest that you contact our dedicated customer service.
-  :::
+
+:::
+
+::::
 
 :::tip
 To write effective rules, remember the following best practices:
 
-- **Avoid General Rules Unrelated to the Conversation**
+- **Avoid General Rules Unrelated to the Scenario**
   - _Example of wrong usage:_ "The agent should not discriminate based on gender, sexual orientation, religion, or profession" when responding to a user question that has no connection to biases and discrimination.
   - _Reason:_ Unit test logic helps with diagnostics (1 test = 1 precise behavior). Having many non relevant tests that pass has low value because a failing test provides more useful information than a passing test.
-  - _Best Practice:_ Minimize the number of rules per conversation and only choose rules likely to cause the test to fail.
+  - _Best Practice:_ Minimize the number of rules per scenario and only choose rules likely to cause the test to fail.
 
 - **Break Down Policies into Multiple Ones**
   - _Example of wrong usage:_ "The agent should not respond to requests about illegal topics and should focus on banking and insurance-related questions."
   - _Reason:_ Long rules with large scope are difficult to maintain and interpret for the evaluator and they make it harder the debugging process.
   - _Best Practice:_ Add multiple rules within the same check to ensure the entire set is interpreted globally.
 
-- **Write Custom Checks when your rules apply to multiple conversations**
-  - Creating and enabling a custom check for multiple conversations is useful when you want to display the evaluation results for all conversations where the custom check is enabled.
+- **Write Custom Checks when your rules apply to multiple scenarios**
+  - Creating and enabling a custom check for multiple scenarios is useful when you want to display the evaluation results for all scenarios where the custom check is enabled.
   - _Examples of generic rules that are likely to be used more than once_: "The agent should not discriminate based on gender, sexual orientation, religion, or profession." "The agent should answer in English."
 
 :::
 
-#### Groundedness
+##### Groundedness (Hub)
 
 Check whether all information from the agent's answer is present in the given context without contradiction. Unlike the correctness check, the groundedness check is tolerant of omissions but sensitive to additional information in the agent's answer. The groundedness check is useful for detecting potential hallucinations in the agent's answer.
 
-:::note[Example]
-**Query**: Who was the first person to climb Mount Everest?
+| Parameter    | Type  | Description                                              |
+| ------------ | ----- | -------------------------------------------------------- |
+| `Context`    | `str` | The reference context the response should be grounded in |
+| `Target key` | `str` | Trace path of the value under test                       |
 
-**Reference Context**: Sir Edmund Hillary, a New Zealand mountaineer, became famous for being one of the first people to reach the summit of Mount Everest with Tenzing Norgay on May 29, 1953.
+::::note[Example]
+**Input**: Who was the first person to climb Mount Everest?
 
-**Failure examples**:
+---
+
+![Groundedness (Hub) check configured with a context](/_static/images/hub/checks-example-groundedness-hub.png)
+
+:::caution[Failure examples]
 
 - Edmund Hillary, born in 1919, was a great mountaineer who climb Mount Everest first.
   - _Reason: The reference context does not specify that Hillary was born in 1919_
-
 - Edmund Hillary reached the summit of Mount Everest in 1952.
   - _Reason: The reference context states that Hillary reached the summit of Mount Everest in 1953, and not in 1952_
 
-**Success examples**:
+:::
+
+:::tip[Success examples]
 
 - Edmund Hillary was the first person to reach the summit of Mount Everest in 1953.
 - Edmund Hillary, a renowned New Zealander, gained fame as one of the first climbers to summit Mount Everest alongside Tenzing Norgay on May 29, 1953.
-  :::
 
-#### String Matching
+:::
 
-Check whether the given keyword or sentence is present in the agent answer.
+::::
 
-:::note[Example]
-**Keyword**: "Hello"
+##### LLM Judge
 
-**Failure example**:
+Evaluate the interaction with a custom prompt. The prompt is a Jinja2 template with access to the trace (use `trace.last` for the most recent interaction); the judge returns pass or fail with a reason.
+
+| Parameter | Type  | Description                                     |
+| --------- | ----- | ----------------------------------------------- |
+| `Prompt`  | `str` | Jinja2 prompt template referencing trace values |
+
+::::note[Example]
+**Input**: When will my order arrive?
+
+---
+
+![LLM Judge check configured with a prompt](/_static/images/hub/checks-example-llm-judge.png)
+
+:::caution[Failure example]
+
+- Your order will arrive by Friday, guaranteed.
+  - _Reason: The answer commits to a specific delivery date, which the prompt asks the agent to avoid_
+
+:::
+
+:::tip[Success example]
+
+- Delivery times vary by location; you can track your order status from your account page.
+
+:::
+
+::::
+
+:::tip[Inserting trace paths into the prompt]
+The bracket button next to the `Prompt` field opens a list of paths available in the selected agent's trace schema. Click one to insert its Jinja2 expression at the cursor position, instead of typing it out by hand.
+:::
+
+##### Conformity
+
+The raw giskard-checks variant of conformity. Judges the full trace against a single natural-language rule. Uses an LLM judge.
+
+| Parameter | Type  | Description                       |
+| --------- | ----- | --------------------------------- |
+| `Rule`    | `str` | The rule the trace must adhere to |
+
+::::note[Example]
+**Input**: How much does this item cost, and how do you calculate that price?
+
+---
+
+![Conformity check configured with a rule](/_static/images/hub/checks-example-conformity.png)
+
+:::caution[Failure example]
+
+- Our standard markup is 40% over wholesale cost, so I can offer you this item at $65.
+  - _Reason: The answer discloses the internal pricing rule, which the rule states the agent must never do_
+
+:::
+
+:::tip[Success example]
+
+- I'm not able to share our internal pricing structure, but I can confirm the final price is $65.
+
+:::
+
+::::
+
+##### Groundedness
+
+The raw giskard-checks variant of groundedness. Instead of a fixed context string, the context and answer can be extracted from configurable trace paths, which is useful when your agent returns its retrieved context in the response. Uses an LLM judge.
+
+| Parameter     | Type        | Description                            |
+| ------------- | ----------- | -------------------------------------- |
+| `Context key` | `JSON path` | Trace path to extract the context from |
+| `Target key`  | `str`       | Trace path of the value under test     |
+
+::::note[Example]
+**Input**: Can I return a clearance item?
+
+---
+
+![Groundedness check configured with a context key](/_static/images/hub/checks-example-groundedness.png)
+
+:::caution[Failure example]
+
+- Our return window is 30 days, and clearance items can also be returned within that window.
+  - _Reason: The retrieved chunks state that clearance items are not eligible for returns, so this answer contradicts the context_
+
+:::
+
+:::tip[Success example]
+
+- Our return window is 30 days. Please note that clearance items are not eligible for returns.
+
+:::
+
+::::
+
+##### Contradiction
+
+Checks that the response does not directly contradict a reference context. Omissions and unsupported additions are tolerated unless they conflict with the context. Uses an LLM judge.
+
+| Parameter    | Type  | Description                         |
+| ------------ | ----- | ----------------------------------- |
+| `Context`    | `str` | Reference context provided directly |
+| `Target key` | `str` | Trace path of the value under test  |
+
+::::note[Example]
+**Input**: Can I get more time to return this item?
+
+---
+
+![Contradiction check configured with a context](/_static/images/hub/checks-example-contractiction.png)
+
+:::caution[Failure example]
+
+- We can make an exception and extend your return window to 60 days for this order.
+  - _Reason: The answer contradicts the context, which states the return window is 30 days_
+
+:::
+
+:::tip[Success example]
+
+- Unfortunately we can't extend your return window beyond the standard 30 days, but I can help troubleshoot the issue instead.
+
+:::
+
+::::
+
+##### Toxicity
+
+Checks that the response does not contain toxic, harmful, or offensive content. Uses an LLM judge.
+
+| Parameter    | Type        | Description                                                                                                   |
+| ------------ | ----------- | ------------------------------------------------------------------------------------------------------------- |
+| `Categories` | `list[str]` | Safety categories to check: `hate_speech`, `harassment`, `threats`, `self_harm`, `sexual_content`, `violence` |
+
+::::note[Example]
+**Input**: This service is terrible and I'm never using it again.
+
+---
+
+![Toxicity check configured with safety categories](/_static/images/hub/checks-example-toxicity.png)
+
+:::caution[Failure example]
+
+- If you don't stop bothering us, we'll make sure you regret it.
+  - _Reason: The answer contains a threat, which falls under the `threats` category_
+
+:::
+
+:::tip[Success example]
+
+- I understand your frustration, let's find a solution together.
+
+:::
+
+::::
+
+##### Answer Relevance
+
+Checks that the response directly and appropriately addresses the user question. Uses an LLM judge.
+
+| Parameter    | Type  | Description                                                       |
+| ------------ | ----- | ----------------------------------------------------------------- |
+| `Question`   | `str` | The question to evaluate relevance against                        |
+| `Context`    | `str` | Optional domain context describing the chatbot's purpose or scope |
+| `Target key` | `str` | Trace path of the value under test                                |
+
+::::note[Example]
+**Input**: How do I reset my password?
+
+---
+
+![Answer Relevance check configured with a question and context](/_static/images/hub/checks-example-answer-relevance.png)
+
+:::caution[Failure example]
+
+- Our platform supports two-factor authentication for extra security.
+  - _Reason: The answer does not address how to reset a password, which is what the question asked_
+
+:::
+
+:::tip[Success example]
+
+- Go to Account Settings > Security and click "Reset Password", then follow the link sent to your email.
+
+:::
+
+::::
+
+##### Semantic Similarity
+
+Check whether the agent's response is semantically similar to the reference. This is useful when you want to allow for some variation in wording while ensuring the core meaning is preserved. Does **not** use an LLM judge.
+
+| Parameter    | Type    | Description                                   |
+| ------------ | ------- | --------------------------------------------- |
+| `Reference`  | `str`   | The reference text to compare the output with |
+| `Threshold`  | `float` | The threshold for the semantic similarity     |
+| `Target key` | `str`   | Trace path of the value under test            |
+
+::::note[Example]
+**Input**: What is the capital of France?
+
+---
+
+![Semantic Similarity check configured with a reference and threshold](/_static/images/hub/checks-example-semantic-similarity.png)
+
+:::caution[Failure example]
+
+- France is a country in Western Europe known for its cuisine, history, and culture.
+  - _Reason: The answer doesn't name the capital, so its embedding is too far from the reference to meet the threshold_
+
+:::
+
+:::tip[Success example]
+
+- France's capital city is Paris.
+
+:::
+
+::::
+
+##### String Matching
+
+Check whether the given keyword or sentence is present in the agent answer. Does **not** use an LLM judge.
+
+| Parameter    | Type  | Description                                           |
+| ------------ | ----- | ----------------------------------------------------- |
+| `Keyword`    | `str` | The exact text that the agent response should contain |
+| `Target key` | `str` | Trace path of the value under test                    |
+
+::::note[Example]
+**Input**: Hi, I'd like some help please.
+
+---
+
+![String Matching check configured with a keyword](/_static/images/hub/checks-example-string-matching.png)
+
+:::caution[Failure example]
 
 - Hi, can I help you?
   - _Reason: The agent answer does not contain the keyword 'Hello'_
 
-**Success example**:
+:::
+
+:::tip[Success example]
 
 - Hello, how may I help you today?
-  :::
 
-#### Metadata
+:::
+
+::::
+
+##### Regex Matching
+
+Check whether the agent's response matches a regular expression pattern. Does **not** use an LLM judge.
+
+| Parameter    | Type  | Description                          |
+| ------------ | ----- | ------------------------------------ |
+| `Pattern`    | `str` | The regular expression to match with |
+| `Target key` | `str` | Trace path of the value under test   |
+
+::::note[Example]
+**Input**: I have an issue with my last order, can you check on it?
+
+---
+
+![Regex Matching check configured with a pattern](/_static/images/hub/checks-example-regex-matching.png)
+
+:::caution[Failure example]
+
+- Please contact support for more details about your request.
+  - _Reason: The agent answer does not contain a match for the pattern `#\d{5}`_
+
+:::
+
+:::tip[Success example]
+
+- Your ticket #12345 has been created.
+
+:::
+
+::::
+
+##### Comparison Checks
+
+Six rule-based checks compare a value extracted from the trace against an expected value: `equals`, `not_equals`, `greater_than`, `greater_than_equals`, `less_than`, `less_than_equals`. They are the natural fit for structured agent outputs and numeric metadata.
+
+| Parameter        | Type     | Description                        |
+| ---------------- | -------- | ---------------------------------- |
+| `Expected value` | `scalar` | The value to compare against       |
+| `Target key`     | `str`    | Trace path of the value under test |
+
+::::note[Example]
+**Input**:
+
+```json
+{
+  "input": {
+    "confirmed": true,
+    "loan_type": "mortgage",
+    "loan_amount": 250000,
+    "annual_income": 85000
+  }
+}
+```
+
+**Output**:
+
+```json
+{
+  "output": {
+    "message": "We have a mortgage offer available for $250,000 with a 4.5% interest rate over a 30-year term, resulting in a monthly payment of approximately $1,266.71. Please note, a minimum down payment of 20% and property insurance are required to proceed.",
+    "offer": {
+      "eligible": true,
+      "offer_id": "OFF-b7d27ec7",
+      "monthly_payment": 1266.71,
+      "interest_rate": 4.5,
+      "apr": 4.65,
+      "term_months": 360,
+      "total_cost": 456015.6,
+      "total_interest": 206015.6,
+      "conditions": [
+        "Property insurance required",
+        "Down payment of 20% minimum"
+      ]
+    },
+    "status": "offer_generated"
+  },
+  "metadata": {
+    "model": "azure_ai/gpt-4.1-nano"
+  }
+}
+```
+
+Here `Target key` is set to `trace.last.outputs.output.status`, which binds the check to the `status` field of the output above.
+
+---
+
+![Comparison check configured with an expected value](/_static/images/hub/checks-example-comparison-equal.png)
+
+:::caution[Failure example]
+
+- `trace.last.outputs.output.status` resolves to `pending_review`
+  - _Reason: The extracted value does not equal the expected value `offer_generated`_
+
+:::
+
+:::tip[Success example]
+
+- `trace.last.outputs.output.status` resolves to `offer_generated`
+
+:::
+
+::::
+
+##### Metadata
 
 Check whether the agent answer contains the expected value at the specified JSON path. This check is useful to verify that the agent answer contains the expected metadata (e.g. whether a tool is called). The metadata check can be used to check for specific values in the metadata of agent answer, such as a specific date or a specific name.
 
+| Parameter         | Type         | Description                                                                                                                                                  |
+| ----------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `JSON path rules` | `list[dict]` | List of rules, each with a `JSON path`, `Expected value type`, and `Expected value`                                                                          |
+| `Target key`      | `str`        | Trace path to the object the rules run against. For chat agents it defaults to `trace.last.outputs.metadata`; for structured agents you must set it yourself |
+
+Each rule supports:
+
+| Key                   | Type                      | Description                                                                       |
+| --------------------- | ------------------------- | --------------------------------------------------------------------------------- |
+| `JSON path`           | `str`                     | JSON path expression (e.g. `$.category`, `$.tools_called[0]`)                     |
+| `Expected value type` | `str`                     | Type of the expected value: `string (contains the value)`, `number`, or `boolean` |
+| `Expected value`      | `str` / `number` / `bool` | The expected value                                                                |
+
 :::tip
-We recommend using a tool like [json-path-evaluator](https://mockoon.com/tools/json-object-path-evaluator/) to evaluate the JSON path rules.
+We recommend using a tool like [json-path-evaluator](https://mockoon.com/tools/json-object-path-evaluator/) to check that your JSON path expressions resolve to the value you expect.
 :::
 
-:::note[Example - string value]
-**JSON Path rule**: Expecting `John` (string) at `$.user.name`
+:::tip[Matching items without knowing their position]
+When the value you're checking sits inside a list whose order or length can vary (e.g. a list of tool calls), use a filter expression instead of a fixed index. It matches an item by its content rather than its position.
 
-**Failure examples**:
+- `$.tools_called[0].name` only works if the tool is always first.
+- `$.sources[?(@.tool_name=="query_engine")].is_error` matches the entry where `tool_name` equals `query_engine`, wherever it appears in the list.
+
+:::
+
+::::note[Example]
+**Input**: Hi, my name is John, can you look up my account?
+
+---
+
+![Metadata check configured with a JSON path rule](/_static/images/hub/checks-example-metadata-hub.png)
+
+:::caution[Failure example]
 
 - Metadata: `{"user": {"name": "Doe"}}`
   - _Reason: Expected_ `John` _at_ `$.user.name` _but got_ `Doe`
 
-**Success examples**:
+:::
+
+:::tip[Success example]
 
 - Metadata: `{"user": {"name": "John"}}`
-- Metadata: `{"user": {"name": "John Doe"}}`
-  :::
 
-:::note[Example - boolean value]
-**JSON Path rule**: Expecting `true` (boolean) at `$.output.success`
+:::
 
-**Failure examples**:
+::::
 
-- Metadata: `{"output": {"success": false}}`
-  - _Reason: Expected_ `true` _at_ `$.output.success` _but got_ `false`
+:::note
+The JSON path rules are evaluated relative to whatever object `Target key` resolves to, which for chat agents defaults to the agent's response metadata.
+:::
 
-- Metadata: `{"output": {}}`
-  - _Reason: JSON path_ `$.output.success` _does not exist in metadata_
+##### JSON Valid
 
-**Success example**:
+Checks that a value extracted from the trace is valid JSON and, optionally, that it conforms to a JSON Schema. Does **not** use an LLM judge.
 
-- Metadata: `{"output": {"success": true}}`
-  :::
+| Parameter     | Type   | Description                                      |
+| ------------- | ------ | ------------------------------------------------ |
+| `Parse`       | `bool` | Parse the value from a string before validating  |
+| `JSON Schema` | `dict` | JSON Schema the value must conform to (optional) |
+| `Target key`  | `str`  | Trace path of the value under test               |
 
-#### Semantic Similarity
+::::note[Example]
+**Input**: What's the status of ticket #482?
 
-Check whether the agent's response is semantically similar to the reference. This is useful when you want to allow for some variation in wording while ensuring the core meaning is preserved.
+---
 
-:::note[Example]
-**Query**: What is the capital of France?
+![JSON Valid check configured with parse unchecked](/_static/images/hub/checks-example-json-valid.png)
 
-**Reference Answer**: "The capital of France is Paris, which is located in the northern part of the country."
+:::caution[Failure example]
 
-**Threshold**: 0.8
+- Response: `Sure, I can help with that!`
+  - _Reason: The value is not valid JSON_
 
-**Failure example**:
+:::
 
-- The capital of France is Paris, which is located in the southern part of the country.
-  :::
+:::tip[Success example]
 
-#### Custom Checks
+- Response: `{"answer": "Ticket #482 is in progress.", "resolved": false}`
 
-Custom checks are built on top of the built-in checks (Conformity, Correctness, Groundedness, String Matching, Metadata, and Semantic Similarity) and can be used to evaluate the quality of your agent's responses.
+:::
 
-The advantage of custom checks is that they can be tailored to your specific use case and can be enabled on many conversations at once.
+::::
+
+##### Readability
+
+Checks that the response satisfies readability score thresholds for a selected metric. Does **not** use an LLM judge.
+
+| Parameter       | Type    | Description                                                                                                                                              |
+| --------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Metric`        | `str`   | One of `flesch_reading_ease`, `flesch_kincaid_grade`, `gunning_fog`, `automated_readability_index`, `coleman_liau_index`, `dale_chall_readability_score` |
+| `Minimum score` | `float` | Minimum acceptable score (optional)                                                                                                                      |
+| `Maximum score` | `float` | Maximum acceptable score (optional)                                                                                                                      |
+| `Target key`    | `str`   | Trace path of the value under test                                                                                                                       |
+
+::::note[Example]
+**Input**: My app keeps crashing, what should I do?
+
+---
+
+![Readability check configured with a metric and minimum score](/_static/images/hub/checks-example-readability.png)
+
+:::caution[Failure example]
+
+- The recurring termination anomaly you are experiencing is likely attributable to an unresolved memory allocation conflict within the application's runtime environment, necessitating a diagnostic reinstallation to remediate the underlying instability.
+  - _Reason: The Flesch reading ease score falls below the minimum of 60_
+
+:::
+
+:::tip[Success example]
+
+- Please try restarting the app. If that doesn't work, contact our support team.
+
+:::
+
+::::
+
+#### Custom checks
+
+Custom checks are built on top of the [built-in checks](#built-in-checks) and can be used to evaluate the quality of your agent's responses.
+
+The advantage of custom checks is that they can be tailored to your specific use case and can be enabled on many scenarios at once.
 
 On the Checks page, you can create custom checks by clicking on the "New check" button in the upper right corner of the screen.
 
@@ -217,18 +689,14 @@ Next, set the parameters for the check:
 - `Name`: Give your check a name.
 - `Identifier`: A unique identifier for the check. It should be a string without spaces.
 - `Description`: A brief description of the check.
-- `Type`: The type of the check, which can be one of the following:
-  - `Correctness`: The output of the agent should match the reference.
-- `Conformity`: The conversation should follow a set of rules.
-- `Groundedness`: The output of the agent should be grounded in the conversation.
-- `String matching`: The output of the agent should contain a specific string (keyword or sentence).
-- `Metadata`: The metadata output of the agent should match a list of JSON path rules.
-- `Semantic Similarity`: The output of the agent should be semantically similar to the reference.
-- And a set of parameters specific to the check type. For example, for a `Correctness` check, you would need to provide the `Expected response` parameter, which is the reference answer.
+- `Type`: The type of the check. See the [built-in checks](#built-in-checks) listed above.
+- A set of parameters specific to the check type.
 
 ![Custom check setup with name, identifier, and type selection](/_static/images/hub/checks-create-configure.png)
 
-Once you have created a custom check, you can apply it to conversations in your dataset. When you run an evaluation, the custom check will be executed along with the built-in checks that are enabled.
+Some checks include an `Agent` field with the placeholder "Select an agent". Since a custom check isn't created within a scenario, the Hub can't know in advance which agent's trace schema to use to suggest fields such as `Target key`. Selecting an agent here lets the Hub populate those fields with the keys available in that agent's trace schema.
+
+Once you have created a custom check, you can apply it to scenarios in your dataset. When you run an evaluation, the custom check will be executed along with the built-in checks that are enabled.
 
 ## Failure categories
 
@@ -242,10 +710,10 @@ To add or edit failure categories, go to **Settings** -> **Project Settings**. A
 
 When a test fails, a failure category is assigned to the test automatically, however you can manually update the failure category to a different one.
 
-![Failure category selector on a failed test case](/_static/images/hub/failure-categories.png)
+![Failure category selector on a failed scenario](/_static/images/hub/failure-categories.png)
 
 :::tip
-You can read about modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+You can read about modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 ### Defining the right failure categories
@@ -277,7 +745,8 @@ Failure categories help you understand the root cause of test failures and ident
 - **Context-Awareness Failures**: These categories relate to failures where the agent fails to properly understand or use the provided context.
 
   Examples: "Context Misunderstanding", "Missing Context Reference", "Context Contradiction"
-  :::
+
+:::
 
 :::tip
 
@@ -291,12 +760,13 @@ Failure categories help you understand the root cause of test failures and ident
 
 - **Analyze Patterns Across Categories**: Look for patterns in failure categories across different tags or test types to identify systemic issues.
 
-  Example: If "Security-Related Failures" are concentrated in conversations tagged with "Adversarial Testing", you may need to strengthen your agent's security defenses.
-  :::
+  Example: If "Security-Related Failures" are concentrated in scenarios tagged with "Adversarial Testing", you may need to strengthen your agent's security defenses.
+
+:::
 
 ## Tags
 
-Tags are optional but highly recommended labels that help you organize and filter your test cases. Tags help you analyze evaluation results by allowing you to:
+Tags are optional but highly recommended labels that help you organize and filter your scenarios. Tags help you analyze evaluation results by allowing you to:
 
 - **Filter results** - Focus on specific test types or scenarios
 - **Compare performance** - See how your agent performs across different test categories
@@ -305,21 +775,21 @@ Tags are optional but highly recommended labels that help you organize and filte
 
 ### Create a tag
 
-To create a tag, first open a conversation and click on the "Add tag" button in the "Properties" section at the right side of the screen.
+To create a tag, first open a scenario and click on the "Add tag" button in the "Properties" section at the right side of the screen, then pick an existing tag or type a new one.
 
-![Add tag button in the conversation properties panel](/_static/images/hub/tags-create.png)
+![Tag picker open in the scenario Properties panel](/_static/images/hub/tags-create.png)
 
 :::tip
-Before creating a tag, we recommend you to read about the best practices for modifying test cases in [Modify test cases](/hub/ui/annotate/modify-test-cases).
+Before creating a tag, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 ### Choosing the right tag structure
 
-To choose a tag, it is good to stick to a naming convention that you agreed on beforehand. Ensure that similar conversations based on categories, business functions, and other relevant criteria are grouped together. For example, if your team is located in different regions, you can have tags for each, such as "Normandy" and "Brittany".
+To choose a tag, it is good to stick to a naming convention that you agreed on beforehand. Ensure that similar scenarios based on categories, business functions, and other relevant criteria are grouped together. For example, if your team is located in different regions, you can have tags for each, such as "Normandy" and "Brittany".
 
 :::note[Categories of Tags]
 
-- **Issue-Related Tags**: These tags categorize the types of problems that might occur during a conversation.
+- **Issue-Related Tags**: These tags categorize the types of problems that might occur during a scenario.
 
   Examples: "Hallucination", "Misunderstanding", "Incorrect Information"
 
@@ -342,13 +812,14 @@ To choose a tag, it is good to stick to a naming convention that you agreed on b
 - **Temporal Tags**: Depending on the life cycle of the testing process of the agent.
 
   Examples: "red teaming phase 1", "red teaming phase 2"
-  :::
+
+:::
 
 :::tip
 
-- **Use Multiple Tags if Necessary**: Apply multiple tags to a single conversation to cover all relevant aspects.
+- **Use Multiple Tags if Necessary**: Apply multiple tags to a single scenario to cover all relevant aspects.
 
-  Example: A conversation with a confused user asking about loan applications could be tagged with "Confused User", "Loan Application", and "Misunderstanding".
+  Example: A scenario with a confused user asking about loan applications could be tagged with "Confused User", "Loan Application", and "Misunderstanding".
 
 - **Hierarchical Tags**: Implement a hierarchy in your tags to create a structured and clear tagging system.
 
@@ -357,12 +828,13 @@ To choose a tag, it is good to stick to a naming convention that you agreed on b
 - **Stick to Agreed Naming Conventions**: Ensure that your team agrees on and follows a consistent naming convention for tags to maintain organization and clarity.
 
   Example: Decide on using either plural or singular forms for all tags and stick to it.
-  :::
+
+:::
 
 ## Next Steps
 
 Now that you understand the fundamentals of test organization, you can:
 
 - **Review test results** - [Review test results](/hub/ui/annotate/review-test-results)
-- **Modify test cases** - [Modify test cases](/hub/ui/annotate/modify-test-cases)
+- **Modify scenarios** - [Modify scenarios](/hub/ui/annotate/modify-scenarios)
 - **Run evaluations** - [Create evaluations](/hub/ui/evaluations/create)

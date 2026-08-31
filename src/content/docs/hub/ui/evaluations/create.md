@@ -91,7 +91,7 @@ Using failure categories helps you:
 - **Track improvements** - Monitor how failure rates change over time
 
 :::tip
-You can read about failure category changes in [Modify scenarios](/hub/ui/annotate/modify-test-cases).
+You can read about failure category changes in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
 :::
 
 ### Tags view
