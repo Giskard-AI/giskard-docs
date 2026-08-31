@@ -179,10 +179,6 @@ for attempt in attempts:
     print("---")
 ```
 
-:::caution
-`attempt.messages` is deprecated. Read `attempt.input` and `attempt.output` directly. For structured agents, `attempt.messages` flattens the input and output objects into text and loses their original structure.
-:::
-
 ### Mark an attempt as reviewed
 
 If a flagged attempt is a false positive, update its review status:
