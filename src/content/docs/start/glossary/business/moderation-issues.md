@@ -1,6 +1,6 @@
 ---
 title: "Moderation Issues"
-description: "Detect LLM moderation failures where models apply overly restrictive content filters to valid business queries."
+description: "Detect LLM moderation failures where models apply overly restrictive content filters that block valid business queries and legitimate information."
 sidebar:
   order: 6
 ---
