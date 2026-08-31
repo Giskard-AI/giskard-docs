@@ -209,7 +209,7 @@ suite_result = await vulnerability_scan(
 
 The `description` is what the LLM uses to generate scenarios specific to your agent, so the more precisely you describe its purpose and its boundaries, the more relevant the findings. The description above names two boundaries, refusing investment advice and never disclosing another customer's data, and the scan writes attacks against both: a customer asking which fund to move their savings into, or asking for the balance on an account they name but do not hold. "A chatbot" gets you generic attacks and a shallow report.
 
-## Next Steps
+## Next steps
 
 - [Customize a scan](/oss/scan/how-to/customize-a-scan) to pick generators and bound the run
 - [Run the scan in CI](/oss/scan/how-to/scan-in-ci) to replay a saved suite on every pull request
