@@ -9,36 +9,42 @@ import { Tabs, TabItem } from "@astrojs/starlight/components";
 
 This section provides guidance on managing users in the Hub.
 
-The Hub allows you to set access rights at two levels: global and scoped for both users and groups. To begin, click on the "Settings" icon on the left panel, then select "Users".
+The Hub allows you to set access rights at two levels: global and scoped for both users and groups. To begin, click on the "Settings" icon on the left panel, then open **User Management**.
 
 ## Configure users and groups
 
 <Tabs>
   <TabItem label="User-level permissions">
-    To manage user-level permissions, click the "Settings" icon in the left panel, then select press the dropdown for the "Users" sections. Within the dropdown, you can go to the "Users" section.
+    To manage user-level permissions, click the Settings icon in the left panel, open **User Management**, then select **Users**.
 
-    ![User permissions settings page with role assignments](/_static/images/hub/access-settings.png)
+    ![Users settings page with the Invite user button and user cards](/_static/images/hub/access-settings.png)
+
+    From **Invite user**, you can assign groups and global or scoped permissions before the person logs in. You can still change them later from the user card.
+
+    ![Invite user dialog with email, name, groups, and global permissions](/_static/images/hub/access-settings-invite.png)
 
   </TabItem>
   <TabItem label="Group-level permissions">
-    To manage group-level permissions, click the "Settings" icon in the left panel, then select press the dropdown for the "Users" sections. Within the dropdown, you can go to the "Groups" section.
+    To manage group-level permissions, click the Settings icon in the left panel, open **User Management**, then select **Groups**.
 
-    ![Group management page for creating and editing groups](/_static/images/hub/access-settings-group.png)
+    ![Groups settings page with the Create group button and group cards](/_static/images/hub/access-settings-group.png)
 
-    After creating a group and users, you can then navigate back to the "Users" tab from the left panel. You can then select a user you want to add to a group, click the three vertical dots on the right side of the user box, and click on "Edit Group".
+    After creating a group and users, you can then navigate back to the **Users** tab from the left panel. You can then select a user you want to add to a group, click the three vertical dots on the right side of the user box, and click on **Edit groups**.
 
-    ![User list with edit group option in context menu](/_static/images/hub/access-settings-group-user.png)
+    ![User list with the overflow menu open on Edit groups](/_static/images/hub/access-settings-group-user.png)
 
-    This will open a pop up where you can select the group you want to add the user to.
+    This will open a dialog titled **Editing groups for** the user, where you can select the group you want to add the user to.
 
     ![Group assignment dialog for adding a user to a group](/_static/images/hub/access-settings-group-assign.png)
+
+    To set global and scoped permissions, use **Edit permissions** in the same menu. That opens a dialog, not a separate page.
 
   </TabItem>
 </Tabs>
 
 ## Configure Global Permissions
 
-Global permissions apply access rights across all projects. You can configure Create, Read, Edit, and Delete permissions for each page or entity. This is available in the following pages: Project, Dataset, Agent, Knowledge Base, and Evaluation. Additionally, for features like the Playground, API Key Authentication, and Permission, you can enable or disable the users' right to use it.
+Global permissions apply access rights across all projects. You can configure Create, Read, Edit, and Delete permissions for each entity. This is available for: Project, Check, Dataset, Agent, Knowledge Base, Evaluation, Scan, Task, and User Management. Additionally, for features like the Playground, API Key Authentication, and Audit, you can enable or disable the users' right to use it.
 
 The rights are as follows:
 
@@ -48,14 +54,10 @@ The rights are as follows:
 - **Delete**: users can permanently remove entities of the given type.
 - **Use**: users can use the given feature.
 
-![Set permissions](/_static/images/hub/access-permissions.png)
+![Global permissions grid in the Edit permissions dialog](/_static/images/hub/access-permissions.png)
 
 ## Configure Scoped Permissions
 
 Scoped permissions allow for granular control. For each project, you can specify which pages or entities users are allowed to access. An example of where this may be useful is if you want your users to read everything in a project but only allow a few people to edit the dataset.
 
-![Set scope of permissions](/_static/images/hub/access-scope.png)
-
-:::tip
-Users need to log in first before an admin can give them any permissions in the Hub.
-:::
+![Scoped permissions in the Edit permissions dialog](/_static/images/hub/access-scope.png)

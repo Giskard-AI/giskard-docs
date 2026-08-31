@@ -1,6 +1,6 @@
 ---
 title: "Track event logs"
-description: "Track every change made to entities in Giskard Hub with event logs. View history of modifications to checks, datasets, and test cases."
+description: "Track every change made to entities in Giskard Hub with event logs. View history of modifications to checks, datasets, and scenarios."
 sidebar:
   order: 8
 ---
@@ -18,17 +18,17 @@ Event logs are essential for maintaining accountability and understanding the ev
 - **Understand impact** - Recognize how changes affect your evaluations
 - **Maintain compliance** - Keep complete audit trails for regulatory requirements
 
-## Event logs overview
+## Event Log overview
 
-To begin, click on the "Settings" icon on the left panel, then select "Event logs".
+To begin, click on the "Settings" icon on the left panel, then select **Event Log**.
 
-![Event logs page showing tracked entity changes](/_static/images/hub/event-logs.png)
+![Event Log page showing tracked entity changes](/_static/images/hub/event-logs.png)
 
 Every entity in Giskard Hub maintains a complete history of all modifications. This includes:
 
 - **Checks** - Custom validation rules and their configurations
-- **Datasets** - Test case collections and their metadata
-- **Evaluation test cases** - Individual test cases within evaluations
+- **Datasets** - Scenario collections and their metadata
+- **Scenarios** - Individual scenarios within datasets
 - **Other entities** - All project-related entities track their changes
 
 Each change is recorded with:
@@ -40,13 +40,13 @@ Each change is recorded with:
 
 #### Viewing event history
 
-To view the event history for a specific entity in the Event logs overview:
+To view the event history for a specific entity in the Event Log:
 
-1. Navigate to the entity you want to inspect (e.g., a check, dataset, or test case)
-2. Click the **History** button
-3. Review the list of changes
+1. Find the row for the entity you want to inspect (e.g., a check, dataset, or scenario)
+2. Click on the button in the **History** column
+3. Review the list of changes in the **Change History** drawer
 
-![Event history detail view with change timeline](/_static/images/hub/event-logs-history.png)
+![Change History drawer with a timeline of modifications](/_static/images/hub/event-logs-history.png)
 
 ## Best practices
 
@@ -58,7 +58,7 @@ To view the event history for a specific entity in the Event logs overview:
 
 Now that you understand event logs, you can:
 
-- **Review entity histories** - Check the history of your checks, datasets, and test cases
+- **Review entity histories** - Check the history of your checks, datasets, and scenarios
 - **Investigate changes** - Use event logs to debug evaluation issues
 - **Maintain traceability** - Keep complete audit trails of all modifications
 

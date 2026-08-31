@@ -1,5 +1,5 @@
 ---
-title: "Hallucination & Misinformation"
+title: "Hallucination and Misinformation"
 description: "Learn about LLM hallucination vulnerabilities and how to detect and prevent models from generating false or misleading information."
 sidebar:
   order: 5

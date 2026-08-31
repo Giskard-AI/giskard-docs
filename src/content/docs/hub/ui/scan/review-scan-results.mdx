@@ -5,6 +5,8 @@ sidebar:
   order: 3
 ---
 
+import { TabItem, Tabs } from "@astrojs/starlight/components";
+
 Understand your AI agent's security vulnerabilities and take action to fix them.
 
 ## Understanding your security grade
@@ -28,7 +30,23 @@ Scroll to any vulnerability category to see the specific attacks that were teste
 
 Click **Review** next to any probe to see detailed attack results:
 
-![Attack detail showing prompt, agent response, and vulnerability](/_static/images/hub/scan/attempt-successful.png)
+<Tabs>
+  <TabItem label="Chat agent">
+    For a chat agent, the attack details show the conversation sent to the agent
+    and the response it returned.
+
+    ![Attack detail for a chat agent showing the prompt, response, and vulnerability](/_static/images/hub/scan/attempt-successful.png)
+
+  </TabItem>
+  <TabItem label="Structured agent">
+    For a structured agent, the layout displays the JSON objects sent to and
+    received from the agent. This lets you inspect how the generated attack was
+    adapted to the agent's input schema and review its structured response.
+
+    ![Attack detail for a structured agent showing its JSON input and output](/_static/images/hub/scan/structured-scan-attack.png)
+
+  </TabItem>
+</Tabs>
 
 This shows you:
 
@@ -37,6 +55,12 @@ This shows you:
 - Whether the attack succeeded
 - Why it's considered a vulnerability
 
+:::note[Attempt metadata]
+Metadata is available for each attempt below the scenario trace. It includes execution details such as the original prompt before it was adapted to a structured agent's input schema, detailed scan evaluations, source references, and other probe-specific context.
+:::
+
+
+
 ## Take action on findings
 
 For each detected issue, you have three main actions:
@@ -44,19 +68,19 @@ For each detected issue, you have three main actions:
 - **Mark as false positive:**
   If the identified issue is not a real risk for your use case (for example, it is expected behavior or not relevant to your deployment), you can mark it as a false positive. This will immediately update your agent's security grade and help you track which findings require action.
 
-- **Convert to test case:**
-  You can save the detected attack as a reproducible test case by clicking **Send to dataset**. This allows you to track fixes over time, build regression tests to make sure the issue doesn't reappear, and share concrete examples with your team for further analysis and improvement.
+- **Convert to scenario:**
+  You can save the detected attack as a reproducible scenario by clicking **Send to dataset**. This allows you to track fixes over time, build regression tests to make sure the issue doesn't reappear, and share concrete examples with your team for further analysis and improvement.
 
 - **Create a task:**
   You can create a task to track and assign work items for reviewing vulnerabilities. This is useful for organizing the review of issues found during scans and coordinating work among team members. To create a task, click on **Add task** button on the top right side of the screen when reviewing a specific probe. You can set the task priority, status, assignees, and provide a description of what needs to be done.
 
 :::tip
-To learn more about reviewing test cases, see [Review test results](/hub/ui/annotate/review-test-results).
+To learn more about reviewing scenarios, see [Review test results](/hub/ui/annotate/review-test-results).
 :::
 
 ## Next steps
 
 Now that you have reviewed the scan results, you can take action on the detected vulnerabilities.
 
-- **Review test cases** - [Annotate](/hub/ui/annotate)
+- **Review scenarios** - [Annotate](/hub/ui/annotate)
 - **Run and schedule evaluations** - [Evaluations](/hub/ui/evaluations)
