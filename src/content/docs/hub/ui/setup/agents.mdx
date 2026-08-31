@@ -1,6 +1,6 @@
 ---
 title: "Setup agents"
-description: "Create Chat and Structured agents in Giskard Hub. Configure JSON schemas, interaction context, authentication, and custom API formats."
+description: "Create Chat and Structured agents in Giskard Hub. Configure JSON schemas, conversation context, authentication, and custom API formats."
 sidebar:
   order: 3
 ---
@@ -26,7 +26,7 @@ Fill in the agent details. Every agent has a **Mode**: **Chat** for conversation
   - `Agent API Endpoint`: The URL the Hub POSTs to during scans, evaluations, and playground calls.
   - `Headers`: Authentication and other custom headers sent with every request.
   - `Test connection`: Sends a sample payload that matches the current schemas.
-- `Mode`: `Chat` or `Structured`. Switching mode clears the current schema and all [request field mappings](#interaction-context).
+- `Mode`: `Chat` or `Structured`. Switching mode clears the current schema and all [request field mappings](#conversation-context).
 
 ## Chat agents
 
@@ -53,7 +53,7 @@ The endpoint must return a JSON object with a `response` message. `metadata` is 
 }
 ```
 
-Chat agents start with a default [Build history list](#interaction-context) mapping so later turns receive the full conversation. Remove it if the endpoint should see only the current user message.
+Chat agents start with a default [Build history list](#conversation-context) mapping so later turns receive the full conversation. Remove all mappings if the endpoint should see only the current user message.
 
 ## Structured agents
 
@@ -241,20 +241,30 @@ An extraction pipeline that returns structured fields from a document.
 
 The same shapes appear in scenario `input` and `output` fields, so a dataset built for this agent stays compatible with scans and evaluations.
 
-## Interaction context
+## Conversation context
 
-**Interaction context** controls what the Hub adds to each request from previous turns. Configure it with **Request field mappings** under the schema editors.
+**Conversation context** chooses what previous interaction data the agent receives before each call. Configure it on the agent form in the **Conversation context** card, below the input and output schema editors.
 
-Chat agents default to one mapping that rebuilds the conversation. Structured agents start with none: each call receives only the current input.
+Scans, evaluations, and playground calls all use the same conversation context for the agent.
 
 ![Chat schemas and a Build history list mapping from $.response to messages](/_static/images/hub/setup-agent-interaction-context.png)
 
-| Mapping type               | What it does                                                      | Typical use                                                             |
-| -------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| **Build history list**     | Appends each turn to a running list in the next request           | Stateless chat endpoints that need the full `messages` array            |
-| **Copy previous response** | Copies one value from the previous response into the next request | Thread IDs, session IDs, or conversation tokens the agent stores itself |
+### Request field mappings
+
+**Request field mappings** copy values from previous agent responses into fields on the next request. Each next request field can only be filled by one mapping.
+
+Chat agents default to one mapping that rebuilds the conversation. Structured agents start with none: each call receives only the current input.
+
+| Mapping type               | What it does                                                                                                          | Typical use                                                             |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Build history list**     | Rebuilds a list field from previous request values, previous response values, and the current request value           | Stateless chat endpoints that need the full `messages` array            |
+| **Copy previous response** | Copies one value from the immediately preceding response into the next request, only when that request field is empty | Thread IDs, session IDs, or conversation tokens the agent stores itself |
 
 ![Mapping type help with Copy previous response and Build history list examples](/_static/images/hub/setup-agent-mapping-type.png)
+
+Click **Add field mapping** to add another rule. Use the remove control on a row to delete it.
+
+When no mappings are configured, the Hub sends each interaction input as provided, with no data from earlier turns. For chat agents, click **Restore default chat history** to bring back the default `$.response` → `messages` mapping.
 
 ### Build history list
 
