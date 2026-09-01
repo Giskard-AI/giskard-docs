@@ -14,9 +14,14 @@ Most examples here scan a retail bank's support agent. The tutorial's BotaniBot 
 
 <CardGrid>
   <LinkCard
-    title="Run the Scan in CI"
-    description="Generate the suite once, commit it, and replay it on every pull request."
-    href="/oss/scan/how-to/scan-in-ci"
+    title="Wrap Your Agent for the Scan"
+    description="Connect a stateless, stateful, or history-passing agent through the scan's async function contract."
+    href="/oss/scan/how-to/wrap-your-agent"
+  />
+  <LinkCard
+    title="Customize a Scan"
+    description="Choose generators, bound the scenario budget and concurrency, and add your own scenarios."
+    href="/oss/scan/how-to/customize-a-scan"
   />
   <LinkCard
     title="Tune a Scan Run"
@@ -24,9 +29,9 @@ Most examples here scan a retail bank's support agent. The tutorial's BotaniBot 
     href="/oss/scan/how-to/tune-scan-options"
   />
   <LinkCard
-    title="Scan With Your Own Dataset"
-    description="Replay a Hugging Face or bundled JSONL corpus with the dataset-backed scenario generators."
-    href="/oss/scan/how-to/dataset-generators"
+    title="Run the Scan in CI"
+    description="Generate the suite once, commit it, and replay it on every pull request."
+    href="/oss/scan/how-to/scan-in-ci"
   />
   <LinkCard
     title="Save and Version a Scan Suite"
@@ -34,13 +39,23 @@ Most examples here scan a retail bank's support agent. The tutorial's BotaniBot 
     href="/oss/scan/how-to/save-and-version-suites"
   />
   <LinkCard
-    title="Migrate from Giskard v2 to v3"
-    description="Map the v2 scan, RAGET, and LLM setters onto their v3 replacements, with both versions side by side."
-    href="/oss/migrate-from-v2"
+    title="Scan With Your Own Dataset"
+    description="Replay a Hugging Face or bundled JSONL corpus with the dataset-backed scenario generators."
+    href="/oss/scan/how-to/dataset-generators"
+  />
+  <LinkCard
+    title="Run a Quality Scan"
+    description="Probe a knowledge-grounded agent for hallucinations, sycophancy, and out-of-scope answers."
+    href="/oss/scan/how-to/quality-scan"
   />
   <LinkCard
     title="Run Garak and DeepTeam Scanners"
     description="Red-team your target with the external garak and deepteam scanners and read the unified result."
     href="/oss/scan/how-to/third-party-scanners"
+  />
+  <LinkCard
+    title="Migrate from Giskard v2 to v3"
+    description="Map the v2 scan, RAGET, and LLM setters onto their v3 replacements, with both versions side by side."
+    href="/oss/migrate-from-v2"
   />
 </CardGrid>
