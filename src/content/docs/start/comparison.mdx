@@ -9,37 +9,37 @@ import { LinkCard } from "@astrojs/starlight/components";
 
 Giskard offers two solutions for LLM agent testing and evaluation, each designed for different use cases and requirements.
 
-**Giskard Hub** is our enterprise platform with advanced collaboration features, while **Giskard Open Source** is our free Python library for individual developers and researchers.
+**Giskard Hub** is our enterprise platform for operating testing across an organization, while **Giskard Open Source** is our free, code-first Python toolkit for developers and teams.
 
 This guide will help you understand the differences and choose the right solution for your needs. For definitions of common terms, see the [AI testing glossary](/start/glossary).
 
 ## Feature comparison
 
-| Feature                          | Giskard Open Source     | Giskard Hub                                                   |
-| :------------------------------- | :---------------------- | :------------------------------------------------------------ |
-| **Core Testing**                 |                         |                                                               |
-| Security vulnerability detection | [Basic coverage](/oss)  | [State-of-the-art detection](/hub/ui/scan)                    |
-| Business failure detection       | [Basic coverage](/oss)  | [State-of-the-art detection](/hub/ui/datasets/knowledge-base) |
-| Continuous red teaming           | ❌ Not available        | [✅ Full support](/hub/ui/continuous-red-teaming)             |
-| Tool/function calling tests      | ❌ Not available        | [✅ Full support](/hub/ui/annotate/overview)                  |
-| Custom tests                     | [✅ Full support](/oss) | [✅ Full support](/hub/ui/annotate/overview)                  |
-| Local evaluations                | [✅ Full support](/oss) | [✅ Full support](/hub/ui/evaluations)                        |
-| **Team Collaboration**           |                         |                                                               |
-| Multi-user access                | ❌ Single user only     | [✅ Full team support](/hub/ui/access-rights)                 |
-| Access control                   | ❌ Not available        | [✅ Role-based access](/hub/ui/access-rights)                 |
-| Project management               | ❌ Local only           | [✅ Centralized](/hub/ui/access-rights)                       |
-| Dataset sharing                  | ❌ Local only           | [✅ Team-wide](/hub/ui/access-rights)                         |
-| **Automation & Monitoring**      |                         |                                                               |
-| Scheduled evaluation runs        | ❌ Not available        | [✅ Fully supported](/hub/ui/evaluations)                     |
-| Evaluation comparison dashboard  | ❌ Not available        | [✅ Fully supported](/hub/ui/evaluations/compare)             |
-| Alerting                         | ❌ Not available        | [✅ Configurable alerts](/hub/ui/evaluations)                 |
-| Performance tracking             | ❌ Local only           | [✅ Historical data](/hub/ui/evaluations/compare)             |
-| **Enterprise Security**          |                         |                                                               |
-| SSO (Single Sign-On)             | ❌ Not available        | [✅ SSO support ↗](https://trust.giskard.ai/)                 |
-| 2FA (Two-Factor Authentication)  | ❌ Not available        | [✅ 2FA support ↗](https://trust.giskard.ai/)                 |
-| Audit trails                     | ❌ Not available        | [✅ Full compliance ↗](https://trust.giskard.ai/)             |
-| SOC 2 compliance                 | ❌ Not available        | [✅ SOC 2 certified ↗](https://trust.giskard.ai/)             |
-| Dedicated support & SLAs         | ❌ Community only       | [✅ Enterprise-grade ↗](https://trust.giskard.ai/)            |
+| Feature                          | Giskard Open Source                                                   | Giskard Hub                                                       |
+| :------------------------------- | :-------------------------------------------------------------------- | :---------------------------------------------------------------- |
+| **Core Testing**                 |                                                                       |                                                                   |
+| Security vulnerability detection | [Local vulnerability scanning](/oss/scan)                             | [Advanced managed scanning](/hub/ui/scan)                         |
+| Business failure detection       | [Quality scans and custom checks](/oss)                               | [Managed evaluation workflows](/hub/ui/datasets/knowledge-base)   |
+| Continuous red teaming           | [Run scans and replay suites in your CI](/oss/scan/how-to/scan-in-ci) | [✅ Managed continuous operation](/hub/ui/continuous-red-teaming) |
+| Tool/function calling tests      | [✅ Code-first tool-call checks](/oss/checks/how-to/spy-on-calls)     | [✅ Managed review workflows](/hub/ui/annotate/overview)          |
+| Custom tests                     | [✅ Full support](/oss)                                               | [✅ Full support](/hub/ui/annotate/overview)                      |
+| Local evaluations                | [✅ Full support](/oss)                                               | [✅ Full support](/hub/ui/evaluations)                            |
+| **Team Collaboration**           |                                                                       |                                                                   |
+| Multi-user access                | Collaborate through Git and CI                                        | [✅ Shared team workspace](/hub/ui/access-rights)                 |
+| Access control                   | ❌ Not available                                                      | [✅ Role-based access](/hub/ui/access-rights)                     |
+| Project management               | Versioned in your repository                                          | [✅ Centralized](/hub/ui/access-rights)                           |
+| Dataset sharing                  | Share through version-controlled files                                | [✅ Team-wide](/hub/ui/access-rights)                             |
+| **Automation & Monitoring**      |                                                                       |                                                                   |
+| Scheduled evaluation runs        | Schedule with your CI runner                                          | [✅ Managed scheduling](/hub/ui/evaluations)                      |
+| Evaluation comparison dashboard  | ❌ Not available                                                      | [✅ Fully supported](/hub/ui/evaluations/compare)                 |
+| Alerting                         | ❌ Not available                                                      | [✅ Configurable alerts](/hub/ui/evaluations)                     |
+| Performance tracking             | Retain user-managed CI results                                        | [✅ Managed historical data](/hub/ui/evaluations/compare)         |
+| **Enterprise Security**          |                                                                       |                                                                   |
+| SSO (Single Sign-On)             | ❌ Not available                                                      | [✅ SSO support ↗](https://trust.giskard.ai/)                     |
+| 2FA (Two-Factor Authentication)  | ❌ Not available                                                      | [✅ 2FA support ↗](https://trust.giskard.ai/)                     |
+| Audit trails                     | ❌ Not available                                                      | [✅ Full compliance ↗](https://trust.giskard.ai/)                 |
+| SOC 2 compliance                 | ❌ Not available                                                      | [✅ SOC 2 certified ↗](https://trust.giskard.ai/)                 |
+| Dedicated support & SLAs         | Community support                                                     | [✅ Enterprise-grade ↗](https://trust.giskard.ai/)                |
 
 :::tip[Convinced by our features?]
 **Giskard Hub** might be a good fit for your products. [Talk to our team ↗](https://www.giskard.ai/contact).
@@ -49,17 +49,17 @@ This guide will help you understand the differences and choose the right solutio
 
 **Perfect for:**
 
-- Individual developers and data scientists
+- AI engineers and development teams testing production-bound systems
+- Automated testing in CI/CD pipelines
 - Prototyping and research projects
-- CI/CD pipelines in development environments
 - Teams just starting with AI testing
 - Projects with budget constraints
 
 **What you get:**
 
-- Full access to our basic testing capabilities
+- Full access to local, code-first testing capabilities
 - Local control over your data and models
-- No external dependencies or data sharing
+- No required Giskard-hosted data plane; data handling depends on the model provider you configure
 - Community support and open-source contributions
 
 ## When to upgrade to Giskard Hub
@@ -68,7 +68,7 @@ This guide will help you understand the differences and choose the right solutio
 
 - **Continuous red teaming** - Automated testing and alerting
 - **Team collaboration and business user enablement** – Collaborate across technical and business teams: enable business users to contribute through annotations, prioritize actions based on test results, and access intuitive testing dashboards
-- **Custom checks and result categorization** – Create your own tests and automatically categorize test results for deeper, customizable analysis
+- **Managed checks and result categorization** – Reuse check definitions across scenarios within a project and automatically categorize results for deeper analysis
 - **Enterprise security features** - SSO (Single Sign-On), SOC 2 compliance, and 2FA (Two-Factor Authentication) for robust access control and regulatory requirements
 - **Compliance** - Audit trails and access control requirements
 - **Scale** - Managing multiple projects and models with specific permissions by users and roles
