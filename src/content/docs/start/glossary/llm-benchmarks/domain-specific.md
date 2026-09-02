@@ -1,6 +1,6 @@
 ---
 title: "Domain-Specific Benchmarks"
-description: "Specialized benchmarks that evaluate LLMs' performance in fields such as healthcare, finance, law, and medicine."
+description: "Specialized benchmarks that evaluate LLM performance in professional fields such as healthcare, finance, law, and medicine."
 sidebar:
   order: 7
 ---

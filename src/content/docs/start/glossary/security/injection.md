@@ -1,6 +1,6 @@
 ---
 title: "Prompt Injection"
-description: "Learn about LLM prompt injection vulnerabilities and how to detect and prevent malicious input manipulation."
+description: "Learn about LLM prompt injection vulnerabilities and how to detect and prevent malicious input manipulation that overrides model instructions."
 sidebar:
   order: 2
 ---
