@@ -1,120 +1,513 @@
-<div class="tool-comparison-grid">
-  <article class="tool-comparison-card tool-comparison-card--featured">
-    <h3>Giskard OSS</h3>
-    <dl>
-      <dt>Dynamic scan</dt><dd><a href="/oss/scan/explanation/how-scan-works">Target-aware scenarios</a>, generated and judged from a description or knowledge base</dd>
-      <dt>Structured agents</dt><dd><a href="/oss/checks/explanation/core-concepts">Serializable inputs and outputs</a>, plus <a href="/oss/scan/how-to/wrap-your-agent">declared Pydantic input schemas</a></dd>
-      <dt>Multi-agent and multi-turn</dt><dd><a href="/oss/checks/tutorials/multi-turn">Stateful scenarios</a>; test a multi-agent system by <a href="/oss/scan/how-to/wrap-your-agent">wrapping the whole system</a></dd>
-      <dt>Quality evaluation</dt><dd>Deterministic and LLM-graded <a href="/oss/checks/explanation/when-to-use-which-check">Checks</a>, plus knowledge-base-driven <code>quality_scan</code></dd>
-      <dt>Red teaming</dt><dd><a href="/oss/solutions/scan-vulnerabilities"><code>vulnerability_scan</code></a> tailors attacks to the target</dd>
-      <dt>pytest</dt><dd><a href="/oss/checks/how-to/run-in-pytest">Native async pytest tests</a> with <code>pytest-asyncio</code></dd>
-    </dl>
-  </article>
+---
+type Support = "core" | "partial" | "none";
 
-  <article class="tool-comparison-card">
-    <h3>garak</h3>
-    <dl>
-      <dt>Dynamic scan</dt><dd>Configurable <a href="https://docs.garak.ai/garak/garak-components/vulnerability-probes">probe catalog</a>, including adaptive <a href="https://docs.garak.ai/garak/automatic-red-teaming/garaks-auto-red-team">auto red-team probes</a></dd>
-      <dt>Structured agents</dt><dd><a href="https://docs.garak.ai/garak/garak-components/using-generators">Generator interfaces</a>, primarily for text-generation targets</dd>
-      <dt>Multi-agent and multi-turn</dt><dd>Some probes use <a href="https://docs.garak.ai/garak/automatic-red-teaming/garaks-auto-red-team">multiple turns</a></dd>
-      <dt>Quality evaluation</dt><dd>Primarily an <a href="https://docs.garak.ai/garak">LLM vulnerability scanner</a></dd>
-      <dt>Red teaming</dt><dd>Core workflow for probing models and systems for <a href="https://docs.garak.ai/garak">vulnerabilities</a></dd>
-      <dt>pytest</dt><dd>No first-class workflow documented</dd>
-    </dl>
-  </article>
+interface Tool {
+  id: string;
+  name: string;
+  href: string;
+  featured?: boolean;
+}
 
-  <article class="tool-comparison-card">
-    <h3>promptfoo</h3>
-    <dl>
-      <dt>Dynamic scan</dt><dd><a href="https://www.promptfoo.dev/docs/red-team/quickstart/">Generates red-team tests</a> from purpose, plugins, and strategies</dd>
-      <dt>Structured agents</dt><dd>Configurable <a href="https://www.promptfoo.dev/docs/providers/">providers</a>, including HTTP endpoints and custom code</dd>
-      <dt>Multi-agent and multi-turn</dt><dd><a href="https://www.promptfoo.dev/docs/red-team/strategies/">Strategies</a> include multi-turn attacks</dd>
-      <dt>Quality evaluation</dt><dd>Configurable <a href="https://www.promptfoo.dev/docs/configuration/expected-outputs/">assertions and metrics</a></dd>
-      <dt>Red teaming</dt><dd>Core workflow using <a href="https://www.promptfoo.dev/docs/red-team/">plugins and strategies</a></dd>
-      <dt>pytest</dt><dd>CI integrations documented; pytest is not the native runner</dd>
-    </dl>
-  </article>
+interface Cell {
+  support: Support;
+  summary: string;
+  href?: string;
+}
 
-  <article class="tool-comparison-card">
-    <h3>PyRIT</h3>
-    <dl>
-      <dt>Dynamic scan</dt><dd>Programmable <a href="https://azure.github.io/PyRIT/">attacks and executors</a> against configured targets</dd>
-      <dt>Structured agents</dt><dd>Attacks and executors connect to <a href="https://azure.github.io/PyRIT/">prompt targets</a>, including HTTP targets</dd>
-      <dt>Multi-agent and multi-turn</dt><dd><a href="https://azure.github.io/PyRIT/">Multi-turn attacks</a> execute against targets</dd>
-      <dt>Quality evaluation</dt><dd>Reusable <a href="https://azure.github.io/PyRIT/">scorers</a> for attack outcomes and response properties</dd>
-      <dt>Red teaming</dt><dd>Core workflow for building and running <a href="https://azure.github.io/PyRIT/">attacks with executors</a></dd>
-      <dt>pytest</dt><dd>No first-class workflow documented</dd>
-    </dl>
-  </article>
+interface Row {
+  criterion: string;
+  cells: Record<string, Cell>;
+}
 
-  <article class="tool-comparison-card">
-    <h3>DeepEval + DeepTeam</h3>
-    <dl>
-      <dt>Dynamic scan</dt><dd><a href="https://deepeval.com/docs/red-teaming-introduction">DeepTeam generates attacks</a> from vulnerabilities and enhancements</dd>
-      <dt>Structured agents</dt><dd><a href="https://deepeval.com/docs/red-teaming-introduction#model-callback">Model callbacks</a> for DeepTeam; structured test cases for DeepEval</dd>
-      <dt>Multi-agent and multi-turn</dt><dd><a href="https://deepeval.com/docs/metrics-conversation-completeness">Conversational metrics</a> in DeepEval; multi-turn attacks in DeepTeam</dd>
-      <dt>Quality evaluation</dt><dd>Extensible <a href="https://deepeval.com/docs/metrics-introduction">evaluation metrics</a></dd>
-      <dt>Red teaming</dt><dd><a href="https://deepeval.com/docs/red-teaming-introduction">DeepTeam</a> handles red teaming; DeepEval supplies metrics</dd>
-      <dt>pytest</dt><dd><a href="https://deepeval.com/docs/evaluation-test-cases">Evaluation test cases with pytest</a> through <code>deepeval test run</code></dd>
-    </dl>
-  </article>
+const tools: Tool[] = [
+  { id: "giskard", name: "Giskard OSS", href: "/oss", featured: true },
+  { id: "garak", name: "garak", href: "https://docs.garak.ai/" },
+  {
+    id: "promptfoo",
+    name: "promptfoo",
+    href: "https://www.promptfoo.dev/docs/",
+  },
+  { id: "pyrit", name: "PyRIT", href: "https://azure.github.io/PyRIT/" },
+  {
+    id: "deepeval",
+    name: "DeepEval + DeepTeam",
+    href: "https://deepeval.com/docs/getting-started",
+  },
+];
+
+const rows: Row[] = [
+  {
+    criterion: "Dynamic scan",
+    cells: {
+      giskard: {
+        support: "core",
+        summary: "Target-aware generators",
+        href: "/oss/scan/explanation/how-scan-works",
+      },
+      garak: {
+        support: "partial",
+        summary: "Probe catalog + auto red-team",
+        href: "https://docs.garak.ai/garak/garak-components/vulnerability-probes",
+      },
+      promptfoo: {
+        support: "core",
+        summary: "Plugins and strategies",
+        href: "https://www.promptfoo.dev/docs/red-team/quickstart/",
+      },
+      pyrit: {
+        support: "partial",
+        summary: "Programmable attacks",
+        href: "https://azure.github.io/PyRIT/",
+      },
+      deepeval: {
+        support: "core",
+        summary: "DeepTeam attack generation",
+        href: "https://deepeval.com/docs/red-teaming-introduction",
+      },
+    },
+  },
+  {
+    criterion: "Structured agents",
+    cells: {
+      giskard: {
+        support: "core",
+        summary: "Pydantic input schemas",
+        href: "/oss/scan/how-to/wrap-your-agent",
+      },
+      garak: {
+        support: "partial",
+        summary: "Text-generation generators",
+        href: "https://docs.garak.ai/garak/garak-components/using-generators",
+      },
+      promptfoo: {
+        support: "partial",
+        summary: "HTTP and custom providers",
+        href: "https://www.promptfoo.dev/docs/providers/",
+      },
+      pyrit: {
+        support: "partial",
+        summary: "Prompt targets",
+        href: "https://azure.github.io/PyRIT/",
+      },
+      deepeval: {
+        support: "partial",
+        summary: "Callbacks and test cases",
+        href: "https://deepeval.com/docs/red-teaming-introduction#model-callback",
+      },
+    },
+  },
+  {
+    criterion: "Multi-agent and multi-turn",
+    cells: {
+      giskard: {
+        support: "core",
+        summary: "Stateful wrap-the-system tests",
+        href: "/oss/scan/how-to/wrap-your-agent",
+      },
+      garak: {
+        support: "partial",
+        summary: "Some multi-turn probes",
+        href: "https://docs.garak.ai/garak/automatic-red-teaming/garaks-auto-red-team",
+      },
+      promptfoo: {
+        support: "partial",
+        summary: "Multi-turn strategies",
+        href: "https://www.promptfoo.dev/docs/red-team/strategies/",
+      },
+      pyrit: {
+        support: "partial",
+        summary: "Multi-turn attacks",
+        href: "https://azure.github.io/PyRIT/",
+      },
+      deepeval: {
+        support: "partial",
+        summary: "Metrics + DeepTeam attacks",
+        href: "https://deepeval.com/docs/metrics-conversation-completeness",
+      },
+    },
+  },
+  {
+    criterion: "Quality evaluation",
+    cells: {
+      giskard: {
+        support: "core",
+        summary: "Checks + quality_scan",
+        href: "/oss/checks/explanation/when-to-use-which-check",
+      },
+      garak: {
+        support: "none",
+        summary: "Vulnerability scanner",
+        href: "https://docs.garak.ai/garak",
+      },
+      promptfoo: {
+        support: "core",
+        summary: "Assertions and metrics",
+        href: "https://www.promptfoo.dev/docs/configuration/expected-outputs/",
+      },
+      pyrit: {
+        support: "partial",
+        summary: "Attack scorers",
+        href: "https://azure.github.io/PyRIT/",
+      },
+      deepeval: {
+        support: "core",
+        summary: "Evaluation metrics",
+        href: "https://deepeval.com/docs/metrics-introduction",
+      },
+    },
+  },
+  {
+    criterion: "Red teaming",
+    cells: {
+      giskard: {
+        support: "core",
+        summary: "Target-aware vulnerability_scan",
+        href: "/oss/solutions/scan-vulnerabilities",
+      },
+      garak: {
+        support: "core",
+        summary: "Named vulnerability probes",
+        href: "https://docs.garak.ai/garak",
+      },
+      promptfoo: {
+        support: "core",
+        summary: "Plugins and strategies",
+        href: "https://www.promptfoo.dev/docs/red-team/",
+      },
+      pyrit: {
+        support: "core",
+        summary: "Attacks and executors",
+        href: "https://azure.github.io/PyRIT/",
+      },
+      deepeval: {
+        support: "core",
+        summary: "DeepTeam red teaming",
+        href: "https://deepeval.com/docs/red-teaming-introduction",
+      },
+    },
+  },
+  {
+    criterion: "pytest",
+    cells: {
+      giskard: {
+        support: "core",
+        summary: "Native async pytest",
+        href: "/oss/checks/how-to/run-in-pytest",
+      },
+      garak: {
+        support: "none",
+        summary: "No first-class workflow",
+      },
+      promptfoo: {
+        support: "partial",
+        summary: "CI, not native pytest",
+      },
+      pyrit: {
+        support: "none",
+        summary: "No first-class workflow",
+      },
+      deepeval: {
+        support: "core",
+        summary: "deepeval test run",
+        href: "https://deepeval.com/docs/evaluation-test-cases",
+      },
+    },
+  },
+];
+
+for (const row of rows) {
+  for (const tool of tools) {
+    if (!(tool.id in row.cells)) {
+      throw new Error(
+        `ToolComparison: missing ${tool.id} cell for "${row.criterion}"`,
+      );
+    }
+  }
+}
+
+function supportLabel(support: Support): string {
+  switch (support) {
+    case "core":
+      return "Core";
+    case "partial":
+      return "Partial";
+    case "none":
+      return "Not a focus";
+    default: {
+      const _exhaustive: never = support;
+      return _exhaustive;
+    }
+  }
+}
+
+function isExternal(href: string): boolean {
+  return href.startsWith("http://") || href.startsWith("https://");
+}
+---
+
+<div class="not-content tool-comparison">
+  <ul class="tool-comparison-legend" aria-label="Comparison legend">
+    <li>
+      <span class="tool-comparison-pill" data-support="core">Core</span>
+      First-class workflow
+    </li>
+    <li>
+      <span class="tool-comparison-pill" data-support="partial">Partial</span>
+      Supported in a narrower form
+    </li>
+    <li>
+      <span class="tool-comparison-pill" data-support="none">Not a focus</span>
+      Not a documented primary workflow
+    </li>
+  </ul>
+
+  <div
+    class="tool-comparison-scroll"
+    role="region"
+    aria-labelledby="tool-comparison-caption"
+    tabindex="0"
+  >
+    <table class="tool-comparison-table">
+      <caption id="tool-comparison-caption" class="sr-only">
+        Capability comparison of Giskard OSS, garak, promptfoo, PyRIT, and
+        DeepEval plus DeepTeam
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Capability</th>
+          {
+            tools.map((tool) => (
+              <th
+                scope="col"
+                class:list={{ "is-featured": tool.featured }}
+              >
+                <a
+                  href={tool.href}
+                  {...(isExternal(tool.href)
+                    ? { rel: "noreferrer" }
+                    : {})}
+                >
+                  {tool.name}
+                </a>
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr>
+              <th scope="row">{row.criterion}</th>
+              {tools.map((tool) => {
+                const cell = row.cells[tool.id];
+                if (!cell) {
+                  throw new Error(
+                    `ToolComparison: missing ${tool.id} cell for "${row.criterion}"`,
+                  );
+                }
+                const summary = cell.href ? (
+                  <a
+                    href={cell.href}
+                    {...(isExternal(cell.href)
+                      ? { rel: "noreferrer" }
+                      : {})}
+                  >
+                    {cell.summary}
+                  </a>
+                ) : (
+                  cell.summary
+                );
+                return (
+                  <td class:list={{ "is-featured": tool.featured }}>
+                    <span
+                      class="tool-comparison-pill"
+                      data-support={cell.support}
+                    >
+                      {supportLabel(cell.support)}
+                    </span>
+                    <span class="tool-comparison-summary">{summary}</span>
+                  </td>
+                );
+              })}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <style>
-  .tool-comparison-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    margin-block: 1.5rem;
+  .tool-comparison {
+    margin-block: 1.25rem 1.5rem;
   }
 
-  .tool-comparison-card {
-    border: 1px solid var(--sl-color-hairline-light);
+  .tool-comparison-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin: 0 0 0.85rem;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--sl-color-gray-2, #64748b);
+  }
+
+  .tool-comparison-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .tool-comparison-scroll {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--sl-color-hairline);
     border-radius: 0.75rem;
-    padding: 1.25rem;
-    background: var(--sl-color-bg-nav);
+    background: var(--sl-color-bg);
   }
 
-  .tool-comparison-card--featured {
-    border-color: var(--sl-color-accent);
-    box-shadow: inset 0 0 0 1px var(--sl-color-accent);
+  .tool-comparison-scroll:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
   }
 
-  h3 {
-    margin: 0 0 1rem;
-    font-size: var(--sl-text-h4);
-  }
-
-  dl,
-  dd {
+  .tool-comparison-table {
+    display: table;
+    width: 100%;
+    min-width: 42rem;
     margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.8125rem;
+    line-height: 1.35;
   }
 
-  dt {
-    margin-top: 0.9rem;
-    font-size: var(--sl-text-xs);
+  .tool-comparison-table :is(th, td) {
+    padding: 0.7rem 0.8rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-bg);
+  }
+
+  .tool-comparison-table tbody tr:last-child :is(th, td) {
+    border-bottom: none;
+  }
+
+  .tool-comparison-table thead th {
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
-    line-height: 1.25;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    vertical-align: bottom;
+    background: var(--sl-color-bg-nav);
+    border-bottom: 1px solid var(--sl-color-hairline);
   }
 
-  dt:first-child {
-    margin-top: 0;
+  .tool-comparison-table tbody th {
+    font-weight: 700;
+    white-space: nowrap;
   }
 
-  dd {
-    margin-top: 0.25rem;
-    line-height: 1.55;
+  .tool-comparison-table :is(th, td):first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 9.75rem;
+    width: 9.75rem;
+    box-shadow: 1px 0 0 var(--sl-color-hairline);
   }
 
-  @media (max-width: 50rem) {
-    .tool-comparison-grid {
-      grid-template-columns: 1fr;
-    }
+  .tool-comparison-table thead th:first-child {
+    z-index: 2;
+  }
 
-    .tool-comparison-card {
-      padding: 1rem;
-    }
+  .tool-comparison-table :is(th, td).is-featured {
+    background: color-mix(in srgb, var(--sl-color-accent) 7%, var(--sl-color-bg));
+    box-shadow: inset 3px 0 0 var(--sl-color-accent);
+  }
+
+  .tool-comparison-table thead th.is-featured {
+    background: color-mix(
+      in srgb,
+      var(--sl-color-accent) 10%,
+      var(--sl-color-bg-nav)
+    );
+  }
+
+  .tool-comparison-table tbody tr:hover :is(th, td) {
+    background: color-mix(in srgb, var(--sl-color-accent) 5%, var(--sl-color-bg));
+  }
+
+  .tool-comparison-table tbody tr:hover :is(th, td).is-featured {
+    background: color-mix(in srgb, var(--sl-color-accent) 12%, var(--sl-color-bg));
+  }
+
+  .tool-comparison-table td {
+    min-width: 8.75rem;
+  }
+
+  .tool-comparison-pill {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin: 0;
+    padding: 0.12rem 0.42rem;
+    border-radius: 999px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .tool-comparison-pill[data-support="core"] {
+    color: #14532d;
+    background: #dcfce7;
+  }
+
+  .tool-comparison-pill[data-support="partial"] {
+    color: #92400e;
+    background: #fef3c7;
+  }
+
+  .tool-comparison-pill[data-support="none"] {
+    color: #475569;
+    background: #e2e8f0;
+  }
+
+  :global(:root[data-theme="dark"]) .tool-comparison-pill[data-support="core"] {
+    color: #022c22;
+    background: #05d939;
+  }
+
+  :global(:root[data-theme="dark"])
+    .tool-comparison-pill[data-support="partial"] {
+    color: #ffedd5;
+    background: rgba(249, 115, 22, 0.35);
+  }
+
+  :global(:root[data-theme="dark"]) .tool-comparison-pill[data-support="none"] {
+    color: #c6ffff;
+    background: rgba(198, 255, 255, 0.12);
+  }
+
+  .tool-comparison-summary {
+    display: block;
+    margin-top: 0.35rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>
