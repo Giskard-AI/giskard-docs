@@ -211,6 +211,7 @@ Open research on AI safety and security, including the Phare multilingual benchm
 ### Solutions (Open Source)
 Task-shaped quickstarts that sit above the Checks and Scan sections.
 - Solutions: https://docs.giskard.ai/oss/solutions.md
+- Quality Assessment: https://docs.giskard.ai/oss/solutions/quality-assessment.md
 - Scan Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
 - Check Agentic Systems: https://docs.giskard.ai/oss/solutions/check-agentic-systems.md
 
@@ -222,7 +223,6 @@ Task-shaped quickstarts that sit above the Checks and Scan sections.
 - Tutorials Overview: https://docs.giskard.ai/oss/scan/tutorials.md
 - Your First Scan: https://docs.giskard.ai/oss/scan/tutorials/your-first-scan.md
 - From Red-Team Finding to Regression Test: https://docs.giskard.ai/oss/scan/tutorials/redteam-to-regression.md
-- Scan a RAG Agent: https://docs.giskard.ai/oss/scan/tutorials/scan-a-rag-agent.md
 - Write a Custom Scenario Generator: https://docs.giskard.ai/oss/scan/tutorials/custom-scenario-generator.md
 
 ### Scan How-to Guides

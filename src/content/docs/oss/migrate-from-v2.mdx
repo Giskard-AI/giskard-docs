@@ -102,7 +102,7 @@ async def support_agent(inputs: AgentInput) -> AgentOutput:
     return AgentOutput(answer=response.choices[0].message.content or "")
 ```
 
-The `description` did not disappear, it moved: it is now an argument on the scan itself, and it still steers what the generators write. There is no dataset argument at all, because the scan writes its own scenarios.
+The `description` did not disappear; it moved. It is now an argument on the scan itself, and it still steers what the generators write. There is no dataset argument because the scan writes its own scenarios.
 
 </TabItem>
 <TabItem label="Giskard v2">
@@ -207,7 +207,7 @@ Results also carry `owasp:`, `probe-type:`, and `component:` tags. The full list
 
 ## RAG evaluation: RAGET becomes `quality_scan`
 
-RAGET was two steps, generate a test set from a knowledge base, then evaluate an answer function against it. v3 folds both into one call.
+RAGET involved two steps: generating a test set from a knowledge base, then evaluating an answer function against it. v3 folds both into one call.
 
 <Tabs syncKey="giskard-version">
 <TabItem label="Giskard v3">
@@ -276,15 +276,43 @@ report.correctness_by_topic()
 
 v2 question generators and v3 scenario generators are not row-for-row migrations: v3 generators create scenarios for distinct behaviors, and some use multi-turn conversations. `quality_scan` runs the quality registry unless you build a suite yourself with `generate_suite(generators=[...])`.
 
-For hand-written Checks scenarios, `UserSimulator` and custom interaction generators create the user messages within a scenario. They are lower-level building blocks, not replacements for RAGET question generators. The quality `ScenarioGenerator`s below are the closest automated successor because they build complete scenarios—interactions and checks—from the knowledge base.
+For hand-written Checks scenarios, `UserSimulator` and custom interaction generators create the user messages within a scenario. They are lower-level building blocks, not replacements for RAGET question generators. The quality `ScenarioGenerator`s below are the closest automated equivalents because they build complete scenarios, including interactions and checks, from the knowledge base.
 
-| v3 scenario generator             | Purpose                                                                                     |
-| --------------------------------- | ------------------------------------------------------------------------------------------- |
-| `HallucinationScenarioGenerator`  | Direct document-grounded questions and contradictions.                                      |
-| `SplitQuestionsScenarioGenerator` | Two-message questions that depend on conversation history.                                  |
-| `MultiTopicScenarioGenerator`     | Multi-turn questions over separate knowledge-base topics, exercising retrieval and history. |
-| `SycophancyScenarioGenerator`     | Questions biased by an assertion that is contrary to the source material.                   |
-| `OutOfScopeScenarioGenerator`     | Plausible, precise objects absent from the knowledge base and fabricated-answer behavior.   |
+| v3 scenario generator             | Purpose                                                                                    |
+| --------------------------------- | ------------------------------------------------------------------------------------------ |
+| `HallucinationScenarioGenerator`  | Direct document-grounded questions and contradictions.                                     |
+| `SplitQuestionsScenarioGenerator` | Two-message questions that depend on conversation history.                                 |
+| `MultiTopicScenarioGenerator`     | Multi-turn questions over separate knowledge-base topics, assessing retrieval and history. |
+| `SycophancyScenarioGenerator`     | Questions biased by an assertion that is contrary to the source material.                  |
+| `OutOfScopeScenarioGenerator`     | Plausible, specific topics absent from the knowledge base and fabricated-answer behavior.  |
+
+### Multi-turn scenarios
+
+RAGET's `conversational` question type stored a pre-generated conversation history alongside the final question in one test-set row. The history was fixed before evaluation, and the answer function received it as additional context.
+
+The quality scan instead runs a scenario turn by turn. All of its generators can read the updated conversation trace and continue based on the agent's previous replies. This makes the interaction dynamic and lets the scan assess whether the agent remembers earlier context, retrieves new information as the topic changes, and remains grounded throughout the conversation.
+
+The quality scan defaults to `target_mode="multiturn"`. Multi-turn behavior is part of the general scenario model and can be used across quality scenario categories.
+
+Your target must preserve conversation history for those scenarios to be meaningful. It can keep state internally, or rebuild the message history from the Giskard `Trace`. See [Wrap Your Agent for the Scan](/oss/scan/how-to/wrap-your-agent) for both patterns.
+
+For an agent that only accepts independent requests, pass `target_mode="singleturn"`. The direct-question, sycophancy, and out-of-scope generators limit their scenarios to one turn. Split-question and multi-topic generators require conversation history, so they are skipped.
+
+### Quality scan components vs RAGET question types
+
+Both RAGET and the quality scan associate generated test categories with the components they are designed to assess. RAGET used question types, such as `simple`, `complex`, `distracting`, `situational`, `double`, or `conversational`, and mapped them to RAG components. The quality scan follows the same principle with richer scenario types: each scenario generator assigns one or more `component:` tags, identifying the `llm`, `retrieval`, or `history` parts of the agent it is designed to assess. The report groups results by these tags by default:
+
+| Quality scenario     | Component tags         |
+| -------------------- | ---------------------- |
+| Direct Hallucination | `llm`                  |
+| Sycophancy           | `llm`                  |
+| Split question       | `history`              |
+| Multiple topics      | `retrieval`, `history` |
+| Out of scope         | `llm`, `retrieval`     |
+
+A scenario can assess more than one component. For example, a multi-topic conversation depends on both retrieving information from different documents and carrying context across turns. The tags describe the intended focus of the scenario. They do not inspect the agent's architecture or prove which internal component caused a failure.
+
+There is no one-to-one mapping between RAGET question types and quality scan scenario types, but the same diagnostic workflow carries over. Use component groups to identify broad patterns, then inspect the scenario category and conversation trace to understand each failure.
 
 ### Checks for related concerns
 

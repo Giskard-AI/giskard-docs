@@ -1,0 +1,265 @@
+---
+title: "Quality Assessment"
+description: "Assess whether an AI agent gives correct, grounded answers with generated scenarios, multi-turn conversations, and actionable recommendations."
+sidebar:
+  order: 1
+---
+
+import {
+  CardGrid,
+  LinkCard,
+  Tabs,
+  TabItem,
+} from "@astrojs/starlight/components";
+
+Giskard's **quality scan** assesses whether your agent gives correct answers grounded in the information it is supposed to use. It builds upon the approach introduced by RAGET, a Giskard v2 feature. The quality scan extends that approach beyond RAG pipelines to any agent and adds dynamic, multi-turn capabilities.
+
+The quality scan generates test situations from a knowledge base, runs them against your agent, and uses the results to identify quality failures. These tests are represented as dynamic scenarios rather than static question rows. A scenario can contain several interactions, adapt to the conversation, and check the behavior of the agent at each step.
+
+:::note[Migrating from RAGET?]
+The quality scan keeps RAGET's knowledge-base-driven assessment workflow, but replaces generated question rows and `RAGReport` with dynamic scenarios and a `SuiteResult`. The [Giskard v2 to v3 migration guide](/oss/migrate-from-v2#rag-evaluation-raget-becomes-quality_scan) explains how to migrate from RAGET in detail.
+:::
+
+## Key principles
+
+### Start from a source of truth
+
+Provide the documents that define what correct answers look like, such as product documentation, policies, procedures, or support content. The scan uses this knowledge base both to generate questions and to judge whether the agent's answers contradict it.
+
+This grounding is essential. Without source documents, the quality scan cannot distinguish an answer that sounds plausible from one that is correct for your organization.
+
+### Generate dynamic, multi-turn scenarios
+
+The quality scan generates scenarios from the agent description and knowledge base instead of replaying a fixed list of questions. A scenario contains the conversation and the checks used to evaluate the replies.
+
+Scenarios are dynamic: the generated user can react to an agent response and adapt the next message. They can also span multiple turns, which makes it possible to assess whether the agent keeps context as the conversation evolves.
+
+### Cover diverse scenarios
+
+The quality scan combines several scenario generators. Each one creates a different interaction pattern:
+
+| Scenario                 | Situation                                                                                                                  |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| **Direct Hallucination** | Asks direct questions grounded in the source documents and checks whether the answer contradicts them.                     |
+| **Sycophancy**           | Introduces a confidently stated but incorrect premise and checks whether the agent agrees with it.                         |
+| **Split question**       | Provides part of the context in one message and asks the actual question in a later turn to assess context understanding.  |
+| **Multiple topics**      | Moves between separate knowledge-base topics to assess retrieval and conversation history.                                 |
+| **Out of scope**         | Asks about plausible information that is absent from the knowledge base and checks whether the agent fabricates an answer. |
+
+These generators describe different situations that can occur in real usage. The same underlying weakness can appear in several of them. For example, poor context handling can cause failures in both split-question and multi-topic scenarios. Combining generators gives the scan more varied ways to reveal those overlapping quality failures.
+
+### Diagnose your agent
+
+Each scenario type is associated with one or more agent components. Failures can highlight weaknesses in the associated components:
+
+| Scenario        | Component tags         |
+| --------------- | ---------------------- |
+| Hallucination   | `llm`                  |
+| Sycophancy      | `llm`                  |
+| Split question  | `history`              |
+| Multiple topics | `retrieval`, `history` |
+| Out of scope    | `llm`, `retrieval`     |
+
+Results are grouped by agent component, providing a quick indication of which part may need improvement.
+
+The scan also produces an LLM-generated recommendation from aggregate failure rates. Use it to prioritize investigation, then read the failed conversations and compare them with the source documents before changing the agent. Component tags describe what each scenario category evaluates. They are not produced by inspecting your agent's internal architecture, so they indicate where to investigate rather than proving the root cause.
+
+## Before starting
+
+First, install the scan and choose the model that will generate and judge the scenarios. The scan ships in the `scan` extra, and the provider clients ship in a provider extra, so ask for both. Pick your provider below:
+
+<Tabs>
+<TabItem label="OpenAI">
+
+```bash
+pip install "giskard[scan,openai]"
+```
+
+```python
+from giskard.checks import set_default_generator
+
+set_default_generator("openai/gpt-4o")
+```
+
+Set `OPENAI_API_KEY` in your environment.
+
+</TabItem>
+<TabItem label="Anthropic">
+
+```bash
+pip install "giskard[scan,anthropic]"
+```
+
+```python
+from giskard.checks import set_default_generator
+
+set_default_generator("anthropic/claude-sonnet-4-20250514")
+```
+
+Set `ANTHROPIC_API_KEY` in your environment.
+
+</TabItem>
+<TabItem label="Gemini">
+
+```bash
+pip install "giskard[scan,google]"
+```
+
+```python
+from giskard.checks import set_default_generator
+
+set_default_generator("gemini/gemini-2.5-flash")
+```
+
+Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment.
+
+</TabItem>
+<TabItem label="Any provider">
+
+LiteLLM reaches any provider through a single `"<provider>/<model-name>"` string, so it is the most flexible option.
+
+```bash
+pip install "giskard[scan,litellm]"
+```
+
+```python
+from giskard.agents.generators import LiteLLMGenerator
+from giskard.checks import set_default_generator
+
+llm_judge = LiteLLMGenerator(model="<provider>/<model-name>")
+set_default_generator(llm_judge)
+```
+
+For example `mistral/mistral-large-latest`, `bedrock/anthropic.claude-3-sonnet-20240229-v1:0`, or `ollama/qwen2.5`. For the full list of providers, see [LiteLLM's provider conventions](https://docs.litellm.ai/docs/providers) and set the matching API key in your environment.
+
+</TabItem>
+</Tabs>
+
+`set_default_generator` makes your chosen model the default for generating and judging every scenario in the scan.
+
+## Run a quality assessment
+
+### Provide the assessment context
+
+Once your [generator is configured](#before-starting) and your [agent is wrapped as a `target` callable](/oss/scan/how-to/wrap-your-agent), the main input for the quality scan is the knowledge base. Pass the documents your agent uses as its source of truth, ideally following the same chunking strategy. A list of strings is enough for a small assessment. For larger collections, use `KnowledgeBase` and `Document` objects to preserve document names and metadata.
+
+The `description` complements those documents. It tells the scenario generators what the agent does, who uses it, and which requests are in scope, allowing them to adapt interactions to your use case. The knowledge base supplies the source material from which the generators build grounded questions and against which the checks evaluate the answers.
+
+```python
+from giskard.scan import Document, KnowledgeBase
+
+knowledge_base = KnowledgeBase(
+    documents=(
+        Document(
+            content=(
+                "A disputed card transaction must be reported within 120 days "
+                "of the statement date."
+            ),
+            tags=["disputes"],
+        ),
+        Document(
+            content="A lost debit card must be replaced. It costs 12 EUR.",
+            tags=["cards"],
+        ),
+    )
+)
+```
+
+### Generate and run the scenarios
+
+`quality_scan` combines generation and execution in one asynchronous call. First, it uses the agent description and knowledge base to generate a `Suite` of conversations and checks. It then sends each interaction to the target, records the replies, and evaluates them against the source documents.
+
+The `support_agent` function below is the boundary between Giskard and your application. Replace its body with the call to your agent, workflow, or remote API. During a multi-turn scenario, Giskard calls this function once for each new message, so the wrapper must preserve or reconstruct the conversation history.
+
+```python
+from giskard.scan import quality_scan
+
+
+async def support_agent(inputs: str) -> str:
+    # Replace this body with a call to your agent, workflow, or remote API.
+    raise NotImplementedError
+
+
+result = await quality_scan(
+    target=support_agent,
+    description=(
+        "A customer-support agent for a retail bank. It answers questions "
+        "about cards, transfers, fees, and disputes from published policies."
+    ),
+    languages=["en"],
+    knowledge_base=knowledge_base,
+    max_scenarios=20,
+    target_mode="multiturn",
+)
+```
+
+In this example, `description` focuses generation on retail-bank support, `languages` requests English conversations, and `knowledge_base` provides the facts used to generate and evaluate them. `max_scenarios=20` sets a total budget across the built-in quality generators, rather than generating 20 scenarios per generator. Use a small budget while validating the integration, then increase it to explore a broader set of situations.
+
+`target_mode="multiturn"` allows generators to continue a conversation based on earlier replies. Use `"singleturn"` when the agent handles every request independently. The scan then limits generation to scenarios compatible with that constraint.
+
+### Review the results
+
+The returned `SuiteResult` contains the complete conversation traces, check verdicts, pass rate, generated suite, and aggregate recommendation. Its report is grouped by component by default, helping you compare patterns related to answer generation, retrieval, and conversation history. Read the failed traces and judge messages before acting on those groups or on the generated recommendation.
+
+```python
+result.print_report()
+
+for failure in result.failures_and_errors:
+    print("-", failure.scenario_name)
+
+if result.recommendation:
+    print(result.recommendation)
+```
+
+For the shared scan setup, complete wrapper patterns, knowledge-base options, costs, and generator configuration, follow [Quality Scan for Hallucinations](/oss/scan/how-to/quality-scan).
+
+## Turn discoveries into regression tests
+
+The generated scenarios are returned as a Giskard `Suite`. Save that suite and run the same conversations after changing the model, prompt, retrieval layer, or agent workflow. Replaying a fixed suite makes results more comparable than generating a new set of scenarios for every run.
+
+Generate new suites periodically to discover additional failure modes, and keep stable suites for regression testing and CI.
+
+### Upload the evaluation to Giskard Hub
+
+Upload a completed quality scan to Giskard Hub to share and review its results with your team. After you [install and authenticate the Hub SDK](/hub/sdk/quickstart#1-install-the-sdk), convert the `SuiteResult` to the Hub format and upload it as a local evaluation:
+
+{/* pyright-skip: giskard_hub is not installed in the docs env. */}
+
+```python
+from giskard_hub import HubClient
+
+hub = HubClient()
+
+evaluation = hub.evaluations.upload(
+    project_id="project-id",
+    payload=result.to_hub_format(),
+    name="Quality scan discoveries",
+    auto_classify_failures=True,
+)
+```
+
+The Hub stores each scenario result with its interactions and check outcomes. You can optionally pass `agent_id` to associate the evaluation with a registered agent. See [Upload results from Giskard OSS](/hub/sdk/guides/evaluations#upload-results-from-giskard-oss) for the complete upload workflow.
+
+## Where to go next
+
+<CardGrid>
+  <LinkCard
+    title="Run a Quality Scan"
+    description="Configure the full scan, understand each probe, and interpret the report."
+    href="/oss/scan/how-to/quality-scan"
+  />
+  <LinkCard
+    title="Write RAG Checks"
+    description="Add hand-written retrieval checks and quality scenarios for behavior specific to your system."
+    href="/oss/checks/use-cases/rag-evaluation"
+  />
+  <LinkCard
+    title="Scan Vulnerabilities"
+    description="Red team the same agent for safety and security vulnerabilities with the vulnerability scan."
+    href="/oss/solutions/scan-vulnerabilities"
+  />
+</CardGrid>
+
+## Troubleshooting
+
+If you encounter any issues, join our [Discord community](https://discord.com/invite/ABvfpbu69R) and ask in the #general channel.
