@@ -1,6 +1,6 @@
 ---
-title: "Dataset-Backed Generators"
-description: "Replay a fixed corpus of scan scenarios from a JSONL file, either bundled in the package with LocalDatasetScenarioGenerator or hosted on the Hugging Face Hub with HuggingFaceDatasetScenarioGenerator."
+title: "Scan With Your Own Dataset"
+description: "Replay fixed Giskard scan scenarios from local JSONL files or Hugging Face datasets with built-in dataset-backed generators."
 sidebar:
   order: 6
 ---
@@ -225,7 +225,7 @@ The draw uses the seeded RNG the scan hands each generator, so `seed` fixes exac
 
 `target_mode="singleturn"` clamps every LLM input generator in a loaded scenario to `max_steps=1`, in place. Dataset scenarios that encode a multi-step conversation still run, but only their first turn does.
 
-## Next Steps
+## Next steps
 
 - [Generators reference](/oss/scan/reference/generators) for every generator with its parameters
 - [Tune a Scan Run](/oss/scan/how-to/tune-scan-options) for `max_scenarios`, `seed`, and `commercial_use` in full

@@ -1,11 +1,11 @@
 ---
 title: "Run Garak and DeepTeam Scanners"
-description: "Run the garak and deepteam red-team scanners against a Giskard target with third_party_scan, discover probes with list_scan_items, and read the unified SuiteResult."
+description: "Run garak and deepteam against a Giskard target, discover supported probes and attacks, and interpret their unified scan results."
 sidebar:
   order: 8
 ---
 
-[**garak**](https://github.com/NVIDIA/garak) ↗ and [**deepteam**](https://github.com/confident-ai/deepteam) ↗ are open-source red-teaming tools: they send attack prompts to an LLM app and report which ones got through. They work in different ways, and the difference decides which one you reach for.
+[**garak ↗**](https://github.com/NVIDIA/garak) and [**deepteam ↗**](https://github.com/confident-ai/deepteam) are open-source red-teaming tools: they send attack prompts to an LLM app and report which ones got through. They work in different ways, and the difference decides which one you reach for.
 
 - **garak** mainly replays a fixed corpus of published attacks. Each probe carries a prompt set that is fixed when the probe loads, so it tests your agent against attacks other people have already found. Some of its detectors do use an LLM to judge the response.
 - **deepteam** generates its attacks. It hands your `description` to an LLM as the target's purpose, synthesizes attacks against each vulnerability you selected, and then rewrites or escalates them with the attack techniques you selected.
@@ -61,7 +61,7 @@ Treat `list_scan_items` as the authority rather than the upstream READMEs. For g
 Copy a vulnerability or attack name out of deepteam's own documentation and the scan will run without it, log a warning, and return a skip result. Nothing fails loudly. Check names against `list_scan_items("deepteam")` first, and read the skip count before you conclude the agent resisted anything.
 :::
 
-Read [NVIDIA/garak](https://github.com/NVIDIA/garak) ↗ and [confident-ai/deepteam](https://github.com/confident-ai/deepteam) ↗ for background on what each probe or technique does.
+Read [NVIDIA/garak ↗](https://github.com/NVIDIA/garak) and [confident-ai/deepteam ↗](https://github.com/confident-ai/deepteam) for background on what each probe or technique does.
 
 The deepteam names come from a fixed map inside the adapter rather than deepteam's full catalog. The vulnerabilities are what you test for:
 

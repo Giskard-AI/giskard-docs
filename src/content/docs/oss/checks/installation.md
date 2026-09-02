@@ -84,6 +84,6 @@ set_default_generator("openai/gpt-5-mini")
 
 A model identifier string is wrapped in `Generator` automatically. Pass a `Generator` instance when you need further configuration. Use a capable judge model and review failures before acting on them.
 
-## Next Steps
+## Next steps
 
 For a step-by-step lesson with no API key, try [Your First Test](/oss/checks/tutorials/your-first-test) first. Or head to the [Quickstart](/oss/checks/quickstart) for a single example.
