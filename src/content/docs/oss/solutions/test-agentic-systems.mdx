@@ -1,11 +1,11 @@
 ---
-title: "Check Agentic Systems"
-description: "Write your first Giskard check against an agent: wrap the agent, assert a rule in plain English, collect scenarios into a suite, and export JUnit XML for CI."
+title: "Test Agentic Systems"
+description: "Write your first Giskard check against an agent: wrap the agent, assert a rule in plain language, collect scenarios into a suite, and export JUnit XML for CI."
 sidebar:
   order: 2
 ---
 
-An agent is non-deterministic, so the assertion you want is rarely `==`. It is "the agent refused", "the answer came from the documents", "it never mentioned another customer". [Giskard Checks](/oss/checks) is the library for writing those assertions: you call your agent, state the rule in plain English, and an LLM judge decides pass or fail.
+An agent is non-deterministic, so the assertion you want is rarely `==`. It is "the agent refused", "the answer came from the documents", "it never mentioned another customer". [Giskard Checks](/oss/checks) is the library for writing those assertions: you call your agent, state the rule in plain language, and an LLM judge decides pass or fail.
 
 This page is the shortest runnable path from nothing to a passing suite. For the full library, go to [Giskard Checks](/oss/checks).
 
@@ -69,7 +69,7 @@ The parameter must be named `inputs`. Giskard injects arguments by name, and onl
 
 ## Write a check
 
-A **scenario** is one test case: what you send, and what has to hold about the reply. `Conformity` takes a rule in plain English and hands it to the judge.
+A **scenario** is one test case: what you send, and what has to hold about the reply. `Conformity` takes a rule in plain language and hands it to the judge.
 
 ```python
 from giskard.checks import Conformity, Scenario

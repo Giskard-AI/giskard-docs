@@ -1,5 +1,5 @@
 ---
-title: "Stereotypes & Discrimination"
+title: "Stereotypes and Discrimination"
 description: "Learn about LLM stereotypes and discrimination vulnerabilities and how to detect and prevent biased behavior and unfair treatment."
 sidebar:
   order: 7

@@ -1,5 +1,5 @@
 ---
-title: Async design & pytest
+title: Async design and pytest
 description: "Why Giskard Checks are async-first and how to use them correctly in scripts, pytest, and Jupyter notebooks."
 sidebar:
   order: 3

@@ -1,5 +1,5 @@
 ---
-title: Agents & Knowledge Bases
+title: Agents and Knowledge Bases
 description: Register agents, manage knowledge bases, and use them together for evaluations, dataset generation, and vulnerability scans.
 sidebar:
   order: 2

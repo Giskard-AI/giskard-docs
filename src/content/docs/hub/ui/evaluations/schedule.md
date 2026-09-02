@@ -9,9 +9,9 @@ You can schedule evaluations to run automatically at regular intervals. This is 
 
 ## Open the schedule view
 
-On the Evaluations page, click on the "Schedule" tab. This will display a list of all the scheduled evaluations.
+In the sidebar, open Evaluations and click Scheduled. This will display a list of all the scheduled evaluations.
 
-![List of scheduled evaluations with frequency and agent details](/_static/images/hub/evaluation-schedule-list.png)
+![Scheduled Evaluations page](/_static/images/hub/evaluation-schedule-list.png)
 
 ## Create a new schedule
 
@@ -31,11 +31,15 @@ Next, set the parameters for the evaluation:
 
 - `Tags` (optional): Limit the evaluation to a specific subset of the dataset by applying tags.
 
-- `Number of runs`: Select the number of runs that need to pass for each evaluation entry.
+- `Number of runs per scenario`: Choose how many times to run each scenario (1–5). The evaluation stops at the first failure; if all runs pass, the scenario is considered successful.
 
-- `Frequency`: Select the frequency for the evaluation.
+- `Frequency`: Select Daily, Weekly, or Monthly.
 
-- `Time`: Select the time for the evaluation. (This time is based on the time zone of the server where the Giskard Hub is installed.)
+- `Day of the week`: Shown when Frequency is Weekly. Select which day the evaluation should run.
+
+- `Day of the month`: Shown when Frequency is Monthly. Select a day from 1 to 28.
+
+- `Time (UTC)`: Select the time for the evaluation in UTC. The dialog also shows your current local time.
 
 After filling the form, click on the "Schedule evaluation" button, which will create the evaluation run and schedule it to run at the specified frequency and time.
 

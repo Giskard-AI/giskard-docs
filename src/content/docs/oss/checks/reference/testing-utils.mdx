@@ -1,6 +1,6 @@
 ---
 title: Testing Utilities
-description: "Testing utilities: TestCase for bundling traces with checks, assert_passed(), and debugging helpers."
+description: "Testing utilities: TestCase, TestCaseResult, TestCaseError, TestCaseStatus, assert_passed(), spies, and debugging helpers."
 sidebar:
   order: 5
 ---
@@ -131,7 +131,7 @@ Result of test case execution with check outcomes.
     Results from all checks.
   </Property>
   <Property name="passed" type="bool">
-    True if all checks passed.
+    True when status is PASS: no failures or errors, and not all checks skipped (or empty).
   </Property>
   <Property name="failed" type="bool">
     True if any check failed.
@@ -144,6 +144,12 @@ Result of test case execution with check outcomes.
   </Property>
   <Property name="duration_ms" type="int">
     Execution time in milliseconds.
+  </Property>
+  <Property name="last_interaction_index" type="int | None" defaultValue="None">
+    0-based index, in the scenario's final trace, of the last interaction this step added before its checks ran. `None` when the step added no interactions (for example, skipped). Hub upload uses this to attribute check results to a specific interaction.
+  </Property>
+  <Property name="error" type="TestCaseError | None" defaultValue="None">
+    Execution error that prevented the test case from running normally, such as an input-generation failure.
   </Property>
 </TypeTable>
 
@@ -164,6 +170,55 @@ else:
 # Assert (raises if failed)
 result.assert_passed()
 ```
+
+---
+
+## `TestCaseStatus`
+
+**Module:** `giskard.checks.core.result` (also exported from `giskard.checks`)
+
+Outcome categories for a test case execution. Derived from the case's check results (and `error`, if set): ERROR if `error` is set or any check errored, else FAIL if any check failed, else SKIP if every check was skipped, else PASS. An empty test case is PASS.
+
+| Status  | Value     | Description                                         |
+| ------- | --------- | --------------------------------------------------- |
+| `PASS`  | `"pass"`  | No failures or errors; not all checks skipped (or empty) |
+| `FAIL`  | `"fail"`  | At least one check failed and none errored          |
+| `ERROR` | `"error"` | At least one check errored, or `error` is set       |
+| `SKIP`  | `"skip"`  | All checks were skipped                             |
+
+```python
+from giskard.checks import TestCaseStatus
+
+if result.status == TestCaseStatus.PASS:
+    print("Success!")
+```
+
+---
+
+## `TestCaseError`
+
+**Module:** `giskard.checks.core.result` (also exported from `giskard.checks`)
+
+Captures why a test case failed to execute.
+
+<TypeTable name="TestCaseError">
+  <Property name="message" type="str">
+    Error message.
+  </Property>
+  <Property name="exception_type" type="str">
+    Exception class name (for example `"ValueError"`).
+  </Property>
+  <Property name="traceback" type="str | None" defaultValue="None">
+    Optional traceback string.
+  </Property>
+  <Property name="phase" type="str | None" defaultValue="None">
+    Optional execution phase during which the error occurred.
+  </Property>
+</TypeTable>
+
+<MethodCard name=".summary()" returnType="str">
+  One-line description: the exception type, optional phase, then the message.
+</MethodCard>
 
 ---
 

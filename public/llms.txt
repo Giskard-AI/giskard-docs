@@ -98,10 +98,10 @@ Open research on AI safety and security, including the Phare multilingual benchm
 
 ### Hub UI — Datasets
 - Datasets Overview: https://docs.giskard.ai/hub/ui/datasets.md
-- Import Tests: https://docs.giskard.ai/hub/ui/datasets/import.md
-- Create Manual Tests: https://docs.giskard.ai/hub/ui/datasets/manual.md
-- Scenario-Based Tests: https://docs.giskard.ai/hub/ui/datasets/scenario.md
-- Knowledge Base Tests: https://docs.giskard.ai/hub/ui/datasets/knowledge-base.md
+- Import Scenarios: https://docs.giskard.ai/hub/ui/datasets/import.md
+- Create Manual Scenarios: https://docs.giskard.ai/hub/ui/datasets/manual.md
+- Prompt Preset Scenarios: https://docs.giskard.ai/hub/ui/datasets/prompt-preset.md
+- Knowledge Base Scenarios: https://docs.giskard.ai/hub/ui/datasets/knowledge-base.md
 
 ### Hub UI — Evaluations
 - Evaluations Overview: https://docs.giskard.ai/hub/ui/evaluations.md

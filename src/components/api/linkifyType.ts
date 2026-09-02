@@ -138,10 +138,17 @@ export const OSS_CHECKS_TYPE_PAGES: Readonly<Record<string, string>> = {
   // Scenarios (scenarios.mdx)
   ScenarioResult: "/oss/checks/reference/scenarios",
   SuiteResult: "/oss/checks/reference/scenarios",
+  GroupStats: "/oss/checks/reference/scenarios",
+  GroupedSuiteResult: "/oss/checks/reference/scenarios",
   // Testing utilities (testing-utils.mdx)
   TestCase: "/oss/checks/reference/testing-utils",
   TestCaseResult: "/oss/checks/reference/testing-utils",
+  TestCaseError: "/oss/checks/reference/testing-utils",
   WithSpy: "/oss/checks/reference/testing-utils",
+  // Mixins and errors (core.mdx)
+  WithGeneratorMixin: "/oss/checks/reference/core",
+  WithEmbeddingMixin: "/oss/checks/reference/core",
+  InteractionGenerationError: "/oss/checks/reference/core",
 };
 
 /** Types defined as `<TypeTable>` in /oss/checks/reference/*. */

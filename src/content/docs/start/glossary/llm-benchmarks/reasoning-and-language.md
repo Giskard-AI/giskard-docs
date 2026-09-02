@@ -1,5 +1,8 @@
 ---
 title: "Reasoning and Language Understanding Benchmarks"
+head:
+  - tag: title
+    content: "Reasoning and Language Understanding Benchmarks | Giskard"
 description: "Benchmarks that evaluate LLMs' ability to comprehend text, make logical inferences, and solve problems requiring multi-step reasoning."
 sidebar:
   order: 2
