@@ -54,6 +54,7 @@
   "/oss/notebooks/security/LLM_QA_Google": "https://legacy-docs.giskard.ai/en/stable/reference/notebooks/LLM_QA_Google.html",
   "/oss/notebooks/security/LLM_QA_IPCC": "https://legacy-docs.giskard.ai/en/stable/reference/notebooks/LLM_QA_IPCC.html",
   "/oss/notebooks/security/LLM_QA_Winter_Olympics": "https://legacy-docs.giskard.ai/en/stable/reference/notebooks/LLM_QA_Winter_Olympics.html",
+  "/oss/scan/tutorials/scan-a-rag-agent": "/oss/solutions/quality-assessment",
   "/oss/sdk": "https://legacy-docs.giskard.ai/en/stable/index.html",
   "/oss/sdk/business": "https://legacy-docs.giskard.ai/en/stable/open_source/testset_generation/testset_generation/index.html",
   "/oss/sdk/security": "https://legacy-docs.giskard.ai/en/stable/open_source/scan/scan_llm/index.html",
