@@ -408,6 +408,21 @@ function isExternal(href: string): boolean {
     border-bottom: 1px solid var(--sl-color-hairline);
   }
 
+  .tool-comparison-table thead a {
+    color: inherit;
+    text-decoration: none !important;
+  }
+
+  .tool-comparison-table thead a:hover {
+    text-decoration: underline !important;
+    text-underline-offset: 0.18em;
+  }
+
+  .tool-comparison-table td a {
+    text-decoration-color: color-mix(in srgb, currentColor 38%, transparent);
+    text-underline-offset: 0.18em;
+  }
+
   .tool-comparison-table tbody th {
     font-weight: 700;
   }
@@ -427,18 +442,27 @@ function isExternal(href: string): boolean {
   }
 
   .tool-comparison-table :is(th, td).is-featured {
+    background: color-mix(in srgb, #0284c9 10%, var(--sl-color-bg));
+    box-shadow: inset 3px 0 0 #0284c9;
+  }
+
+  .tool-comparison-table thead th.is-featured {
+    background: color-mix(in srgb, #0284c9 14%, var(--sl-color-bg-nav));
+  }
+
+  :global(:root[data-theme="dark"]) .tool-comparison-table :is(th, td).is-featured {
     background: color-mix(
       in srgb,
-      var(--sl-color-accent) 11%,
+      var(--sl-color-accent) 14%,
       var(--sl-color-bg)
     );
     box-shadow: inset 3px 0 0 var(--sl-color-accent);
   }
 
-  .tool-comparison-table thead th.is-featured {
+  :global(:root[data-theme="dark"]) .tool-comparison-table thead th.is-featured {
     background: color-mix(
       in srgb,
-      var(--sl-color-accent) 10%,
+      var(--sl-color-accent) 16%,
       var(--sl-color-bg-nav)
     );
   }
@@ -448,7 +472,19 @@ function isExternal(href: string): boolean {
   }
 
   .tool-comparison-table tbody tr:hover :is(th, td).is-featured {
-    background: color-mix(in srgb, var(--sl-color-accent) 12%, var(--sl-color-bg));
+    background: color-mix(in srgb, #0284c9 16%, var(--sl-color-bg));
+  }
+
+  :global(:root[data-theme="dark"])
+    .tool-comparison-table
+    tbody
+    tr:hover
+    :is(th, td).is-featured {
+    background: color-mix(
+      in srgb,
+      var(--sl-color-accent) 20%,
+      var(--sl-color-bg)
+    );
   }
 
   .tool-comparison-table td {
@@ -502,7 +538,7 @@ function isExternal(href: string): boolean {
 
   .tool-comparison-summary {
     display: block;
-    margin-top: 0.35rem;
+    margin-top: 0.45rem;
   }
 
   .sr-only {
