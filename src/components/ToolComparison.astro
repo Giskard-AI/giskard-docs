@@ -232,7 +232,7 @@ function supportLabel(support: Support): string {
     case "partial":
       return "Partial";
     case "none":
-      return "Not a focus";
+      return "None";
     default: {
       const _exhaustive: never = support;
       return _exhaustive;
@@ -256,7 +256,7 @@ function isExternal(href: string): boolean {
       Supported in a narrower form
     </li>
     <li>
-      <span class="tool-comparison-pill" data-support="none">Not a focus</span>
+      <span class="tool-comparison-pill" data-support="none">None</span>
       Not a documented primary workflow
     </li>
   </ul>
@@ -376,8 +376,9 @@ function isExternal(href: string): boolean {
 
   .tool-comparison-table {
     display: table;
+    table-layout: fixed;
     width: 100%;
-    min-width: 42rem;
+    min-width: 40rem;
     margin: 0;
     border-collapse: separate;
     border-spacing: 0;
@@ -386,9 +387,10 @@ function isExternal(href: string): boolean {
   }
 
   .tool-comparison-table :is(th, td) {
-    padding: 0.7rem 0.8rem;
+    padding: 0.65rem 0.55rem;
     text-align: left;
     vertical-align: top;
+    overflow-wrap: break-word;
     border-bottom: 1px solid var(--sl-color-hairline);
     background: var(--sl-color-bg);
   }
@@ -408,15 +410,15 @@ function isExternal(href: string): boolean {
 
   .tool-comparison-table tbody th {
     font-weight: 700;
-    white-space: nowrap;
   }
 
   .tool-comparison-table :is(th, td):first-child {
     position: sticky;
     left: 0;
     z-index: 1;
-    min-width: 9.75rem;
-    width: 9.75rem;
+    min-width: 9.25rem;
+    width: 9.25rem;
+    padding-inline: 0.8rem;
     box-shadow: 1px 0 0 var(--sl-color-hairline);
   }
 
@@ -425,7 +427,11 @@ function isExternal(href: string): boolean {
   }
 
   .tool-comparison-table :is(th, td).is-featured {
-    background: color-mix(in srgb, var(--sl-color-accent) 7%, var(--sl-color-bg));
+    background: color-mix(
+      in srgb,
+      var(--sl-color-accent) 11%,
+      var(--sl-color-bg)
+    );
     box-shadow: inset 3px 0 0 var(--sl-color-accent);
   }
 
@@ -446,7 +452,7 @@ function isExternal(href: string): boolean {
   }
 
   .tool-comparison-table td {
-    min-width: 8.75rem;
+    min-width: 0;
   }
 
   .tool-comparison-pill {
