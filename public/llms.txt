@@ -211,6 +211,7 @@ Open research on AI safety and security, including the Phare multilingual benchm
 ### Solutions (Open Source)
 Task-shaped quickstarts that sit above the Checks and Scan sections.
 - Solutions: https://docs.giskard.ai/oss/solutions.md
+- Quality Assessment: https://docs.giskard.ai/oss/solutions/quality-assessment.md
 - Scan Vulnerabilities: https://docs.giskard.ai/oss/solutions/scan-vulnerabilities.md
 - Check Agentic Systems: https://docs.giskard.ai/oss/solutions/check-agentic-systems.md
 
@@ -222,7 +223,6 @@ Task-shaped quickstarts that sit above the Checks and Scan sections.
 - Tutorials Overview: https://docs.giskard.ai/oss/scan/tutorials.md
 - Your First Scan: https://docs.giskard.ai/oss/scan/tutorials/your-first-scan.md
 - From Red-Team Finding to Regression Test: https://docs.giskard.ai/oss/scan/tutorials/redteam-to-regression.md
-- Scan a RAG Agent: https://docs.giskard.ai/oss/scan/tutorials/scan-a-rag-agent.md
 - Write a Custom Scenario Generator: https://docs.giskard.ai/oss/scan/tutorials/custom-scenario-generator.md
 
 ### Scan How-to Guides
@@ -231,9 +231,9 @@ Task-shaped quickstarts that sit above the Checks and Scan sections.
 - Customize a Scan: https://docs.giskard.ai/oss/scan/how-to/customize-a-scan.md
 - Tune a Scan Run: https://docs.giskard.ai/oss/scan/how-to/tune-scan-options.md
 - Run the Scan in CI: https://docs.giskard.ai/oss/scan/how-to/scan-in-ci.md
-- Dataset-Backed Generators: https://docs.giskard.ai/oss/scan/how-to/dataset-generators.md
+- Scan With Your Own Dataset: https://docs.giskard.ai/oss/scan/how-to/dataset-generators.md
 - Save and Version a Scan Suite: https://docs.giskard.ai/oss/scan/how-to/save-and-version-suites.md
-- Find Hallucinations and Sycophancy with a Quality Scan: https://docs.giskard.ai/oss/scan/how-to/quality-scan.md
+- Run a Quality Scan: https://docs.giskard.ai/oss/scan/how-to/quality-scan.md
 - Run Garak and DeepTeam Scanners: https://docs.giskard.ai/oss/scan/how-to/third-party-scanners.md
 
 ### Scan API Reference

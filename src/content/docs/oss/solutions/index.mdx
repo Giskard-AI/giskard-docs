@@ -1,6 +1,6 @@
 ---
 title: "Solutions"
-description: "Task-shaped entry points into the Giskard open-source library: red team an agent with the scan, or write your own checks against an agentic system."
+description: "Task-shaped entry points into the Giskard open-source library: assess quality, red team an agent, or write your own checks."
 sidebar:
   order: 0
   label: Overview
@@ -8,19 +8,24 @@ sidebar:
 
 import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
-Two ways to test an LLM agent with the open-source library, depending on whether you want the test cases generated or written.
+Choose how you want to test an LLM agent: assess the quality of its answers, red team it for vulnerabilities, or write checks for specific requirements.
 
 <CardGrid>
+  <LinkCard
+    title="Quality Assessment"
+    description="Generate grounded, multi-turn scenarios to assess answer quality and identify where the agent needs improvement."
+    href="/oss/solutions/quality-assessment"
+  />
   <LinkCard
     title="Scan Vulnerabilities"
     description="Describe your agent and let the scan red team it. Install, wrap, run, read the report."
     href="/oss/solutions/scan-vulnerabilities"
   />
   <LinkCard
-    title="Check Agentic Systems"
-    description="Write the assertions yourself: state a rule in plain English, collect scenarios into a suite, run it in CI."
-    href="/oss/solutions/check-agentic-systems"
+    title="Test Agentic Systems"
+    description="Write the assertions yourself: state a rule in plain language, collect scenarios into a suite, run it in CI."
+    href="/oss/solutions/test-agentic-systems"
   />
 </CardGrid>
 
-Each page is a quickstart. The full documentation lives in [Giskard Scan](/oss/scan) and [Giskard Checks](/oss/checks). Most teams end up running both: the scan to discover vulnerabilities they had not thought of, checks to lock in the behavior they already care about.
+Each page is a quickstart. The full documentation lives in [Giskard Scan](/oss/scan) and [Giskard Checks](/oss/checks). Most teams use the quality and vulnerability scans to discover issues, then checks to lock in the behavior they care about.

@@ -1,11 +1,13 @@
 ---
-title: "Check Agentic Systems"
-description: "Write your first Giskard check against an agent: wrap the agent, assert a rule in plain English, collect scenarios into a suite, and export JUnit XML for CI."
+title: "Test Agentic Systems"
+description: "Write your first Giskard check against an agent: wrap the agent, assert a rule in plain language, collect scenarios into a suite, and export JUnit XML for CI."
 sidebar:
-  order: 2
+  order: 3
 ---
 
-An agent is non-deterministic, so the assertion you want is rarely `==`. It is "the agent refused", "the answer came from the documents", "it never mentioned another customer". [Giskard Checks](/oss/checks) is the library for writing those assertions: you call your agent, state the rule in plain English, and an LLM judge decides pass or fail.
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+An agent is non-deterministic, so the assertion you want is rarely `==`. It is "the agent refused", "the answer came from the documents", "it never mentioned another customer". [Giskard Checks](/oss/checks) is the library for writing those assertions: you call your agent, state the rule in plain language, and an LLM judge decides pass or fail.
 
 This page is the shortest runnable path from nothing to a passing suite. For the full library, go to [Giskard Checks](/oss/checks).
 
@@ -69,7 +71,7 @@ The parameter must be named `inputs`. Giskard injects arguments by name, and onl
 
 ## Write a check
 
-A **scenario** is one test case: what you send, and what has to hold about the reply. `Conformity` takes a rule in plain English and hands it to the judge.
+A **scenario** is one test case: what you send, and what has to hold about the reply. `Conformity` takes a rule in plain language and hands it to the judge.
 
 ```python
 from giskard.checks import Conformity, Scenario
@@ -152,9 +154,24 @@ That is one `<testcase>` per scenario, rendered natively by GitHub Actions, GitL
 
 ## Where to go next
 
-- [Giskard Checks](/oss/checks) for the whole library
-- [Your First Test](/oss/checks/tutorials/your-first-test) for the same ground at tutorial pace
-- [Multi-turn scenarios](/oss/checks/tutorials/multi-turn) for conversations rather than single messages
-- [Spy on internal calls](/oss/checks/how-to/spy-on-calls) to assert which tools the agent called and with what arguments
-- [Run checks in pytest](/oss/checks/how-to/run-in-pytest) to wire a suite into an existing test run
-- [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities) to have the scenarios generated for you instead
+<CardGrid>
+  <LinkCard
+    title="Giskard Checks"
+    description="The whole library: checks, scenarios, suites, and the judge."
+    href="/oss/checks"
+  />
+  <LinkCard
+    title="Multi-turn Scenarios"
+    description="Test conversations rather than single messages."
+    href="/oss/checks/tutorials/multi-turn"
+  />
+  <LinkCard
+    title="Run Checks in pytest"
+    description="Wire a suite into an existing test run."
+    href="/oss/checks/how-to/run-in-pytest"
+  />
+</CardGrid>
+
+## Troubleshooting
+
+If you encounter any issues, join our [Discord community](https://discord.com/invite/ABvfpbu69R) and ask in the #general channel.

@@ -2,10 +2,15 @@
 title: "Scan Vulnerabilities"
 description: "Automatically red team your LLM-based agent for safety and security vulnerabilities with the open-source Giskard scan, and review the findings."
 sidebar:
-  order: 1
+  order: 2
 ---
 
-import { Tabs, TabItem } from "@astrojs/starlight/components";
+import {
+  CardGrid,
+  LinkCard,
+  Tabs,
+  TabItem,
+} from "@astrojs/starlight/components";
 
 Giskard's **scan** red-teams your agent: it generates hostile inputs from a description of what the agent does, runs them, and reports the ones that got through. Use it to find safety and security problems before your users do.
 
@@ -375,6 +380,26 @@ The scan on this page runs locally and is driven by code. When you need more tha
 ![Giskard Hub scan report showing a security grade, issue counts by severity, and results broken down by vulnerability category with OWASP tags](/_static/images/oss/solutions/hub-scan-results.png)
 
 For a complete picture of what the Hub adds, read the [Open Source vs Hub comparison](/start/comparison), or [talk to our team ↗](https://www.giskard.ai/contact) to see it in action.
+
+## Where to go next
+
+<CardGrid>
+  <LinkCard
+    title="Test Agentic Systems"
+    description="Write your own checks and scenarios when the generated ones are not enough."
+    href="/oss/solutions/test-agentic-systems"
+  />
+  <LinkCard
+    title="Run the Scan in CI"
+    description="Replay a saved suite in your pipeline and report failures as JUnit XML."
+    href="/oss/scan/how-to/scan-in-ci"
+  />
+  <LinkCard
+    title="Scan API Reference"
+    description="Every argument, generator, and type used on this page."
+    href="/oss/scan/reference/scan-api"
+  />
+</CardGrid>
 
 ## Troubleshooting
 

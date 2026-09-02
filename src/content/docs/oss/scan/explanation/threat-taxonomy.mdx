@@ -13,11 +13,11 @@ This page is the catalog: which tag means what, which generator emits it, and ho
 
 ## Tag families
 
-| Prefix | Answers | Used by |
-| --- | --- | --- |
-| `threat-type:` | What kind of harm is this? | vulnerability scan |
-| `quality:` | What kind of mistake is this? | quality scan |
-| `component:` | Which part of my pipeline is at fault? | quality scan |
+| Prefix         | Answers                                | Used by            |
+| -------------- | -------------------------------------- | ------------------ |
+| `threat-type:` | What kind of harm is this?             | vulnerability scan |
+| `quality:`     | What kind of mistake is this?          | quality scan       |
+| `component:`   | Which part of my pipeline is at fault? | quality scan       |
 
 A **component** is a part of your pipeline: the model, the retriever, or the conversation history.
 
@@ -53,14 +53,14 @@ The severity depends on what the agent can reach. Where the retrieved documents 
 
 ## What each generator family probes
 
-| Family | Generators | Attack shape |
-| --- | --- | --- |
-| **LLM-driven** | `AdversarialScenarioGenerator` | An LLM writes conformity rules per category, then crafts a prompt to break each one. Tailored to your description. |
-| **Multi-turn: GOAT** | `GOATAttackScenarioGenerator` | An LLM plays an attacker chasing a fixed harmful objective over up to 10 turns, picking from named prompting tricks: suppress refusal wording, force the reply to start with "Sure!", assign a persona, wrap the request in a hypothetical, split it across topics. Exposes agents whose safety rules hold against a direct ask but fold once the framing changes. |
-| **Multi-turn: Crescendo** | `CrescendoAttackScenarioGenerator` | The attacker opens with a broad, harmless question, then narrows turn by turn, each message built out of wording the agent itself just used. Nothing in isolation looks like an attack. Exposes agents that judge each message on its own and never notice where the conversation is heading. |
-| **Dataset-backed** | `PromptInjectionScenarioGenerator`, `HuggingFaceDatasetScenarioGenerator` | Fixed corpora replayed verbatim. Identical every run, no generation cost. |
-| **Token-level** | `GCGInjectionScenarioGenerator` | Takes harmful prompts from a dataset and appends a fixed adversarial suffix, a string of unreadable tokens such as `! ! ! UK ! ! ! ! [ [ [`. Suffixes like these come from gradient search over a model's own weights, tuned to push it toward complying instead of refusing. Exposes safety that filters on how a request reads rather than what it asks for: the prompt still looks harmful to a human, and the suffix carries no meaning, yet the pair gets through. |
-| **Knowledge-base** | the five quality generators, below | Questions derived from your own documents. |
+| Family                    | Generators                                                                | Attack shape                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **LLM-driven**            | `AdversarialScenarioGenerator`                                            | An LLM writes conformity rules per category, then crafts a prompt to break each one. Tailored to your description.                                                                                                                                                                                                                                                                                                                                                      |
+| **Multi-turn: GOAT**      | `GOATAttackScenarioGenerator`                                             | An LLM plays an attacker chasing a fixed harmful objective over up to 10 turns, picking from named prompting tricks: suppress refusal wording, force the reply to start with "Sure!", assign a persona, wrap the request in a hypothetical, split it across topics. Exposes agents whose safety rules hold against a direct ask but fold once the framing changes.                                                                                                      |
+| **Multi-turn: Crescendo** | `CrescendoAttackScenarioGenerator`                                        | The attacker opens with a broad, harmless question, then narrows turn by turn, each message built out of wording the agent itself just used. Nothing in isolation looks like an attack. Exposes agents that judge each message on its own and never notice where the conversation is heading.                                                                                                                                                                           |
+| **Dataset-backed**        | `PromptInjectionScenarioGenerator`, `HuggingFaceDatasetScenarioGenerator` | Fixed corpora replayed verbatim. Identical every run, no generation cost.                                                                                                                                                                                                                                                                                                                                                                                               |
+| **Token-level**           | `GCGInjectionScenarioGenerator`                                           | Takes harmful prompts from a dataset and appends a fixed adversarial suffix, a string of unreadable tokens such as `! ! ! UK ! ! ! ! [ [ [`. Suffixes like these come from gradient search over a model's own weights, tuned to push it toward complying instead of refusing. Exposes safety that filters on how a request reads rather than what it asks for: the prompt still looks harmful to a human, and the suffix carries no meaning, yet the pair gets through. |
+| **Knowledge-base**        | the five quality generators, below                                        | Questions derived from your own documents.                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 Dataset-backed and token-level generators ask the same questions of every agent, so a pass tells you your agent handles a known corpus. LLM-driven generators ask questions specific to your `description`, so a pass tells you something about your agent, and a vague description makes that guarantee correspondingly vague.
 
@@ -72,13 +72,13 @@ The quality scan generates questions from your **knowledge base**, the set of do
 
 The quality scan's five generators each pair a failure mode with the components that could have caused it.
 
-| Generator | `quality:` tag | `component:` tags |
-| --- | --- | --- |
-| `HallucinationScenarioGenerator` | `direct-hallucination` | `llm` |
-| `SycophancyScenarioGenerator` | `sycophancy-hallucinations` | `llm` |
-| `OutOfScopeScenarioGenerator` | `fabricated-hallucination` | `llm`, `retrieval` |
-| `MultiTopicScenarioGenerator` | `multi-topic-questions` | `retrieval`, `history` |
-| `SplitQuestionsScenarioGenerator` | `split-questions` | `history` |
+| Generator                         | `quality:` tag              | `component:` tags      |
+| --------------------------------- | --------------------------- | ---------------------- |
+| `HallucinationScenarioGenerator`  | `direct-hallucination`      | `llm`                  |
+| `SycophancyScenarioGenerator`     | `sycophancy-hallucinations` | `llm`                  |
+| `OutOfScopeScenarioGenerator`     | `fabricated-hallucination`  | `llm`, `retrieval`     |
+| `MultiTopicScenarioGenerator`     | `multi-topic-questions`     | `retrieval`, `history` |
+| `SplitQuestionsScenarioGenerator` | `split-questions`           | `history`              |
 
 What each one asks, taking the bank's own documents as the knowledge base (a fee schedule: "Overdraft fee: $25 per item, waived once per calendar year on request"; a dispute policy: "Card disputes must be raised within 60 days of the statement date"; account terms: "Standard checking has no monthly fee above a $500 average balance"):
 
@@ -98,7 +98,7 @@ A generator tagged with two components cannot distinguish between them from the 
 
 ## How grouping behaves
 
-`vulnerability_scan` defaults to `group_by="threat-type"` and `quality_scan` to `group_by="component"`. A vulnerability report answers *how exposed am I*, a question about risk categories. A quality report answers *what do I fix*, a question about your architecture.
+`vulnerability_scan` defaults to `group_by="threat-type"` and `quality_scan` to `group_by="component"`. A vulnerability report answers _how exposed am I_, a question about risk categories. A quality report answers _what do I fix_, a question about your architecture.
 
 `group_by` matches any tag prefix and buckets scenarios by the part after the colon. A scenario with two `component:` tags appears in both buckets, so bucket counts can exceed the scenario count, and scenarios carrying no tag with that key land in an unnamed bucket. `group_by=None` prints the flat report.
 
@@ -114,8 +114,8 @@ Verdicts come from an LLM judge, a model asked to decide whether a reply was acc
 
 The quality scan ends with a written recommendation generated from the grouped results. An LLM produces it and the call is wrapped in a `try`, so a failure yields an empty string. An empty recommendation means recommendation generation failed, never that the scan found nothing. Read `failed_count` for that.
 
-## Next Steps
+## Next steps
 
 - [How the Scan Works](/oss/scan/explanation/how-scan-works) for the pipeline these tags travel through
 - [Generators reference](/oss/scan/reference/generators) for every generator with its parameters
-- [Scan a RAG Agent](/oss/scan/tutorials/scan-a-rag-agent) for the quality tags on a real report
+- [Run a Quality Scan](/oss/scan/how-to/quality-scan) for the quality tags on a real report
