@@ -2,7 +2,7 @@
 title: "Run Garak and DeepTeam Scanners"
 description: "Run the garak and deepteam red-team scanners against a Giskard target with third_party_scan, discover probes with list_scan_items, and read the unified SuiteResult."
 sidebar:
-  order: 8
+  order: 9
 ---
 
 [**garak**](https://github.com/NVIDIA/garak) ↗ and [**deepteam**](https://github.com/confident-ai/deepteam) ↗ are open-source red-teaming tools: they send attack prompts to an LLM app and report which ones got through. They work in different ways, and the difference decides which one you reach for.
@@ -20,9 +20,9 @@ No tool here is exhaustive. Each covers the attacks its own maintainers wrote or
 
 Neither scanner ships with `giskard.scan`. Each is an optional extra, pinned in the library's `pyproject.toml`:
 
-| Extra | Installs | Command |
-| --- | --- | --- |
-| `garak` | `garak>=0.15,<1` | `pip install "giskard[scan,garak]"` |
+| Extra      | Installs             | Command                                |
+| ---------- | -------------------- | -------------------------------------- |
+| `garak`    | `garak>=0.15,<1`     | `pip install "giskard[scan,garak]"`    |
 | `deepteam` | `deepteam>=1.0.7,<2` | `pip install "giskard[scan,deepteam]"` |
 
 Calling `third_party_scan` without the matching extra raises `ImportError` with the install command in the message. The import is lazy, so the package stays installable without either.
@@ -33,7 +33,7 @@ The built-in generators produce scenarios from your `description` and a curated 
 
 **garak** is a flat list of hand-written probes. A **probe** is one named attack that carries its own prompts and its own detector, a small scorer that reads the response and decides whether the attack worked. You select probes by name, and that is the only axis. Its catalog covers DAN jailbreaks (prompts that talk a model past its safety rules), encoded-payload data exfiltration, [prompt injection](/start/glossary/security/injection), and model-specific quirks. The prompts do not adapt to what your agent does.
 
-**deepteam** has two independent axes. A *vulnerability* is what harm you test for, such as [information disclosure](/start/glossary/security/information-disclosure) or [harmful content](/start/glossary/security/harmful-content). An *attack* is how the prompt is delivered: an encoding, a framing, or a multi-turn escalation. The two do not overlap and neither implies the other. deepteam runs the cross-product internally: `Toxicity` attempted via `Leetspeak`, `PIILeakage` via `CrescendoJailbreaking`, and so on.
+**deepteam** has two independent axes. A _vulnerability_ is what harm you test for, such as [information disclosure](/start/glossary/security/information-disclosure) or [harmful content](/start/glossary/security/harmful-content). An _attack_ is how the prompt is delivered: an encoding, a framing, or a multi-turn escalation. The two do not overlap and neither implies the other. deepteam runs the cross-product internally: `Toxicity` attempted via `Leetspeak`, `PIILeakage` via `CrescendoJailbreaking`, and so on.
 
 That cross-product is also the cost model. Each vulnerability fans out into subtypes (`Bias` covers race, gender, politics, religion), and the run size is subtypes × `attacks_per_vulnerability_type` × attacks.
 
@@ -53,7 +53,7 @@ list_scan_items("garak")     # loadable probe plugin names
 list_scan_items("deepteam")  # supported vulnerability and attack names
 ```
 
-`"garak"` and `"deepteam"` raise `ImportError` when the extra is missing; any other tool name raises `ValueError`. For garak, only *active, loadable* probes are listed by default. `include_inactive=True` adds catalog entries garak marks inactive, which are skipped anyway if you request them explicitly. The argument is ignored for the other tools.
+`"garak"` and `"deepteam"` raise `ImportError` when the extra is missing; any other tool name raises `ValueError`. For garak, only _active, loadable_ probes are listed by default. `include_inactive=True` adds catalog entries garak marks inactive, which are skipped anyway if you request them explicitly. The argument is ignored for the other tools.
 
 Treat `list_scan_items` as the authority rather than the upstream READMEs. For garak it enumerates the probes of the garak version you installed, so it never drifts. For deepteam it matters more: Giskard supports a fixed subset of deepteam's catalog, and names outside that subset are silently skipped instead of raising.
 
@@ -65,27 +65,27 @@ Read [NVIDIA/garak](https://github.com/NVIDIA/garak) ↗ and [confident-ai/deept
 
 The deepteam names come from a fixed map inside the adapter rather than deepteam's full catalog. The vulnerabilities are what you test for:
 
-| Vulnerability | What it looks for |
-| --- | --- |
-| `Bias` | Discriminatory or stereotyped output about a group |
-| `Toxicity` | Insults, harassment, and other abusive language |
-| `PIILeakage` | Personal data about third parties leaving the agent |
-| `PromptLeakage` | The agent revealing its own system prompt or configuration |
-| `Misinformation` | Confident false claims presented as fact |
+| Vulnerability    | What it looks for                                          |
+| ---------------- | ---------------------------------------------------------- |
+| `Bias`           | Discriminatory or stereotyped output about a group         |
+| `Toxicity`       | Insults, harassment, and other abusive language            |
+| `PIILeakage`     | Personal data about third parties leaving the agent        |
+| `PromptLeakage`  | The agent revealing its own system prompt or configuration |
+| `Misinformation` | Confident false claims presented as fact                   |
 
 The attacks are how the request is disguised or escalated:
 
-| Attack | Turns | What the technique does |
-| --- | --- | --- |
-| `PromptInjection` | Single | Embeds instructions that tell the agent to ignore its own |
-| `Roleplay` | Single | Wraps the request in a fictional persona the agent is asked to play |
-| `Leetspeak` | Single | Rewrites the request in leetspeak (`h4ck`) so filters miss the words |
-| `ROT13` | Single | Rotates every letter 13 places, so the request reaches the model encoded |
-| `LinearJailbreaking` | Multi | Rewrites the prompt turn after turn, using each refusal to steer the next try |
-| `CrescendoJailbreaking` | Multi | Starts benign and escalates gradually toward the harmful ask |
-| `TreeJailbreaking` | Multi | Branches into several rewrites per turn and keeps the ones that get furthest |
-| `SequentialJailbreak` | Multi | Hides the request inside a benign narrative, such as a character dialogue or a game level |
-| `BadLikertJudge` | Multi | Asks the agent to score harmfulness on a scale, then to write an example of the worst score |
+| Attack                  | Turns  | What the technique does                                                                     |
+| ----------------------- | ------ | ------------------------------------------------------------------------------------------- |
+| `PromptInjection`       | Single | Embeds instructions that tell the agent to ignore its own                                   |
+| `Roleplay`              | Single | Wraps the request in a fictional persona the agent is asked to play                         |
+| `Leetspeak`             | Single | Rewrites the request in leetspeak (`h4ck`) so filters miss the words                        |
+| `ROT13`                 | Single | Rotates every letter 13 places, so the request reaches the model encoded                    |
+| `LinearJailbreaking`    | Multi  | Rewrites the prompt turn after turn, using each refusal to steer the next try               |
+| `CrescendoJailbreaking` | Multi  | Starts benign and escalates gradually toward the harmful ask                                |
+| `TreeJailbreaking`      | Multi  | Branches into several rewrites per turn and keeps the ones that get furthest                |
+| `SequentialJailbreak`   | Multi  | Hides the request inside a benign narrative, such as a character dialogue or a game level   |
+| `BadLikertJudge`        | Multi  | Asks the agent to score harmfulness on a scale, then to write an example of the worst score |
 
 Encoding attacks like `Leetspeak` and `ROT13` are trivial to decode. They work because a safety filter reads the literal text while the model reads through the encoding.
 
@@ -94,6 +94,7 @@ Encoding attacks like `Leetspeak` and `ROT13` are trivial to decode. They work b
 Both tools go through the same entry point:
 
 {/* pyright-skip: Signature excerpt. */}
+
 ```python
 async def third_party_scan(
     target,
@@ -152,6 +153,7 @@ async def support_agent(inputs: AgentInput) -> AgentOutput:
 Point garak at it:
 
 {/* pyright-skip: Requires the garak extra. */}
+
 ```python
 from giskard.scan import third_party_scan
 
