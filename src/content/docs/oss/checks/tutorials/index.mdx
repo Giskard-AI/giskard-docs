@@ -1,6 +1,6 @@
 ---
 title: "Giskard Checks Tutorials"
-description: "Step-by-step tutorials teaching fundamental Giskard Checks patterns from your first test to reusable test suites."
+description: "Follow hands-on Giskard Checks tutorials from your first test and LLM call through multi-turn scenarios and reusable test suites."
 sidebar:
   order: 0
   label: Overview
@@ -12,9 +12,18 @@ import { LinkCard, CardGrid } from "@astrojs/starlight/components";
 
 These tutorials teach you the fundamental patterns of Giskard Checks through hands-on, step-by-step exercises. Each one is a lesson you type along with, in order. When you already know what you want to build and need one specific task done, use the [how-to guides](/oss/checks/how-to) instead.
 
+## Prerequisites
+
+To start **Your First Test**, you need:
+
+- Giskard Checks installed, following the [installation steps](/oss/checks/installation)
+- Basic Python knowledge
+
+It needs no API key or LLM. Before **Your First LLM Call** and the later tutorials, configure an LLM provider and API key using the same guide, and be familiar with basic `async/await`.
+
 ## Available tutorials
 
-The numbered path on the [Giskard Checks overview](/oss/checks) runs Your First Test, Your First LLM Call, then Test Suites. Multi-Turn Scenarios and Dynamic Scenarios are optional side trips you can take at any point after Your First LLM Call.
+The recommended path here runs Your First Test, Your First LLM Call, Multi-Turn Scenarios, then Test Suites. Dynamic Scenarios is an alternative after Your First LLM Call and also prepares you for Test Suites.
 
 <CardGrid>
   <LinkCard
@@ -47,12 +56,3 @@ The numbered path on the [Giskard Checks overview](/oss/checks) runs Your First 
 ## Next steps
 
 Once you can build scenarios, extend with your own validation logic: see [Custom Checks](/oss/checks/how-to/custom-checks) to create domain-specific checks with `FnCheck`, Check subclasses, and more.
-
-**Your First Test** has no prerequisites — no API key or LLM needed. Start there if you are new to Giskard Checks.
-
-## Prerequisites
-
-Before starting these tutorials, you should:
-
-- Have completed the [Install & Configure](/oss/checks/installation) guide
-- Have basic Python and `async/await` knowledge
