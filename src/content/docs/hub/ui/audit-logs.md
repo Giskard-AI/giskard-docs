@@ -1,7 +1,8 @@
 ---
-title: "Audit Logs"
+title: "Track Changes with Audit Logs"
 description: "Track every change made to entities in Giskard Hub with audit logs. View history of modifications to checks, datasets, and scenarios."
 sidebar:
+  label: "Audit Logs"
   order: 8
 ---
 
