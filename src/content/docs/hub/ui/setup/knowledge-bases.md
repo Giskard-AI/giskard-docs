@@ -48,6 +48,6 @@ Once imported, the knowledge base shows its documents and topics. If no topics w
 ## Next steps
 
 - **Setup agents** - [Setup agents](/hub/ui/setup/agents)
-- **Manage users and groups** - [Manage users and groups](/hub/ui/access-rights)
+- **Manage users and groups** - [Manage users and groups](/hub/ui/user-management)
 - **Create scenarios and datasets** - [Create scenarios and datasets](/hub/ui/datasets)
 - **Launch vulnerability scans** - [Launch vulnerability scans](/hub/ui/scan)
