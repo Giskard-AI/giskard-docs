@@ -20,7 +20,7 @@
     "test:python-snippets": "node scripts/check-python-snippets.mjs"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "13.6.0",
+    "@astrojs/cloudflare": "14.2.6",
     "@astrojs/starlight": "0.39.2",
     "@tailwindcss/vite": "4.3.0",
     "astro": "6.3.8",
