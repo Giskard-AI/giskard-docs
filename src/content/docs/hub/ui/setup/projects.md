@@ -17,4 +17,4 @@ Once the project is created, clicking it in the list opens project settings. Alt
 
 - **Setup agents** - [Setup agents](/hub/ui/setup/agents)
 - **Setup knowledge bases** - [Setup knowledge bases](/hub/ui/setup/knowledge-bases)
-- **Manage users and groups** - [Manage users and groups](/hub/ui/access-rights)
+- **Manage users and groups** - [Manage users and groups](/hub/ui/user-management)
