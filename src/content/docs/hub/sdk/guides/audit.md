@@ -5,7 +5,7 @@ sidebar:
   order: 8
 ---
 
-Every significant action in the Hub (creating, updating, or deleting a resource) is recorded in the **Audit Log**. Use the SDK to query these events for compliance reporting, change history, or debugging unexpected changes. You can also browse audit events from the [Hub UI event logs page](/hub/ui/event-logs).
+Every significant action in the Hub (creating, updating, or deleting a resource) is recorded in the **Audit Log**. Use the SDK to query these events for compliance reporting, change history, or debugging unexpected changes. You can also browse audit events from the [Hub UI event logs page](/hub/ui/audit-logs).
 
 ## Search audit events
 

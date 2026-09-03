@@ -35,6 +35,8 @@
   "/hub/ui/annotate/task_management": "/hub/ui/annotate/task-management",
   "/hub/ui/datasets/knowledge_base": "/hub/ui/datasets/knowledge-base",
   "/hub/ui/datasets/scenario": "/hub/ui/datasets/prompt-preset",
+  "/hub/ui/access-rights": "/hub/ui/user-management",
+  "/hub/ui/event-logs": "/hub/ui/audit-logs",
   "/hub/ui/release_notes/2025-09-25": "/hub/ui/release-notes",
   "/hub/ui/release_notes/2025-10-24": "/hub/ui/release-notes",
   "/hub/ui/release_notes/2025-11-24": "/hub/ui/release-notes",

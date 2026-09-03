@@ -86,9 +86,9 @@ Open research on AI safety and security, including the Phare multilingual benchm
 
 ### Hub UI
 - Introduction: https://docs.giskard.ai/hub/ui.md
-- Access Rights: https://docs.giskard.ai/hub/ui/access-rights.md
+- Track Changes with Audit Logs: https://docs.giskard.ai/hub/ui/audit-logs.md
 - Continuous Red Teaming: https://docs.giskard.ai/hub/ui/continuous-red-teaming.md
-- Event Logs: https://docs.giskard.ai/hub/ui/event-logs.md
+- User Management: https://docs.giskard.ai/hub/ui/user-management.md
 
 ### Hub UI — Setup
 - Setup Overview: https://docs.giskard.ai/hub/ui/setup.md
