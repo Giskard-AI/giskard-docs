@@ -1,24 +1,24 @@
 ---
-title: "Track event logs"
-description: "Track every change made to entities in Giskard Hub with event logs. View history of modifications to checks, datasets, and scenarios."
+title: "Audit logs"
+description: "Track every change made to entities in Giskard Hub with audit logs. View history of modifications to checks, datasets, and scenarios."
 sidebar:
   order: 8
 ---
 
-Event logs provide full traceability for all changes made to entities within Giskard Hub. This feature allows you to keep track of every change that every person has made on every entity, providing complete audit trails for your evaluation configurations.
+Audit logs provide full traceability for all changes made to entities within Giskard Hub. This feature allows you to keep track of every change that every person has made on every entity, providing complete audit trails for your evaluation configurations.
 
 <iframe width="100%" height="400" src="https://www.youtube.com/embed/W_9MhdmHouk?si=0cW-jUuMaO8lifS5" title="How to track entity changes with event logs in Giskard Hub" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-**Why use event logs?**
+**Why use audit logs?**
 
-Event logs are essential for maintaining accountability and understanding the evolution of your evaluation setup. They help you:
+Audit logs are essential for maintaining accountability and understanding the evolution of your evaluation setup. They help you:
 
 - **Track changes** - See what has been modified on any entity
 - **Identify authors** - Know who made each change
 - **Understand impact** - Recognize how changes affect your evaluations
 - **Maintain compliance** - Keep complete audit trails for regulatory requirements
 
-## Event Log overview
+## Audit logs overview
 
 To begin, click on the "Settings" icon on the left panel, then select **Event Log**.
 
@@ -50,16 +50,16 @@ To view the event history for a specific entity in the Event Log:
 
 ## Best practices
 
-- **Review history regularly** - Check event logs when investigating evaluation results
+- **Review history regularly** - Check audit logs when investigating evaluation results
 - **Monitor critical entities** - Pay special attention to changes in checks and datasets that affect production evaluations
-- **Coordinate with team** - Review event logs before making major changes to understand recent modifications
+- **Coordinate with team** - Review audit logs before making major changes to understand recent modifications
 
 ## Next steps
 
-Now that you understand event logs, you can:
+Now that you understand audit logs, you can:
 
 - **Review entity histories** - Check the history of your checks, datasets, and scenarios
-- **Investigate changes** - Use event logs to debug evaluation issues
+- **Investigate changes** - Use audit logs to debug evaluation issues
 - **Maintain traceability** - Keep complete audit trails of all modifications
 
 For more information about working with specific entity types, see:
