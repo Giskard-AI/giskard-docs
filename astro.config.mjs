@@ -62,6 +62,7 @@ export default defineConfig({
                     label: 'Get Started',
                     items: [
                         { label: 'Giskard Library', slug: 'oss' },
+                        { slug: 'oss/comparison', label: 'Compare OSS tools' },
                         { slug: 'oss/migrate-from-v2', label: 'Migrate from v2 to v3' },
                         { slug: 'oss/agent-skills', label: 'Agent Skills' },
                         { slug: 'oss/contributing', label: 'Contributing' },

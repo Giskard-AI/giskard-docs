@@ -1,13 +1,41 @@
 ---
 title: "Wrap Your Agent for the Scan"
-description: "Connect the scan to your own agent: the async function contract, and the wrapper patterns for stateful and history-passing agents."
+description: "Connect the scan to your own agent: the typed callable contract and wrapper patterns for stateful and history-passing agents."
 sidebar:
   order: 1
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-The scan talks to your agent through a single entry point: an **async function** that takes a typed input and returns a typed output. Both types are [Pydantic ↗](https://docs.pydantic.dev/) models, which makes the contract explicit and validated.
+The scan talks to your agent through a single entry point: a **sync or async callable** that takes a typed input and returns a typed output. Scan infers its generated input from a [Pydantic-compatible ↗](https://docs.pydantic.dev/) annotation. Outputs can use any target type supported by Checks, although individual checks may require extractable or textual values. The examples on this page use Pydantic models and async functions.
+
+### How Scan fills structured inputs
+
+Scan creates scenarios first, then generates a typed input for each interaction when the scenario runs. Dynamic generators can produce the declared Pydantic input type directly; this is how the default adversarial generators and Crescendo work.
+
+Dataset-backed generators and third-party scanners start with textual test prompts instead. For these generators, Giskard asks a mapping model to build and cache a schema-valid template containing a `{{prompt}}` placeholder in one or more suitable string fields. It supplies neutral, schema-valid placeholder values for other required fields, then substitutes each generated prompt without sending that prompt to the mapping model.
+
+For example, given this input model:
+
+```python
+from typing import Literal
+
+from pydantic import BaseModel
+
+
+class TicketInput(BaseModel):
+    subject: str
+    body: str
+    priority: Literal["low", "normal", "high"]
+```
+
+For a dataset-backed or third-party scan, the mapping model might place the attack or quality prompt in `body` while supplying valid values for `subject` and `priority`; the exact template is inferred from the schema. The mapping is cached once per schema and process, and the mapping model does not see the generated test prompt. Scan raises an error if the mapping model reports that the schema has no string field suitable for the user message.
+
+### Multi-agent systems
+
+Giskard has no native multi-agent orchestration primitive. To scan a multi-agent application, expose the whole application through a user-supplied target callable. Your wrapper can invoke a supervisor, router, or agent graph internally and return the final structured result. Giskard tests that external system boundary; it does not orchestrate or address the internal agents separately.
+
+Expose routing decisions, tool calls, or intermediate steps in the output model or a [custom trace](/oss/checks/how-to/custom-trace) when you want Checks to assert on them.
 
 Multi-turn attacks call your agent once per turn with only the new message, so the right wrapper depends on how your agent keeps track of the conversation. A **trace** is Giskard's record of one conversation, and each **interaction** on it is one message and the reply it got, so `trace.interactions` is the history so far.
 
@@ -17,11 +45,11 @@ Before you start, run `pip install "giskard[scan,openai]"`, which brings in the 
 
 Find your agent in this table, then open the matching tab:
 
-| Your agent | Pattern |
-| --- | --- |
-| Answers one question at a time and forgets it. A single LLM call, a RAG endpoint, a `/ask` route. | **Basic** |
-| Keeps the conversation on its own side, keyed by a session or thread id. A LangGraph checkpointer, an Assistants-style thread, a chat API with a `conversation_id`. | **Stateful** |
-| Holds no state but expects the whole message list on every call. | **History-passing** |
+| Your agent                                                                                                                                                          | Pattern             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| Answers one question at a time and forgets it. A single LLM call, a RAG endpoint, a `/ask` route.                                                                   | **Basic**           |
+| Keeps the conversation on its own side, keyed by a session or thread id. A LangGraph checkpointer, an Assistants-style thread, a chat API with a `conversation_id`. | **Stateful**        |
+| Holds no state but expects the whole message list on every call.                                                                                                    | **History-passing** |
 
 All three examples wrap the same agent, a customer-support assistant for a retail bank, so the only thing that changes between them is how the turn history is carried. The rest of the scan docs reuse this agent; the tutorial uses a lower-stakes garden-center assistant instead, because it runs against a live model.
 
@@ -72,11 +100,12 @@ Run this one with `target_mode="singleturn"`. It has no memory, so a multi-turn 
 </TabItem>
 <TabItem label="Stateful">
 
-The same agent, but the conversation lives on the agent's side and is addressed by a thread id: a LangGraph checkpointer, a session-based HTTP API, or the in-memory store below. Giskard has to hand you the *same* id on every turn of one conversation.
+The same agent, but the conversation lives on the agent's side and is addressed by a thread id: a LangGraph checkpointer, a session-based HTTP API, or the in-memory store below. Giskard has to hand you the _same_ id on every turn of one conversation.
 
 Subclass `Trace` with a generated `thread_id` field and declare a `trace` parameter. Giskard creates the trace when a conversation starts and preserves its fields across turns, so each conversation gets its own stable id:
 
 {/* pyright-skip: Alternative example. */}
+
 ```python
 import os
 from uuid import uuid4
@@ -133,6 +162,7 @@ If you forget the `Trace` subclass and generate the id inside the function, ever
 The same agent with no store at all: it is a pure function of the whole conversation, which is what most self-hosted chat endpoints look like. Declare a `trace` parameter and rebuild the message list from `trace.interactions`, which holds the previous turns of the current conversation:
 
 {/* pyright-skip: Alternative example. */}
+
 ```python
 import os
 
@@ -177,7 +207,7 @@ async def support_agent(
     return AgentOutput(answer=response.choices[0].message.content)
 ```
 
-`trace.interactions` is the history *before* the current message, so append `inputs.question` yourself. Drop that last line and the agent answers the previous turn twice.
+`trace.interactions` is the history _before_ the current message, so append `inputs.question` yourself. Drop that last line and the agent answers the previous turn twice.
 
 </TabItem>
 </Tabs>
