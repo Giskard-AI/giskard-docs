@@ -79,6 +79,10 @@ export default defineConfig({
                     label: 'Checks',
                     items: [{ autogenerate: { directory: 'oss/checks', collapsed: false } }],
                 },
+                {
+                    label: 'Compare',
+                    items: [{ autogenerate: { directory: 'oss/compare', collapsed: false } }],
+                },
             ],
             routeMiddleware: './src/routeData.ts',
             expressiveCode: {
