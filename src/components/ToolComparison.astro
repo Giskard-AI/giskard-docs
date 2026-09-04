@@ -7,7 +7,6 @@ interface Tool {
   href: string;
   featured?: boolean;
 }
-
 interface Cell {
   support: Support;
   summary: string;
@@ -76,7 +75,7 @@ const rows: Row[] = [
       },
       garak: {
         support: "partial",
-        summary: "Text-generation generators",
+        summary: "Generative-model and app interfaces",
         href: "https://docs.garak.ai/garak/garak-components/using-generators",
       },
       promptfoo: {
@@ -100,8 +99,8 @@ const rows: Row[] = [
     criterion: "Multi-agent and multi-turn",
     cells: {
       giskard: {
-        support: "core",
-        summary: "Stateful wrap-the-system tests",
+        support: "partial",
+        summary: "Stateful tests; user-wrapped systems",
         href: "/oss/scan/how-to/wrap-your-agent",
       },
       garak: {
@@ -135,8 +134,8 @@ const rows: Row[] = [
         href: "/oss/checks/explanation/when-to-use-which-check",
       },
       garak: {
-        support: "none",
-        summary: "Vulnerability scanner",
+        support: "partial",
+        summary: "Security focus; some quality probes",
         href: "https://docs.garak.ai/garak",
       },
       promptfoo: {
@@ -161,7 +160,7 @@ const rows: Row[] = [
     cells: {
       giskard: {
         support: "core",
-        summary: "Target-aware vulnerability_scan",
+        summary: "Some target-aware generators",
         href: "/oss/solutions/scan-vulnerabilities",
       },
       garak: {
@@ -190,21 +189,21 @@ const rows: Row[] = [
     criterion: "pytest",
     cells: {
       giskard: {
-        support: "core",
-        summary: "Native async pytest",
+        support: "partial",
+        summary: "User-managed pytest-asyncio",
         href: "/oss/checks/how-to/run-in-pytest",
       },
       garak: {
         support: "none",
-        summary: "No first-class workflow",
+        summary: "CLI/harness; no native pytest",
       },
       promptfoo: {
         support: "partial",
-        summary: "CI, not native pytest",
+        summary: "CI; pytest is user-managed",
       },
       pyrit: {
         support: "none",
-        summary: "No first-class workflow",
+        summary: "Executor APIs; no native pytest",
       },
       deepeval: {
         support: "core",
@@ -253,7 +252,7 @@ function isExternal(href: string): boolean {
     </li>
     <li>
       <span class="tool-comparison-pill" data-support="partial">Partial</span>
-      Supported in a narrower form
+      Narrower or user-managed workflow
     </li>
     <li>
       <span class="tool-comparison-pill" data-support="none">None</span>
