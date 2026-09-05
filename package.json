@@ -2,7 +2,7 @@
   "name": "giskard-docs",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@11.11.0",
+  "packageManager": "pnpm@11.25.0",
   "scripts": {
     "dev": "node scripts/convert-notebooks.mjs && astro dev",
     "start": "astro dev",
@@ -20,20 +20,20 @@
     "test:python-snippets": "node scripts/check-python-snippets.mjs"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "13.6.0",
-    "@astrojs/starlight": "0.39.2",
-    "@tailwindcss/vite": "4.3.0",
+    "@astrojs/cloudflare": "13.7.0",
+    "@astrojs/starlight": "0.42.0",
+    "@tailwindcss/vite": "4.3.3",
     "astro": "6.3.8",
-    "astro-mermaid": "2.0.1",
-    "mermaid": "11.16.1",
-    "sharp": "0.35.0",
-    "starlight-auto-sidebar": "0.4.0",
-    "starlight-image-zoom": "0.14.2",
-    "tailwindcss": "4.3.0"
+    "astro-mermaid": "2.1.0",
+    "mermaid": "11.17.2",
+    "sharp": "0.35.4",
+    "starlight-auto-sidebar": "0.4.1",
+    "starlight-image-zoom": "0.15.0",
+    "tailwindcss": "4.3.3"
   },
   "devDependencies": {
-    "pyright": "1.1.408",
-    "prettier": "3.8.3",
-    "wrangler": "4.95.0"
+    "pyright": "1.1.413",
+    "prettier": "3.9.6",
+    "wrangler": "4.128.0"
   }
 }
