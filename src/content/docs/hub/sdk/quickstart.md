@@ -39,7 +39,7 @@ Follow the instructions from https://docs.giskard.ai/hub/sdk/quickstart.md and i
 
 Click the user badge in the bottom-left corner of the Hub UI, then copy the **API Key** value:
 
-![Finding your API key in the Hub UI](../../../../assets/images/sdk/api-key.png)
+![Finding your API key in the Hub UI](@assets/images/sdk/api-key.png)
 
 ## 1. Install the SDK
 
@@ -207,7 +207,7 @@ Once complete, print the metrics summary and inspect individual results:
 hub.helpers.print_metrics(evaluation)
 ```
 
-![Evaluation metrics output](../../../../assets/images/sdk/evaluation-metrics-output.png)
+![Evaluation metrics output](@assets/images/sdk/evaluation-metrics-output.png)
 
 You can also iterate over individual results programmatically:
 

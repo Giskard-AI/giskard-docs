@@ -23,7 +23,7 @@ Audit logs are essential for maintaining accountability and understanding the ev
 
 To begin, click on the "Settings" icon on the left panel, then select **Event Log**.
 
-![Event Log page showing tracked entity changes](/_static/images/hub/event-logs.png)
+![Event Log page showing tracked entity changes](@assets/images/hub/event-logs.png)
 
 Every entity in Giskard Hub maintains a complete history of all modifications. This includes:
 
@@ -47,7 +47,7 @@ To view the event history for a specific entity in the Event Log:
 2. Click on the button in the **History** column
 3. Review the list of changes in the **Change History** drawer
 
-![Change History drawer with a timeline of modifications](/_static/images/hub/event-logs-history.png)
+![Change History drawer with a timeline of modifications](@assets/images/hub/event-logs-history.png)
 
 ## Best practices
 

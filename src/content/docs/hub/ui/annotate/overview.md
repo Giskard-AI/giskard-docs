@@ -34,15 +34,15 @@ Metrics provide quantitative measurements of your agent's performance across dif
 
 Within an existing or new scenario, click on the "Add check" button.
 
-![Interaction with no check yet, showing the Add check button](/_static/images/hub/checks-built-in-creation-placeholder.png)
+![Interaction with no check yet, showing the Add check button](@assets/images/hub/checks-built-in-creation-placeholder.png)
 
 Pick a built-in check from the list. Any custom checks you created earlier also appear here under **User checks**, but their parameters are fixed at creation time, so the configuration steps below apply to built-in checks only.
 
-![Add checks dialog listing available built-in and custom checks](/_static/images/hub/checks-built-in-pick.png)
+![Add checks dialog listing available built-in and custom checks](@assets/images/hub/checks-built-in-pick.png)
 
 After, you can configure the check parameters which depends on the check type. This will look something like this:
 
-![Correctness check configured with an expected response and target key](/_static/images/hub/checks-built-in-created.png)
+![Correctness check configured with an expected response and target key](@assets/images/hub/checks-built-in-created.png)
 
 Once configured, save the scenario to make sure the check configuration is saved. The full list of check configuration parameters can be found below.
 
@@ -63,7 +63,7 @@ Not every check has a `Target key`. Whether one is available depends on the chec
 
 Some parameters can be set to either a static value or a dynamic trace path. Toggle between **Value** and **Key** next to the field: **Value** treats your input as a literal value; **Key** treats it as a target-key-style path, so the check reads that value from the trace at evaluation time instead of using a fixed literal.
 
-![Expected value field with a toggle between Value and Key mode](/_static/images/hub/checks-value-key-toggle.png)
+![Expected value field with a toggle between Value and Key mode](@assets/images/hub/checks-value-key-toggle.png)
 
 This toggle is only available on specific parameters where comparing against a dynamic trace value makes sense. It's not present on every field.
 
@@ -93,7 +93,7 @@ Check whether all information from the reference answer is present in the agent 
 
 ---
 
-![Correctness check configured with an expected response](/_static/images/hub/checks-example-correctness.png)
+![Correctness check configured with an expected response](@assets/images/hub/checks-example-correctness.png)
 
 :::caution[Failure examples]
 
@@ -130,7 +130,7 @@ Given a rule or criterion, check whether the agent answer complies with this rul
 
 ---
 
-![Conformity (Hub) check configured with a rule](/_static/images/hub/checks-example-conformity-hub.png)
+![Conformity (Hub) check configured with a rule](@assets/images/hub/checks-example-conformity-hub.png)
 
 :::caution[Failure example]
 
@@ -180,7 +180,7 @@ Check whether all information from the agent's answer is present in the given co
 
 ---
 
-![Groundedness (Hub) check configured with a context](/_static/images/hub/checks-example-groundedness-hub.png)
+![Groundedness (Hub) check configured with a context](@assets/images/hub/checks-example-groundedness-hub.png)
 
 :::caution[Failure examples]
 
@@ -213,7 +213,7 @@ Evaluate the interaction with a custom prompt. The prompt is a Jinja2 template w
 
 ---
 
-![LLM Judge check configured with a prompt](/_static/images/hub/checks-example-llm-judge.png)
+![LLM Judge check configured with a prompt](@assets/images/hub/checks-example-llm-judge.png)
 
 :::caution[Failure example]
 
@@ -247,7 +247,7 @@ The raw giskard-checks variant of conformity. Judges the full trace against a si
 
 ---
 
-![Conformity check configured with a rule](/_static/images/hub/checks-example-conformity.png)
+![Conformity check configured with a rule](@assets/images/hub/checks-example-conformity.png)
 
 :::caution[Failure example]
 
@@ -278,7 +278,7 @@ The raw giskard-checks variant of groundedness. Instead of a fixed context strin
 
 ---
 
-![Groundedness check configured with a context key](/_static/images/hub/checks-example-groundedness.png)
+![Groundedness check configured with a context key](@assets/images/hub/checks-example-groundedness.png)
 
 :::caution[Failure example]
 
@@ -309,7 +309,7 @@ Checks that the response does not directly contradict a reference context. Omiss
 
 ---
 
-![Contradiction check configured with a context](/_static/images/hub/checks-example-contractiction.png)
+![Contradiction check configured with a context](@assets/images/hub/checks-example-contractiction.png)
 
 :::caution[Failure example]
 
@@ -339,7 +339,7 @@ Checks that the response does not contain toxic, harmful, or offensive content. 
 
 ---
 
-![Toxicity check configured with safety categories](/_static/images/hub/checks-example-toxicity.png)
+![Toxicity check configured with safety categories](@assets/images/hub/checks-example-toxicity.png)
 
 :::caution[Failure example]
 
@@ -371,7 +371,7 @@ Checks that the response directly and appropriately addresses the user question.
 
 ---
 
-![Answer Relevance check configured with a question and context](/_static/images/hub/checks-example-answer-relevance.png)
+![Answer Relevance check configured with a question and context](@assets/images/hub/checks-example-answer-relevance.png)
 
 :::caution[Failure example]
 
@@ -403,7 +403,7 @@ Check whether the agent's response is semantically similar to the reference. Thi
 
 ---
 
-![Semantic Similarity check configured with a reference and threshold](/_static/images/hub/checks-example-semantic-similarity.png)
+![Semantic Similarity check configured with a reference and threshold](@assets/images/hub/checks-example-semantic-similarity.png)
 
 :::caution[Failure example]
 
@@ -434,7 +434,7 @@ Check whether the given keyword or sentence is present in the agent answer. Does
 
 ---
 
-![String Matching check configured with a keyword](/_static/images/hub/checks-example-string-matching.png)
+![String Matching check configured with a keyword](@assets/images/hub/checks-example-string-matching.png)
 
 :::caution[Failure example]
 
@@ -465,7 +465,7 @@ Check whether the agent's response matches a regular expression pattern. Does **
 
 ---
 
-![Regex Matching check configured with a pattern](/_static/images/hub/checks-example-regex-matching.png)
+![Regex Matching check configured with a pattern](@assets/images/hub/checks-example-regex-matching.png)
 
 :::caution[Failure example]
 
@@ -537,7 +537,7 @@ Here `Target key` is set to `trace.last.outputs.output.status`, which binds the 
 
 ---
 
-![Comparison check configured with an expected value](/_static/images/hub/checks-example-comparison-equal.png)
+![Comparison check configured with an expected value](@assets/images/hub/checks-example-comparison-equal.png)
 
 :::caution[Failure example]
 
@@ -588,7 +588,7 @@ When the value you're checking sits inside a list whose order or length can vary
 
 ---
 
-![Metadata check configured with a JSON path rule](/_static/images/hub/checks-example-metadata-hub.png)
+![Metadata check configured with a JSON path rule](@assets/images/hub/checks-example-metadata-hub.png)
 
 :::caution[Failure example]
 
@@ -624,7 +624,7 @@ Checks that a value extracted from the trace is valid JSON and, optionally, that
 
 ---
 
-![JSON Valid check configured with parse unchecked](/_static/images/hub/checks-example-json-valid.png)
+![JSON Valid check configured with parse unchecked](@assets/images/hub/checks-example-json-valid.png)
 
 :::caution[Failure example]
 
@@ -657,7 +657,7 @@ Checks that the response satisfies readability score thresholds for a selected m
 
 ---
 
-![Readability check configured with a metric and minimum score](/_static/images/hub/checks-example-readability.png)
+![Readability check configured with a metric and minimum score](@assets/images/hub/checks-example-readability.png)
 
 :::caution[Failure example]
 
@@ -682,7 +682,7 @@ The advantage of custom checks is that they can be tailored to your specific use
 
 On the Checks page, you can create custom checks by clicking on the "New check" button in the upper right corner of the screen.
 
-![Custom checks page with new check button](/_static/images/hub/checks-create.png)
+![Custom checks page with new check button](@assets/images/hub/checks-create.png)
 
 Next, set the parameters for the check:
 
@@ -692,7 +692,7 @@ Next, set the parameters for the check:
 - `Type`: The type of the check. See the [built-in checks](#built-in-checks) listed above.
 - A set of parameters specific to the check type.
 
-![Custom check setup with name, identifier, and type selection](/_static/images/hub/checks-create-configure.png)
+![Custom check setup with name, identifier, and type selection](@assets/images/hub/checks-create-configure.png)
 
 Some checks include an `Agent` field with the placeholder "Select an agent". Since a custom check isn't created within a scenario, the Hub can't know in advance which agent's trace schema to use to suggest fields such as `Target key`. Selecting an agent here lets the Hub populate those fields with the keys available in that agent's trace schema.
 
@@ -710,7 +710,7 @@ To add or edit failure categories, go to **Settings** -> **Project Settings**. A
 
 When a test fails, a failure category is assigned to the test automatically, however you can manually update the failure category to a different one.
 
-![Failure category selector on a failed scenario](/_static/images/hub/failure-categories.png)
+![Failure category selector on a failed scenario](@assets/images/hub/failure-categories.png)
 
 :::tip
 You can read about modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
@@ -777,7 +777,7 @@ Tags are optional but highly recommended labels that help you organize and filte
 
 To create a tag, first open a scenario and click on the "Add tag" button in the "Properties" section at the right side of the screen, then pick an existing tag or type a new one.
 
-![Tag picker open in the scenario Properties panel](/_static/images/hub/tags-create.png)
+![Tag picker open in the scenario Properties panel](@assets/images/hub/tags-create.png)
 
 :::tip
 Before creating a tag, we recommend you to read about the best practices for modifying scenarios in [Modify scenarios](/hub/ui/annotate/modify-scenarios).
