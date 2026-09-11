@@ -2,7 +2,7 @@
   "name": "giskard-docs",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@11.11.0",
+  "packageManager": "pnpm@12.4.0",
   "scripts": {
     "dev": "node scripts/convert-notebooks.mjs && astro dev",
     "start": "astro dev",
@@ -20,7 +20,7 @@
     "test:python-snippets": "node scripts/check-python-snippets.mjs"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "13.6.0",
+    "@astrojs/cloudflare": "14.3.1",
     "@astrojs/starlight": "0.39.2",
     "@tailwindcss/vite": "4.3.0",
     "astro": "6.3.8",
