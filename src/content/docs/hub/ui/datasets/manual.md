@@ -21,13 +21,13 @@ In this section, we will walk you through both and show how to create scenarios 
 
 On the Datasets page, click the "New dataset" button in the upper-right corner of the screen. Creating a dataset is a two-step flow: you fill in its settings, then bind it to a schema.
 
-![Datasets list with the New dataset button](/_static/images/hub/datasets-list.png)
+![Datasets list with the New dataset button](@assets/images/hub/datasets-list.png)
 
 #### Step 1: Settings
 
 Enter a **name** and an optional **description** for the dataset, then click "Next".
 
-![New dataset dialog, step 1: name and description](/_static/images/hub/new-dataset-settings.png)
+![New dataset dialog, step 1: name and description](@assets/images/hub/new-dataset-settings.png)
 
 #### Step 2: Schema
 
@@ -36,19 +36,19 @@ Choose the schema the dataset is bound to. The schema sets the shape that every 
 - **Chat**: the standard format, a sequence of alternating user and assistant messages. There is nothing else to configure, click "Create" to finish.
 - **Structured**: any format whose schema is not a chat, defined as custom JSON input and output.
 
-![New dataset dialog, step 2: choosing between Chat and Structured](/_static/images/hub/new-dataset-schema.png)
+![New dataset dialog, step 2: choosing between Chat and Structured](@assets/images/hub/new-dataset-schema.png)
 
 When you pick **Structured**, an **Input schema (JSON)** editor and an **Output schema (JSON)** editor appear. Define both to describe the shape of each scenario's input and output.
 
 To save time, select an agent from the **Linked agent** dropdown to prefill both editors from that agent's definition. The agent must be a **structured** agent that belongs to the current project. Linking an agent is optional: you can write both schemas by hand, even before any structured agent exists. When the schemas are ready, click "Create".
 
-![New dataset dialog, step 2 with Structured selected: linked agent and input/output schema editors](/_static/images/hub/new-dataset-schema-structured.png)
+![New dataset dialog, step 2 with Structured selected: linked agent and input/output schema editors](@assets/images/hub/new-dataset-schema-structured.png)
 
 #### Review a dataset's schema
 
 Once the dataset exists, its header shows a small pill with the bound schema, either **chat** or **structured**. Click the pill to reopen the schema in a read-only version of the same dialog, where you can review the input and output schemas without editing them.
 
-![Dataset header showing the clickable schema pill](/_static/images/hub/dataset-schema-pill.png)
+![Dataset header showing the clickable schema pill](@assets/images/hub/dataset-schema-pill.png)
 
 After creating the dataset, you can add individual scenarios to it.
 
@@ -69,14 +69,14 @@ The selector at the top of the interactions panel controls which agent the scena
 
 Write the **User** message for each interaction.
 
-![Chat scenario with an empty User message field and an empty Checks section](/_static/images/hub/manual-scenario-chat-empty.png)
+![Chat scenario with an empty User message field and an empty Checks section](@assets/images/hub/manual-scenario-chat-empty.png)
 _Chat scenario, initial state._
 
 #### Structured scenarios
 
 Fill in the values of the **Input (JSON)** editor. It is prefilled from the dataset's input schema, so the keys are already in place and you only provide the values. A live linter flags invalid JSON as you type.
 
-![Structured scenario with the Input JSON editor prefilled from the schema and an empty Checks section](/_static/images/hub/manual-scenario-structured-empty.png)
+![Structured scenario with the Input JSON editor prefilled from the schema and an empty Checks section](@assets/images/hub/manual-scenario-structured-empty.png)
 _Structured scenario, initial state._
 
 #### Generate the output trace
@@ -86,10 +86,10 @@ The agent's response is not stored when you enter the input, you generate it. Cl
 - For a **chat** scenario, the output trace is the **Assistant** message, with an expandable **Metadata** section.
 - For a **structured** scenario, the output trace is an **Output (JSON)** editor.
 
-![Chat scenario after running, showing the Assistant message in the Output trace section](/_static/images/hub/manual-scenario-chat-trace.png)
+![Chat scenario after running, showing the Assistant message in the Output trace section](@assets/images/hub/manual-scenario-chat-trace.png)
 _Chat scenario, after Run scenario._
 
-![Structured scenario after running, showing the Output JSON in the Output trace section](/_static/images/hub/manual-scenario-structured-trace.png)
+![Structured scenario after running, showing the Output JSON in the Output trace section](@assets/images/hub/manual-scenario-structured-trace.png)
 _Structured scenario, after Run scenario._
 
 Once you save the scenario, its output trace is kept with it. Run the scenario again at any time to regenerate it.
@@ -110,7 +110,7 @@ The side panel of the scenario also holds:
 - **Tags** (optional): labels to organize and filter scenarios.
 - **Comments**: a thread to discuss the scenario with your team.
 
-![Iteratively design your scenarios using a business-centric & interactive interface.](/_static/images/hub/annotation-studio.png)
+![Iteratively design your scenarios using a business-centric & interactive interface.](@assets/images/hub/annotation-studio.png)
 
 ## Create manual scenarios from the red teaming playground
 
@@ -118,13 +118,13 @@ The side panel of the scenario also holds:
 
 You can create manual scenarios in the red teaming playground. Here you can try to come up with a scenario that is representative of the agent's behavior or test it against a specific vulnerability.
 
-![Red teaming playground chat interface for testing AI agents](/_static/images/hub/playground.png)
+![Red teaming playground chat interface for testing AI agents](@assets/images/hub/playground.png)
 
 The toolbar at the top shows which agent the scenario runs against and its schema. With a **chat** agent, you type a message in the box at the bottom and the agent replies with an assistant message.
 
 With a **structured** agent, the message box is replaced by the agent's **Input** schema, prefilled as JSON. Edit the values and send the object, and the agent returns an **Output** object shaped by its schema.
 
-![Red teaming playground with a structured agent: a prefilled Input JSON editor and a JSON Output](/_static/images/hub/playground-structured.png)
+![Red teaming playground with a structured agent: a prefilled Input JSON editor and a JSON Output](@assets/images/hub/playground-structured.png)
 
 The right panel displays all your scenarios. You can have as many scenarios as you need. To add a new one, click the "New scenario" button. You are also shown a list of your recent scenarios from the most recent to the oldest.
 
@@ -142,11 +142,11 @@ Once you've captured a scenario that adequately tests your desired functionality
 
 The action sits behind the more actions (**⋮**) button in the playground toolbar. Open the menu and choose **Send to dataset**.
 
-![The more actions menu in the playground toolbar, with the Send to dataset option](/_static/images/hub/playground-toolbar-more-actions.png)
+![The more actions menu in the playground toolbar, with the Send to dataset option](@assets/images/hub/playground-toolbar-more-actions.png)
 
 This opens the **Save scenario to dataset** dialog. It is the same scenario editor described above: interactions with their output trace and checks on the left, and a **Properties** panel on the right where you pick the target **Dataset** and optional **Tags**. For a scenario built with a structured agent, the interactions show the **Input** and **Output** JSON editors instead of message fields. Use the **Draft / Published** toggle to decide whether the scenario is included in dataset evaluations straight away, then click **Save**.
 
-![Save scenario to dataset dialog, with the interactions on the left and the dataset selector on the right](/_static/images/hub/playground-save.png)
+![Save scenario to dataset dialog, with the interactions on the left and the dataset selector on the right](@assets/images/hub/playground-save.png)
 
 ### Approaches for Red Teaming AI Agents
 

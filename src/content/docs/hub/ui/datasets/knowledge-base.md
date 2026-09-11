@@ -35,7 +35,7 @@ These clusters and topics are then used to generate dedicated tests that challen
 
 To begin, navigate to the Datasets page and click **Generate** in the upper-right corner of the screen. This opens the **Pick your generation type** modal with two options: Prompt preset and Knowledge base. Select the **Knowledge base** option.
 
-![Dataset generation modal with knowledge base option selected](/_static/images/hub/generate-knowledge-base-select.png)
+![Dataset generation modal with knowledge base option selected](@assets/images/hub/generate-knowledge-base-select.png)
 
 Starting from the Datasets page, the modal also asks for a **Dataset name**: the scenarios land in a new dataset created on the fly. Starting the generation from within an existing dataset skips this and adds the scenarios to that dataset.
 
@@ -43,7 +43,7 @@ Starting from the Datasets page, the modal also asks for a **Dataset name**: the
 
 The Knowledge Base tab allows you to generate a dataset with examples based on your knowledge base.
 
-![Knowledge base test generation form with topic selection](/_static/images/hub/generate-dataset-document-based.png)
+![Knowledge base test generation form with topic selection](@assets/images/hub/generate-dataset-document-based.png)
 
 In this case, dataset generation requires two additional pieces of information:
 

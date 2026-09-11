@@ -18,7 +18,7 @@ import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 The Hub is the user interface from which you can scan, test, and evaluate agentic applications, including LLM-based chatbots, RAGs and classification systems. It implements the following workflow:
 
-![Giskard Hub workflow: scan vulnerabilities, evaluate datasets, then review results and automate](/_static/images/hub/hub-workflow.png)
+![Giskard Hub workflow: scan vulnerabilities, evaluate datasets, then review results and automate](@assets/images/hub/hub-workflow.png)
 
 <CardGrid>
   <LinkCard
@@ -69,7 +69,7 @@ graph LR
 
 The Dashboard is the first page you'll see upon logging in. It provides an overview of your project, displaying the number of agents, datasets, evaluations, and knowledge bases, along with scheduled evaluations of the agent's performance over time and a summary of recent scans.
 
-![Giskard Hub project dashboard showing stats, scheduled evaluations, and scans](/_static/images/hub/dashboard.png)
+![Giskard Hub project dashboard showing stats, scheduled evaluations, and scans](@assets/images/hub/dashboard.png)
 
 ## Create a project
 
@@ -77,7 +77,7 @@ To create a project, click the Settings icon on the left panel. This page lets y
 
 In Projects, click "Create project". A modal appears where you can enter the project's name and description.
 
-![Create project dialog with name and description fields](/_static/images/hub/create-project.png)
+![Create project dialog with name and description fields](@assets/images/hub/create-project.png)
 
 Once the project is created, clicking it in the list opens project settings. Alternatively, use the dropdown menu in the upper left corner of the screen to select the project you want to work on.
 
@@ -89,11 +89,11 @@ To create an agent, open the Agents page and click "New Agent".
 Agents are configured through an API endpoint. They can be scanned for vulnerabilities and evaluated against datasets.
 :::
 
-![Agent list page with new agent button](/_static/images/hub/setup-agent-list.png)
+![Agent list page with new agent button](@assets/images/hub/setup-agent-list.png)
 
 Fill in the agent details:
 
-![Agent configuration form with API endpoint and header settings](/_static/images/hub/setup-agent-detail.png)
+![Agent configuration form with API endpoint and header settings](@assets/images/hub/setup-agent-detail.png)
 
 - `Name`: The name of the agent.
 - `Description`: Used to refine automatic evaluation and generation for better accuracy in your specific use case.
@@ -134,11 +134,11 @@ To import a knowledge base, open Knowledge Bases and click "Add Knowledge Base".
 A **Knowledge Base** is a domain-specific collection of information. You can have several knowledge bases for different areas of your business.
 :::
 
-![Knowledge base list with add knowledge base button](/_static/images/hub/import-kb-list.png)
+![Knowledge base list with add knowledge base button](@assets/images/hub/import-kb-list.png)
 
 Fill in the knowledge base details:
 
-![Knowledge base import form with name and file upload fields](/_static/images/hub/import-kb-detail.png)
+![Knowledge base import form with name and file upload fields](@assets/images/hub/import-kb-detail.png)
 
 - `Name`: The name of the knowledge base.
 - `File`: The document to upload, containing the knowledge base content. Supported formats are:
@@ -166,7 +166,7 @@ Each object in your JSON or JSONL file should have the following structure:
 
 Once imported, the knowledge base shows its documents and topics. If no topics were uploaded, Giskard Hub identifies and generates them. In the example below, the knowledge base is ready with 206 documents and 5 topics.
 
-![Imported knowledge base showing document count and topics](/_static/images/hub/import-kb-success.png)
+![Imported knowledge base showing document count and topics](@assets/images/hub/import-kb-success.png)
 
 ## Need help?
 
