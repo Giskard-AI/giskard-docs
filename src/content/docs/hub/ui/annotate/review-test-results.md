@@ -149,7 +149,7 @@ If you don't know if the agent answers correctly or not and there needs to be a 
 
 When reviewing a scenario, the first thing to check is whether the scenario passed or failed. By opening the scenario, you can see the metrics along with the failure category and tags on the right side of the screen.
 
-![Scenario review showing check results and failure category](/_static/images/hub/review-test-metrics.png)
+![Scenario review showing check results and failure category](@assets/images/hub/review-test-metrics.png)
 
 **PASS:**
 
@@ -185,7 +185,7 @@ Each check provides an explanation of why it passed or failed. This explanation 
 
 Each check also has a **Settings** section, collapsed by default. Expand it to see the parameters the check was configured with, for example a custom check's pattern or rule, and the target key it read from the trace. Reviewing these settings alongside the failure reason often makes it clear why a check passed or failed.
 
-![Failed Regex Matching check with the Settings section expanded, showing the pattern and target key used](/_static/images/hub/review-check-settings.png)
+![Failed Regex Matching check with the Settings section expanded, showing the pattern and target key used](@assets/images/hub/review-check-settings.png)
 
 :::tip
 For more information about checks and how to enable/disable them, see the "Enable/Disable checks" section in [Modify scenarios](/hub/ui/annotate/modify-scenarios). For comprehensive information about all check types, see [Overview](/hub/ui/annotate/overview).
@@ -234,10 +234,10 @@ What an interaction looks like depends on the agent type:
 
 For a chat agent, you author the **User** message at each interaction; for a structured agent, you author the **Input**. In both cases, the agent's response, the **Assistant** message or the **Output**, is generated and evaluated at scenario time, and the agent can rely on the history of earlier interactions in the same scenario when producing that response.
 
-![Chat agent scenario result showing user/assistant message bubbles across interactions](/_static/images/hub/review-chat-interaction.png)
+![Chat agent scenario result showing user/assistant message bubbles across interactions](@assets/images/hub/review-chat-interaction.png)
 _Chat agent: interactions are shown as User / Assistant message bubbles._
 
-![Structured agent scenario result showing Input and Output JSON editors for an interaction](/_static/images/hub/review-structured-interaction.png)
+![Structured agent scenario result showing Input and Output JSON editors for an interaction](@assets/images/hub/review-structured-interaction.png)
 _Structured agent: interactions are shown as Input / Output JSON objects._
 
 :::tip
@@ -248,7 +248,7 @@ For information on creating and structuring scenarios, see [Manual datasets](/hu
 
 Checks are evaluated interaction by interaction, in order. As soon as a check fails, the evaluation stops: any interactions after that point are skipped and not executed.
 
-![Checks panel showing subsequent interactions were skipped after a failed check](/_static/images/hub/review-check-skipped.png)
+![Checks panel showing subsequent interactions were skipped after a failed check](@assets/images/hub/review-check-skipped.png)
 
 ### Metadata
 

@@ -24,7 +24,7 @@ Start testing your AI agent for security vulnerabilities.
 5. **Start the scan**
    Click **Launch Scan** to begin the red teaming process
 
-![Scan configuration with agent, vulnerability categories, and options](/_static/images/hub/scan/launch-scan.png)
+![Scan configuration with agent, vulnerability categories, and options](@assets/images/hub/scan/launch-scan.png)
 
 ## Select individual probes
 
@@ -32,13 +32,13 @@ By default, you configure a scan **By category**. To run a more targeted scan, s
 
 You must select at least one probe before launching the scan.
 
-![Select individual probes for a scan](/_static/images/hub/scan/select-probes.png)
+![Select individual probes for a scan](@assets/images/hub/scan/select-probes.png)
 
 ## Monitor scan progress
 
 Once started, you can track the scan's progress in real-time:
 
-![Live scan progress showing probe execution and results](/_static/images/hub/scan/scan-running.png)
+![Live scan progress showing probe execution and results](@assets/images/hub/scan/scan-running.png)
 
 The scan typically takes 5-15 minutes depending on your agent's complexity and the number of categories selected.
 

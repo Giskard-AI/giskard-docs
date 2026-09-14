@@ -11,13 +11,13 @@ You can schedule evaluations to run automatically at regular intervals. This is 
 
 In the sidebar, open Evaluations and click Scheduled. This will display a list of all the scheduled evaluations.
 
-![Scheduled Evaluations page](/_static/images/hub/evaluation-schedule-list.png)
+![Scheduled Evaluations page](@assets/images/hub/evaluation-schedule-list.png)
 
 ## Create a new schedule
 
 To create a new scheduled evaluation, click on the "Schedule Evaluation" button in the upper right corner of the screen.
 
-![Schedule evaluation form with agent, dataset, and frequency options](/_static/images/hub/evaluation-schedule.png)
+![Schedule evaluation form with agent, dataset, and frequency options](@assets/images/hub/evaluation-schedule.png)
 
 ## Configure the schedule
 

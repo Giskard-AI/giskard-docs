@@ -146,7 +146,7 @@ hub.helpers.print_metrics(evaluation)
 
 The output is a rich terminal table showing per-check pass rates:
 
-![Evaluation metrics output from hub.helpers.print_metrics()](../../../../../assets/images/sdk/evaluation-metrics-output.png)
+![Evaluation metrics output from hub.helpers.print_metrics()](@assets/images/sdk/evaluation-metrics-output.png)
 
 ### Search and filter results
 

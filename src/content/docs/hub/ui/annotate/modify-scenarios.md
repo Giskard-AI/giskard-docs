@@ -73,7 +73,7 @@ After modifying a scenario or its checks, you should rerun it to validate your c
 
 The **Run scenario** button sits in the fixed toolbar at the top of the scenario screen, so it stays available as you scroll through interactions.
 
-![Run scenario button in the fixed toolbar above the interactions list](/_static/images/hub/scenario-run-scenario-button.png)
+![Run scenario button in the fixed toolbar above the interactions list](@assets/images/hub/scenario-run-scenario-button.png)
 
 Clicking it regenerates the trace for every interaction and then runs all of their checks. Use it when you've changed the scenario itself, or when you want a full, up-to-date result across every check.
 
@@ -81,7 +81,7 @@ Clicking it regenerates the trace for every interaction and then runs all of the
 
 Each check also has its own **Run check** button, next to its enable/disable toggle.
 
-![Run check button next to a single check](/_static/images/hub/scenario-run-check-button.png)
+![Run check button next to a single check](@assets/images/hub/scenario-run-check-button.png)
 
 This is more granular:
 
