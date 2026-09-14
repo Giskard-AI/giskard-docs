@@ -4,3 +4,10 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Link: </llms.txt>; rel="describedby"; type="text/plain"; title="Giskard Documentation index for LLMs", </llms-full.txt>; rel="describedby"; type="text/plain"; title="Full Giskard Documentation content for LLMs", </sitemap.xml>; rel="sitemap"; type="application/xml"
+
+# Content-hashed build assets (CSS, JS, fonts, source images the /_image
+# endpoint reads from). The hash changes when the file changes, so a
+# far-future immutable cache is safe. Transformed images served from
+# /_image already carry their own immutable cache-control.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

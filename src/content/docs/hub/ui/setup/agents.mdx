@@ -13,11 +13,11 @@ To create an agent, open the Agents page and click "New Agent".
 Agents are configured through an API endpoint. They can be scanned for vulnerabilities and evaluated against datasets.
 :::
 
-![Agent list page with new agent button](/_static/images/hub/setup-agent-list.png)
+![Agent list page with new agent button](@assets/images/hub/setup-agent-list.png)
 
 Fill in the agent details. Every agent has a **Mode**: **Chat** for conversational message lists, or **Structured** for a custom JSON request and response.
 
-![Agent configuration form with API endpoint, headers, and Chat mode](/_static/images/hub/setup-agent-detail.png)
+![Agent configuration form with API endpoint, headers, and Chat mode](@assets/images/hub/setup-agent-detail.png)
 
 - `Name`: The name of the agent.
 - `Description`: Used to refine automatic evaluation and generation for better accuracy in your specific use case.
@@ -61,13 +61,13 @@ Use **Structured** when the application is not a chatbot: classifiers, extractor
 
 Select **Structured** in Mode. The Hub warns that switching clears the current schema and all bindings, then replaces the chat schemas with empty JSON Schema objects you edit yourself.
 
-![Ticket classifier form with Structured mode selected](/_static/images/hub/setup-agent-structured.png)
+![Ticket classifier form with Structured mode selected](@assets/images/hub/setup-agent-structured.png)
 
 ### Schema configuration
 
 **Input Schema** and **Output Schema** are JSON Schema documents. They describe the JSON body the Hub POSTs and the JSON body it expects back.
 
-![Input Schema and Output Schema editors for a ticket classifier](/_static/images/hub/setup-agent-structured-schema.png)
+![Input Schema and Output Schema editors for a ticket classifier](@assets/images/hub/setup-agent-structured-schema.png)
 
 Scenarios, dataset generation, and playground calls all use these schemas. Keep them accurate so generated data and checks match the live API.
 
@@ -247,14 +247,14 @@ The same shapes appear in scenario `input` and `output` fields, so a dataset bui
 
 Chat agents default to one mapping that rebuilds the conversation. Structured agents start with none: each call receives only the current input.
 
-![Chat schemas and a Build history list mapping from $.response to messages](/_static/images/hub/setup-agent-interaction-context.png)
+![Chat schemas and a Build history list mapping from $.response to messages](@assets/images/hub/setup-agent-interaction-context.png)
 
 | Mapping type               | What it does                                                      | Typical use                                                             |
 | -------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | **Build history list**     | Appends each turn to a running list in the next request           | Stateless chat endpoints that need the full `messages` array            |
 | **Copy previous response** | Copies one value from the previous response into the next request | Thread IDs, session IDs, or conversation tokens the agent stores itself |
 
-![Mapping type help with Copy previous response and Build history list examples](/_static/images/hub/setup-agent-mapping-type.png)
+![Mapping type help with Copy previous response and Build history list examples](@assets/images/hub/setup-agent-mapping-type.png)
 
 ### Build history list
 

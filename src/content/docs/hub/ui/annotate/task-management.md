@@ -55,7 +55,7 @@ The Hub UI provides a comprehensive overview of all your tasks, including:
 - **Assignees** - Know who is responsible for each task
 - **Filters** - Filter tasks by your own tasks or unassigned tasks
 
-![Task management page with priority, status, and assignee columns](/_static/images/hub/tasks-overview.png)
+![Task management page with priority, status, and assignee columns](@assets/images/hub/tasks-overview.png)
 
 ## Create a task
 
@@ -95,7 +95,7 @@ To create a task from a scan result:
    - **Assignees** - Select one or more team members
    - **Description** - Provide a clear description of what needs to be done
 
-![Creating a task from a vulnerability scan probe result](/_static/images/hub/tasks-from-probe.png)
+![Creating a task from a vulnerability scan probe result](@assets/images/hub/tasks-from-probe.png)
 
 ### From evaluation runs
 
@@ -116,13 +116,13 @@ To create a task from an evaluation run:
    - **Description** - Provide a clear description of what needs to be done
    - **Draft** - Chose to set the linked failed scenario to draft status, excluding it from the evaluation run.
 
-![Create a task from an evaluation run](/_static/images/hub/tasks-from-run.png)
+![Create a task from an evaluation run](@assets/images/hub/tasks-from-run.png)
 
 ## Iterate on a task
 
 When iterating on a task, there are various things you can can change. First, you need to open the task and view it.
 
-![Task editing interface with assignee, status, and priority fields](/_static/images/hub/tasks-edit.png)
+![Task editing interface with assignee, status, and priority fields](@assets/images/hub/tasks-edit.png)
 
 When editing a task, you can change the following information:
 
@@ -175,7 +175,7 @@ An important feature related to tasks is the ability to set scenarios to draft. 
 When you go to the scenario linked to an evaluation run and create a task, you can set it to draft status. Before using it again, you need to resolve all associated tasks.
 Similarly, you can select a scenario from a dataset and set it to draft status.
 
-![Draft status toggle excluding scenario from evaluations](/_static/images/hub/tasks-draft.png)
+![Draft status toggle excluding scenario from evaluations](@assets/images/hub/tasks-draft.png)
 
 ## Follow the review process
 
@@ -224,7 +224,7 @@ To add a comment:
 3. Add your comment
 4. Press the "Post comment" button
 
-![Adding a comment to a scenario for team review](/_static/images/hub/comment-create.png)
+![Adding a comment to a scenario for team review](@assets/images/hub/comment-create.png)
 
 ## Best practices
 

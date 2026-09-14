@@ -18,7 +18,7 @@ In this section, we will walk you through how to compare evaluations in Giskard 
 
 On the Evaluation History page, select two or three runs, then click Compare in the table toolbar. The page will display a comparison of the selected evaluations.
 
-![Side-by-side comparison of two evaluation runs](/_static/images/hub/comparison-overview.png)
+![Side-by-side comparison of two evaluation runs](@assets/images/hub/comparison-overview.png)
 
 ## Understanding the comparison view
 
@@ -28,7 +28,7 @@ First, it shows the success rate - the percentage of scenarios that the checks p
 
 Clicking on a scenario will show a detailed comparison.
 
-![Scenario-level comparison showing response differences](/_static/images/hub/comparison-detail.png)
+![Scenario-level comparison showing response differences](@assets/images/hub/comparison-detail.png)
 
 Within this comparison you can explore the performance of the agent on a specific scenario and metrics.
 

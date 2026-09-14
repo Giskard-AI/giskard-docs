@@ -22,7 +22,7 @@ By moving from generic stress testing to rule-driven scenarios, you get higher q
 
 To begin, navigate to the Datasets page and click **Generate** in the upper-right corner of the screen. This opens the **Pick your generation type** modal with two options: Prompt preset and Knowledge base. Select the **Prompt preset** option.
 
-![Select prompt preset option from generation modal](/_static/images/hub/scenario-select.png)
+![Select prompt preset option from generation modal](@assets/images/hub/scenario-select.png)
 
 Starting from the Datasets page, the modal also asks for a **Dataset name**: the scenarios land in a new dataset created on the fly. Starting the generation from within an existing dataset skips this and adds the scenarios to that dataset.
 
@@ -30,7 +30,7 @@ Starting from the Datasets page, the modal also asks for a **Dataset name**: the
 
 Generation runs as a two-step flow. In step 1, **Choose or create**, you pick a prompt preset: a reusable bundle of personas, topics, tone, and rules that shapes the scenarios. Select one of the built-in presets or create your own.
 
-![Prompt preset selection interface](/_static/images/hub/scenario-persona-choose.png)
+![Prompt preset selection interface](@assets/images/hub/scenario-persona-choose.png)
 
 When creating a new prompt preset, it's always nice to have:
 
@@ -41,7 +41,7 @@ When creating a new prompt preset, it's always nice to have:
 
 You can then add specific rules that define behaviors your agent should respect and that are at risk of being broken when interacting with the selected personas. These rules help evaluate different persona situations and will be used to generate scenarios that specifically test whether your agent maintains these behaviors.
 
-![Add prompt preset form with name, description, and rules](/_static/images/hub/scenario-persona-create.png)
+![Add prompt preset form with name, description, and rules](@assets/images/hub/scenario-persona-create.png)
 
 For example:
 
@@ -61,7 +61,7 @@ Step 2, **Review**, shows the selected preset and its rules. Set:
 - **Target key**: the output field the generated checks evaluate. It defaults to the assistant response for a chat agent, or to the first available path in the schema for a structured agent, and you can point it elsewhere. The preset's rules are turned into a conformity check on this key. See [Annotate](/hub/ui/annotate) for how target keys and checks work.
 - **Number of scenarios**: how many scenarios to generate.
 
-![Prompt preset generation settings with agent, target key, and scenario count](/_static/images/hub/scenario-generate.png)
+![Prompt preset generation settings with agent, target key, and scenario count](@assets/images/hub/scenario-generate.png)
 
 Click **Generate**. It runs relatively quickly, and you end up with a high-quality, evaluated dataset.
 

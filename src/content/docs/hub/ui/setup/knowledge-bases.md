@@ -11,11 +11,11 @@ To import a knowledge base, open Knowledge Bases and click "Add Knowledge Base".
 A **Knowledge Base** is a domain-specific collection of information. You can have several knowledge bases for different areas of your business.
 :::
 
-![Knowledge base list with add knowledge base button](/_static/images/hub/import-kb-list.png)
+![Knowledge base list with add knowledge base button](@assets/images/hub/import-kb-list.png)
 
 Fill in the knowledge base details:
 
-![Knowledge base import form for JSON and JSONL files](/_static/images/hub/import-kb-detail.png)
+![Knowledge base import form for JSON and JSONL files](@assets/images/hub/import-kb-detail.png)
 
 - `Name`: The name of the knowledge base.
 - `File`: The document to upload, containing the knowledge base content. Supported formats are:
@@ -43,7 +43,7 @@ Each object in your JSON or JSONL file should have the following structure:
 
 Once imported, the knowledge base shows its documents and topics. If no topics were uploaded, Giskard Hub identifies and generates them. In the example below, the knowledge base is ready with 206 documents and 5 topics.
 
-![Imported knowledge base showing document count and topics](/_static/images/hub/import-kb-success.png)
+![Imported knowledge base showing document count and topics](@assets/images/hub/import-kb-success.png)
 
 ## Next steps
 
