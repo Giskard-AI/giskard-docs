@@ -255,13 +255,13 @@ suite_result = await vulnerability_scan(
 
 While the suite runs, Giskard shows live progress for each scenario, with a count of how many passed and failed:
 
-![Giskard scan running, with a progress bar over the scenarios, per-scenario rows, and a passed and failed count](/_static/images/oss/solutions/suite-run-progress.png)
+![Giskard scan running, with a progress bar over the scenarios, per-scenario rows, and a passed and failed count](@assets/images/oss/solutions/suite-run-progress.png)
 
 The `description` is what the LLM uses to generate **domain-specific** scenarios, so the more precisely you describe your agent's purpose and boundaries, the more relevant the findings. Naming the boundaries explicitly, as the description above does with investment advice and other customers' data, is what makes the scan attack those rules instead of generic ones.
 
 For every failed scenario, the report shows the judge's verdict and the full conversation trace that triggered it, so you can see exactly how the agent was manipulated:
 
-![A failed scan scenario showing the judge's verdict and the multi-turn conversation trace of inputs and outputs](/_static/images/oss/solutions/suite-report-failure.png)
+![A failed scan scenario showing the judge's verdict and the multi-turn conversation trace of inputs and outputs](@assets/images/oss/solutions/suite-report-failure.png)
 
 ## What's next?
 
@@ -377,7 +377,7 @@ Beyond the built-in scenarios, you can write your own evaluation logic with cust
 
 The scan on this page runs locally and is driven by code. When you need more than that, the [Giskard Hub](/hub/ui/scan), our enterprise platform, manages the complete red teaming workflow: through the web interface, the [Python SDK](/hub/sdk), or the API, you launch a more advanced scan (50+ probes), get a security grade for your agent, and turn the findings into [test datasets](/hub/ui/datasets) that your whole team, including business experts, can review and annotate. On top of that, [continuous red teaming](/hub/ui/continuous-red-teaming) keeps testing your deployed agent against emerging threats, catching vulnerabilities and regressions before they can be exploited.
 
-![Giskard Hub scan report showing a security grade, issue counts by severity, and results broken down by vulnerability category with OWASP tags](/_static/images/oss/solutions/hub-scan-results.png)
+![Giskard Hub scan report showing a security grade, issue counts by severity, and results broken down by vulnerability category with OWASP tags](@assets/images/oss/solutions/hub-scan-results.png)
 
 For a complete picture of what the Hub adds, read the [Open Source vs Hub comparison](/start/comparison), or [talk to our team ↗](https://www.giskard.ai/contact) to see it in action.
 

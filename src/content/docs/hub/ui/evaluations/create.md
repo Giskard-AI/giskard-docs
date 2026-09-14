@@ -7,7 +7,7 @@ sidebar:
 
 On the Evaluation History page, click on the "Run evaluation" button in the upper right corner of the screen.
 
-![Evaluation runs list with run evaluation button](/_static/images/hub/evaluation-list.png)
+![Evaluation runs list with run evaluation button](@assets/images/hub/evaluation-list.png)
 
 ## Configure the evaluation
 
@@ -23,7 +23,7 @@ Next, set the parameters for the evaluation:
 
 - `Number of runs per scenario`: Choose how many times to run each scenario (1–5). The evaluation stops at the first failure; if all runs pass, the scenario is considered successful.
 
-![Evaluation configuration form with agent and dataset selection](/_static/images/hub/evaluation-run.png)
+![Evaluation configuration form with agent and dataset selection](@assets/images/hub/evaluation-run.png)
 
 ## Checks used in the evaluation
 
@@ -63,7 +63,7 @@ The metrics view displays performance statistics for each check that was used in
 
 The chart below displays the number of scenarios that passed, failed, errored, or were not executed.
 
-![Evaluation metrics view showing pass/fail rates per check](/_static/images/hub/evaluation-metrics.png)
+![Evaluation metrics view showing pass/fail rates per check](@assets/images/hub/evaluation-metrics.png)
 
 The metrics view helps you:
 
@@ -81,7 +81,7 @@ The failure categories view groups test failures by their failure category. This
 
 The chart below displays the number of scenarios that passed, failed, errored, or were not executed.
 
-![Failure categories view grouping test results by root cause](/_static/images/hub/evaluation-categories.png)
+![Failure categories view grouping test results by root cause](@assets/images/hub/evaluation-categories.png)
 
 Using failure categories helps you:
 
@@ -98,7 +98,7 @@ You can read about failure category changes in [Modify scenarios](/hub/ui/annota
 
 The tags view helps you filter and analyze results by custom tags.
 
-![Tags view showing test results filtered by category](/_static/images/hub/evaluation-tags.png)
+![Tags view showing test results filtered by category](@assets/images/hub/evaluation-tags.png)
 
 Using tags helps you:
 
@@ -115,7 +115,7 @@ You can read about tag definitions in [Annotate overview](/hub/ui/annotate/overv
 
 The evaluation run table displays scenarios with several columns that provide important information:
 
-![Evaluation results table with status, metrics, and failure columns](/_static/images/hub/evaluation-columns.png)
+![Evaluation results table with status, metrics, and failure columns](@assets/images/hub/evaluation-columns.png)
 
 These columns help you:
 

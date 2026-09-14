@@ -25,7 +25,7 @@ This section walks through the new-dataset flow first, then the existing-dataset
 
 On the Datasets page, click the "Import" button in the upper-right corner of the screen.
 
-![Datasets list with the Import button](/_static/images/hub/datasets-list.png)
+![Datasets list with the Import button](@assets/images/hub/datasets-list.png)
 
 The import is a two-step flow: you first lock the dataset schema, then choose the file to import against it.
 
@@ -37,7 +37,7 @@ Enter a **name** and an optional **description**, then choose the schema the new
 
 The standard format, a sequence of alternating user and assistant messages. There is nothing else to configure. Click "Create dataset and continue".
 
-![Import flow, step 1: creating a new chat dataset](/_static/images/hub/import-new-dataset-chat.png)
+![Import flow, step 1: creating a new chat dataset](@assets/images/hub/import-new-dataset-chat.png)
 
 #### Structured dataset
 
@@ -45,7 +45,7 @@ Any format whose schema is not a chat, defined as custom JSON input and output. 
 
 Select an agent from the **Linked agent** dropdown to prefill both editors from that agent's definition, or write both schemas by hand. Linking an agent is optional. When the schemas are ready, click "Create dataset and continue".
 
-![Import flow, step 1: creating a new structured dataset](/_static/images/hub/import-new-dataset-structured.png)
+![Import flow, step 1: creating a new structured dataset](@assets/images/hub/import-new-dataset-structured.png)
 
 ### Step 2: Import the file
 
@@ -53,7 +53,7 @@ The dataset now exists and its schema is locked. A banner recaps which dataset y
 
 Pick the file to import. Accepted formats are JSON, JSONL, and CSV for chat datasets, JSON and JSONL only for structured datasets. The **Help** panel on the right shows the expected structure for each format.
 
-![Import flow, step 2: choosing the file to import](/_static/images/hub/import-file-step.png)
+![Import flow, step 2: choosing the file to import](@assets/images/hub/import-file-step.png)
 
 The file is validated against the dataset schema before anything is saved:
 
