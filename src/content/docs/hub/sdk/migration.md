@@ -1,11 +1,11 @@
 ---
 title: Migration Guide
-description: Migrate from Hub v2 to Hub v3. Update renamed resources and check identifiers, and use unified Conformity and Groundedness checks.
+description: Migrate from Hub v2 (SDK 3.1) to Hub v3 (SDK 3.2.0). Renamed resources, deprecated methods, and breaking check identifier changes.
 sidebar:
   order: 7
 ---
 
-Hub v3 pairs with SDK **3.2.0**. This guide covers what changes when you move from Hub v2 (SDK 3.1.x) to Hub v3. Most SDK renames are backwards compatible and only emit a `DeprecationWarning`. Some **check identifier renames are breaking**, so read that section first. Conformity and Groundedness accept both their short names and their `hub_` names.
+Hub v3 pairs with SDK **3.2.0**. This guide covers what changes when you move from Hub v2 (SDK 3.1.x) to Hub v3. Most SDK renames are backwards compatible and only emit a `DeprecationWarning`. Some **check identifier renames are breaking**, so read that section first. Your existing Conformity and Groundedness identifiers and parameters remain supported.
 
 :::caution
 The Hub and the SDK must upgrade together, Hub first, then the SDK. SDK 3.1.x breaks against Hub v3 (it sends old check identifiers and calls endpoints that were removed), and SDK 3.2.0 does not work against Hub v2.
@@ -59,42 +59,36 @@ hub.scenarios.create(
 )
 ```
 
-### Conformity and Groundedness use the Hub checks
+### Conformity and Groundedness remain compatible
 
-These two checks accept both identifiers:
+You can continue using the `conformity` and `groundedness` identifiers from Hub v2. Hub v3 also accepts their `hub_` names:
 
-| Accepted identifiers               | Stored check type  | UI name      |
-| ---------------------------------- | ------------------ | ------------ |
-| `conformity`, `hub_conformity`     | `hub_conformity`   | Conformity   |
-| `groundedness`, `hub_groundedness` | `hub_groundedness` | Groundedness |
+| Hub v2 identifier | Accepted in Hub v3                   |
+| ----------------- | ------------------------------------ |
+| `conformity`      | `conformity` or `hub_conformity`     |
+| `groundedness`    | `groundedness` or `hub_groundedness` |
 
-Both names select the Hub evaluator. They no longer select separate OSS and Hub implementations in the Hub.
-
-For scenario checks, put check parameters inside `params`:
+Your existing check configurations still work with SDK 3.2.0. For example:
 
 ```python
 checks = [
-    {"identifier": "conformity", "params": {"rule": "Use formal language."}},
+    {"identifier": "conformity", "params": {"rules": ["Use formal language."]}},
     {
         "identifier": "groundedness",
-        "params": {"context_key": "trace.last.outputs.metadata.retrieved_chunks"},
+        "params": {"context": "Our return window is 30 days."},
     },
 ]
 ```
 
-- **Conformity:** use `rule: str`. The legacy `rules: list[str]` is still accepted and converted to a single string with one bullet line per rule.
-- **Groundedness:** pass `context` as a string or list of strings, or use `context_key` to read it from the trace. A supplied `context` takes precedence over `context_key`.
-- **Target path:** use `target_key` for both checks. The legacy `text_key` name is still accepted. When added to a scenario by identifier, both checks default to `trace.last.outputs.response.content`. Groundedness uses `trace.last.outputs.metadata` as its default context path.
+- **Conformity:** for new configurations, use `rule: str`. Your existing `rules: list[str]` is still accepted and converted to a single string with one bullet line per rule. The UI shows these instructions in one **Rule** field.
+- **Groundedness:** your existing fixed `context` remains supported. You can also pass a list of strings or use `context_key` to read context from the trace. A supplied `context` takes precedence over `context_key`.
+- **Target path:** use `target_key` for both checks. Your existing `text_key` is still accepted. The default target for scenario checks remains the response content (`trace.last.outputs.response.content`).
 
-Use one parameter name for each setting: `rule` or `rules`, and `target_key` or `text_key`.
+Use one parameter name for each setting: `rule` or `rules`, and `target_key` or `text_key`. See [Built-in checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for all parameters and defaults.
 
-#### Saved data and OSS imports
+#### Existing data
 
-The Hub upgrade converts existing check configurations, scenario references, and saved evaluation checks to the Hub types. Custom checks keep their identity. If a scenario had both the OSS and Hub variant, it keeps both check instances. Their metrics use the names **Conformity** and **Groundedness**. Saved verdicts and annotations are preserved; reruns use the Hub evaluators.
-
-OSS checks imported through the SDK are also converted automatically. Explicit input values and trace paths are preserved. An OSS Conformity spec without a target gets `target_key="trace"` to preserve its full-trace scope. This differs from adding a scenario check by identifier, which uses the response-content default described above.
-
-See [Import OSS checks](/hub/sdk/guides/datasets-and-checks#import-oss-checks) for an example.
+The Hub upgrade migrates saved check configurations, scenario references, and evaluation checks automatically. Saved verdicts and annotations are preserved. Existing custom checks are also migrated; see [Custom check identifiers](#custom-check-identifiers-require-a-custom_-prefix) for the required identifier prefix.
 
 ### Check params renamed
 
@@ -103,7 +97,7 @@ Whether you pass raw dicts or the typed params classes:
 - `CorrectnessParams` is removed. Use `HubCorrectnessParams` (`reference`).
 - `MetadataParams` is removed. Use `HubMetadataParams` (`json_path_rules`).
 - `StringMatchParams` is removed. Use `StringMatchingParams`.
-- SDK 3.2.0 still defines `ConformityParams` with `rule` and `HubConformityParams` with the legacy `rules` field. The Hub accepts both configurations and runs the Hub evaluator. For new fields missing from an SDK parameter type, use a raw `spec` with `hub.checks.create()` or `hub.checks.update()`.
+- In SDK 3.2.0+, `ConformityParams` uses `rule`, and `HubConformityParams` uses the existing `rules` field. The Hub accepts both configurations and runs the Hub evaluator. For new fields missing from an SDK parameter type, use a raw `spec` with `hub.checks.create()` or `hub.checks.update()`.
 - `semantic_similarity` keeps its identifier, but its `reference` param is renamed to `reference_text`. Scripts passing `{"reference": ...}` to this check get a 422.
 - Typed params classes cover built-in checks and their compatibility aliases (e.g. `HubGroundednessParams`, `GroundednessParams`, `SemanticSimilarityParams`, `LLMJudgeParams`).
 
