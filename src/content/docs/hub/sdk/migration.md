@@ -1,11 +1,11 @@
 ---
 title: Migration Guide
-description: Migrate from Hub v2 (SDK 3.1) to Hub v3 (SDK 3.2.0). Renamed resources, deprecated methods, and breaking check identifier changes.
+description: Migrate from Hub v2 to Hub v3. Update renamed resources and check identifiers, and use unified Conformity and Groundedness checks.
 sidebar:
   order: 7
 ---
 
-Hub v3 pairs with SDK **3.2.0**. This guide covers what changes when you move from Hub v2 (SDK 3.1.x) to Hub v3. Most SDK renames are backwards compatible and only emit a `DeprecationWarning`. The **check identifier renames are breaking**: scripts and CI pipelines that pass the old identifiers will fail against Hub v3, so read that section first.
+Hub v3 pairs with SDK **3.2.0**. This guide covers what changes when you move from Hub v2 (SDK 3.1.x) to Hub v3. Most SDK renames are backwards compatible and only emit a `DeprecationWarning`. Some **check identifier renames are breaking**, so read that section first. Conformity and Groundedness accept both their short names and their `hub_` names.
 
 :::caution
 The Hub and the SDK must upgrade together, Hub first, then the SDK. SDK 3.1.x breaks against Hub v3 (it sends old check identifiers and calls endpoints that were removed), and SDK 3.2.0 does not work against Hub v2.
@@ -27,15 +27,13 @@ python -c "import giskard_hub; print(giskard_hub.__version__)"
 
 ## Breaking: check identifiers renamed
 
-The Hub renamed several built-in check identifiers. Requests that pass an old identifier now get a **422 error** from the Hub, usually with a "Did you mean the '...' check?" tip. This applies everywhere an identifier appears: `checks` inside scenarios, `hub.evaluations.run_single()`, custom check `params`, and uploaded dataset files.
+The Hub renamed the built-in check identifiers listed below. Requests that pass one of these old identifiers get a **422 error** from the Hub, usually with a "Did you mean the '...' check?" tip. This applies everywhere an identifier appears: `checks` inside scenarios, `hub.evaluations.run_single()`, custom check `params`, and uploaded dataset files.
 
-| Old identifier             | New identifier     |
-| -------------------------- | ------------------ |
-| `correctness`              | `hub_correctness`  |
-| `conformity` (Hub check)   | `hub_conformity`   |
-| `groundedness` (Hub check) | `hub_groundedness` |
-| `metadata`                 | `hub_metadata`     |
-| `string_match`             | `string_matching`  |
+| Old identifier | New identifier    |
+| -------------- | ----------------- |
+| `correctness`  | `hub_correctness` |
+| `metadata`     | `hub_metadata`    |
+| `string_match` | `string_matching` |
 
 ```python
 # Hub v2 (SDK 3.1)
@@ -61,9 +59,42 @@ hub.scenarios.create(
 )
 ```
 
-:::caution
-`conformity` and `groundedness` **still exist but changed meaning**. They now name the open-source giskard-checks variants, not the Hub checks. The OSS `conformity` takes a single `rule: str` instead of `rules: list[str]`, so a script that keeps passing `{"identifier": "conformity", "params": {"rules": [...]}}` fails with a 422 instead of a rename tip. Switch those to `hub_conformity` and `hub_groundedness`. See [Built-in checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for the full new catalogue.
-:::
+### Conformity and Groundedness use the Hub checks
+
+These two checks accept both identifiers:
+
+| Accepted identifiers               | Stored check type  | UI name      |
+| ---------------------------------- | ------------------ | ------------ |
+| `conformity`, `hub_conformity`     | `hub_conformity`   | Conformity   |
+| `groundedness`, `hub_groundedness` | `hub_groundedness` | Groundedness |
+
+Both names select the Hub evaluator. They no longer select separate OSS and Hub implementations in the Hub.
+
+For scenario checks, put check parameters inside `params`:
+
+```python
+checks = [
+    {"identifier": "conformity", "params": {"rule": "Use formal language."}},
+    {
+        "identifier": "groundedness",
+        "params": {"context_key": "trace.last.outputs.metadata.retrieved_chunks"},
+    },
+]
+```
+
+- **Conformity:** use `rule: str`. The legacy `rules: list[str]` is still accepted and converted to a single string with one bullet line per rule.
+- **Groundedness:** pass `context` as a string or list of strings, or use `context_key` to read it from the trace. A supplied `context` takes precedence over `context_key`.
+- **Target path:** use `target_key` for both checks. The legacy `text_key` name is still accepted. When added to a scenario by identifier, both checks default to `trace.last.outputs.response.content`. Groundedness uses `trace.last.outputs.metadata` as its default context path.
+
+Use one parameter name for each setting: `rule` or `rules`, and `target_key` or `text_key`.
+
+#### Saved data and OSS imports
+
+The Hub upgrade converts existing check configurations, scenario references, and saved evaluation checks to the Hub types. Custom checks keep their identity. If a scenario had both the OSS and Hub variant, it keeps both check instances. Their metrics use the names **Conformity** and **Groundedness**. Saved verdicts and annotations are preserved; reruns use the Hub evaluators.
+
+OSS checks imported through the SDK are also converted automatically. Explicit input values and trace paths are preserved. An OSS Conformity spec without a target gets `target_key="trace"` to preserve its full-trace scope. This differs from adding a scenario check by identifier, which uses the response-content default described above.
+
+See [Import OSS checks](/hub/sdk/guides/datasets-and-checks#import-oss-checks) for an example.
 
 ### Check params renamed
 
@@ -72,9 +103,9 @@ Whether you pass raw dicts or the typed params classes:
 - `CorrectnessParams` is removed. Use `HubCorrectnessParams` (`reference`).
 - `MetadataParams` is removed. Use `HubMetadataParams` (`json_path_rules`).
 - `StringMatchParams` is removed. Use `StringMatchingParams`.
-- `ConformityParams` now describes the OSS check (single required `rule: str`). Use `HubConformityParams` for the Hub check (`rules: list[str]`).
+- SDK 3.2.0 still defines `ConformityParams` with `rule` and `HubConformityParams` with the legacy `rules` field. The Hub accepts both configurations and runs the Hub evaluator. For new fields missing from an SDK parameter type, use a raw `spec` with `hub.checks.create()` or `hub.checks.update()`.
 - `semantic_similarity` keeps its identifier, but its `reference` param is renamed to `reference_text`. Scripts passing `{"reference": ...}` to this check get a 422.
-- Typed params classes now exist for all 21 built-in checks (e.g. `HubGroundednessParams`, `SemanticSimilarityParams`, `LLMJudgeParams`).
+- Typed params classes cover built-in checks and their compatibility aliases (e.g. `HubGroundednessParams`, `GroundednessParams`, `SemanticSimilarityParams`, `LLMJudgeParams`).
 
 ### Validation moved server-side
 
@@ -101,7 +132,7 @@ check = hub.checks.create(
     project_id=project_id,
     identifier="custom_tone_professional",
     name="Professional tone",
-    params={"type": "hub_conformity", "rules": ["Use formal language."]},
+    spec={"kind": "hub_conformity", "rule": "Use formal language."},
 )
 checks = [{"identifier": "custom_tone_professional"}]
 ```
@@ -156,7 +187,7 @@ You cannot mix `interactions=` with the legacy arguments in one call. The same a
 
 ### `datasets.upload()` records
 
-Records in the legacy `{messages, demo_output, checks}` shape are still translated on upload, with a `DeprecationWarning`. Use the new `{"interactions": [{"position", "input", "output", "checks"}]}` shape, and remember the check identifiers inside must use the new names either way.
+Records in the legacy `{messages, demo_output, checks}` shape are still translated on upload, with a `DeprecationWarning`. Use the new `{"interactions": [{"position", "input", "output", "checks"}]}` shape, and update the renamed identifiers listed above. The `conformity` and `groundedness` aliases remain valid.
 
 ### `agents.generate_completion()`: `messages` becomes `input`
 
@@ -261,7 +292,7 @@ If your CI started failing after the Hub upgrade, work through this checklist:
 
 1. **Pin the SDK to 3.2.0 or later** in your requirements.
 2. **Search your scripts for old check identifiers** (`correctness`, `metadata`, `string_match`) and replace them with the new names from the table above. Also rename `reference` to `reference_text` on `semantic_similarity` checks.
-3. **Check every `conformity` and `groundedness` usage.** If it passes `rules=` or a fixed `context=` for the Hub behaviour, rename it to `hub_conformity` / `hub_groundedness`.
+3. **Check Conformity and Groundedness parameters.** Both short and `hub_` identifiers work. Use `params={"rule": ...}` for scenario Conformity checks; existing `rules` lists still work. Set `target_key` explicitly if you need a target other than the default.
 4. **Prefix custom check references.** The Hub renamed your existing custom checks to `custom_<identifier>`. Update scripts that reference them by the old identifier.
-5. **Update uploaded dataset files** (`hub.datasets.upload()` JSON/JSONL): the records may keep the legacy shape, but the identifiers inside `checks` must be the new ones.
+5. **Update uploaded dataset files** (`hub.datasets.upload()` JSON/JSONL): the records may keep the legacy shape. Update `correctness`, `metadata`, and `string_match`; Conformity and Groundedness aliases are accepted.
 6. Treat any remaining `UnprocessableEntityError` (422) as a validation message from the Hub. The error body names the rejected identifier or param and often suggests the correct check.

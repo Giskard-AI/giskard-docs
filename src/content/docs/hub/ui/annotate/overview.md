@@ -38,6 +38,8 @@ Within an existing or new scenario, click on the "Add check" button.
 
 Pick a built-in check from the list. Any custom checks you created earlier also appear here under **User checks**, but their parameters are fixed at creation time, so the configuration steps below apply to built-in checks only.
 
+**Conformity** and **Groundedness** each have one entry in the list. These entries also cover checks imported from OSS. Custom checks keep their own names under **User checks**.
+
 ![Add checks dialog listing available built-in and custom checks](/_static/images/hub/checks-built-in-pick.png)
 
 After, you can configure the check parameters which depends on the check type. This will look something like this:
@@ -58,6 +60,8 @@ Click the field to open a dropdown listing the paths available in the connected 
 :::note
 Not every check has a `Target key`. Whether one is available depends on the check type (see the parameter table for each check below).
 :::
+
+An imported OSS Conformity check can use `trace` as its target to evaluate the full trace. New Conformity and Groundedness checks use the response content by default for chat agents.
 
 #### Value or key mode
 
@@ -112,25 +116,27 @@ Check whether all information from the reference answer is present in the agent 
 
 ::::
 
-##### Conformity (Hub)
+<span id="conformity-hub"></span>
 
-Given a rule or criterion, check whether the agent answer complies with this rule. This can be used to check business specific behavior or constraints. A conformity check may have several rules. Each rule should check a unique and unambiguous behavior. Here are a few examples of rules:
+##### Conformity
+
+Checks whether the agent's answer follows a rule or criterion. Use it for business rules and constraints. Enter the instructions in the **Rule** field. You can include several requirements in the same field, with one clear requirement per line. For example:
 
 - The agent should not talk about \{\{competitor company\}\}.
 - The agent should only answer in English.
 - The agent should always keep a professional tone.
 
-| Parameter    | Type        | Description                                |
-| ------------ | ----------- | ------------------------------------------ |
-| `Rules`      | `list[str]` | One or more rules the response must follow |
-| `Target key` | `str`       | Trace path of the value under test         |
+| Parameter    | Type  | Description                           |
+| ------------ | ----- | ------------------------------------- |
+| `Rule`       | `str` | Instructions the response must follow |
+| `Target key` | `str` | Trace path of the value under test    |
 
 ::::note[Example]
 **Input**: Should I invest in bitcoin to save for a flat?
 
 ---
 
-![Conformity (Hub) check configured with a rule](/_static/images/hub/checks-example-conformity-hub.png)
+![Conformity check configured with a rule and target key](/_static/images/hub/checks-example-conformity-hub.png)
 
 :::caution[Failure example]
 
@@ -158,7 +164,7 @@ To write effective rules, remember the following best practices:
 - **Break Down Policies into Multiple Ones**
   - _Example of wrong usage:_ "The agent should not respond to requests about illegal topics and should focus on banking and insurance-related questions."
   - _Reason:_ Long rules with large scope are difficult to maintain and interpret for the evaluator and they make it harder the debugging process.
-  - _Best Practice:_ Add multiple rules within the same check to ensure the entire set is interpreted globally.
+  - _Best Practice:_ Write each requirement on a separate line in the **Rule** field so the check can evaluate the requirements together.
 
 - **Write Custom Checks when your rules apply to multiple scenarios**
   - Creating and enabling a custom check for multiple scenarios is useful when you want to display the evaluation results for all scenarios where the custom check is enabled.
@@ -166,21 +172,25 @@ To write effective rules, remember the following best practices:
 
 :::
 
-##### Groundedness (Hub)
+<span id="groundedness-hub"></span>
+
+##### Groundedness
 
 Check whether all information from the agent's answer is present in the given context without contradiction. Unlike the correctness check, the groundedness check is tolerant of omissions but sensitive to additional information in the agent's answer. The groundedness check is useful for detecting potential hallucinations in the agent's answer.
 
-| Parameter    | Type  | Description                                              |
-| ------------ | ----- | -------------------------------------------------------- |
-| `Context`    | `str` | The reference context the response should be grounded in |
-| `Target key` | `str` | Trace path of the value under test                       |
+| Parameter    | Type         | Description                                                      |
+| ------------ | ------------ | ---------------------------------------------------------------- |
+| `Context`    | Value or Key | Reference information, entered as text or read from a trace path |
+| `Target key` | `str`        | Trace path of the answer under test                              |
+
+For **Context**, choose **Value** to enter fixed reference text. Choose **Key** to read reference information from the trace at evaluation time, for example `trace.last.outputs.metadata.retrieved_chunks`. The results can highlight unsupported statements and reference passages.
 
 ::::note[Example]
 **Input**: Who was the first person to climb Mount Everest?
 
 ---
 
-![Groundedness (Hub) check configured with a context](/_static/images/hub/checks-example-groundedness-hub.png)
+![Groundedness check configured with context in Value mode and a target key](/_static/images/hub/checks-example-groundedness-hub.png)
 
 :::caution[Failure examples]
 
@@ -233,67 +243,6 @@ Evaluate the interaction with a custom prompt. The prompt is a Jinja2 template w
 :::tip[Inserting trace paths into the prompt]
 The bracket button next to the `Prompt` field opens a list of paths available in the selected agent's trace schema. Click one to insert its Jinja2 expression at the cursor position, instead of typing it out by hand.
 :::
-
-##### Conformity
-
-The raw giskard-checks variant of conformity. Judges the full trace against a single natural-language rule. Uses an LLM judge.
-
-| Parameter | Type  | Description                       |
-| --------- | ----- | --------------------------------- |
-| `Rule`    | `str` | The rule the trace must adhere to |
-
-::::note[Example]
-**Input**: How much does this item cost, and how do you calculate that price?
-
----
-
-![Conformity check configured with a rule](/_static/images/hub/checks-example-conformity.png)
-
-:::caution[Failure example]
-
-- Our standard markup is 40% over wholesale cost, so I can offer you this item at $65.
-  - _Reason: The answer discloses the internal pricing rule, which the rule states the agent must never do_
-
-:::
-
-:::tip[Success example]
-
-- I'm not able to share our internal pricing structure, but I can confirm the final price is $65.
-
-:::
-
-::::
-
-##### Groundedness
-
-The raw giskard-checks variant of groundedness. Instead of a fixed context string, the context and answer can be extracted from configurable trace paths, which is useful when your agent returns its retrieved context in the response. Uses an LLM judge.
-
-| Parameter     | Type        | Description                            |
-| ------------- | ----------- | -------------------------------------- |
-| `Context key` | `JSON path` | Trace path to extract the context from |
-| `Target key`  | `str`       | Trace path of the value under test     |
-
-::::note[Example]
-**Input**: Can I return a clearance item?
-
----
-
-![Groundedness check configured with a context key](/_static/images/hub/checks-example-groundedness.png)
-
-:::caution[Failure example]
-
-- Our return window is 30 days, and clearance items can also be returned within that window.
-  - _Reason: The retrieved chunks state that clearance items are not eligible for returns, so this answer contradicts the context_
-
-:::
-
-:::tip[Success example]
-
-- Our return window is 30 days. Please note that clearance items are not eligible for returns.
-
-:::
-
-::::
 
 ##### Contradiction
 

@@ -414,7 +414,7 @@ check = hub.checks.create(
     project_id=project.id,
     identifier="custom_tone_professional",
     name="Professional tone",
-    params={"type": "hub_conformity", "rules": ["Use formal language."]},
+    spec={"kind": "hub_conformity", "rule": "Use formal language."},
 )
 ```
 
@@ -433,6 +433,7 @@ check = hub.checks.create(
   <Property name="identifier" type="str | None">Updated identifier.</Property>
   <Property name="name" type="str | None">Updated name.</Property>
   <Property name="params" type="CheckTypeParam | None">Updated check params.</Property>
+  <Property name="spec" type="dict[str, object] | None">Updated raw check spec with a `kind`. Provide either `params` or `spec`.</Property>
   <Property name="description" type="str | None">Updated description.</Property>
 </MethodCard>
 
@@ -459,16 +460,14 @@ check = hub.checks.create(
 
 #### Check type params
 
-The `params` field accepts one of these shapes (main params shown; see the [built-in checks guide](/hub/sdk/guides/datasets-and-checks#built-in-checks) for full detail):
+The Hub accepts these `params` dictionaries when creating a custom check (main params shown). You can also pass a raw `spec` with `kind` instead of `type`. See the [built-in checks guide](/hub/sdk/guides/datasets-and-checks#built-in-checks) for all parameters and defaults.
 
 | Type                    | `params` shape                                                                                                                              | Evaluation method |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | **Correctness (Hub)**   | `{"type": "hub_correctness", "reference": str}`                                                                                             | LLM judge         |
-| **Conformity (Hub)**    | `{"type": "hub_conformity", "rules": list[str]}`                                                                                            | LLM judge         |
-| **Groundedness (Hub)**  | `{"type": "hub_groundedness", "context": str}`                                                                                              | LLM judge         |
+| **Conformity**          | `{"type": "hub_conformity", "rule": str}`                                                                                                   | LLM judge         |
+| **Groundedness**        | `{"type": "hub_groundedness", "context": str \| list[str]}` or `{"type": "hub_groundedness", "context_key": str}`                           | LLM judge         |
 | **LLM judge**           | `{"type": "llm_judge", "prompt": str}`                                                                                                      | LLM judge         |
-| **Conformity**          | `{"type": "conformity", "rule": str}`                                                                                                       | LLM judge         |
-| **Groundedness**        | `{"type": "groundedness", "context": str \| list[str], "context_key": str}`                                                                 | LLM judge         |
 | **Contradiction**       | `{"type": "contradiction", "context": str \| list[str]}`                                                                                    | LLM judge         |
 | **Toxicity**            | `{"type": "toxicity", "categories": list[str]}`                                                                                             | LLM judge         |
 | **Answer relevance**    | `{"type": "answer_relevance"}`                                                                                                              | LLM judge         |
@@ -482,7 +481,13 @@ The `params` field accepts one of these shapes (main params shown; see the [buil
 
 Each `JsonPathRule`: `{"json_path": str, "expected_value": str | number | bool, "expected_value_type": "string" | "number" | "boolean"}`
 
-Every check also accepts a target path parameter to point it at a specific field of a structured output: `text_key` for the Hub LLM checks, `metadata_key` for `hub_metadata`, and `target_key` for the rest.
+`conformity` and `groundedness` are accepted aliases for `hub_conformity` and `hub_groundedness`. The Hub stores and runs the Hub types. Conformity also accepts a legacy `rules` list and converts it to one `rule` string.
+
+Conformity and Groundedness use `target_key` (default `trace.last.outputs.response.content` for the Hub types); legacy `text_key` is still accepted. Groundedness uses `context_key` (default `trace.last.outputs.metadata`) when `context` is omitted, and accepts an optional fixed `answer` instead of reading `target_key`. An imported OSS Conformity spec without a target uses the full `trace`.
+
+`hub_correctness` uses `text_key`, and `hub_metadata` uses `metadata_key`. Other checks with a configurable target use `target_key`.
+
+SDK 3.2.0 parameter types still contain the legacy Hub fields (`rules` and `text_key`). Those fields remain supported. Use a raw `spec` when you need fields that your installed SDK does not yet include in its parameter types.
 
 </ResourceSection>
 
@@ -2050,7 +2055,9 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     Whether the check is enabled.
   </Property>
   <Property name="params" type="dict[str, Any]">
-    Check-specific parameters.
+    Check-specific parameters. Put `params` beside `identifier`, for example
+    `{"identifier": "hub_conformity", "params": {"rule": "Use formal language."}}`.
+    `conformity` and `groundedness` select the same checks as their `hub_` aliases.
   </Property>
 </TypeTable>
 
@@ -2087,15 +2094,16 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="CheckTypeParam">
   <Property name="alias" type="union">
-    `TypeAlias` for the union of the typed params dicts for all 21 built-in
-    checks: `HubCorrectnessParamsParam`, `HubConformityParamsParam`,
-    `HubGroundednessParamsParam`, `HubMetadataParamsParam`,
-    `LLMJudgeParamsParam`, `ConformityParamsParam`, `GroundednessParamsParam`,
-    `ContradictionParamsParam`, `ToxicityParamsParam`,
-    `AnswerRelevanceParamsParam`, `SemanticSimilarityParamsParam`,
-    `StringMatchingParamsParam`, `RegexMatchingParamsParam`, the six comparison
-    params, `JsonValidParamsParam`, and `ReadabilityParamsParam`. See [Check
-    type params](#check-type-params) for the concrete shapes.
+    `TypeAlias` for the union of typed params dicts for built-in checks and
+    compatibility aliases: `HubCorrectnessParamsParam`,
+    `HubConformityParamsParam`, `HubGroundednessParamsParam`,
+    `HubMetadataParamsParam`, `LLMJudgeParamsParam`, `ConformityParamsParam`,
+    `GroundednessParamsParam`, `ContradictionParamsParam`,
+    `ToxicityParamsParam`, `AnswerRelevanceParamsParam`,
+    `SemanticSimilarityParamsParam`, `StringMatchingParamsParam`,
+    `RegexMatchingParamsParam`, the six comparison params,
+    `JsonValidParamsParam`, and `ReadabilityParamsParam`. See [Check type
+    params](#check-type-params) for the concrete shapes.
   </Property>
 </TypeTable>
 
