@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import { unified } from "@astrojs/markdown-remark";
 import tailwindcss from "@tailwindcss/vite";
 
 import cloudflare from "@astrojs/cloudflare";
@@ -9,10 +10,13 @@ import mermaid from "astro-mermaid";
 import starlightAutoSidebar from "starlight-auto-sidebar";
 import starlightImageZoom from "starlight-image-zoom";
 
-// https://astro.build/config
 export default defineConfig({
     site: 'https://docs.giskard.ai',
     trailingSlash: 'never',
+    compressHTML: true,
+    markdown: {
+        processor: unified(),
+    },
 
     integrations: [
         starlight({
@@ -24,7 +28,6 @@ export default defineConfig({
                 alt: 'Giskard',
             },
             customCss: [
-                // Load custom styles
                 './src/styles/custom.css',
             ],
             social: [
@@ -32,7 +35,6 @@ export default defineConfig({
                 { label: 'Discord', href: 'https://discord.com/invite/ABvfpbu69R', icon: 'discord' },
             ],
             sidebar: [
-                // Overview sidebar
                 {
                     label: 'Overview',
                     items: [
@@ -47,17 +49,14 @@ export default defineConfig({
                         { label: 'Blog ↗', link: 'https://www.giskard.ai/knowledge-categories/blog', attrs: { target: '_blank' } },
                     ],
                 },
-                // Hub UI sidebar
                 {
                     label: 'Hub UI',
                     items: [{ autogenerate: { directory: 'hub/ui', collapsed: false } }],
                 },
-                // Hub SDK sidebar
                 {
                     label: 'Hub SDK',
                     items: [{ autogenerate: { directory: 'hub/sdk', collapsed: false } }],
                 },
-                // Open Source sidebar
                 {
                     label: 'Get Started',
                     items: [
@@ -111,5 +110,6 @@ export default defineConfig({
         },
     },
 
-    adapter: cloudflare(),
+    // Git-based last-updated dates require Node during prerendering.
+    adapter: cloudflare({ prerenderEnvironment: 'node' }),
 });

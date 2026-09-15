@@ -1,5 +1,6 @@
 {
 	"name": "giskard-docs",
+  "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2026-02-12",
   "compatibility_flags": [
     "nodejs_compat",

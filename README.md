@@ -1,10 +1,10 @@
 # Giskard Docs (Starlight)
 
-Documentation site built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build), deployed to Cloudflare Pages at `docs.giskard.ai`.
+Documentation site built with [Astro](https://astro.build) + [Starlight](https://starlight.astro.build), deployed to Cloudflare Workers at `docs.giskard.ai`.
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 22.12+ (CI uses Node.js 24)
 - [pnpm](https://pnpm.io/) (auto-managed via the `packageManager` field in `package.json`; enable with `corepack enable`)
 - Python 3 + `black` (optional, only needed for `pnpm run format`)
 
@@ -85,4 +85,4 @@ On CI, output overwrite and `.mdx` regeneration only happen on pushes to `main`.
 
 ## Deployment
 
-Deployed automatically via Cloudflare Pages on push to `main`. Preview deployments are created for every PR.
+Deployed automatically via Cloudflare Workers Builds on push to `main`. Preview builds run for pull requests.
