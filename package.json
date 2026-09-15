@@ -2,7 +2,7 @@
   "name": "giskard-docs",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@11.11.0",
+  "packageManager": "pnpm@12.4.1",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -29,7 +29,7 @@
     "@tailwindcss/vite": "4.3.0",
     "astro": "7.3.2",
     "astro-mermaid": "2.1.0",
-    "mermaid": "11.16.1",
+    "mermaid": "12.0.0",
     "sharp": "0.35.4",
     "starlight-auto-sidebar": "0.4.1",
     "starlight-image-zoom": "0.15.0",
