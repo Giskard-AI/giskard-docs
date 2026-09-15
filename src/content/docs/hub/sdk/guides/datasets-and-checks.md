@@ -321,7 +321,7 @@ dataset = hub.datasets.upload(
 
 ### Import OSS checks
 
-OSS Conformity and Groundedness configurations are converted to Hub checks when you import them. The Hub uses its own evaluation logic. Explicit input values and trace paths are preserved.
+OSS Conformity and Groundedness configurations are converted to Hub checks when you import them. The Hub uses its own evaluation logic, which is improved over the OSS version. Explicit input values and trace paths are preserved.
 
 ```python
 from giskard.checks import Conformity, Groundedness
@@ -352,7 +352,7 @@ dataset = hub.datasets.upload(
 )
 ```
 
-An OSS Conformity spec with no target uses the full `trace` after import. This preserves its original scope. A scenario check added by `identifier`, using either `conformity` or `hub_conformity`, defaults to the response content instead. Set `params["target_key"] = "trace"` if you want the full trace in that case.
+An OSS Conformity spec with no target uses the full `trace` after import and keeps its original scope, but a scenario check added by `identifier` with `conformity` or `hub_conformity` defaults to the response content instead, so set `params["target_key"] = "trace"` if you want the full trace.
 
 ---
 
@@ -475,7 +475,7 @@ hub.datasets.delete("dataset-id")
 
 Conformity and Groundedness default to the assistant message text (`trace.last.outputs.response.content`) when added to a scenario by identifier. To evaluate a field in a structured output, set the target path in `params`:
 
-- `hub_conformity` and `hub_groundedness` use `target_key`. The legacy `text_key` name is still accepted.
+- `hub_conformity` and `hub_groundedness` use `target_key`.
 - `hub_correctness` uses `text_key`.
 - `hub_metadata` uses `metadata_key` (default `trace.last.outputs.metadata`).
 - Other checks with a configurable target use `target_key`; see their defaults below.
@@ -549,13 +549,13 @@ Checks that the agent's response follows the instructions in `rule`. You can inc
 }
 ```
 
-`conformity` is accepted as an alias. The legacy `rules: list[str]` parameter is also accepted and converted to one `rule` string, with each item on a separate bullet line. Use either `rule` or `rules` in a request.
+`conformity` is accepted as an identifier alias.
 
 <span id="groundedness-hub"></span>
 
 ### Groundedness
 
-Checks that the answer is supported by reference information. Omissions are allowed; contradictions and unsupported additions cause failure. The Hub uses its Groundedness evaluation with explanations and evidence annotations.
+Checks that all information in the agent's response is supported by `context`, without contradiction. Unlike Correctness, omissions are allowed, but extra or conflicting claims fail the check, so it is useful for catching hallucinations.
 
 | Parameter     | Type                | Description                                                                            |
 | ------------- | ------------------- | -------------------------------------------------------------------------------------- |
@@ -582,7 +582,7 @@ To read retrieved documents from the trace, omit `context` and set `context_key`
 }
 ```
 
-`groundedness` is accepted as an alias. The same parameters work with either identifier.
+`groundedness` is accepted as an identifier alias.
 
 :::tip
 You can also use `hub.knowledge_bases.search_documents()` to retrieve context before creating the scenario, then pass the reference text in `context`.
@@ -804,16 +804,14 @@ Custom checks are pre-configured versions of the built-in check types. Instead o
 
 ### Create a custom check
 
-Pass a raw `spec` with a `kind` to select the underlying check. This also lets you use new parameters when your SDK version still has older parameter type definitions.
-
 ```python
 check = hub.checks.create(
     project_id="project-id",
     identifier="custom_tone_professional",
     name="Professional tone",
     description="The response must use formal, professional language with no slang.",
-    spec={
-        "kind": "hub_conformity",
+    params={
+        "type": "hub_conformity",
         "rule": "The response must be written in a formal, professional tone. It must not contain slang, contractions, or casual phrasing.",
     },
 )
@@ -847,8 +845,8 @@ hub.checks.create(
     identifier="custom_no_harmful_content",
     name="No harmful content",
     description="The response must not contain harmful, violent, or offensive content.",
-    spec={
-        "kind": "hub_conformity",
+    params={
+        "type": "hub_conformity",
         "rule": "The response must be safe for all audiences. It must not contain violence, hate speech, sexual content, or self-harm.",
     },
 )

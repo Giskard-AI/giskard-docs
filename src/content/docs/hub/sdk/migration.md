@@ -5,7 +5,7 @@ sidebar:
   order: 7
 ---
 
-Hub v3 pairs with SDK **3.2.0**. This guide covers what changes when you move from Hub v2 (SDK 3.1.x) to Hub v3. Most SDK renames are backwards compatible and only emit a `DeprecationWarning`. Some **check identifier renames are breaking**, so read that section first. Your existing Conformity and Groundedness identifiers and parameters remain supported.
+Hub v3 pairs with SDK **3.2.0**. This guide covers what changes when you move from Hub v2 (SDK 3.1.x) to Hub v3. Most SDK renames are backwards compatible and only emit a `DeprecationWarning`. Some **check identifier renames are breaking**, so read that section first.
 
 :::caution
 The Hub and the SDK must upgrade together, Hub first, then the SDK. SDK 3.1.x breaks against Hub v3 (it sends old check identifiers and calls endpoints that were removed), and SDK 3.2.0 does not work against Hub v2.
@@ -61,20 +61,22 @@ hub.scenarios.create(
 
 ### Conformity and Groundedness remain compatible
 
-You can continue using the `conformity` and `groundedness` identifiers from Hub v2. Hub v3 also accepts their `hub_` names:
+You can continue using the `conformity` and `groundedness` identifiers from Hub v2. They are aliases for the Hub checks:
 
-| Hub v2 identifier | Accepted in Hub v3                   |
-| ----------------- | ------------------------------------ |
-| `conformity`      | `conformity` or `hub_conformity`     |
-| `groundedness`    | `groundedness` or `hub_groundedness` |
+| Hub v2 identifier | Canonical identifier |
+| ----------------- | -------------------- |
+| `conformity`      | `hub_conformity`     |
+| `groundedness`    | `hub_groundedness`   |
 
-Your existing check configurations still work with SDK 3.2.0. For example:
+Prefer `hub_conformity` and `hub_groundedness` in new code. The short names still work, but the Hub stores the canonical `hub_` identifiers. When you fetch scenarios or evaluation results, these checks come back as `hub_conformity` and `hub_groundedness`, even if you created them with the aliases.
+
+Your existing check configurations still work with SDK 3.2.0. For new code, use the canonical identifiers:
 
 ```python
 checks = [
-    {"identifier": "conformity", "params": {"rules": ["Use formal language."]}},
+    {"identifier": "hub_conformity", "params": {"rules": ["Use formal language."]}},
     {
-        "identifier": "groundedness",
+        "identifier": "hub_groundedness",
         "params": {"context": "Our return window is 30 days."},
     },
 ]
@@ -86,10 +88,6 @@ checks = [
 
 Use one parameter name for each setting: `rule` or `rules`, and `target_key` or `text_key`. See [Built-in checks](/hub/sdk/guides/datasets-and-checks#built-in-checks) for all parameters and defaults.
 
-#### Existing data
-
-The Hub upgrade migrates saved check configurations, scenario references, and evaluation checks automatically. Saved verdicts and annotations are preserved. Existing custom checks are also migrated; see [Custom check identifiers](#custom-check-identifiers-require-a-custom_-prefix) for the required identifier prefix.
-
 ### Check params renamed
 
 Whether you pass raw dicts or the typed params classes:
@@ -97,7 +95,7 @@ Whether you pass raw dicts or the typed params classes:
 - `CorrectnessParams` is removed. Use `HubCorrectnessParams` (`reference`).
 - `MetadataParams` is removed. Use `HubMetadataParams` (`json_path_rules`).
 - `StringMatchParams` is removed. Use `StringMatchingParams`.
-- In SDK 3.2.0+, `ConformityParams` uses `rule`, and `HubConformityParams` uses the existing `rules` field. The Hub accepts both configurations and runs the Hub evaluator. For new fields missing from an SDK parameter type, use a raw `spec` with `hub.checks.create()` or `hub.checks.update()`.
+- `ConformityParams` and `HubConformityParams` accept `rule` and the legacy `rules` list. Both accept `target_key` and the legacy `text_key`. Existing fields remain supported without deprecation warnings. `GroundednessParams` and `HubGroundednessParams` also accept these target fields, `context` as a string or list, and `context_key`.
 - `semantic_similarity` keeps its identifier, but its `reference` param is renamed to `reference_text`. Scripts passing `{"reference": ...}` to this check get a 422.
 - Typed params classes cover built-in checks and their compatibility aliases (e.g. `HubGroundednessParams`, `GroundednessParams`, `SemanticSimilarityParams`, `LLMJudgeParams`).
 
@@ -126,7 +124,7 @@ check = hub.checks.create(
     project_id=project_id,
     identifier="custom_tone_professional",
     name="Professional tone",
-    spec={"kind": "hub_conformity", "rule": "Use formal language."},
+    params={"type": "hub_conformity", "rule": "Use formal language."},
 )
 checks = [{"identifier": "custom_tone_professional"}]
 ```
@@ -286,7 +284,7 @@ If your CI started failing after the Hub upgrade, work through this checklist:
 
 1. **Pin the SDK to 3.2.0 or later** in your requirements.
 2. **Search your scripts for old check identifiers** (`correctness`, `metadata`, `string_match`) and replace them with the new names from the table above. Also rename `reference` to `reference_text` on `semantic_similarity` checks.
-3. **Check Conformity and Groundedness parameters.** Both short and `hub_` identifiers work. Use `params={"rule": ...}` for scenario Conformity checks; existing `rules` lists still work. Set `target_key` explicitly if you need a target other than the default.
+3. **Check Conformity and Groundedness parameters.** Prefer `hub_conformity` and `hub_groundedness`; the short names are aliases, and fetched results return the `hub_` identifiers. Use `params={"rule": ...}` for scenario Conformity checks; existing `rules` lists still work. Set `target_key` explicitly if you need a target other than the default.
 4. **Prefix custom check references.** The Hub renamed your existing custom checks to `custom_<identifier>`. Update scripts that reference them by the old identifier.
 5. **Update uploaded dataset files** (`hub.datasets.upload()` JSON/JSONL): the records may keep the legacy shape. Update `correctness`, `metadata`, and `string_match`; Conformity and Groundedness aliases are accepted.
 6. Treat any remaining `UnprocessableEntityError` (422) as a validation message from the Hub. The error body names the rejected identifier or param and often suggests the correct check.
