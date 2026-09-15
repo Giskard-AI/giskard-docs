@@ -350,7 +350,7 @@
       "signature": "(*, role: Literal['user'] = 'user', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
     }
   },
-  "source_ref": "giskard-checks/v1.0.3",
+  "source_ref": "giskard-checks/v1.0.4",
   "symbols": {
     "giskard.checks.AllOf": {
       "aliases": [
@@ -599,6 +599,11 @@
           "doc_summary": "Execute the check against the provided trace.",
           "kind": "method",
           "signature": "(self, trace: TraceType) -> 'CheckResult'"
+        },
+        "to_spec": {
+          "doc_summary": "Return the check configuration in the Giskard Hub wire format.",
+          "kind": "method",
+          "signature": "(self) -> dict[str, typing.Any]"
         }
       },
       "signature": "(*, name: str | None = None, description: str | None = None) -> None"
@@ -1164,13 +1169,8 @@
           "kind": "method",
           "signature": "(self, trace: TraceType) -> collections.abc.AsyncGenerator[giskard.checks.core.interaction.interaction.Interaction[TypeVar, TypeVar], TraceType]"
         },
-        "model_post_init": {
-          "doc_summary": "This function is meant to behave like a BaseModel method to initialize private attributes.",
-          "kind": "method",
-          "signature": "(self: 'BaseModel', context: 'Any', /) -> 'None'"
-        },
         "set_outputs": {
-          "doc_summary": "Update the outputs of the interact and recompute the injection mappings. Returns self for chaining.",
+          "doc_summary": "Update the outputs of the interact. Returns self for chaining.",
           "kind": "method",
           "signature": "(self, outputs: Target[InputType, OutputType, TraceType] | MISSING) -> 'Interact[InputType, OutputType, TraceType]'"
         }
@@ -2590,5 +2590,5 @@
       "signature": "(generator: giskard.agents.generators.base.BaseGenerator | str) -> None"
     }
   },
-  "version": "1.0.3"
+  "version": "1.0.4"
 }
