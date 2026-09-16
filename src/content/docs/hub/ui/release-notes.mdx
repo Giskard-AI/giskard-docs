@@ -9,11 +9,49 @@ Below you will find the release notes for each version of Giskard Hub UI. Each e
 
 ---
 
+## 3.0.4 (2026-09-15)
+
+We're releasing a patch that simplifies Conformity and Groundedness checks and improves dataset imports.
+
+### What's changed?
+
+- **Unified Conformity and Groundedness checks** - The Hub now offers a single Conformity check and a single Groundedness check, combining the Hub and open-source versions. Existing and imported open-source checks are converted automatically.
+
+### What's fixed?
+
+- **Open-source dataset imports** - You can now import scenario JSON datasets from Giskard OSS with their check settings preserved. Unsupported checks show clearer validation errors.
+
+---
+
+## 3.0.3 (2026-09-10)
+
+We're releasing a patch with fixes for evaluation details, custom checks, and scenario history.
+
+### What's fixed?
+
+- **Evaluation details** - Evaluation views now correctly display scenario inputs, dataset names, and check settings.
+
+- **Custom check settings** - Custom check configurations and default target keys in chat datasets now appear correctly.
+
+- **Scenario history** - Fixed errors when viewing scenario history.
+
+---
+
+## 3.0.2 (2026-09-08)
+
+We're releasing a patch with fixes for deployments under a custom URL path.
+
+### What's fixed?
+
+- **Deployments under a custom URL path** - Fixed table loading, scenario navigation, and exports when the Hub is hosted under a URL path such as `/hub`.
+
+---
+
 ## 3.0.0 (2026-09-01)
 
 We're releasing Giskard Hub 3.0, our biggest release so far. Until now the Hub was built around chatbots, and with this version you can test any AI agent whatever its API, whether it is a classifier, an extractor, a routing service, or any other endpoint that speaks JSON. Test cases become scenarios made of interactions, so you can attach checks to any turn of a conversation instead of only the last one. We've also grown the check catalog to 21 built-in checks, added a fully customizable LLM Judge check, and made it possible to upload results from the open-source `giskard.checks` library straight into the Hub.
 
-This release goes together with [Hub SDK 3.2.0](/hub/sdk/release-notes#320-2026-08-25). Upgrade the Hub first, then the SDK. Some check identifiers have changed, so take a look at [What's changed?](#whats-changed) below and at the [SDK Migration Guide](/hub/sdk/migration) before you update your scripts.
+This release goes together with [Hub SDK 3.2.0](/hub/sdk/release-notes#320-2026-08-25). Upgrade the Hub first, then the SDK. Some check identifiers have changed, so take a look at [What's changed?](#whats-changed-1) below and at the [SDK Migration Guide](/hub/sdk/migration) before you update your scripts.
 
 ### What's new?
 

@@ -466,7 +466,7 @@ The Hub accepts these `params` dictionaries when creating a custom check (main p
 
 | Type                    | `params` shape                                                                                                                              | Evaluation method |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| **Correctness (Hub)**   | `{"type": "hub_correctness", "reference": str}`                                                                                             | LLM judge         |
+| **Correctness**         | `{"type": "hub_correctness", "reference": str}`                                                                                             | LLM judge         |
 | **Conformity**          | `{"type": "hub_conformity", "rule": str}`                                                                                                   | LLM judge         |
 | **Groundedness**        | `{"type": "hub_groundedness", "context": str \| list[str]}` or `{"type": "hub_groundedness", "context_key": str}`                           | LLM judge         |
 | **LLM judge**           | `{"type": "llm_judge", "prompt": str}`                                                                                                      | LLM judge         |
@@ -477,7 +477,7 @@ The Hub accepts these `params` dictionaries when creating a custom check (main p
 | **String matching**     | `{"type": "string_matching", "keyword": str, "case_sensitive": bool}`                                                                       | Rule-based        |
 | **Regex matching**      | `{"type": "regex_matching", "pattern": str}`                                                                                                | Rule-based        |
 | **Comparisons**         | `{"type": "equals" \| "not_equals" \| "greater_than" \| "greater_than_equals" \| "less_than" \| "less_than_equals", "expected_value": Any}` | Rule-based        |
-| **Metadata (Hub)**      | `{"type": "hub_metadata", "json_path_rules": list[JsonPathRule]}`                                                                           | Rule-based        |
+| **Metadata**            | `{"type": "hub_metadata", "json_path_rules": list[JsonPathRule]}`                                                                           | Rule-based        |
 | **JSON valid**          | `{"type": "json_valid", "expected_schema": dict}`                                                                                           | Rule-based        |
 | **Readability**         | `{"type": "readability", "metric": str, "min_score": float, "max_score": float}`                                                            | Rule-based        |
 
