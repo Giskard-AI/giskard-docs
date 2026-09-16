@@ -1,6 +1,6 @@
 ---
 title: Contribute to Giskard
-description: "How to contribute to the Giskard open-source project: prerequisites, workflow, and community."
+description: "How to contribute to the Giskard open-source project: prerequisites, development workflow, code checks, pull requests, and community."
 sidebar:
   order: 2
 ---

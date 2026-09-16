@@ -1,6 +1,6 @@
 ---
 title: Core Concepts
-description: "The key primitives of Giskard Checks — Interaction, Trace, Check, and Scenario — and how they work together at runtime."
+description: "The key primitives of Giskard Checks — Interaction, Trace, Check, and Scenario — and how they work together at runtime to test AI systems."
 sidebar:
   order: 1
 ---
