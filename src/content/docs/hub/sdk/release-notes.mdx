@@ -10,9 +10,24 @@ Below you will find the release notes for each version of Giskard Hub SDK. Each 
 
 ---
 
+## 3.2.1 (2026-09-16)
+
+This patch release improves check configuration and dataset upload compatibility. Supported by [Hub 3.0.4](/hub/ui/release-notes#304-2026-09-15).
+
+### What's changed?
+
+- **Conformity and Groundedness checks** — Updated parameter support for the unified checks in [Hub 3.0.4](/hub/ui/release-notes#304-2026-09-15). Use `rule` and `target_key` in new code; `rules` and `text_key` remain supported as deprecated parameters.
+- **Groundedness reference context** — Hub Groundedness checks now accept reference context as text, a list of passages, or a field from the agent's trace.
+
+### What's fixed?
+
+- **Dataset uploads** — Uploads using the older dataset format now preserve expected answers, rules, and reference context as checks.
+
+---
+
 ## 3.2.0 (2026-08-25)
 
-This release pairs with Hub v3 and must be upgraded together with it: upgrade the Hub first, then the SDK. It introduces support for structured (non-conversational) agents, renames test cases to **scenarios** and project scenarios to **prompt presets**, and ships a much larger check catalogue with renamed identifiers. The check identifier renames are **breaking** — see the [Migration Guide](/hub/sdk/migration) before upgrading, especially if you run evaluations in CI.
+This release is supported by [Hub 3.0.0](/hub/ui/release-notes#300-2026-09-01). Upgrade the Hub first, then the SDK. It introduces support for structured (non-conversational) agents, renames test cases to **scenarios** and project scenarios to **prompt presets**, and ships a much larger check catalogue with renamed identifiers. The check identifier renames are **breaking** — see the [Migration Guide](/hub/sdk/migration) before upgrading, especially if you run evaluations in CI.
 
 ### New features
 
