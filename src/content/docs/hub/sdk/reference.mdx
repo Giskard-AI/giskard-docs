@@ -19,6 +19,8 @@ import TypeTable from "../../../../components/api/TypeTable.astro";
 import LiteralType from "../../../../components/api/LiteralType.astro";
 import LiteralValue from "../../../../components/api/LiteralValue.astro";
 
+For help updating existing code, see the [migration guide](/hub/sdk/migration).
+
 <CardGrid>
   <LinkCard
     title="Client"
@@ -339,7 +341,7 @@ agent = hub.agents.create(
     ID of the agent to call.
   </Property>
   <Property name="input" type="dict[str, Any]" required>
-    Structured input matching the agent's input schema. For chat agents: `{"messages": [{"role": "user", "content": "..."}]}`. The legacy `messages=` list argument is deprecated.
+    Structured input matching the agent's input schema. For chat agents: `{"messages": [{"role": "user", "content": "..."}]}`.
   </Property>
   <Property name="chat_id" type="str | None">
     Playground chat to attach the completion to.
@@ -414,7 +416,7 @@ check = hub.checks.create(
     project_id=project.id,
     identifier="custom_tone_professional",
     name="Professional tone",
-    params={"type": "hub_conformity", "rules": ["Use formal language."]},
+    params={"type": "hub_conformity", "rule": "Use formal language."},
 )
 ```
 
@@ -433,6 +435,7 @@ check = hub.checks.create(
   <Property name="identifier" type="str | None">Updated identifier.</Property>
   <Property name="name" type="str | None">Updated name.</Property>
   <Property name="params" type="CheckTypeParam | None">Updated check params.</Property>
+  <Property name="spec" type="dict[str, object] | None">Updated raw check spec with a `kind`. Provide either `params` or `spec`.</Property>
   <Property name="description" type="str | None">Updated description.</Property>
 </MethodCard>
 
@@ -459,16 +462,14 @@ check = hub.checks.create(
 
 #### Check type params
 
-The `params` field accepts one of these shapes (main params shown; see the [built-in checks guide](/hub/sdk/guides/datasets-and-checks#built-in-checks) for full detail):
+The Hub accepts these `params` dictionaries when creating a custom check (main params shown). You can also pass a raw `spec` with `kind` instead of `type`. See the [built-in checks guide](/hub/sdk/guides/datasets-and-checks#built-in-checks) for all parameters and defaults.
 
 | Type                    | `params` shape                                                                                                                              | Evaluation method |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | **Correctness (Hub)**   | `{"type": "hub_correctness", "reference": str}`                                                                                             | LLM judge         |
-| **Conformity (Hub)**    | `{"type": "hub_conformity", "rules": list[str]}`                                                                                            | LLM judge         |
-| **Groundedness (Hub)**  | `{"type": "hub_groundedness", "context": str}`                                                                                              | LLM judge         |
+| **Conformity**          | `{"type": "hub_conformity", "rule": str}`                                                                                                   | LLM judge         |
+| **Groundedness**        | `{"type": "hub_groundedness", "context": str \| list[str]}` or `{"type": "hub_groundedness", "context_key": str}`                           | LLM judge         |
 | **LLM judge**           | `{"type": "llm_judge", "prompt": str}`                                                                                                      | LLM judge         |
-| **Conformity**          | `{"type": "conformity", "rule": str}`                                                                                                       | LLM judge         |
-| **Groundedness**        | `{"type": "groundedness", "context": str \| list[str], "context_key": str}`                                                                 | LLM judge         |
 | **Contradiction**       | `{"type": "contradiction", "context": str \| list[str]}`                                                                                    | LLM judge         |
 | **Toxicity**            | `{"type": "toxicity", "categories": list[str]}`                                                                                             | LLM judge         |
 | **Answer relevance**    | `{"type": "answer_relevance"}`                                                                                                              | LLM judge         |
@@ -482,7 +483,9 @@ The `params` field accepts one of these shapes (main params shown; see the [buil
 
 Each `JsonPathRule`: `{"json_path": str, "expected_value": str | number | bool, "expected_value_type": "string" | "number" | "boolean"}`
 
-Every check also accepts a target path parameter to point it at a specific field of a structured output: `text_key` for the Hub LLM checks, `metadata_key` for `hub_metadata`, and `target_key` for the rest.
+Conformity and Groundedness use `target_key`, which defaults to `trace.last.outputs.response.content`. Groundedness uses `context_key` (default `trace.last.outputs.metadata`) when `context` is omitted. Set `answer` to check a fixed value instead of reading `target_key`.
+
+`hub_correctness` uses `text_key`, and `hub_metadata` uses `metadata_key`. Other checks with a configurable target use `target_key`.
 
 </ResourceSection>
 
@@ -511,14 +514,14 @@ from giskard_hub.types import Dataset, Scenario, TaskProgress
 
   <Property name="project_id" type="str" required>Project ID.</Property>
   <Property name="data" type="FileTypes | list[dict[str, Any]] | str" required>
-    File path (`str` or `Path`), file-like object, or list of dicts. Each record should have an `interactions` list (`{"input", "output", "checks"}`). The legacy `messages`/`checks`/`demo_output` record shape is deprecated but still translated.
+    File path (`str` or `Path`), file-like object, or list of dicts. Each record should have an `interactions` list (`{"input", "output", "checks"}`).
   </Property>
   <Property name="dataset_id" type="str | None">Dataset to import into. If omitted, a new dataset is created.</Property>
   <Property name="name" type="str | None">Name for the new dataset. Required when `dataset_id` is omitted.</Property>
 </MethodCard>
 
 <MethodCard name=".generate_preset_based()" returnType="Dataset">
-  Generate a dataset of scenarios from a prompt preset. The dataset's `status` will be `"running"` until generation completes -- use `hub.helpers.wait_for_completion()` to wait. The deprecated `generate_scenario_based(scenario_id=)` alias still works.
+  Generate a dataset of scenarios from a prompt preset. The dataset's `status` will be `"running"` until generation completes -- use `hub.helpers.wait_for_completion()` to wait.
 
   <Property name="project_id" type="str" required>Project ID.</Property>
   <Property name="agent_id" type="str" required>Agent to generate scenarios for.</Property>
@@ -586,13 +589,13 @@ from giskard_hub.types import Dataset, Scenario, TaskProgress
 </MethodCard>
 
 <MethodCard name=".list_scenarios()" returnType="list[Scenario]">
-  List all scenarios in a dataset. The deprecated `list_test_cases()` alias still works.
+  List all scenarios in a dataset.
 
   <Property name="dataset_id" type="str" required>Dataset ID.</Property>
 </MethodCard>
 
 <MethodCard name=".search_scenarios()" returnType="list[Scenario]">
-  Search scenarios with filters, sorting, and pagination. Pass `include_metadata=True` to receive `tuple[list[Scenario], APIPaginatedMetadata]`. The deprecated `search_test_cases()` alias still works.
+  Search scenarios with filters, sorting, and pagination. Pass `include_metadata=True` to receive `tuple[list[Scenario], APIPaginatedMetadata]`.
 
   <Property name="dataset_id" type="str" required>Dataset ID.</Property>
   <Property name="query" type="str | None">Free-text search query.</Property>
@@ -687,7 +690,7 @@ For most use cases, prefer `hub.helpers.evaluate(agent=my_fn, ...)` which handle
   Evaluate a single (input, output) pair against checks without creating a full evaluation.
 
   <Property name="project_id" type="str" required>Project ID the checks belong to.</Property>
-  <Property name="input_data" type="dict[str, Any]" required>Structured input (for chat agents: `{"messages": [...]}`). The legacy `messages=` list argument is deprecated.</Property>
+  <Property name="input_data" type="dict[str, Any]" required>Structured input (for chat agents: `{"messages": [...]}`).</Property>
   <Property name="agent_output" type="AgentOutputParam | dict | str" required>Agent's output to evaluate. A bare string is wrapped as an assistant response.</Property>
   <Property name="checks" type="Iterable[CheckConfigParam]" required>Checks to apply.</Property>
   <Property name="agent_description" type="str">Description of the agent for context.</Property>
@@ -783,7 +786,7 @@ from giskard_hub.types import ScenarioEvaluation, FailureCategory
 </MethodCard>
 
 <MethodCard name=".rerun_scenario()" returnType="ScenarioEvaluation">
-  Rerun a single result. The deprecated `rerun_test_case()` alias still works.
+  Rerun a single result.
 
   <Property name="result_id" type="str" required>
     Result ID.
@@ -1071,7 +1074,7 @@ from giskard_hub.types import Project
 
 ### `hub.projects.prompt_presets`
 
-Reusable persona and behaviour templates for preset-based dataset generation. The deprecated `hub.projects.scenarios` alias still works and maps to the same endpoints.
+Reusable persona and behaviour templates for preset-based dataset generation.
 
 ```python
 from giskard_hub.types import PromptPreset, PromptPresetPreview
@@ -1377,8 +1380,7 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
     Link to a specific evaluation result.
   </Property>
   <Property name="dataset_scenario_id" type="str | None">
-    Link to a specific scenario. The deprecated `dataset_test_case_id` alias
-    still works.
+    Link to a specific scenario.
   </Property>
   <Property name="probe_attempt_id" type="str | None">
     Link to a specific scan probe attempt.
@@ -1405,7 +1407,7 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
   <Property name="priority" type="TaskPriority | None">Updated priority: `"low"`, `"medium"`, or `"high"`.</Property>
   <Property name="description" type="str | None">Updated description.</Property>
   <Property name="assignee_ids" type="list[str] | None">Updated user IDs to assign.</Property>
-  <Property name="set_scenario_status" type="str | None">Also set the linked scenario's status. The deprecated `set_test_case_status` alias still works.</Property>
+  <Property name="set_scenario_status" type="str | None">Also set the linked scenario's status.</Property>
 </MethodCard>
 
 <MethodCard name=".list()" returnType="list[Task]">
@@ -1432,7 +1434,7 @@ from giskard_hub.types import Task, TaskStatus, TaskPriority
 
 ### `hub.scenarios`
 
-<ResourceSection description="Create, update, and manage individual scenarios within datasets. Sub-resource: hub.scenarios.comments. The deprecated hub.test_cases alias still works and maps to the same endpoints.">
+<ResourceSection description="Create, update, and manage individual scenarios within datasets. Sub-resource: hub.scenarios.comments.">
 
 ```python
 from giskard_hub.types import Scenario, ScenarioComment, Interaction
@@ -1443,7 +1445,7 @@ from giskard_hub.types import Scenario, ScenarioComment, Interaction
 
   <Property name="dataset_id" type="str" required>Dataset this scenario belongs to.</Property>
   <Property name="interactions" type="Iterable[InteractionParam]" required>
-    Interactions as `[{"input": {...}, "output": {...}, "checks": [...]}]`. For chat agents, `input` is `{"messages": [{"role", "content"}]}`. The legacy `messages=` / `checks=` / `demo_output=` arguments are deprecated but still translated.
+    Interactions as `[{"input": {...}, "output": {...}, "checks": [...]}]`. For chat agents, `input` is `{"messages": [{"role", "content"}]}`.
   </Property>
   <Property name="status" type='"active" | "draft" | None'>Scenario status.</Property>
   <Property name="tags" type="list[str]">Tags for filtering.</Property>
@@ -1948,7 +1950,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="GenerateCompletionOutput">
   <Property name="output" type="dict[str, Any]">
-    Raw structured output of the agent, matching its output schema. For chat agents: `{"response": {...}, "metadata": {...}}`. The deprecated `.response` and `.message` accessors read `output["response"]`.
+    Raw structured output of the agent, matching its output schema. For chat agents: `{"response": {...}, "metadata": {...}}`.
   </Property>
   <Property name="error" type="ExecutionError | None">
     Error details if the agent call failed.
@@ -2050,7 +2052,8 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     Whether the check is enabled.
   </Property>
   <Property name="params" type="dict[str, Any]">
-    Check-specific parameters.
+    Check-specific parameters. Put `params` beside `identifier`, for example
+    `{"identifier": "hub_conformity", "params": {"rule": "Use formal language."}}`.
   </Property>
 </TypeTable>
 
@@ -2087,15 +2090,16 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
 
 <TypeTable name="CheckTypeParam">
   <Property name="alias" type="union">
-    `TypeAlias` for the union of the typed params dicts for all 21 built-in
-    checks: `HubCorrectnessParamsParam`, `HubConformityParamsParam`,
-    `HubGroundednessParamsParam`, `HubMetadataParamsParam`,
-    `LLMJudgeParamsParam`, `ConformityParamsParam`, `GroundednessParamsParam`,
-    `ContradictionParamsParam`, `ToxicityParamsParam`,
-    `AnswerRelevanceParamsParam`, `SemanticSimilarityParamsParam`,
-    `StringMatchingParamsParam`, `RegexMatchingParamsParam`, the six comparison
-    params, `JsonValidParamsParam`, and `ReadabilityParamsParam`. See [Check
-    type params](#check-type-params) for the concrete shapes.
+    `TypeAlias` for the union of typed params dicts for built-in checks and
+    compatibility aliases: `HubCorrectnessParamsParam`,
+    `HubConformityParamsParam`, `HubGroundednessParamsParam`,
+    `HubMetadataParamsParam`, `LLMJudgeParamsParam`, `ConformityParamsParam`,
+    `GroundednessParamsParam`, `ContradictionParamsParam`,
+    `ToxicityParamsParam`, `AnswerRelevanceParamsParam`,
+    `SemanticSimilarityParamsParam`, `StringMatchingParamsParam`,
+    `RegexMatchingParamsParam`, the six comparison params,
+    `JsonValidParamsParam`, and `ReadabilityParamsParam`. See [Check type
+    params](#check-type-params) for the concrete shapes.
   </Property>
 </TypeTable>
 
@@ -2353,7 +2357,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     Parent evaluation ID.
   </Property>
   <Property name="scenario" type="Scenario | ScenarioReference">
-    The scenario. The deprecated `.test_case` accessor still works.
+    The scenario.
   </Property>
   <Property name="scenario_exists" type="bool | None">
     Whether the scenario still exists.
@@ -2592,7 +2596,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     Parent probe ID.
   </Property>
   <Property name="input" type="dict[str, Any]">
-    Structured adversarial input sent to the agent (for chat agents: `{"messages": [...]}`). The deprecated `.messages` accessor flattens `input` and `output` into chat messages.
+    Structured adversarial input sent to the agent (for chat agents: `{"messages": [...]}`).
   </Property>
   <Property name="output" type="dict[str, Any]">
     Structured response from the agent.
@@ -3015,8 +3019,7 @@ Shared building blocks used by every resource. The `*Param` variants are `TypedD
     The agent that responded.
   </Property>
   <Property name="exchanges" type="list[PlaygroundExchange]">
-    Ordered exchanges. The deprecated `.messages` accessor flattens them into
-    chat messages.
+    Ordered exchanges.
   </Property>
   <Property name="created_at" type="datetime">
     Creation timestamp.
