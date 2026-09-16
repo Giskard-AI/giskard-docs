@@ -511,7 +511,7 @@ Each built-in check can be used directly in scenarios by passing its `identifier
 
 Each check is detailed below.
 
-### Correctness (Hub)
+### Correctness
 
 Validates that all information from the **reference** answer is present in the agent's response, without contradiction. Uses an LLM judge.
 
@@ -717,7 +717,7 @@ Six rule-based checks compare a value extracted from the trace against an expect
 }
 ```
 
-### Metadata (Hub)
+### Metadata
 
 Validates values extracted via JSON path expressions from the response **metadata**. Useful for verifying structured outputs like tool calls, categories, or flags. Does **not** use an LLM judge.
 
