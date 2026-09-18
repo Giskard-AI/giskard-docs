@@ -6,12 +6,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const clientDir = resolve(root, "dist", "client");
 
-// MDX pages that contain Markdown tables and must render at least one <table>.
+// Pages that must render at least one <table> (Markdown or a custom component).
 // The global scan below already protects every page; this list is a canary so
 // the check stays meaningful (it fails if the build stops emitting these pages
 // or their tables vanish).
 const MDX_TABLE_PAGES = [
   "start/comparison",
+  "oss/comparison",
   "oss/checks/tutorials/test-suites",
   "oss/checks/reference/core",
   "oss/checks/reference/utils",
