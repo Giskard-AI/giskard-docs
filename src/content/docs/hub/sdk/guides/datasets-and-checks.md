@@ -76,9 +76,7 @@ scenario = hub.scenarios.create(
                 {
                     "identifier": "hub_conformity",
                     "params": {
-                        "rules": [
-                            "The agent must answer the question in exactly the same language as the question was asked."
-                        ]
+                        "rule": "The agent must answer in the same language as the question."
                     },
                 },
             ],
@@ -321,6 +319,41 @@ dataset = hub.datasets.upload(
 )
 ```
 
+### Import OSS checks
+
+OSS Conformity and Groundedness configurations are converted to Hub checks when you import them. The Hub uses its own evaluation logic, which is improved over the OSS version. Explicit input values and trace paths are preserved.
+
+```python
+from giskard.checks import Conformity, Groundedness
+
+oss_checks = [
+    Conformity(rule="The agent must answer politely."),
+    Groundedness(
+        context=["Our return window is 30 days."],
+        target_key="trace.last.outputs.response.content",
+    ),
+]
+
+dataset = hub.datasets.upload(
+    project_id="project-id",
+    name="Imported OSS checks",
+    data=[
+        {
+            "interactions": [
+                {
+                    "input": {
+                        "messages": [{"role": "user", "content": "Can I return my order?"}]
+                    },
+                    "checks": [check.model_dump(mode="json") for check in oss_checks],
+                }
+            ]
+        }
+    ],
+)
+```
+
+An OSS Conformity spec with no target uses the full `trace` after import and keeps its original scope, but a scenario check added by `identifier` with `conformity` or `hub_conformity` defaults to the response content instead, so set `params["target_key"] = "trace"` if you want the full trace.
+
 ---
 
 ## Generate scenarios from a prompt preset
@@ -440,11 +473,12 @@ hub.datasets.delete("dataset-id")
 
 ## Point checks at structured outputs
 
-By default, checks evaluate the assistant message text (`trace.last.outputs.response.content`). Every check accepts a target path parameter to point it at a different field, which is how you evaluate structured agent outputs:
+Conformity and Groundedness default to the assistant message text (`trace.last.outputs.response.content`) when added to a scenario by identifier. To evaluate a field in a structured output, set the target path in `params`:
 
-- Hub LLM checks (`hub_correctness`, `hub_conformity`, `hub_groundedness`) use `text_key`.
+- `hub_conformity` and `hub_groundedness` use `target_key`.
+- `hub_correctness` uses `text_key`.
 - `hub_metadata` uses `metadata_key` (default `trace.last.outputs.metadata`).
-- The other checks use `target_key`.
+- Other checks with a configurable target use `target_key`; see their defaults below.
 
 For example, `"target_key": "trace.last.outputs.category"` evaluates the `category` field of a structured response.
 
@@ -452,32 +486,32 @@ For example, `"target_key": "trace.last.outputs.category"` evaluates the `catego
 
 ## Built-in checks
 
-Each built-in check can be used directly in scenarios by passing its `identifier` and the required `params`:
+Each built-in check can be used directly in scenarios by passing its `identifier` and the required `params`. Put `params` beside `identifier`, and put parameters such as `rule` inside `params`.
 
-| Identifier                             | Method               | What it evaluates                                                          | Key params                    |
-| -------------------------------------- | -------------------- | -------------------------------------------------------------------------- | ----------------------------- |
-| `hub_correctness`                      | LLM judge            | Does the response fully agree with the reference answer?                   | `reference`                   |
-| `hub_conformity`                       | LLM judge            | Does the response comply with one or more business rules?                  | `rules`                       |
-| `hub_groundedness`                     | LLM judge            | Is the response grounded in the provided context, without hallucinations?  | `context`                     |
-| `llm_judge`                            | LLM judge            | Evaluate with a custom Jinja2 prompt returning pass or fail with a reason. | `prompt`                      |
-| `conformity`                           | LLM judge            | Does the full trace conform to a single natural-language rule?             | `rule`                        |
-| `groundedness`                         | LLM judge            | Is the answer grounded in context extracted from configurable trace paths? | `context`, `context_key`      |
-| `contradiction`                        | LLM judge            | Does the response contradict a reference context?                          | `context`                     |
-| `toxicity`                             | LLM judge            | Does the response contain toxic, harmful, or offensive content?            | `categories`                  |
-| `answer_relevance`                     | LLM judge            | Does the response directly address the user question?                      | (none required)               |
-| `semantic_similarity`                  | Embedding similarity | Is the response semantically close to a reference?                         | `reference_text`, `threshold` |
-| `string_matching`                      | Rule-based           | Does the response contain a given keyword or sentence?                     | `keyword`                     |
-| `regex_matching`                       | Rule-based           | Does the response match a regular expression pattern?                      | `pattern`                     |
-| `equals` / `not_equals`                | Rule-based           | Does a value extracted from the trace equal (or differ from) the expected? | `expected_value`              |
-| `greater_than` / `greater_than_equals` | Rule-based           | Is a numeric trace value greater than (or equal to) the expected value?    | `expected_value`              |
-| `less_than` / `less_than_equals`       | Rule-based           | Is a numeric trace value less than (or equal to) the expected value?       | `expected_value`              |
-| `hub_metadata`                         | Rule-based           | Do JSON path values in the response metadata satisfy specified conditions? | `json_path_rules`             |
-| `json_valid`                           | Rule-based           | Is an extracted value valid JSON, optionally conforming to a JSON Schema?  | `expected_schema`             |
-| `readability`                          | Rule-based           | Does the response meet readability score thresholds for a chosen metric?   | `metric`                      |
+`conformity` is an alias for `hub_conformity`, and `groundedness` is an alias for `hub_groundedness`. Either identifier selects the same Hub check. The catalog and UI show one **Conformity** and one **Groundedness** entry.
+
+| Identifier                             | Method               | What it evaluates                                                          | Key params                             |
+| -------------------------------------- | -------------------- | -------------------------------------------------------------------------- | -------------------------------------- |
+| `hub_correctness`                      | LLM judge            | Does the response fully agree with the reference answer?                   | `reference`                            |
+| `hub_conformity`                       | LLM judge            | Does the response comply with business rules?                              | `rule`, `target_key`                   |
+| `hub_groundedness`                     | LLM judge            | Is the response supported by reference information?                        | `context`, `context_key`, `target_key` |
+| `llm_judge`                            | LLM judge            | Evaluate with a custom Jinja2 prompt returning pass or fail with a reason. | `prompt`                               |
+| `contradiction`                        | LLM judge            | Does the response contradict a reference context?                          | `context`                              |
+| `toxicity`                             | LLM judge            | Does the response contain toxic, harmful, or offensive content?            | `categories`                           |
+| `answer_relevance`                     | LLM judge            | Does the response directly address the user question?                      | (none required)                        |
+| `semantic_similarity`                  | Embedding similarity | Is the response semantically close to a reference?                         | `reference_text`, `threshold`          |
+| `string_matching`                      | Rule-based           | Does the response contain a given keyword or sentence?                     | `keyword`                              |
+| `regex_matching`                       | Rule-based           | Does the response match a regular expression pattern?                      | `pattern`                              |
+| `equals` / `not_equals`                | Rule-based           | Does a value extracted from the trace equal (or differ from) the expected? | `expected_value`                       |
+| `greater_than` / `greater_than_equals` | Rule-based           | Is a numeric trace value greater than (or equal to) the expected value?    | `expected_value`                       |
+| `less_than` / `less_than_equals`       | Rule-based           | Is a numeric trace value less than (or equal to) the expected value?       | `expected_value`                       |
+| `hub_metadata`                         | Rule-based           | Do JSON path values in the response metadata satisfy specified conditions? | `json_path_rules`                      |
+| `json_valid`                           | Rule-based           | Is an extracted value valid JSON, optionally conforming to a JSON Schema?  | `expected_schema`                      |
+| `readability`                          | Rule-based           | Does the response meet readability score thresholds for a chosen metric?   | `metric`                               |
 
 Each check is detailed below.
 
-### Correctness (Hub)
+### Correctness
 
 Validates that all information from the **reference** answer is present in the agent's response, without contradiction. Uses an LLM judge.
 
@@ -492,33 +526,43 @@ Validates that all information from the **reference** answer is present in the a
 }
 ```
 
-### Conformity (Hub)
+<span id="conformity-hub"></span>
 
-Checks that the agent's response follows one or more rules. Each rule should describe a single, distinct behaviour. Uses an LLM judge.
+### Conformity
 
-| Parameter | Type        | Description                                |
-| --------- | ----------- | ------------------------------------------ |
-| `rules`   | `list[str]` | One or more rules the response must follow |
+Checks that the agent's response follows the instructions in `rule`. You can include several requirements in one string. The Hub uses its LLM judge to evaluate them together.
+
+| Parameter    | Type  | Description                                                                                               |
+| ------------ | ----- | --------------------------------------------------------------------------------------------------------- |
+| `rule`       | `str` | Required instructions the response must follow                                                            |
+| `target_key` | `str` | Trace path to evaluate. Defaults to `trace.last.outputs.response.content`; use `trace` for the full trace |
 
 ```python
 {
     "identifier": "hub_conformity",
     "params": {
-        "rules": [
-            "The response must be written in a formal, professional tone.",
-            "The response must not include any personal opinions.",
-        ]
+        "rule": (
+            "- Use a formal, professional tone.\n"
+            "- Do not include personal opinions."
+        )
     },
 }
 ```
 
-### Groundedness (Hub)
+`conformity` is accepted as an identifier alias.
 
-Validates that the agent's response is grounded in the provided context -- i.e., it does not introduce information absent from the context. Uses an LLM judge.
+<span id="groundedness-hub"></span>
 
-| Parameter | Type  | Description                                              |
-| --------- | ----- | -------------------------------------------------------- |
-| `context` | `str` | The reference context the response should be grounded in |
+### Groundedness
+
+Checks that all information in the agent's response is supported by `context`, without contradiction. Unlike Correctness, omissions are allowed, but extra or conflicting claims fail the check, so it is useful for catching hallucinations.
+
+| Parameter     | Type                | Description                                                                            |
+| ------------- | ------------------- | -------------------------------------------------------------------------------------- |
+| `context`     | `str` / `list[str]` | Optional reference text or documents. If provided, takes precedence over `context_key` |
+| `context_key` | `str`               | Trace path used when `context` is omitted. Defaults to `trace.last.outputs.metadata`   |
+| `target_key`  | `str`               | Trace path of the answer. Defaults to `trace.last.outputs.response.content`            |
+| `answer`      | `str`               | Optional fixed answer. If provided, takes precedence over `target_key`                 |
 
 ```python
 {
@@ -529,8 +573,19 @@ Validates that the agent's response is grounded in the provided context -- i.e.,
 }
 ```
 
+To read retrieved documents from the trace, omit `context` and set `context_key`:
+
+```python
+{
+    "identifier": "hub_groundedness",
+    "params": {"context_key": "trace.last.outputs.metadata.retrieved_chunks"},
+}
+```
+
+`groundedness` is accepted as an identifier alias.
+
 :::tip
-Combine with `hub.knowledge_bases.search_documents()` to dynamically retrieve context from your knowledge base and pass it as the `context` field.
+You can also use `hub.knowledge_bases.search_documents()` to retrieve context before creating the scenario, then pass the reference text in `context`.
 :::
 
 ### LLM judge
@@ -547,38 +602,6 @@ Evaluates the interaction with a custom prompt. The prompt is a Jinja2 template 
     "params": {
         "prompt": "The user asked: {{ trace.last.inputs.messages[-1].content }}\nThe agent answered: {{ trace.last.outputs.response.content }}\n\nDoes the answer avoid making promises about delivery dates?"
     },
-}
-```
-
-### Conformity
-
-The raw giskard-checks variant of conformity. Judges the full trace against a single natural-language rule. Uses an LLM judge.
-
-| Parameter | Type  | Description                       |
-| --------- | ----- | --------------------------------- |
-| `rule`    | `str` | The rule the trace must adhere to |
-
-```python
-{
-    "identifier": "conformity",
-    "params": {"rule": "The agent must never disclose internal pricing rules."},
-}
-```
-
-### Groundedness
-
-The raw giskard-checks variant of groundedness. Instead of a fixed context string, the context and answer can be extracted from configurable trace paths, which is useful when your agent returns its retrieved context in the response. Uses an LLM judge.
-
-| Parameter     | Type                | Description                            |
-| ------------- | ------------------- | -------------------------------------- |
-| `context`     | `str` / `list[str]` | Reference context provided directly    |
-| `context_key` | `str`               | Trace path to extract the context from |
-| `target_key`  | `str`               | Trace path of the answer under test    |
-
-```python
-{
-    "identifier": "groundedness",
-    "params": {"context_key": "trace.last.outputs.metadata.retrieved_chunks"},
 }
 ```
 
@@ -694,7 +717,7 @@ Six rule-based checks compare a value extracted from the trace against an expect
 }
 ```
 
-### Metadata (Hub)
+### Metadata
 
 Validates values extracted via JSON path expressions from the response **metadata**. Useful for verifying structured outputs like tool calls, categories, or flags. Does **not** use an LLM judge.
 
@@ -704,9 +727,9 @@ Validates values extracted via JSON path expressions from the response **metadat
 
 Each rule dict supports:
 
-| Key                   | Type  | Description                                                      |
-| --------------------- | ----- | ---------------------------------------------------------------- |
-| `json_path`           | `str` | JSON path expression (e.g. `$.category`, `$.tools_called[0]`)    |
+| Key                   | Type                      | Description                                                      |
+| --------------------- | ------------------------- | ---------------------------------------------------------------- |
+| `json_path`           | `str`                     | JSON path expression (e.g. `$.category`, `$.tools_called[0]`)    |
 | `expected_value`      | `str` / `number` / `bool` | The expected value                                               |
 | `expected_value_type` | `str`                     | Type of the expected value (`"string"`, `"number"`, `"boolean"`) |
 
@@ -789,9 +812,7 @@ check = hub.checks.create(
     description="The response must use formal, professional language with no slang.",
     params={
         "type": "hub_conformity",
-        "rules": [
-            "The response must be written in a formal, professional tone. It must not contain slang, contractions, or casual phrasing."
-        ],
+        "rule": "The response must be written in a formal, professional tone. It must not contain slang, contractions, or casual phrasing.",
     },
 )
 
@@ -826,9 +847,7 @@ hub.checks.create(
     description="The response must not contain harmful, violent, or offensive content.",
     params={
         "type": "hub_conformity",
-        "rules": [
-            "The response must be safe for all audiences. It must not contain violence, hate speech, sexual content, or self-harm."
-        ],
+        "rule": "The response must be safe for all audiences. It must not contain violence, hate speech, sexual content, or self-harm.",
     },
 )
 ```
