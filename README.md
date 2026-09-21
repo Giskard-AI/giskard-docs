@@ -83,6 +83,19 @@ make regen-mdx
 
 On CI, output overwrite and `.mdx` regeneration only happen on pushes to `main`. Pull-request runs execute notebooks in read-only mode (`OVERWRITE_NB=0`).
 
+## Updating the skill discovery index
+
+The catalog at `public/.well-known/agent-skills/index.json` and its archives are generated from a published commit of [giskard-skills](https://github.com/Giskard-AI/giskard-skills). After installing the Node dependencies, refresh them from a local checkout:
+
+```bash
+node scripts/sync-agent-skills.mjs ../giskard-skills <published-commit-or-tag>
+node scripts/sync-agent-skills.mjs ../giskard-skills <published-commit-or-tag> --check
+```
+
+The command discovers every committed `SKILL.md`, reads its current name and description, bundles each skill with its supporting files and license, and recalculates the SHA-256 digests. Fixed archive timestamps make repeated runs reproducible. It does not fetch, commit, or push. Use a commit that is available upstream; uncommitted skill edits are not included. If a skill is removed or renamed, remove its obsolete archive when reviewing the generated changes.
+
+When adding a skill, also update `src/content/docs/oss/agent-skills.mdx` and any relevant setup guides. The Markdown page endpoints and `llms-full.txt` derive their content from those pages automatically; `public/llms.txt` links to the discovery index.
+
 ## Deployment
 
 Deployed automatically via Cloudflare Workers Builds on push to `main`. Preview builds run for pull requests.

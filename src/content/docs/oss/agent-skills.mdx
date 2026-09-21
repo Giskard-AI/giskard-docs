@@ -1,15 +1,34 @@
 ---
 title: Agent Skills
-description: "Drop-in agent skills for Claude Code, Cursor, and other coding agents that automate Giskard workflows, from test generation to Collibra export."
+description: "Drop-in agent skills for Claude Code, Cursor, and other coding agents that automate Giskard workflows, from Hub setup to test generation and Collibra export."
 ---
 
 import { Badge } from "@astrojs/starlight/components";
 
 **Giskard Agent Skills** are drop-in workflows for coding agents (Claude Code, Cursor, and more), installable via the [`skills` CLI](https://www.npmjs.com/package/skills). Once installed, a skill teaches your agent how to handle Giskard-specific tasks without elaborate custom prompts.
 
+## Hub Agent Setup <Badge text="v1.0.0" variant="tip" />
+
+Connects a local or remote agent to [Giskard Hub](/hub/ui/setup/agents). Your coding agent creates an authenticated HTTPS endpoint for Chat or Structured inputs, collects any streamed output into a complete response, and registers and tests the connection through the [Hub SDK](/hub/sdk).
+
+For an editable remote agent, the skill deploys the wrapper on the remote host. For a local wrapper, it opens a public HTTPS tunnel through Cloudflare or ngrok, protected by the wrapper's API key. The skill asks for your Hub URL, [Hub API key](/hub/sdk/quickstart#finding-your-api-key), and project name or ID.
+
+```bash
+npx skills add Giskard-AI/giskard-skills --skill hub-agent-setup
+```
+
+It activates on prompts like _"connect my agent to Giskard Hub"_ or _"register my chatbot in the Hub"_. For example:
+
+```text title="Sample prompt" wrap
+Connect the agent in ./agent.py to Giskard Hub in the Support project.
+```
+
+[Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/hub/hub-agent-setup)
+
 ## Scenario Generator <Badge text="v1.1.0" variant="tip" />
 
 Turns your coding agent into an expert red-teamer for [Giskard Checks](/oss/checks). Describe your agent and the failure modes you worry about, and the skill produces a complete, runnable `giskard.checks` test suite with adversarial scenarios and layered checks.
+
 ```bash
 npx skills add Giskard-AI/giskard-skills --skill scenario-generator
 ```
@@ -25,6 +44,7 @@ My customer support bot available on @support_bot.py must never leak customer PI
 ## RAG Evaluator <Badge text="v1.1.0" variant="tip" />
 
 Turns your coding agent into an expert RAG evaluation engineer for [Giskard Checks](/oss/checks). Describe a Q&A bot grounded in documents and the skill produces a quality-focused `giskard.checks` evaluation suite covering groundedness, answer relevance, retrieval quality, hallucination, citation accuracy, and out-of-scope handling.
+
 ```bash
 npx skills add Giskard-AI/giskard-skills --skill rag-evaluator
 ```
@@ -54,6 +74,10 @@ Retrieve the latest scan of the Zephyr project and send it to Collibra.
 ```
 
 [Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/integrations/giskard-to-collibra)
+
+## Discover skills programmatically
+
+The [skill discovery index](/.well-known/agent-skills/index.json) lists all available skills with descriptions, download URLs, and SHA-256 digests. Each download includes the skill's instructions and supporting references or scripts.
 
 ## Install as a Claude Code plugin
 
