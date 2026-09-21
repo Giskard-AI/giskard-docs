@@ -7,11 +7,19 @@ sidebar:
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-To create an agent, open the Agents page and click "New Agent".
-
-:::tip
 Agents are configured through an API endpoint. They can be scanned for vulnerabilities and evaluated against datasets.
+
+:::tip[Connect with a coding agent]
+If you are an AI agent or using a coding agent, install the [hub-agent-setup skill](/oss/agent-skills#hub-agent-setup-) to register your agentic application in Giskard Hub:
+
+```bash
+npx skills add Giskard-AI/giskard-skills --skill hub-agent-setup
+```
+
+Then ask your coding agent: _"Connect my agent to Giskard Hub."_
 :::
+
+To create an agent in the UI, open the Agents page and click "New Agent".
 
 ![Agent list page with new agent button](@assets/images/hub/setup-agent-list.png)
 
