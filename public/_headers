@@ -11,3 +11,14 @@
 # /_image already carry their own immutable cache-control.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Skill discovery packages include references and scripts as well as SKILL.md.
+/.well-known/agent-skills/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=300
+
+/.well-known/agent-skills/index.json
+  Content-Type: application/json; charset=utf-8
+
+/.well-known/agent-skills/*.tar.gz
+  Content-Type: application/gzip
