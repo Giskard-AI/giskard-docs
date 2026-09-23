@@ -53,6 +53,7 @@ Open research on AI safety and security, including the Phare multilingual benchm
 ### Overview
 - Welcome to Giskard: https://docs.giskard.ai/.md
 - Open Source vs Hub: https://docs.giskard.ai/start/comparison.md
+- Agent Skills: https://docs.giskard.ai/start/agent-skills.md
 
 ### Knowledge Glossary
 - AI Testing & Evaluation Glossary: https://docs.giskard.ai/start/glossary.md
@@ -159,7 +160,6 @@ Open research on AI safety and security, including the Phare multilingual benchm
 
 ### Giskard Checks (Open Source)
 - Giskard Library: https://docs.giskard.ai/oss.md
-- Agent Skills: https://docs.giskard.ai/oss/agent-skills.md
 - Contribute to Giskard: https://docs.giskard.ai/oss/contributing.md
 - What are Giskard Checks?: https://docs.giskard.ai/oss/checks.md
 - Install & Configure: https://docs.giskard.ai/oss/checks/installation.md

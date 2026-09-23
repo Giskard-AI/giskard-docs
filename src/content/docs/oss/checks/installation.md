@@ -46,7 +46,7 @@ Paste the following into your coding agent:
 Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md and install Giskard in my project.
 ```
 
-For reusable workflows that generate scenarios and evaluation suites, see [Giskard Agent Skills](/oss/agent-skills).
+For reusable workflows that generate scenarios and evaluation suites, see [Giskard Agent Skills](/start/agent-skills).
 :::
 
 ## Configure the default LLM judge model
