@@ -1,10 +1,17 @@
 import type { APIRoute } from 'astro';
 import { getEntry } from 'astro:content';
+import redirectMap from '../redirects.json';
+
+const redirects: Record<string, string> = redirectMap;
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, redirect }) => {
 	const slug = params.slug || 'index';
+	const target = redirects[`/${slug}`];
+	if (target?.startsWith('/') && !target.startsWith('//')) {
+		return redirect(`${target}.md`, 301);
+	}
 	const entry = await getEntry('docs', slug);
 
 	if (!entry) {

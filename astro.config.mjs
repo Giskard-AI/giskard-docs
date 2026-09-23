@@ -40,6 +40,7 @@ export default defineConfig({
                     items: [
                         { slug: 'index', label: 'Welcome to Giskard' },
                         { slug: 'start/comparison', label: 'Open Source vs Hub' },
+                        { slug: 'start/agent-skills', label: 'Agent Skills' },
                         {
                             label: 'Knowledge Glossary',
                             collapsed: true,
@@ -62,7 +63,6 @@ export default defineConfig({
                     items: [
                         { label: 'Giskard Library', slug: 'oss' },
                         { slug: 'oss/migrate-from-v2', label: 'Migrate from v2 to v3' },
-                        { slug: 'oss/agent-skills', label: 'Agent Skills' },
                         { slug: 'oss/contributing', label: 'Contributing' },
                     ]
                 },
