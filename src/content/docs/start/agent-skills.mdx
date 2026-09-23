@@ -7,6 +7,8 @@ import { Badge } from "@astrojs/starlight/components";
 
 **Giskard Agent Skills** give your coding agent instructions and supporting tools for working with [Giskard Hub](/hub/ui), [open-source libraries](/oss), and integrations. Use them to connect an agent to the Hub, build RAG evaluations and red-team test suites, or export scan results to [Collibra](https://www.collibra.com/). Each skill below includes an installation command for the [`skills` CLI](https://www.npmjs.com/package/skills) and an example prompt to get started.
 
+To install a skill with your coding assistant, share this page and ask it to install the skill for your task.
+
 ## Hub
 
 ### Agent Setup <Badge text="v1.0.0" variant="tip" />
@@ -80,10 +82,6 @@ Retrieve the latest scan of the Zephyr project and send it to Collibra.
 ```
 
 [Source on GitHub ↗](https://github.com/Giskard-AI/giskard-skills/tree/main/integrations/giskard-to-collibra)
-
-## Discover skills programmatically
-
-The [skill discovery index](/.well-known/agent-skills/index.json) lists all available skills with descriptions, download URLs, and SHA-256 digests. Each download includes the skill's instructions and supporting references or scripts.
 
 ## Install as a Claude Code plugin
 
