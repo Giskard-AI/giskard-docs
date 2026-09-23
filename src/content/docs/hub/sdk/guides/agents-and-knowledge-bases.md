@@ -12,7 +12,7 @@ An **Agent** is your agentic application, such as LLM-based chatbots or classifi
 Every agent declares an **input schema** and an **output schema** (JSON Schema) that describe the request and response bodies. If you don't provide them, the agent defaults to the conversational (chat-style) format shown below, which covers most use cases. Agents with custom schemas are covered in [Structured agents](#structured-agents).
 
 :::tip[Connect with a coding agent]
-If you are an AI agent or using a coding agent, install the [hub-agent-setup skill](/oss/agent-skills#hub-agent-setup-) to register your agentic application in Giskard Hub:
+If you are an AI agent or using a coding agent, install the [hub-agent-setup skill](/start/agent-skills#hub-agent-setup-) to register your agentic application in Giskard Hub:
 
 ```bash
 npx skills add Giskard-AI/giskard-skills --skill hub-agent-setup
