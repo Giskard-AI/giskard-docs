@@ -96,6 +96,28 @@
       },
       "signature": "(*, params: giskard.agents.generators._types.GenerationParams = <factory>, retry_policy: giskard.agents.generators.middleware.RetryPolicy | None = None, rate_limiter: giskard.core.rate_limiter.base.BaseRateLimiter | None = None, middlewares: list[giskard.agents.generators.middleware.CompletionMiddleware] = <factory>) -> None"
     },
+    "giskard.agents.som.base.BaseSOM": {
+      "bases": [
+        "giskard.core.discriminated.Discriminated",
+        "abc.ABC"
+      ],
+      "doc_summary": "A System One Model that predicts probabilities instead of generating text.",
+      "fields": {
+        "model": {
+          "annotation": "<class 'str'>",
+          "required": true
+        }
+      },
+      "kind": "class",
+      "members": {
+        "predict": {
+          "doc_summary": "Predict the probability of ``question`` using the supplied context.",
+          "kind": "method",
+          "signature": "(self, messages: collections.abc.Sequence[giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage], question: str, *, timeout: float | int | None = None) -> giskard.agents.som.base.SOMResponse"
+        }
+      },
+      "signature": "(*, model: Annotated[str, MinLen(min_length=1)]) -> None"
+    },
     "giskard.agents.templates.message.MessageTemplate": {
       "bases": [
         "pydantic.main.BaseModel"
@@ -146,6 +168,11 @@
         "kind": {
           "doc_summary": "The discriminator field identifying the concrete type.",
           "kind": "property"
+        },
+        "kinds": {
+          "doc_summary": "Return the kind strings registered for this discriminated family.",
+          "kind": "classmethod",
+          "signature": "(cls) -> frozenset[str]"
         },
         "register": {
           "doc_summary": "",
@@ -350,7 +377,7 @@
       "signature": "(*, role: Literal['user'] = 'user', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
     }
   },
-  "source_ref": "giskard-checks/v1.0.4",
+  "source_ref": "giskard-checks/v1.0.5",
   "symbols": {
     "giskard.checks.AllOf": {
       "aliases": [
@@ -418,6 +445,10 @@
           "default": "True",
           "required": false
         },
+        "judge": {
+          "annotation": "giskard.checks.core.judge.BaseJudge | None",
+          "required": false
+        },
         "name": {
           "annotation": "str | None",
           "required": false
@@ -450,13 +481,18 @@
           "kind": "method",
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
         },
+        "get_som_trace": {
+          "doc_summary": "Return the conversation evidence to send to a SOM judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType, inputs: dict[str, typing.Any]) -> giskard.checks.core.interaction.trace.Trace[Any, Any]"
+        },
         "run": {
           "doc_summary": "Return ERROR when question/answer keys do not resolve; else run the judge.",
           "kind": "method",
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, question: str | MISSING = MISSING, question_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.inputs', answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | MISSING = MISSING, include_history: bool = True) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, judge: Annotated[giskard.checks.core.judge.BaseJudge | None, BeforeValidator(func=<function _coerce_judge>, json_schema_input_type=PydanticUndefined)] = None, name: str | None = None, description: str | None = None, question: str | MISSING = MISSING, question_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.inputs', answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | MISSING = MISSING, include_history: bool = True) -> None"
     },
     "giskard.checks.AnyOf": {
       "aliases": [
@@ -491,13 +527,33 @@
       },
       "signature": "(*, name: str | None = None, description: str | None = None, checks: list[giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]]) -> None"
     },
+    "giskard.checks.BaseJudge": {
+      "bases": [
+        "giskard.core.discriminated.Discriminated"
+      ],
+      "doc_summary": "Backend that turns a check prompt and inputs into an ``LLMCheckResult``.",
+      "kind": "class",
+      "members": {
+        "judge": {
+          "doc_summary": "Evaluate ``prompt`` with ``inputs`` and return structured output.",
+          "kind": "method",
+          "signature": "(self, prompt: str | giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage | giskard.agents.templates.message.MessageTemplate | giskard.agents.workflow.TemplateReference, inputs: dict[str, typing.Any], *, output_type: type[pydantic.main.BaseModel] | None = <class 'giskard.checks._judge_result.LLMCheckResult'>) -> pydantic.main.BaseModel"
+        },
+        "parse": {
+          "doc_summary": "Coerce a judge from loose configuration values.",
+          "kind": "classmethod",
+          "signature": "(cls, value: Any) -> 'BaseJudge'"
+        }
+      },
+      "signature": "() -> None"
+    },
     "giskard.checks.BaseLLMCheck": {
       "aliases": [
         "giskard.checks.judges.BaseLLMCheck"
       ],
       "bases": [
         "giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]",
-        "giskard.checks.core.mixin.WithGeneratorMixin",
+        "giskard.checks.core.mixin.WithJudgeMixin",
         "typing.Generic"
       ],
       "doc_summary": "Abstract base class for LLM-based checks.",
@@ -508,6 +564,10 @@
         },
         "generator": {
           "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "judge": {
+          "annotation": "giskard.checks.core.judge.BaseJudge | None",
           "required": false
         },
         "name": {
@@ -527,6 +587,11 @@
           "kind": "method",
           "signature": "(self) -> str | giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage | giskard.agents.templates.message.MessageTemplate | giskard.agents.workflow.TemplateReference"
         },
+        "get_som_trace": {
+          "doc_summary": "Return the conversation evidence to send to a SOM judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType, inputs: dict[str, typing.Any]) -> giskard.checks.core.interaction.trace.Trace[Any, Any]"
+        },
         "output_type": {
           "doc_summary": "",
           "kind": "property"
@@ -537,7 +602,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, judge: Annotated[giskard.checks.core.judge.BaseJudge | None, BeforeValidator(func=<function _coerce_judge>, json_schema_input_type=PydanticUndefined)] = None, name: str | None = None, description: str | None = None) -> None"
     },
     "giskard.checks.BaseLLMGenerator": {
       "bases": [
@@ -702,6 +767,10 @@
           "annotation": "giskard.agents.generators.base.BaseGenerator | None",
           "required": false
         },
+        "judge": {
+          "annotation": "giskard.checks.core.judge.BaseJudge | None",
+          "required": false
+        },
         "name": {
           "annotation": "str | None",
           "required": false
@@ -724,7 +793,7 @@
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, rule: str) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, judge: Annotated[giskard.checks.core.judge.BaseJudge | None, BeforeValidator(func=<function _coerce_judge>, json_schema_input_type=PydanticUndefined)] = None, name: str | None = None, description: str | None = None, rule: str) -> None"
     },
     "giskard.checks.Contradiction": {
       "aliases": [
@@ -759,6 +828,10 @@
           "annotation": "giskard.agents.generators.base.BaseGenerator | None",
           "required": false
         },
+        "judge": {
+          "annotation": "giskard.checks.core.judge.BaseJudge | None",
+          "required": false
+        },
         "name": {
           "annotation": "str | None",
           "required": false
@@ -774,12 +847,17 @@
         "get_inputs": {
           "doc_summary": "Get template inputs for the LLM prompt.",
           "kind": "method",
-          "signature": "(self, trace: giskard.checks.core.interaction.trace.Trace[TypeVar, TypeVar]) -> dict[str, str]"
+          "signature": "(self, trace: giskard.checks.core.interaction.trace.Trace[TypeVar, TypeVar]) -> dict[str, typing.Any]"
         },
         "get_prompt": {
           "doc_summary": "Get the prompt for the LLM evaluation.",
           "kind": "method",
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
+        },
+        "get_som_trace": {
+          "doc_summary": "Return the conversation evidence to send to a SOM judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType, inputs: dict[str, typing.Any]) -> giskard.checks.core.interaction.trace.Trace[Any, Any]"
         },
         "run": {
           "doc_summary": "Return ERROR when answer/context keys do not resolve; else run the judge.",
@@ -787,7 +865,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | MISSING = MISSING, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, judge: Annotated[giskard.checks.core.judge.BaseJudge | None, BeforeValidator(func=<function _coerce_judge>, json_schema_input_type=PydanticUndefined)] = None, name: str | None = None, description: str | None = None, answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | MISSING = MISSING, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
     },
     "giskard.checks.DatasetInputGenerator": {
       "bases": [
@@ -1033,6 +1111,10 @@
           "annotation": "giskard.agents.generators.base.BaseGenerator | None",
           "required": false
         },
+        "judge": {
+          "annotation": "giskard.checks.core.judge.BaseJudge | None",
+          "required": false
+        },
         "name": {
           "annotation": "str | None",
           "required": false
@@ -1048,12 +1130,17 @@
         "get_inputs": {
           "doc_summary": "Build template variables from resolved inputs.",
           "kind": "method",
-          "signature": "(self, trace: giskard.checks.core.interaction.trace.Trace[TypeVar, TypeVar]) -> dict[str, str]"
+          "signature": "(self, trace: giskard.checks.core.interaction.trace.Trace[TypeVar, TypeVar]) -> dict[str, typing.Any]"
         },
         "get_prompt": {
           "doc_summary": "Get the prompt for the LLM evaluation.",
           "kind": "method",
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
+        },
+        "get_som_trace": {
+          "doc_summary": "Return the conversation evidence to send to a SOM judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType, inputs: dict[str, typing.Any]) -> giskard.checks.core.interaction.trace.Trace[Any, Any]"
         },
         "run": {
           "doc_summary": "Return ERROR when answer/context keys do not resolve; else run the judge.",
@@ -1061,7 +1148,7 @@
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | MISSING = MISSING, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, judge: Annotated[giskard.checks.core.judge.BaseJudge | None, BeforeValidator(func=<function _coerce_judge>, json_schema_input_type=PydanticUndefined)] = None, name: str | None = None, description: str | None = None, answer: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', context: str | list[str] | MISSING = MISSING, context_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.metadata.context') -> None"
     },
     "giskard.checks.GroupStats": {
       "bases": [
@@ -1275,6 +1362,27 @@
       },
       "signature": "(*, name: str | None = None, description: str | None = None, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', parse: bool = True, schema: dict[str, Any] | None = None) -> None"
     },
+    "giskard.checks.LLMChatJudge": {
+      "bases": [
+        "giskard.checks.core.judge.BaseJudge"
+      ],
+      "doc_summary": "Judge by rendering the check prompt and calling an LLM generator.",
+      "fields": {
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "judge": {
+          "doc_summary": "Evaluate ``prompt`` with ``inputs`` and return structured output.",
+          "kind": "method",
+          "signature": "(self, prompt: str | giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage | giskard.agents.templates.message.MessageTemplate | giskard.agents.workflow.TemplateReference, inputs: dict[str, typing.Any], *, output_type: type[pydantic.main.BaseModel] | None = <class 'giskard.checks._judge_result.LLMCheckResult'>) -> pydantic.main.BaseModel"
+        }
+      },
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None) -> None"
+    },
     "giskard.checks.LLMCheckResult": {
       "aliases": [
         "giskard.checks.judges.LLMCheckResult"
@@ -1360,6 +1468,10 @@
           "annotation": "giskard.agents.generators.base.BaseGenerator | None",
           "required": false
         },
+        "judge": {
+          "annotation": "giskard.checks.core.judge.BaseJudge | None",
+          "required": false
+        },
         "name": {
           "annotation": "str | None",
           "required": false
@@ -1386,7 +1498,7 @@
           "signature": "(self) -> Self"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, prompt: str | None = None, prompt_path: str | None = None) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, judge: Annotated[giskard.checks.core.judge.BaseJudge | None, BeforeValidator(func=<function _coerce_judge>, json_schema_input_type=PydanticUndefined)] = None, name: str | None = None, description: str | None = None, prompt: str | None = None, prompt_path: str | None = None) -> None"
     },
     "giskard.checks.LessThan": {
       "aliases": [
@@ -1746,6 +1858,36 @@
         }
       },
       "signature": "(*, name: str | None = None, description: str | None = None, policy: str, rule: str, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', data: dict[str, typing.Any] = <factory>) -> None"
+    },
+    "giskard.checks.SOMJudge": {
+      "bases": [
+        "giskard.checks.core.judge.BaseJudge"
+      ],
+      "doc_summary": "Judge by scoring a System One Model probability against a threshold.",
+      "fields": {
+        "model": {
+          "annotation": "<class 'giskard.agents.som.base.BaseSOM'>",
+          "required": true
+        },
+        "pass_threshold": {
+          "annotation": "<class 'float'>",
+          "default": "0.5",
+          "required": false
+        },
+        "timeout": {
+          "annotation": "float | int | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "judge": {
+          "doc_summary": "Evaluate ``prompt`` with ``inputs`` and return structured output.",
+          "kind": "method",
+          "signature": "(self, prompt: str | giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage | giskard.agents.templates.message.MessageTemplate | giskard.agents.workflow.TemplateReference, inputs: dict[str, typing.Any], *, output_type: type[pydantic.main.BaseModel] | None = <class 'giskard.checks._judge_result.LLMCheckResult'>) -> pydantic.main.BaseModel"
+        }
+      },
+      "signature": "(*, model: giskard.agents.som.base.BaseSOM, pass_threshold: Annotated[float, Ge(ge=0), Le(le=1), _PydanticGeneralMetadata(allow_inf_nan=False)] = 0.5, timeout: float | int | None = None) -> None"
     },
     "giskard.checks.Scenario": {
       "bases": [
@@ -2379,6 +2521,10 @@
           "annotation": "giskard.agents.generators.base.BaseGenerator | None",
           "required": false
         },
+        "judge": {
+          "annotation": "giskard.checks.core.judge.BaseJudge | None",
+          "required": false
+        },
         "name": {
           "annotation": "str | None",
           "required": false
@@ -2406,13 +2552,18 @@
           "kind": "method",
           "signature": "(self) -> giskard.agents.workflow.TemplateReference"
         },
+        "get_som_trace": {
+          "doc_summary": "Return the conversation evidence to send to a SOM judge.",
+          "kind": "method",
+          "signature": "(self, trace: TraceType, inputs: dict[str, typing.Any]) -> giskard.checks.core.interaction.trace.Trace[Any, Any]"
+        },
         "run": {
           "doc_summary": "Return ERROR when ``target_key`` does not resolve; else run the judge.",
           "kind": "method",
           "signature": "(self, trace: TraceType) -> giskard.checks.core.result.CheckResult"
         }
       },
-      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, name: str | None = None, description: str | None = None, output: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', categories: list[typing.Literal['hate_speech', 'harassment', 'threats', 'self_harm', 'sexual_content', 'violence']] = <factory>) -> None"
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, judge: Annotated[giskard.checks.core.judge.BaseJudge | None, BeforeValidator(func=<function _coerce_judge>, json_schema_input_type=PydanticUndefined)] = None, name: str | None = None, description: str | None = None, output: str | MISSING = MISSING, target_key: Annotated[str, AfterValidator(func=<function _validate_jsonpath_syntax>), <giskard.checks.core.extraction._JSONPathStrMarker object>] = 'trace.last.outputs', categories: list[typing.Literal['hate_speech', 'harassment', 'threats', 'self_harm', 'sexual_content', 'violence']] = <factory>) -> None"
     },
     "giskard.checks.Trace": {
       "bases": [
@@ -2536,6 +2687,31 @@
       "members": {},
       "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None) -> None"
     },
+    "giskard.checks.WithJudgeMixin": {
+      "bases": [
+        "giskard.checks.core.mixin.WithGeneratorMixin"
+      ],
+      "doc_summary": "Attach a :class:`~giskard.checks.core.judge.BaseJudge` to a check.",
+      "fields": {
+        "generator": {
+          "annotation": "giskard.agents.generators.base.BaseGenerator | None",
+          "required": false
+        },
+        "judge": {
+          "annotation": "giskard.checks.core.judge.BaseJudge | None",
+          "required": false
+        }
+      },
+      "kind": "class",
+      "members": {
+        "model_copy": {
+          "doc_summary": "!!! abstract \"Usage Documentation\"",
+          "kind": "method",
+          "signature": "(self, *, update: collections.abc.Mapping[str, Any] | None = None, deep: bool = False) -> Self"
+        }
+      },
+      "signature": "(*, generator: giskard.agents.generators.base.BaseGenerator | None = None, judge: Annotated[giskard.checks.core.judge.BaseJudge | None, BeforeValidator(func=<function _coerce_judge>, json_schema_input_type=PydanticUndefined)] = None) -> None"
+    },
     "giskard.checks.WithSpy": {
       "bases": [
         "giskard.checks.core.interaction.base.InteractionSpec[TypeVar, TypeVar, TypeVar]",
@@ -2574,21 +2750,41 @@
       "kind": "function",
       "signature": "(fn: Callable[[TraceType], collections.abc.Awaitable[bool | giskard.checks.core.result.CheckResult] | bool | giskard.checks.core.result.CheckResult], *, name: str | None = None, description: str | None = None, success_message: str | None = None, failure_message: str | None = None, details: dict[str, Any] | None = None) -> giskard.checks.core.check.Check[TypeVar, TypeVar, TypeVar]"
     },
+    "giskard.checks.get_default_embedding_model": {
+      "doc_summary": "Get the current default embedding model.",
+      "kind": "function",
+      "signature": "() -> giskard.agents.embeddings.base.BaseEmbeddingModel"
+    },
     "giskard.checks.get_default_generator": {
       "doc_summary": "Get the current default generator.",
       "kind": "function",
       "signature": "() -> giskard.agents.generators.base.BaseGenerator"
+    },
+    "giskard.checks.get_default_judge": {
+      "doc_summary": "Return the configured judge, falling back to the default LLM generator.",
+      "kind": "function",
+      "signature": "() -> giskard.checks.core.judge.BaseJudge"
     },
     "giskard.checks.resolve": {
       "doc_summary": "",
       "kind": "function",
       "signature": "(trace: TraceType, key: str) -> Any"
     },
+    "giskard.checks.set_default_embedding_model": {
+      "doc_summary": "Set the default embedding model independently of generation and judging.",
+      "kind": "function",
+      "signature": "(model: giskard.agents.embeddings.base.BaseEmbeddingModel | str | None) -> None"
+    },
     "giskard.checks.set_default_generator": {
-      "doc_summary": "Set the default LLM generator for all checks.",
+      "doc_summary": "Set the default model for content generation.",
       "kind": "function",
       "signature": "(generator: giskard.agents.generators.base.BaseGenerator | str) -> None"
+    },
+    "giskard.checks.set_default_judge": {
+      "doc_summary": "Set the default judge independently of content generation.",
+      "kind": "function",
+      "signature": "(judge: JudgeInput | None) -> None"
     }
   },
-  "version": "1.0.4"
+  "version": "1.0.5"
 }
