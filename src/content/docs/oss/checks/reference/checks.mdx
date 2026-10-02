@@ -460,6 +460,8 @@ check = Not(
 
 Validation checks powered by Large Language Models for semantic understanding. An LLM judge is another model reading the transcript and returning a verdict. It can be wrong in both directions: read failures before you act, and do not treat a passing suite as proof the agent is safe.
 
+At run time, built-in LLM checks evaluate through `_judge` → `get_default_judge()` unless you pass `judge=`. The optional `generator=` constructor argument is a **deprecated alias** for `judge` (not serialized); do not pass both.
+
 ### `BaseLLMCheck`
 
 <ResourceSection description="Abstract base class for creating custom LLM-powered checks. Handles LLM interaction, prompt rendering, and result parsing — subclasses only need to define the evaluation prompt.">
@@ -467,12 +469,12 @@ Validation checks powered by Large Language Models for semantic understanding. A
 **Module:** `giskard.checks.judges.base`
 
 <TypeTable name="BaseLLMCheck">
-  <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
-    LLM generator for evaluation. Falls back to the global default if not
-    provided.
-  </Property>
   <Property name="judge" type="BaseJudge | None" defaultValue="None">
-    Judge backend for evaluation. `None` uses `get_default_judge()`.
+    Judge backend. `None` uses `get_default_judge()` at evaluation time.
+  </Property>
+  <Property name="generator" type="BaseGenerator | None" defaultValue="None">
+    Deprecated alias for `judge` on construction (`exclude=True`). Do not set both
+    `generator` and `judge`.
   </Property>
   <Property name="name" type="str | None" defaultValue="None">
     Optional check name.
@@ -568,11 +570,12 @@ Default result model for LLM-based checks. This is the structured output format 
 >
   JSONPath to extract context from trace.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
-  LLM generator for evaluation.
-</Property>
 <Property name="judge" type="BaseJudge | None" defaultValue="None">
-  Judge backend for evaluation. `None` uses `get_default_judge()`.
+  Judge backend. `None` uses `get_default_judge()` at evaluation time.
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  Deprecated alias for `judge` on construction. Do not set both `generator` and
+  `judge`.
 </Property>
 
 Use `Groundedness` to compare an answer with retrieved documents:
@@ -625,11 +628,12 @@ Use `Groundedness` when every claim must be supported by the context. Use [`Cont
 >
   JSONPath to extract context from the trace.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
-  LLM generator for evaluation.
-</Property>
 <Property name="judge" type="BaseJudge | None" defaultValue="None">
-  Judge backend for evaluation. `None` uses `get_default_judge()`.
+  Judge backend. `None` uses `get_default_judge()` at evaluation time.
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  Deprecated alias for `judge` on construction. Do not set both `generator` and
+  `judge`.
 </Property>
 
 ```python
@@ -672,11 +676,12 @@ Uses the same inputs as [`Groundedness`](#groundedness), but only reports a conf
   Whether earlier interactions are shown to the judge as context. Turn it off to
   score the last turn in isolation.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
-  LLM generator for evaluation (falls back to default).
-</Property>
 <Property name="judge" type="BaseJudge | None" defaultValue="None">
-  Judge backend for evaluation. `None` uses `get_default_judge()`.
+  Judge backend. `None` uses `get_default_judge()` at evaluation time.
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  Deprecated alias for `judge` on construction. Do not set both `generator` and
+  `judge`.
 </Property>
 
 Use this check when an answer should address the current question:
@@ -725,11 +730,12 @@ scenario = (
   `ToxicityCategory` is a `Literal` over exactly those six values; any other
   string raises a `ValidationError` when you construct the check.
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
-  LLM generator for evaluation (falls back to default).
-</Property>
 <Property name="judge" type="BaseJudge | None" defaultValue="None">
-  Judge backend for evaluation. `None` uses `get_default_judge()`.
+  Judge backend. `None` uses `get_default_judge()` at evaluation time.
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  Deprecated alias for `judge` on construction. Do not set both `generator` and
+  `judge`.
 </Property>
 
 Customers whose card has just been declined are sometimes abusive. The check is on the reply, not the message:
@@ -762,11 +768,12 @@ Narrowing `categories` focuses the judge on what you actually care about and cut
 <Property name="rule" type="str" required>
   The rule statement to evaluate against the trace (literal text).
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
-  LLM generator for evaluation (falls back to default).
-</Property>
 <Property name="judge" type="BaseJudge | None" defaultValue="None">
-  Judge backend for evaluation. `None` uses `get_default_judge()`.
+  Judge backend. `None` uses `get_default_judge()` at evaluation time.
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  Deprecated alias for `judge` on construction. Do not set both `generator` and
+  `judge`.
 </Property>
 
 Write the rule as one sentence a colleague could apply by hand:
@@ -808,11 +815,12 @@ Use `Conformity` for a policy you can state as a rule. If the rule keeps growing
 <Property name="prompt_path" type="str | None">
   Path to a template file (e.g. `"checks::my_template.j2"`).
 </Property>
-<Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
-  LLM generator for evaluation.
-</Property>
 <Property name="judge" type="BaseJudge | None" defaultValue="None">
-  Judge backend for evaluation. `None` uses `get_default_judge()`.
+  Judge backend. `None` uses `get_default_judge()` at evaluation time.
+</Property>
+<Property name="generator" type="BaseGenerator | None" defaultValue="None">
+  Deprecated alias for `judge` on construction. Do not set both `generator` and
+  `judge`.
 </Property>
 
 Exactly one of `prompt` or `prompt_path` must be provided.

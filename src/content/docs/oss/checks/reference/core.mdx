@@ -85,11 +85,18 @@ Public mixin for custom checks and generators that call an LLM. `LLMGenerator`, 
 
 **Module:** `giskard.checks.core.mixin` (also exported from `giskard.checks`)
 
-Public mixin for LLM-backed checks. `BaseLLMCheck` and the built-in judge checks include it. When `judge` is omitted, `_judge` resolves to `get_default_judge()` at use time, so a later `set_default_judge()` is visible.
+Public mixin for LLM-backed checks. `BaseLLMCheck` and the built-in judge checks include it. Evaluation calls `_judge`, which returns `judge` when set or otherwise `get_default_judge()` at use time, so a later `set_default_judge()` is visible.
 
 <TypeTable name="WithJudgeMixin">
   <Property name="judge" type="BaseJudge | None" defaultValue="None">
-    Judge backend for evaluation. `None` uses the process-wide default.
+    Judge backend for evaluation. `None` uses `get_default_judge()` (runtime override,
+    then `GISKARD_CHECKS_DEFAULT_JUDGE`, then `LLMChatJudge()` tied to the default
+    generator).
+  </Property>
+  <Property name="generator" type="BaseGenerator | None" defaultValue="None">
+    Deprecated constructor alias for `judge` (`exclude=True` on the model). Legacy
+    `generator=` kwargs are migrated to `judge`. Do not pass both `generator` and
+    `judge`.
   </Property>
 </TypeTable>
 
@@ -120,6 +127,8 @@ LLM-backed checks render a prompt, then call a `BaseJudge` to produce an `LLMChe
     Optional timeout in seconds for the SOM call.
   </Property>
 </MethodCard>
+
+`SOMJudge` raises `MissingJudgeEvidenceError` when the trace passed to `get_som_trace` cannot supply the evidence the judge needs (for example an empty trace).
 
 ---
 
@@ -559,11 +568,17 @@ model_name = resolve(trace, "trace.interactions[0].metadata.model")
 <MethodCard name="set_default_judge()" returnType="None">
   Set the default judge independently of content generation.
 
-  <Property name="judge" type="BaseJudge | str | None" required>A judge instance, a model identifier string (wrapped in `LLMChatJudge`), or `None` to clear the override.</Property>
+  <Property name="judge" type="JudgeInput | None" required>
+    A `BaseJudge`, `BaseGenerator`, or `BaseSOM` instance; a model identifier
+    string; a JSON dict for `BaseJudge.parse`; or `None` to clear the runtime
+    override.
+  </Property>
 </MethodCard>
 
 <MethodCard name="get_default_judge()" returnType="BaseJudge">
-  Return the configured judge, falling back to the default LLM generator.
+  Return the configured judge: runtime override, then
+  `GISKARD_CHECKS_DEFAULT_JUDGE`, then `LLMChatJudge()` tracking the default
+  generator.
 </MethodCard>
 
 <MethodCard name="get_default_embedding_model()" returnType="BaseEmbeddingModel">

@@ -45,7 +45,7 @@ These pages document the symbols in `giskard.checks` you will use directly. They
   />
   <LinkCard
     title="Settings"
-    description="Default LLM generator, embedding model, and environment-backed GiskardChecksSettings"
+    description="Default generator, judge, embedding model, and environment-backed GiskardChecksSettings"
     href="/oss/checks/reference/settings"
   />
 </CardGrid>
@@ -74,6 +74,9 @@ from giskard.checks import (
     WithGeneratorMixin,
     WithJudgeMixin,
     WithEmbeddingMixin,
+    BaseJudge,
+    LLMChatJudge,
+    SOMJudge,
     # Built-in checks
     FnCheck,
     StringMatching,
