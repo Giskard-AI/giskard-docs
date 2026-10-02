@@ -116,9 +116,9 @@ Giskard provides several families of checks:
 
 - **Rule-based** — `Equals`, `StringMatching`, `FnCheck`: exact values, keywords, or custom predicates. Fast, free, deterministic.
 - **Semantic similarity** — `SemanticSimilarity`: compare meaning rather than exact text. Uses embeddings; good when phrasing varies.
-- **LLM-as-judge** — `Groundedness`, `Conformity`, `LLMJudge`: qualitative evaluation (tone, policy compliance, reasoning). Uses an LLM call; more flexible but slower and non-deterministic.
+- **LLM-as-judge** — `Groundedness`, `Conformity`, `LLMJudge`: qualitative evaluation (tone, policy compliance, reasoning). Each check evaluates the trace through a **judge** (pass optional `judge=`, or use `get_default_judge()` after `set_default_judge()`). The default judge is LLM-backed; more flexible but slower and non-deterministic. Verdicts use the judge configuration, not `set_default_generator()`, which only affects content generation (simulators, `Generator` in interaction specs, and similar).
 
-For guidance on choosing the right check, see [When to Use Which Check](/oss/checks/explanation/when-to-use-which-check). For the full API, see the [Checks reference](/oss/checks/reference/checks). To build your own validation logic, see [Custom Checks](/oss/checks/how-to/custom-checks).
+For guidance on choosing the right check, see [When to Use Which Check](/oss/checks/explanation/when-to-use-which-check). For defaults and environment variables, see [Settings](/oss/checks/reference/settings). For the full API, see the [Checks reference](/oss/checks/reference/checks). To build your own validation logic, see [Custom Checks](/oss/checks/how-to/custom-checks).
 
 ```python
 from giskard.checks import Groundedness

@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-Built-in checks like `Groundedness`, `StringMatching`, and `LessThan` accept path parameters such as `target_key`, `context_key`, and `question_key` that point into the trace. This page covers the syntax.
+Built-in checks like `Groundedness`, `StringMatching`, and `LessThan` accept path parameters such as `target_key`, `context_key`, and `question_key` that point into the trace. LLM-backed checks such as `Groundedness` also accept optional `judge=` (or the default from `set_default_judge()`); paths select what to read from the trace, not which judge runs. This page covers the syntax.
 
 ## The `trace.` Prefix
 
