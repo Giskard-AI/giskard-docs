@@ -128,7 +128,6 @@ Suites often call two different LLM defaults:
 | --- | --- | --- |
 | **Used for** | Generating scenario content (`UserSimulator`, `LLMGenerator`, `Generator` in interaction specs) | Scoring LLM checks (`Groundedness`, `Conformity`, `LLMJudge`, …) |
 | **Env var** | `GISKARD_CHECKS_DEFAULT_MODEL` | `GISKARD_CHECKS_DEFAULT_JUDGE` |
-| **Per check** | — | optional `judge=` |
 
 The two defaults are independent; many projects point both at the same model id. Environment variables and resolution order are documented in [Settings](/oss/checks/reference/settings).
 
