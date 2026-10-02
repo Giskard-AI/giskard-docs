@@ -93,6 +93,34 @@ Public mixin for LLM-backed checks. `BaseLLMCheck` and the built-in judge checks
   </Property>
 </TypeTable>
 
+### Judge backends
+
+**Module:** `giskard.checks.core.judge` (also exported from `giskard.checks`)
+
+LLM-backed checks render a prompt, then call a `BaseJudge` to produce an `LLMCheckResult`. The default is `LLMChatJudge`, which uses a `BaseGenerator` (typically `get_default_generator()`).
+
+<TypeTable name="BaseJudge">
+  <Property name="kind" type="str">Discriminator for serialization.</Property>
+</TypeTable>
+
+<MethodCard name="LLMChatJudge" returnType="LLMChatJudge">
+  <Property name="generator" type="BaseGenerator | None" defaultValue="None">
+    Generator used for the judge completion. `None` uses `get_default_generator()`.
+  </Property>
+</MethodCard>
+
+<MethodCard name="SOMJudge" returnType="SOMJudge">
+  <Property name="model" type="BaseSOM" required>
+    System One Model used to score the check prompt.
+  </Property>
+  <Property name="pass_threshold" type="float" defaultValue="0.5">
+    Minimum model probability required to pass (0–1).
+  </Property>
+  <Property name="timeout" type="float | int | None" defaultValue="None">
+    Optional timeout in seconds for the SOM call.
+  </Property>
+</MethodCard>
+
 ---
 
 ## `WithEmbeddingMixin`
