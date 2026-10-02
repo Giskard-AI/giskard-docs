@@ -71,11 +71,25 @@ Use the `@Check.register()` decorator to make your check discoverable and enable
 
 **Module:** `giskard.checks.core.mixin` (also exported from `giskard.checks`)
 
-Public mixin for custom checks and generators that call an LLM. `BaseLLMCheck`, `LLMGenerator`, `UserSimulator`, and `DatasetInputGenerator` include it. When `generator` is omitted, `_generator` resolves to `get_default_generator()` at use time (not at construction), so a later `set_default_generator()` is visible.
+Public mixin for custom checks and generators that call an LLM. `LLMGenerator`, `UserSimulator`, and `DatasetInputGenerator` include it. When `generator` is omitted, `_generator` resolves to `get_default_generator()` at use time (not at construction), so a later `set_default_generator()` is visible.
 
 <TypeTable name="WithGeneratorMixin">
   <Property name="generator" type="BaseGenerator | None" defaultValue="None">
     Generator for LLM evaluation. `None` uses the process-wide default.
+  </Property>
+</TypeTable>
+
+---
+
+## `WithJudgeMixin`
+
+**Module:** `giskard.checks.core.mixin` (also exported from `giskard.checks`)
+
+Public mixin for LLM-backed checks. `BaseLLMCheck` and the built-in judge checks include it. When `judge` is omitted, `_judge` resolves to `get_default_judge()` at use time, so a later `set_default_judge()` is visible.
+
+<TypeTable name="WithJudgeMixin">
+  <Property name="judge" type="BaseJudge | None" defaultValue="None">
+    Judge backend for evaluation. `None` uses the process-wide default.
   </Property>
 </TypeTable>
 
@@ -505,7 +519,7 @@ model_name = resolve(trace, "trace.interactions[0].metadata.model")
 **Module:** `giskard.checks`
 
 <MethodCard name="set_default_generator()" returnType="None">
-  Set the default LLM generator used by all LLM-based checks.
+  Set the default model for content generation.
 
   <Property name="generator" type="BaseGenerator | str" required>A generator instance, or a model identifier string (e.g. `"openai/gpt-4o-mini"`) wrapped in `Generator` automatically.</Property>
 </MethodCard>
@@ -514,15 +528,33 @@ model_name = resolve(trace, "trace.interactions[0].metadata.model")
   Get the currently configured default generator.
 </MethodCard>
 
+<MethodCard name="set_default_judge()" returnType="None">
+  Set the default judge independently of content generation.
+
+  <Property name="judge" type="BaseJudge | str | None" required>A judge instance, a model identifier string (wrapped in `LLMChatJudge`), or `None` to clear the override.</Property>
+</MethodCard>
+
+<MethodCard name="get_default_judge()" returnType="BaseJudge">
+  Return the configured judge, falling back to the default LLM generator.
+</MethodCard>
+
+<MethodCard name="get_default_embedding_model()" returnType="BaseEmbeddingModel">
+  Get the current default embedding model.
+</MethodCard>
+
+<MethodCard name="set_default_embedding_model()" returnType="None">
+  Set the default embedding model independently of generation and judging.
+
+  <Property name="model" type="BaseEmbeddingModel | str | None" required>An embedding model instance, a model identifier string, or `None` to clear the override.</Property>
+</MethodCard>
+
 ```python
-from giskard.checks import set_default_generator
+from giskard.checks import Groundedness, set_default_generator, set_default_judge
 
-set_default_generator("openai/gpt-5")
+set_default_generator("openai/gpt-5-mini")
+set_default_judge("openai/gpt-5")
 
-# Now LLM checks will use this generator by default
-from giskard.checks import Groundedness
-
-check = Groundedness()  # uses the default generator
+check = Groundedness()  # uses the default judge (and its generator when needed)
 ```
 
 ---

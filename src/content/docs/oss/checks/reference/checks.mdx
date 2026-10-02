@@ -471,6 +471,9 @@ Validation checks powered by Large Language Models for semantic understanding. A
     LLM generator for evaluation. Falls back to the global default if not
     provided.
   </Property>
+  <Property name="judge" type="BaseJudge | None" defaultValue="None">
+    Judge backend for evaluation. `None` uses `get_default_judge()`.
+  </Property>
   <Property name="name" type="str | None" defaultValue="None">
     Optional check name.
   </Property>
@@ -568,6 +571,9 @@ Default result model for LLM-based checks. This is the structured output format 
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation.
 </Property>
+<Property name="judge" type="BaseJudge | None" defaultValue="None">
+  Judge backend for evaluation. `None` uses `get_default_judge()`.
+</Property>
 
 Use `Groundedness` to compare an answer with retrieved documents:
 
@@ -622,6 +628,9 @@ Use `Groundedness` when every claim must be supported by the context. Use [`Cont
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation.
 </Property>
+<Property name="judge" type="BaseJudge | None" defaultValue="None">
+  Judge backend for evaluation. `None` uses `get_default_judge()`.
+</Property>
 
 ```python
 from giskard.checks import Contradiction
@@ -665,6 +674,9 @@ Uses the same inputs as [`Groundedness`](#groundedness), but only reports a conf
 </Property>
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation (falls back to default).
+</Property>
+<Property name="judge" type="BaseJudge | None" defaultValue="None">
+  Judge backend for evaluation. `None` uses `get_default_judge()`.
 </Property>
 
 Use this check when an answer should address the current question:
@@ -716,6 +728,9 @@ scenario = (
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation (falls back to default).
 </Property>
+<Property name="judge" type="BaseJudge | None" defaultValue="None">
+  Judge backend for evaluation. `None` uses `get_default_judge()`.
+</Property>
 
 Customers whose card has just been declined are sometimes abusive. The check is on the reply, not the message:
 
@@ -749,6 +764,9 @@ Narrowing `categories` focuses the judge on what you actually care about and cut
 </Property>
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation (falls back to default).
+</Property>
+<Property name="judge" type="BaseJudge | None" defaultValue="None">
+  Judge backend for evaluation. `None` uses `get_default_judge()`.
 </Property>
 
 Write the rule as one sentence a colleague could apply by hand:
@@ -792,6 +810,9 @@ Use `Conformity` for a policy you can state as a rule. If the rule keeps growing
 </Property>
 <Property name="generator" type="BaseGenerator" defaultValue="get_default_generator()">
   LLM generator for evaluation.
+</Property>
+<Property name="judge" type="BaseJudge | None" defaultValue="None">
+  Judge backend for evaluation. `None` uses `get_default_judge()`.
 </Property>
 
 Exactly one of `prompt` or `prompt_path` must be provided.
@@ -982,17 +1003,27 @@ scenario = (
 
 The last check calls an LLM provider, so this scenario sends the trace off your machine.
 
-### Reusing generators
+### Default judge and generator
 
-Set the judge model once instead of passing it to every LLM check:
+Set the default judge once instead of passing `judge=` to every LLM check. `set_default_generator` configures content generation (simulators, input generators); LLM checks evaluate traces through the default judge, which falls back to an `LLMChatJudge` built from the default generator when you have not called `set_default_judge`.
 
 ```python
 from giskard.agents import Generator
-from giskard.checks import Conformity, Groundedness, set_default_generator
-
-set_default_generator(
-    Generator(model="openai/gpt-5").with_params(temperature=0.1)
+from giskard.checks import (
+    Conformity,
+    Groundedness,
+    LLMChatJudge,
+    set_default_generator,
+    set_default_judge,
 )
+
+set_default_judge(
+    LLMChatJudge(
+        generator=Generator(model="openai/gpt-5").with_params(temperature=0.1)
+    )
+)
+# Or keep the default LLM judge but steer content generation separately:
+set_default_generator("openai/gpt-5-mini")
 
 check = Groundedness(target_key="trace.last.outputs.answer")
 check = Conformity(

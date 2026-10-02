@@ -72,6 +72,7 @@ from giskard.checks import (
     GroupedSuiteResult,
     GroupStats,
     WithGeneratorMixin,
+    WithJudgeMixin,
     WithEmbeddingMixin,
     # Built-in checks
     FnCheck,
@@ -93,6 +94,10 @@ from giskard.checks import (
     # Configuration
     set_default_generator,
     get_default_generator,
+    set_default_judge,
+    get_default_judge,
+    get_default_embedding_model,
+    set_default_embedding_model,
 )
 
 # LLM-based checks

@@ -8,7 +8,7 @@ sidebar:
 import Property from "../../../../../components/api/Property.astro";
 import MethodCard from "../../../../../components/api/MethodCard.astro";
 
-Environment and runtime configuration for Giskard Checks. Two models are involved: the **generator** (the LLM used by LLM-backed checks, including as a judge) and the **embedding model** (used by checks such as `SemanticSimilarity`). Both default to OpenAI, and both send the text they are given to the provider you configure.
+Environment and runtime configuration for Giskard Checks. Three defaults are involved: the **generator** (content generation for simulators and input generators), the **judge** (how LLM-backed checks evaluate traces), and the **embedding model** (used by checks such as `SemanticSimilarity`). All default to OpenAI, and each sends the text it is given to the provider you configure.
 
 **Module:** `giskard.checks.settings`
 
@@ -72,12 +72,12 @@ Set it in the environment or `.env` before that import.
 
 ## Default generator
 
-LLM-backed checks such as `LLMJudge`, `Groundedness`, and `Toxicity` use this generator when you do not pass one yourself. A runtime override from `set_default_generator` wins over `GISKARD_CHECKS_DEFAULT_MODEL`.
+`UserSimulator`, `LLMGenerator`, and other content-generation paths use this generator when you do not pass one yourself. A runtime override from `set_default_generator` wins over `GISKARD_CHECKS_DEFAULT_MODEL`. LLM-backed checks evaluate traces through the default judge (see below); they do not call `set_default_generator` for verdicts.
 
 <MethodCard name="set_default_generator()" returnType="None">
-  Set the process-wide default LLM generator.
+  Set the default model for content generation.
 
-  <Property name="generator" type="BaseGenerator | str" required>A generator instance, or a model identifier string (e.g. `"openai/gpt-4o-mini"`) wrapped in `Generator` automatically. Used by LLM checks that do not receive one explicitly.</Property>
+  <Property name="generator" type="BaseGenerator | str" required>A generator instance, or a model identifier string (e.g. `"openai/gpt-4o-mini"`) wrapped in `Generator` automatically.</Property>
 </MethodCard>
 
 <MethodCard name="get_default_generator()" returnType="BaseGenerator">
@@ -95,9 +95,36 @@ get_default_generator()  # the generator set above
 
 To set this once per pytest session, see [CI/CD Integration](/oss/checks/how-to/ci-cd).
 
-<MethodCard name="get_default_embedding_model()" returnType="EmbeddingModel">
-  Return an `EmbeddingModel` built from `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL`
-  (falling back to `text-embedding-3-small`).
+---
+
+## Default judge
+
+LLM-backed checks such as `LLMJudge`, `Groundedness`, and `Toxicity` call `get_default_judge()` when you do not pass `judge=` yourself. Until you call `set_default_judge`, that judge is an `LLMChatJudge` backed by `get_default_generator()`.
+
+<MethodCard name="set_default_judge()" returnType="None">
+  Set the default judge independently of content generation.
+
+  <Property name="judge" type="BaseJudge | str | None" required>A judge instance, a model identifier string (wrapped in `LLMChatJudge`), or `None` to clear the override.</Property>
+</MethodCard>
+
+<MethodCard name="get_default_judge()" returnType="BaseJudge">
+  Return the configured judge, falling back to the default LLM generator.
+</MethodCard>
+
+---
+
+## Default embedding model
+
+Checks such as `SemanticSimilarity` use this embedding model when you do not pass `embedding_model=` yourself. A runtime override from `set_default_embedding_model` wins over `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL`.
+
+<MethodCard name="get_default_embedding_model()" returnType="BaseEmbeddingModel">
+  Get the current default embedding model.
+</MethodCard>
+
+<MethodCard name="set_default_embedding_model()" returnType="None">
+  Set the default embedding model independently of generation and judging.
+
+  <Property name="model" type="BaseEmbeddingModel | str | None" required>An embedding model instance, a model identifier string, or `None` to clear the override.</Property>
 </MethodCard>
 
 ---
@@ -105,12 +132,15 @@ To set this once per pytest session, see [CI/CD Integration](/oss/checks/how-to/
 ## Imports
 
 ```python
-from giskard.checks import get_default_generator, set_default_generator
-from giskard.checks.settings import (
-    GiskardChecksSettings,
+from giskard.checks import (
     get_default_embedding_model,
-    get_settings,
+    get_default_generator,
+    get_default_judge,
+    set_default_embedding_model,
+    set_default_generator,
+    set_default_judge,
 )
+from giskard.checks.settings import GiskardChecksSettings, get_settings
 ```
 
 ## See also
