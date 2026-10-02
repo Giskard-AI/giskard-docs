@@ -1013,7 +1013,7 @@ The last check calls an LLM provider, so this scenario sends the trace off your 
 
 ### Default judge and generator
 
-Set the default judge once instead of passing `judge=` to every LLM check. `set_default_generator` configures content generation (simulators, input generators); LLM checks evaluate traces through the default judge, which falls back to an `LLMChatJudge` built from the default generator when you have not called `set_default_judge`.
+Set the default judge once instead of passing `judge=` to every LLM check. See [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges) for how this relates to `set_default_generator`.
 
 ```python
 from giskard.agents import Generator

@@ -116,9 +116,21 @@ Giskard provides several families of checks:
 
 - **Rule-based** — `Equals`, `StringMatching`, `FnCheck`: exact values, keywords, or custom predicates. Fast, free, deterministic.
 - **Semantic similarity** — `SemanticSimilarity`: compare meaning rather than exact text. Uses embeddings; good when phrasing varies.
-- **LLM-as-judge** — `Groundedness`, `Conformity`, `LLMJudge`: qualitative evaluation (tone, policy compliance, reasoning). Each check evaluates the trace through a **judge** (pass optional `judge=`, or use `get_default_judge()` after `set_default_judge()`). The default judge is LLM-backed; more flexible but slower and non-deterministic. Verdicts use the judge configuration, not `set_default_generator()`, which only affects content generation (simulators, `Generator` in interaction specs, and similar).
+- **LLM-as-judge** — `Groundedness`, `Conformity`, `LLMJudge`: qualitative evaluation (tone, policy compliance, reasoning). Flexible but slower and non-deterministic.
 
-For guidance on choosing the right check, see [When to Use Which Check](/oss/checks/explanation/when-to-use-which-check). For defaults and environment variables, see [Settings](/oss/checks/reference/settings). For the full API, see the [Checks reference](/oss/checks/reference/checks). To build your own validation logic, see [Custom Checks](/oss/checks/how-to/custom-checks).
+For guidance on choosing the right check, see [When to Use Which Check](/oss/checks/explanation/when-to-use-which-check). For the full API, see the [Checks reference](/oss/checks/reference/checks). To build your own validation logic, see [Custom Checks](/oss/checks/how-to/custom-checks).
+
+### Generators and judges
+
+Suites often call two different LLM defaults:
+
+| | `set_default_generator()` | `set_default_judge()` |
+| --- | --- | --- |
+| **Used for** | Generating scenario content (`UserSimulator`, `LLMGenerator`, `Generator` in interaction specs) | Scoring LLM checks (`Groundedness`, `Conformity`, `LLMJudge`, …) |
+| **Env var** | `GISKARD_CHECKS_DEFAULT_MODEL` | `GISKARD_CHECKS_DEFAULT_JUDGE` |
+| **Per check** | — | optional `judge=` |
+
+The two defaults are independent; many projects point both at the same model id. Environment variables and resolution order are documented in [Settings](/oss/checks/reference/settings).
 
 ```python
 from giskard.checks import Groundedness

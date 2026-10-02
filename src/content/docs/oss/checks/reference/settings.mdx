@@ -8,7 +8,7 @@ sidebar:
 import Property from "../../../../../components/api/Property.astro";
 import MethodCard from "../../../../../components/api/MethodCard.astro";
 
-Environment and runtime configuration for Giskard Checks. Three defaults are involved: the **generator** (content generation for simulators and input generators), the **judge** (how LLM-backed checks evaluate traces), and the **embedding model** (used by checks such as `SemanticSimilarity`). `default_model` seeds both content generation and the fallback LLM judge when you do not set a separate judge default.
+Environment and runtime configuration for Giskard Checks: generator, judge, and embedding defaults. How they differ in practice is summarized in [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges).
 
 **Module:** `giskard.checks.settings`
 
@@ -82,7 +82,7 @@ Set it in the environment or `.env` before that import.
 
 ## Default generator
 
-`UserSimulator`, `LLMGenerator`, and other content-generation paths use this generator when you do not pass one yourself. A runtime override from `set_default_generator` wins over `GISKARD_CHECKS_DEFAULT_MODEL`. LLM-backed checks evaluate traces through `_judge` → `get_default_judge()`; they do not use `WithGeneratorMixin._generator` for verdicts.
+`UserSimulator`, `LLMGenerator`, and other content-generation paths use this generator when you do not pass one yourself. A runtime override from `set_default_generator` wins over `GISKARD_CHECKS_DEFAULT_MODEL`. LLM checks use [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges) — verdicts go through `get_default_judge()`, not this default.
 
 <MethodCard name="set_default_generator()" returnType="None">
   Set the default model for content generation.

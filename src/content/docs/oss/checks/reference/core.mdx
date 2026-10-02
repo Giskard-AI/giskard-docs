@@ -89,9 +89,8 @@ Public mixin for LLM-backed checks. `BaseLLMCheck` and the built-in judge checks
 
 <TypeTable name="WithJudgeMixin">
   <Property name="judge" type="BaseJudge | None" defaultValue="None">
-    Judge backend for evaluation. `None` uses `get_default_judge()` (runtime override,
-    then `GISKARD_CHECKS_DEFAULT_JUDGE`, then `LLMChatJudge()` tied to the default
-    generator).
+    Judge backend for evaluation. `None` uses `get_default_judge()` (see
+    [Settings](/oss/checks/reference/settings)).
   </Property>
   <Property name="generator" type="BaseGenerator | None" defaultValue="None">
     Deprecated constructor alias for `judge` (`exclude=True` on the model). Legacy
