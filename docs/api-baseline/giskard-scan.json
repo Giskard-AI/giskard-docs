@@ -1,7 +1,7 @@
 {
   "module": "giskard.scan",
   "package": "giskard-scan",
-  "source_ref": "v3.0.1",
+  "source_ref": "giskard-scan/v1.0.1",
   "symbols": {
     "giskard.scan.AdversarialScenarioGenerator": {
       "bases": [
