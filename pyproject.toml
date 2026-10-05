@@ -16,7 +16,7 @@ dev = [
     "nbmake==1.5.5",
     "nest-asyncio==1.6.0",
     "pytest==9.1.1",
-    "python-dotenv==1.2.3",
+    "python-dotenv==1.2.4",
 ]
 
 [tool.pytest.ini_options]
