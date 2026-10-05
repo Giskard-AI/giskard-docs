@@ -16,7 +16,7 @@ A **SOM judge** (`SOMJudge`) uses a **System One Model** instead: a model that r
 | **Verdict** | Model writes pass/fail + rationale | Fixed threshold on `P(pass)` |
 | **Reason text** | Natural language from the model | Python summary (probability and threshold) |
 | **Custom output schemas** | Supported via `output_type` | Only `LLMCheckResult` |
-| **Latency** | One model call, roughly 0.5–5 s | One model call, roughly 0.5–5 s |
+| **Latency** | One chat completion per verdict (roughly 0.5–5 s) | One SOM probability call per verdict (depends on provider and trace size) |
 | **Typical use** | Exploratory rules, rich failure messages | Rubric-style checks at scale, comparable scores |
 
 SOM judging does not replace rule-based or semantic checks. It is an alternative **backend for qualitative checks** when you want a scored probability rather than a generated rationale. For choosing between rule-based, semantic, and LLM-style checks in general, see [When to use which check](/oss/checks/explanation/when-to-use-which-check).

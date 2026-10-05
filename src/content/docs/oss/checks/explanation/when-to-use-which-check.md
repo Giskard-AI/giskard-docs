@@ -118,7 +118,7 @@ When the wording of a correct answer can vary but the meaning should not. `Seman
 When the rule is qualitative and cannot be written as code: tone, whether the answer is supported by the retrieved documents, whether it follows a policy, whether the reasoning holds up. `Groundedness`, `Conformity`, and `LLMJudge` cover these. Each verdict costs one model call and takes roughly 0.5-5 seconds. See [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges) for defaults.
 
 **When should you use a SOM judge instead of a chat LLM judge?**
-When you want the same qualitative checks but a **probability and threshold** instead of a free-form rationale — for example rubric-style conformity at scale. Configure `set_default_judge("typesafe/jev")` or pass `judge=SOMJudge(...)`. Latency is still one model call per verdict (roughly 0.5-5 seconds). See [SOM as a judge](/oss/checks/explanation/som-as-judge).
+When you want the same qualitative checks but a **probability and threshold** instead of a free-form rationale — for example rubric-style conformity at scale. Configure `set_default_judge("typesafe/jev")` or pass `judge=SOMJudge(...)`. Each verdict still costs one SOM API call; latency depends on the provider and how much trace evidence you send. See [SOM as a judge](/oss/checks/explanation/som-as-judge).
 
 **Can you combine several checks in one test?**
 Yes. A scenario takes any number of checks, and every one has to pass for the scenario to pass. Order them by cost: rule-based first, then semantic similarity, then the LLM judges. A cheap check that fails often tells you what went wrong without paying for an LLM call.
