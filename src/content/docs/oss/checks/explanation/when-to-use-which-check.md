@@ -48,7 +48,7 @@ SemanticSimilarity(
 )
 ```
 
-**LLM-as-judge** — when the criterion is qualitative and hard to express as a rule: tone, groundedness (whether the answer is supported by the documents you retrieved), policy compliance, reasoning quality. Read failing verdicts before you trust them. For `judge=` and suite-wide defaults, see [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges).
+**LLM-as-judge** — when the criterion is qualitative and hard to express as a rule: tone, groundedness (whether the answer is supported by the documents you retrieved), policy compliance, reasoning quality. Read failing verdicts before you trust them. For `judge=` and suite-wide defaults, see [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges). The default backend is a chat LLM; you can switch qualitative checks to a [SOM judge](/oss/checks/explanation/som-as-judge) that scores a pass probability instead of generating a rationale.
 
 ```python
 Groundedness(
@@ -116,6 +116,9 @@ When the wording of a correct answer can vary but the meaning should not. `Seman
 
 **When should you use an LLM-as-judge check?**
 When the rule is qualitative and cannot be written as code: tone, whether the answer is supported by the retrieved documents, whether it follows a policy, whether the reasoning holds up. `Groundedness`, `Conformity`, and `LLMJudge` cover these. Each verdict costs one model call and takes roughly 0.5-5 seconds. See [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges) for defaults.
+
+**When should you use a SOM judge instead of a chat LLM judge?**
+When you want the same qualitative checks but a **probability and threshold** instead of a free-form rationale — for example rubric-style conformity at scale. Configure `set_default_judge("typesafe/jev")` or pass `judge=SOMJudge(...)`. Latency is still one model call per verdict (roughly 0.5-5 seconds). See [SOM as a judge](/oss/checks/explanation/som-as-judge).
 
 **Can you combine several checks in one test?**
 Yes. A scenario takes any number of checks, and every one has to pass for the scenario to pass. Order them by cost: rule-based first, then semantic similarity, then the LLM judges. A cheap check that fails often tells you what went wrong without paying for an LLM call.
