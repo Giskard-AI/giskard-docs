@@ -14,10 +14,12 @@ A **SOM judge** (`SOMJudge`) uses a **System One Model** instead: a model that r
 | | LLM judge (`LLMChatJudge`) | SOM judge (`SOMJudge`) |
 | --- | --- | --- |
 | **Verdict** | Model writes pass/fail + rationale | Fixed threshold on `P(pass)` |
-| **Reason text** | Natural language from the model | Python summary (probability and threshold) |
+| **Reason text** | Natural language from the model | Probability and threshold only (no generated explanation of why a check failed) |
 | **Custom output schemas** | Supported via `output_type` | Only `LLMCheckResult` |
-| **Latency** | One chat completion per verdict (roughly 0.5–5 s) | One SOM probability call per verdict (depends on provider and trace size) |
-| **Typical use** | Exploratory rules, rich failure messages | Rubric-style checks at scale, comparable scores |
+| **Latency** | One chat completion per verdict (about 3 s per check for `gpt-5.6-luna` in an internal benchmark; varies by model and provider) | One SOM probability call per verdict (about 0.3 s per check for `typesafe/jev` in that benchmark; varies by model and provider) |
+| **Typical use** | Exploratory rules, rich failure messages | Large evaluation runs, rubric-style checks at scale, comparable scores |
+
+In a September 2026 internal benchmark on giskard-oss (100 generated `quality_scan` scenarios, chat LLM judge vs SOM judge), TypeSafe Jev averaged about 0.3 s per check versus about 3 s for a `gpt-5.6-luna` chat judge — roughly 10× faster in that run. Treat these figures as illustrative; your latency depends on the models, providers, and trace size.
 
 SOM judging does not replace rule-based or semantic checks. It is an alternative **backend for qualitative checks** when you want a scored probability rather than a generated rationale. For choosing between rule-based, semantic, and LLM-style checks in general, see [When to use which check](/oss/checks/explanation/when-to-use-which-check).
 
