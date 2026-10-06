@@ -75,7 +75,7 @@ Tune `pass_threshold` when you want stricter or looser pass rates; the bundled c
 
 Set `TYPESAFE_API_KEY` before running scenarios. Optional `TYPESAFE_BASE_URL` or `TYPESAFE_API_BASE` override the API origin when you use a private gateway.
 
-Configure credentials and base URLs in **environment variables** or in **trusted application code** when you construct a `TypeSafeSOM`. Do not treat scenario JSON or other untrusted input as the place to set provider endpoints or API key environment names.
+Configure credentials and base URLs only in environment variables (`TYPESAFE_API_KEY`, optionally `TYPESAFE_BASE_URL` or `TYPESAFE_API_BASE`). Do not set them in application code or scenario JSON.
 
 ## Custom SOM providers
 
