@@ -39,7 +39,7 @@ from giskard.checks import set_default_generator
 set_default_generator("openai/gpt-4o")
 ```
 
-`openai`, `anthropic`, and `google` are the first-party extras. For anything else, install the `litellm` extra and pass any [LiteLLM-supported ↗](https://docs.litellm.ai/docs/providers) model string, such as `"mistral/mistral-large-latest"`, `"azure/gpt-4o"`, or `"ollama/llama3"`.
+`openai`, `anthropic`, and `google` are the first-party extras. To use a self-hosted or third-party server that speaks the OpenAI Chat Completions API (vLLM, Ollama, OpenRouter, and so on), keep the `openai` extra and register the endpoint's `base_url`. See [Use an OpenAI-compatible endpoint](/oss/checks/installation#use-an-openai-compatible-endpoint). For anything else, install the `litellm` extra and pass any [LiteLLM-supported ↗](https://docs.litellm.ai/docs/providers) model string, such as `"mistral/mistral-large-latest"`, `"azure/gpt-4o"`, or `"ollama/llama3"`.
 
 Each provider reads its own API key from the environment (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`). Keep them in a `.env` file and load it before you call `set_default_generator`:
 

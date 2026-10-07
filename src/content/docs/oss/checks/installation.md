@@ -84,6 +84,34 @@ set_default_generator("openai/gpt-5-mini")
 
 A model identifier string is wrapped in `Generator` automatically. Pass a `Generator` instance when you need further configuration. Use a capable judge model and review failures before acting on them.
 
+### Use an OpenAI-compatible endpoint
+
+Any server that implements the OpenAI Chat Completions API can be your judge. That includes vLLM, Ollama, LM Studio, OpenRouter, Together, Groq, DeepSeek, and self-hosted gateways. You don't need LiteLLM for this. Install the `openai` extra, register the endpoint under a name of your choice with `giskard.llm.configure`, and use that name as the model prefix:
+
+```python
+from giskard.checks import set_default_generator
+from giskard.llm import configure
+
+configure(
+    "my-endpoint",  # alias used as the model prefix below
+    provider="openai",  # speak the OpenAI Chat Completions protocol
+    base_url="https://my-llm-host.example.com/v1",  # the /v1 root, not /chat/completions
+    api_key="os.environ/MY_ENDPOINT_API_KEY",  # read from the environment on first use
+)
+
+set_default_generator("my-endpoint/my-model-id")
+```
+
+The part after the prefix (`my-model-id`) is sent as-is in the `model` field of the request, so use the exact id your server lists under `GET /v1/models`.
+
+A few things to keep in mind:
+
+- `base_url` must point to the API root that ends in `/v1`. The SDK appends `/chat/completions` itself.
+- `api_key` takes either a literal value or `os.environ/VAR_NAME`, which reads `VAR_NAME` when the provider is first used. Servers that don't check keys, such as a local vLLM or Ollama, still expect a non-empty value. Any placeholder string works.
+- Using a custom alias such as `my-endpoint/` leaves `openai/` pointing to `api.openai.com`, so you can mix both in the same project. To redirect every `openai/...` model instead, call `configure("openai", base_url=..., api_key=...)`. You can also set the `OPENAI_BASE_URL` environment variable, which the `openai` SDK reads by default.
+- Call `configure` before the first LLM call. Calling it again with the same name replaces the earlier configuration.
+- For structured verdicts, `LLMJudge` and the other judge checks send a `response_format` JSON schema. If your server does not support structured outputs, pick a model and server that do. Otherwise judge calls may fail to parse.
+
 ## Next steps
 
 For a step-by-step lesson with no API key, try [Your First Test](/oss/checks/tutorials/your-first-test) first. Or head to the [Quickstart](/oss/checks/quickstart) for a single example.
