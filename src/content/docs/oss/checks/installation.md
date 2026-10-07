@@ -84,6 +84,42 @@ set_default_generator("openai/gpt-5-mini")
 
 A model identifier string is wrapped in `Generator` automatically. Pass a `Generator` instance when you need further configuration. Use a capable judge model and review failures before acting on them.
 
+## Use an OpenAI-compatible gateway
+
+Gateways that expose an OpenAI-compatible API work through the `openai/` provider. Point the SDK at the gateway with `OPENAI_BASE_URL` and keep the model string prefixed with `openai/`.
+
+<a href="https://www.edenai.co" target="_blank">Eden AI ↗</a> is one such gateway, useful when you want one key across vendors or judge calls that stay inside the EU:
+
+```bash
+OPENAI_API_KEY="your-eden-ai-api-key"
+OPENAI_BASE_URL="https://api.edenai.run/v3"
+```
+
+Its model ids are namespaced by the upstream vendor, as `vendor/model`, so the string carries two prefixes: `openai/` picks the SDK and the rest is the gateway's model id.
+
+```python
+from dotenv import load_dotenv
+from giskard.checks import set_default_generator
+
+load_dotenv()
+
+set_default_generator("openai/openai/gpt-5.5")
+```
+
+The same works through LiteLLM with `pip install "giskard[litellm]"` and `LiteLLMGenerator(model="openai/openai/gpt-5.5")`, which reads the same variables.
+
+A judge prompt carries your test inputs and your agent's outputs. To keep that inside the EU, Eden AI exposes a regional host that serves only models cleared for European processing:
+
+```bash
+OPENAI_BASE_URL="https://api.eu.edenai.run/v3"
+```
+
+Pick a model from that subset, such as `openai/mistral/mistral-large-latest`. Requesting one that is not cleared raises `LLMError` with HTTP 451 rather than running the call elsewhere, so a misconfigured judge stops the run instead of leaving the region. See the <a href="https://www.edenai.co/docs/v3/data-governance/eu-endpoint" target="_blank">EU endpoint documentation ↗</a> for which models qualify.
+
+:::note[Why two prefixes]
+Giskard strips the first segment to choose the SDK, so `"openai/openai/gpt-5.5"` sends `openai/gpt-5.5` to the gateway and pins the vendor. Dropping the second prefix also resolves, but lets the gateway choose the route, which is harder to reproduce when a judge verdict is disputed.
+:::
+
 ## Next steps
 
 For a step-by-step lesson with no API key, try [Your First Test](/oss/checks/tutorials/your-first-test) first. Or head to the [Quickstart](/oss/checks/quickstart) for a single example.
