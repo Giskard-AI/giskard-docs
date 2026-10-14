@@ -1,0 +1,42 @@
+---
+title: "Compare open-source AI testing tools"
+description: "Compare Giskard OSS with garak, promptfoo, PyRIT, and DeepEval across dynamic scanning, agent testing, evaluation, and CI workflows."
+---
+
+import ToolComparison from "../../../components/ToolComparison.astro";
+
+Giskard OSS combines two parts of a code-first testing workflow for AI engineers:
+
+- [**Checks**](/oss/checks) expresses expected agent behavior as executable scenarios and pass/fail checks.
+- [**Scan**](/oss/scan) discovers security and quality failures using the same scenario and check model; you can serialize generated suites and maintain them through your own regression-test workflow.
+
+Checks and Scan are currently in beta. The comparison below focuses on their documented open-source capabilities and on five projects with overlapping evaluation or red-teaming scope: [garak](https://docs.garak.ai/), [promptfoo](https://www.promptfoo.dev/docs/), [PyRIT](https://azure.github.io/PyRIT/), and Confident AI's paired [DeepEval](https://deepeval.com/docs/getting-started) and [DeepTeam](https://deepeval.com/docs/red-teaming-introduction) projects.
+
+## At a glance
+
+Scan a row to compare one capability across tools. Values summarize documented workflows as of September 2026; follow the links for implementation details.
+
+<ToolComparison />
+
+This is a workflow comparison, not a claim that one project covers every feature of another. Capabilities and terminology change; follow the linked project documentation when a specific integration or attack technique is a deciding factor.
+
+## Why Giskard's dynamic Scan is different
+
+Giskard Scan starts from the system you describe. Its dynamic generators create scenarios relevant to that system, while other generators load fixed datasets. Scan runs those scenarios with executable checks. A vulnerability scan looks for adversarial failures; a quality scan can use a supplied knowledge base to look for incorrect or unsupported behavior.
+
+The target is a typed callable; it does not need a chat-shaped interface or a particular agent class. Dynamic generators can emit the declared Pydantic input type directly. Dataset-backed and third-party generators instead map textual prompts into that input schema before calling the target. This lets Scan exercise structured applications, including user-wrapped tool-using systems, through their external callable boundary. Multi-turn scenarios can keep state across interactions.
+
+Scan is the discovery layer rather than the end of the workflow. `result.suite` exposes the generated suite in memory; you can serialize it separately, edit it in Python, and replay it locally. Storage, version control, pytest integration, CI scheduling, and selection of maintained scenarios remain user-managed rather than native Giskard services.
+
+## When another tool may fit better
+
+- Choose **garak** when you want a specialist vulnerability scanner with a configurable catalog of named probes against model or generator interfaces. You can also [run garak through Giskard Scan](/oss/scan/how-to/third-party-scanners#run-garak).
+- Choose **promptfoo** when a configuration-driven CLI workflow and its provider, assertion, or red-team plugin ecosystem fit your stack.
+- Choose **PyRIT** when you want a Python framework for composing attacks, executors, targets, converters, memory, and scorers.
+- Choose **DeepEval + DeepTeam** when you want DeepEval's maintained evaluation-metric families together with its separate DeepTeam red-teaming framework.
+
+These tools can also complement Giskard. Its [`third_party_scan` adapters](/oss/scan/how-to/third-party-scanners) run garak and DeepTeam against a Giskard target and normalize their findings into `SuiteResult`. DeepTeam is a separate project from DeepEval, although the DeepTeam adapter uses DeepEval internally. Giskard has no selectable Promptfoo, PyRIT, or standalone DeepEval adapter and no product-owned normalization path for their standalone results.
+
+## Need organizational or managed security workflows?
+
+Giskard Hub adds shared project assets, evaluation and scan history, collaboration, role-based access control, scheduled evaluations, and managed scan and red-team-audit workflows. See [Open Source vs Hub](/start/comparison) for the product comparison.
