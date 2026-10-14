@@ -1,0 +1,133 @@
+---
+title: Giskard vs DeepEval
+description: "Giskard Checks and DeepEval compared — two pytest-native Python libraries for evaluating LLM applications."
+sidebar:
+  order: 2
+---
+
+DeepEval is the closest thing to a direct comparison for Giskard Checks. Both
+are open-source Python libraries, both integrate with pytest, and both are built
+by a company that also sells a platform (Confident AI for DeepEval, the
+[Giskard Hub](/start/comparison) for Giskard).
+
+The differences are mostly about the **unit of evaluation** and about how much
+of the tool you can use without an account.
+
+## Feature comparison
+
+| | Giskard Checks | DeepEval |
+| --- | --- | --- |
+| License | MIT (`giskard-checks`); Apache 2.0 (`giskard`, `giskard-scan`) | Apache 2.0 |
+| Unit of evaluation | Scenario (a conversation, possibly multi-turn and stateful) | Test case (input, output, context, expected output) |
+| pytest integration | Plain `async def test_*` + `assert result.passed` | `deepeval test run` wrapper around pytest, plus `assert_test` |
+| Concurrency model | Async-first — `Scenario.run()` is a coroutine | Sync core with async support added; parallelism via `-n` workers |
+| Built-in metric count | Smaller, deliberately curated set | Larger (50+ metrics), including many research-derived ones |
+| Multi-turn / stateful | First-class (`Trace`, repeated `.interact()`, `UserSimulator`) | Supported via conversational test cases and golden datasets |
+| Red teaming | Same library and primitives, via `giskard.scan` (the `scan` extra) | Separate package (DeepTeam) |
+| Framework coupling | None — your agent is a plain async callable | None required, but ships many framework-specific integrations |
+| Works fully offline from vendor | Yes | Yes — all metrics run locally |
+| Hosted platform | Giskard Hub (commercial) | Confident AI (free tier; paid plans from $200/month per organization, not per user) |
+
+## Setup
+
+```bash
+pip install --pre "giskard[scan,openai]" pytest-asyncio
+```
+
+`my_agent` below is your own agent: a callable taking the user message and
+returning the reply. The tests are marked with `@pytest.mark.asyncio`; set
+`asyncio_mode = auto` in your pytest config if you would rather not mark each
+one.
+
+## Side by side
+
+The same assertion — "the answer mentions Paris" — in both libraries.
+
+**Giskard Checks**
+
+```python
+# test_capital.py
+import pytest
+from giskard.checks import Scenario, RegexMatching
+
+
+@pytest.mark.asyncio
+async def test_capital_of_france():
+    scenario = (
+        Scenario("capital_of_france")
+        .interact(
+            inputs="What is the capital of France?",
+            outputs=lambda inputs: my_agent(inputs),
+        )
+        .check(RegexMatching(pattern=r"Paris", name="mentions_paris"))
+    )
+
+    result = await scenario.run()
+    assert result.passed
+```
+
+**DeepEval**
+
+```python
+# test_capital.py
+from deepeval import assert_test
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+
+
+def test_capital_of_france():
+    test_case = LLMTestCase(
+        input="What is the capital of France?",
+        actual_output=my_agent("What is the capital of France?"),
+    )
+
+    assert_test(test_case, [AnswerRelevancyMetric(threshold=0.7)])
+```
+
+The shape of the difference: DeepEval asks you to produce the output first and
+then score the resulting record, while Giskard holds a reference to your agent
+and drives it. That matters as soon as turn two depends on turn one — in
+Giskard you just call `.interact()` again and the trace accumulates, whereas in
+DeepEval you assemble the conversation yourself before scoring it.
+
+## Pick DeepEval when…
+
+- **You want breadth of metrics today.** DeepEval ships far more built-in
+  metrics than Giskard does, including G-Eval, many RAG-specific ones, and a
+  large catalogue of research-derived scorers. If you want a named metric off
+  the shelf, DeepEval is more likely to already have it.
+- **You want benchmark harnesses included.** DeepEval bundles runners for public
+  benchmarks (MMLU, HellaSwag, and others). Giskard does not.
+- **You are already on Confident AI.** The library-to-platform path is smooth,
+  and re-plumbing it to something else costs time.
+- **Your team prefers synchronous code.** Giskard's async-first design is a
+  feature if you are running many LLM-backed checks, and friction if your
+  codebase is entirely synchronous and you do not want to think about event
+  loops.
+
+## Pick Giskard when…
+
+- **Your system is conversational or stateful.** Multi-turn agents with tool
+  calls fit the scenario model much more naturally than the flat test-case
+  model.
+- **You want your safety testing in the same library.** `giskard.scan` generates
+  adversarial scenarios that are the *same objects* your functional tests use,
+  run by the same runner, producing the same result type. See
+  [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities).
+- **You want no wrapper CLI.** Giskard tests are ordinary pytest tests; you run
+  them with `pytest`, and everything you already know about markers, fixtures,
+  and reporting applies unchanged.
+- **Concurrency matters.** With dozens of LLM-as-judge checks, async-first
+  scheduling is a meaningful wall-clock difference.
+
+## See also
+
+- [Run tests with pytest](/oss/checks/how-to/run-in-pytest)
+- [Core concepts](/oss/checks/explanation/core-concepts)
+- [Custom checks](/oss/checks/how-to/custom-checks) — for porting a metric you
+  like from elsewhere
+
+Sources: [DeepEval documentation ↗](https://deepeval.com/docs/getting-started),
+[Confident AI pricing ↗](https://www.confident-ai.com/pricing). Pricing and
+metric counts were last checked in August 2026 and change often — verify before
+deciding.

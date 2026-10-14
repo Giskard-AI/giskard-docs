@@ -1,0 +1,139 @@
+---
+title: Giskard vs Ragas
+description: "Giskard Checks and Ragas compared — a general-purpose testing framework versus the de facto standard RAG metrics library."
+sidebar:
+  order: 4
+---
+
+Ragas is the reference implementation of RAG evaluation metrics. It popularised
+the faithfulness / answer relevance / context precision / context recall quartet,
+and those metrics are now reimplemented across most other evaluation platforms.
+
+This is the comparison where "versus" is least appropriate. Ragas is primarily a
+**metrics library**; Giskard Checks is primarily a **testing framework**. Many
+teams should use both.
+
+## Feature comparison
+
+| | Giskard Checks | Ragas |
+| --- | --- | --- |
+| License | MIT (`giskard-checks`); Apache 2.0 (`giskard`, `giskard-scan`) | Apache 2.0 |
+| Primary purpose | Test framework for LLM applications | Metrics + synthetic test data for RAG |
+| Scope | RAG, agents, chatbots, structured outputs, safety | RAG-centric (agent and general-purpose metrics added over time) |
+| Input shape | A scenario that drives your agent | An evaluation dataset of question / answer / contexts rows |
+| RAG metric depth | Groundedness, answer relevance, semantic similarity, custom judges | The canonical, widely cited implementations |
+| Synthetic test data | Adversarial generation via `giskard.scan` (the `scan` extra) | Yes — knowledge-graph-based testset generation |
+| Multi-turn / stateful | First-class | Limited; the dataset model is row-oriented |
+| pytest integration | Native (`assert result.passed`) | You wrap the score yourself |
+| Runs fully locally | Yes | Yes |
+| Pass/fail semantics | Built in — checks return a status | You choose thresholds yourself |
+
+## Setup
+
+```bash
+pip install --pre "giskard[scan,openai]" pytest-asyncio
+```
+
+`my_agent` below is your own agent: a callable taking the user message and
+returning the reply. The tests are marked with `@pytest.mark.asyncio`; set
+`asyncio_mode = auto` in your pytest config if you would rather not mark each
+one.
+
+## Side by side
+
+**Giskard Checks**
+
+```python
+# test_rag.py
+import pytest
+from giskard.checks import Scenario, Groundedness
+
+
+@pytest.mark.asyncio
+async def test_answer_is_grounded():
+    scenario = (
+        Scenario("grounded_answer")
+        .interact(
+            inputs="What is the capital of France?",
+            outputs=lambda inputs: my_rag_agent(inputs),
+        )
+        .check(
+            Groundedness(
+                name="grounded",
+                target_key="trace.last.outputs",
+                context="Paris is the capital and largest city of France.",
+            )
+        )
+    )
+
+    result = await scenario.run()
+    assert result.passed
+```
+
+**Ragas**
+
+```python
+from ragas import evaluate
+from ragas.dataset_schema import EvaluationDataset
+from ragas.metrics import Faithfulness
+
+dataset = EvaluationDataset.from_list([
+    {
+        "user_input": "What is the capital of France?",
+        "response": "The capital of France is Paris.",
+        "retrieved_contexts": ["Paris is the capital and largest city of France."],
+    }
+])
+
+result = evaluate(dataset=dataset, metrics=[Faithfulness()])
+print(result)
+```
+
+Note what each returns. Ragas gives you a **score** you then interpret; Giskard
+gives you a **pass or fail** you can assert on in CI. Neither is better in the
+abstract — scores are what you want while exploring quality, pass/fail is what
+you want at a merge gate.
+
+## Pick Ragas when…
+
+- **You want the canonical RAG metrics.** Ragas' implementations are the ones
+  papers and platforms cite. If you need a faithfulness number that reviewers
+  and other teams will recognize, use the reference implementation.
+- **You need synthetic test set generation.** Ragas can build an evaluation set
+  from your documents using a knowledge-graph-based generator. Giskard Checks
+  has nothing equivalent; `giskard.scan` generates *adversarial* scenarios,
+  which is a different job.
+- **You are benchmarking, not gating.** For "is retriever A better than
+  retriever B on 500 questions", a dataframe of scores is the right output and
+  a pass/fail test suite is the wrong one.
+- **You already have an evaluation dataset.** If your data is already rows of
+  question / answer / contexts, Ragas consumes it directly and Giskard's
+  agent-driving model is overhead you do not need.
+
+## Pick Giskard when…
+
+- **You want regression tests, not a report.** Checks have pass/fail semantics
+  and run in pytest, so a quality regression fails CI like any other bug.
+- **You are testing more than retrieval quality.** Tone, format compliance,
+  refusal behavior, tool-call correctness, structured-output validity, and
+  safety all live in the same suite.
+- **Your system is conversational.** Multi-turn state does not fit a row-oriented
+  dataset well.
+- **You want safety testing in the same library.** See
+  [Scan Vulnerabilities](/oss/solutions/scan-vulnerabilities).
+
+## Using both
+
+If you like a specific Ragas metric, you do not have to give it up. Wrap it as a
+custom check with `from_fn` and keep the rest of your suite in Giskard — see
+[Custom checks](/oss/checks/how-to/custom-checks). A reasonable division of
+labour is Ragas for exploratory retrieval benchmarking and Giskard for the
+merge-gate suite.
+
+## See also
+
+- [Groundedness check](/oss/checks/reference)
+- [RAG use case](/oss/checks/use-cases)
+
+Sources: [Ragas documentation ↗](https://docs.ragas.io/),
+[ragas.io ↗](https://www.ragas.io/). Last checked August 2026.

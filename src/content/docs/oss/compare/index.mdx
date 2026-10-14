@@ -1,0 +1,86 @@
+---
+title: Giskard vs other evaluation frameworks
+description: "How Giskard Checks compares with DeepEval, Promptfoo, Ragas, and LangSmith evaluations — including when to pick the other tool."
+sidebar:
+  order: 1
+---
+
+import { LinkCard, CardGrid } from "@astrojs/starlight/components";
+
+These pages compare Giskard Checks with four tools people evaluate alongside
+it. Each one ends with a section telling you when to pick the other tool
+instead. If you spot something inaccurate or out of date, please
+[open an issue ↗](https://github.com/Giskard-AI/giskard-oss/issues) — these
+tools move fast and comparison pages rot quickly.
+
+RAGET, the v2 RAG evaluation toolkit, has not been ported to v3.
+
+## Where Giskard sits
+
+Giskard Checks is a Python testing library for non-deterministic systems. The
+design bets are:
+
+- **pytest-native.** Scenarios are plain `async def test_*` functions and
+  `assert result.passed`. There is no separate runner, CLI, or YAML dialect to
+  learn, and no second place your CI config has to live.
+- **Async-first.** `Scenario.run()` is a coroutine, so checks can run
+  concurrently; pass `parallel=True` to `Suite.run` to fan scenarios out.
+- **Framework-agnostic.** Giskard calls your agent through a plain async
+  callable. It does not care whether you use LangChain, LlamaIndex, the raw
+  provider SDK, or an HTTP endpoint, and it does not need to be in the request
+  path.
+- **Scenarios + checks, not just metrics.** A scenario models a conversation
+  (single- or multi-turn, stateful, with tool calls); checks assert things about
+  the resulting trace. This is a different unit of work than "score this
+  (question, answer, context) row".
+- **Fully local.** Everything runs on your machine or in your CI. There is no
+  account, no telemetry-by-default, and no hosted backend required to see your
+  results. The only thing leaving your network is what you send to the LLM
+  provider you configured.
+- **The same library red-teams.** `giskard.scan` (installed with the `scan`
+  extra) reuses the same `Scenario` and `Check` primitives to generate adversarial suites, so your functional tests
+  and your safety tests are the same objects with the same runner.
+
+The flip side of all of these: Giskard is a library, not a platform. It has no
+UI, no hosted trace store, and no production monitoring. If you want those,
+either pair it with an observability tool or look at the
+[Giskard Hub](/start/comparison).
+
+## Comparisons
+
+<CardGrid>
+  <LinkCard
+    title="Giskard vs DeepEval"
+    description="The closest comparison — both are pytest-native Python eval libraries"
+    href="/oss/compare/giskard-vs-deepeval"
+  />
+  <LinkCard
+    title="Giskard vs Promptfoo"
+    description="YAML-and-CLI prompt testing vs Python scenarios; plus what the OpenAI acquisition means"
+    href="/oss/compare/giskard-vs-promptfoo"
+  />
+  <LinkCard
+    title="Giskard vs Ragas"
+    description="RAG metrics library vs general-purpose testing framework"
+    href="/oss/compare/giskard-vs-ragas"
+  />
+  <LinkCard
+    title="Giskard vs LangSmith evaluations"
+    description="Hosted platform evals vs a local library"
+    href="/oss/compare/giskard-vs-langsmith-evals"
+  />
+</CardGrid>
+
+## They are not always alternatives
+
+Several of these tools solve a different half of the problem than Giskard does,
+and combining them is common and reasonable:
+
+- **Giskard + LangSmith / Langfuse.** Use the observability platform for
+  production tracing and use Giskard for the pre-merge test suite. They do not
+  conflict.
+- **Giskard + Ragas.** Ragas metrics are well-established for RAG scoring. If
+  you like a specific Ragas metric, wrap it in a Giskard check with `from_fn`
+  and keep the rest of your suite in Giskard.
+- **Giskard + Promptfoo.** Promptfoo is good at fast prompt A/B sweeps. Nothing stops you from iterating on prompts there and locking the
+  result in as a Giskard regression test.
