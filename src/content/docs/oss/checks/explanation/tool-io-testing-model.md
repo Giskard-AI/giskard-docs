@@ -125,10 +125,14 @@ scenario = Scenario("verify_order_query").add_interaction(spied)
 See [Spy on internal calls](/oss/checks/how-to/spy-on-calls) for the full
 API. Two limitations shape how you use it:
 
-- `WithSpy` patches with a bare `MagicMock`, so the real function does not
-  run. If your agent depends on the return value (e.g. the DB result drives
-  the reply), configure `mock.return_value` / `mock.side_effect` beforehand
-  or test the output separately with real data.
+- `WithSpy` patches with a bare, unconfigured `MagicMock` that it creates
+  internally and does **not** expose, so the real function does not run and
+  always returns a mock object. If your agent depends on the return value
+  (e.g. the DB result drives the reply), `WithSpy` alone is not enough —
+  use `unittest.mock.patch` / `patch.object` directly with a configured
+  `MagicMock(return_value=...)` / `side_effect` (the service-layer patching
+  pattern described in "What is still missing"), or test the output
+  separately with real data.
 - It targets a single function path. For agents with many tools, you either
   nest `WithSpy` instances or patch the underlying service module directly
   with `unittest.mock.patch.object` at both the source and the importing
