@@ -1093,6 +1093,45 @@ class QuotesPublishedFee(Check):
 check = QuotesPublishedFee(min_retrieval_score=0.85)
 ```
 
+### `CheckResult`
+
+**Module:** `giskard.checks.core.result`
+
+The immutable result a `Check.run()` returns. All checks, built-in or custom, produce a `CheckResult`; `ScenarioResult` and `SuiteResult` roll those up by step.
+
+<MethodCard name="CheckResult.success() / .failure() / .error() / .skip()" returnType="CheckResult">
+  Class constructors for each outcome. `success` and `failure` take `message` and optional `details` / `metrics`; `error` and `skip` record that no verdict was reached.
+</MethodCard>
+
+<TypeTable name="CheckResult">
+  <Property name="status" type="CheckStatus">
+    The outcome: `PASS`, `FAIL`, `ERROR`, or `SKIP`. `ERROR` and `SKIP` mean <em>no verdict was reached</em>.
+  </Property>
+  <Property name="passed" type="bool">
+    True only when `status` is `PASS`. Use this — not `not failed` — because `SKIP`/`ERROR` are neither passed nor failed.
+  </Property>
+  <Property name="failed" type="bool">
+    True only when `status` is `FAIL`.
+  </Property>
+  <Property name="errored" type="bool">
+    True only when `status` is `ERROR` (the check raised, or explicitly reported an error).
+  </Property>
+  <Property name="skipped" type="bool">
+    True only when `status` is `SKIP`. Skipped checks are excluded from pass-rate denominators.
+  </Property>
+  <Property name="message" type="str | None">
+    Short human-readable reason for the outcome.
+  </Property>
+  <Property name="details" type="dict[str, Any]">
+    Structured payload. The runner augments every result with <code>duration_ms</code>, <code>check_kind</code>, <code>check_name</code>, <code>check_description</code>, and <code>check_spec</code>.
+  </Property>
+  <Property name="metrics" type="list[Metric]">
+    Auxiliary named numeric measurements captured by the check.
+  </Property>
+</TypeTable>
+
+A `CheckResult` has no top-level `name` field. When you need the check's name, read it from `details["check_name"]` (set by the runner from `Check.name`). Skipped results carry the same key, so the lookup works uniformly for passed, failed, errored, and skipped results.
+
 ---
 
 ## See also

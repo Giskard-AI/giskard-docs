@@ -49,6 +49,16 @@ Follow the instructions from https://docs.giskard.ai/oss/checks/installation.md 
 For reusable workflows that generate scenarios and evaluation suites, see [Giskard Agent Skills](/start/agent-skills).
 :::
 
+:::note[Suppress the welcome banner]
+Importing `giskard.checks` prints a short one-time welcome message to stderr. Set `GISKARD_QUIET=1` to silence it — useful in CI logs, notebooks, or any non-interactive run:
+
+```bash
+export GISKARD_QUIET=1
+```
+
+Any truthy value (`1`, `true`, `yes`, `on`) works; the banner prints at most once per process.
+:::
+
 ## Configure the default LLM judge model
 
 A judge is an LLM that reads your agent's reply and decides whether it satisfies a rule you wrote in plain language. Some checks need one (`LLMJudge`, `Groundedness`, `Conformity`). To use them, configure a provider SDK. The default `Generator` uses Giskard's native provider SDK integrations; install the matching `giskard` extra, such as `openai` above. LiteLLM is optional through `giskard[litellm]`.
