@@ -174,7 +174,7 @@ In async contexts (like pytest with `@pytest.mark.asyncio`), you can use `await`
 
 ### Stop on failure
 
-A scenario runs its steps in order. Within a single step, **every check attached to that step runs** — the runner does not short-circuit after the first failure inside a step. If any check in a step returns `FAIL` or `ERROR`, execution stops at that step boundary: **all later steps are `SKIP`** (their checks are reported as skipped, not silently dropped). Branch on a step's `status` or the per-check `CheckResult.failed` / `errored` properties rather than on `not passed`, because `SKIP` and `ERROR` are distinct from `FAIL`.
+A scenario runs its steps in order. Within a single step, **every check attached to that step runs** — the runner does not short-circuit after the first failure inside a step. Execution stops at the first step whose outcome is not `PASS` (any check `FAIL`s or `ERROR`s, or every check in the step `SKIP`s): **all later steps are `SKIP`** (their checks are reported as skipped, not silently dropped). Branch on a step's `status` or the per-check `CheckResult.failed` / `errored` properties rather than on `not passed`, because `SKIP` and `ERROR` are distinct from `FAIL`.
 
 ## Fluent API Mapping
 
