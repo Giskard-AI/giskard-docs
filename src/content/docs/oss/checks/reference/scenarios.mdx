@@ -295,6 +295,27 @@ print("no scenarios evaluated" if rate is None else f"{rate:.0%}")
 
 `pass_rate` is the fraction of non-skipped scenarios that passed.
 
+### Multiple runs and statistical pass rates
+
+`Scenario.run()` accepts `multiple_runs=N` (each run gets a fresh trace; execution stops on the first non-passing run). `Suite.run()` does **not** take a `multiple_runs` argument — a suite runs each of its scenarios once. For a statistical pass rate over a non-deterministic agent, run the suite (or the scenario) repeatedly yourself and aggregate:
+
+```python
+from giskard.checks import Suite
+
+
+async def suite_pass_rate(suite: Suite, target, n_runs: int) -> float:
+    """Fraction of full-suite executions where every scenario passed."""
+    passed = 0
+    for _ in range(n_runs):
+        result = await suite.run(target=target)
+        # pass_rate is None only when nothing was evaluated; treat that as not-passing.
+        if result.pass_rate == 1.0:
+            passed += 1
+    return passed / n_runs
+```
+
+Use the per-scenario `Scenario.run(multiple_runs=...)` form when you want retries of a single scenario, and the explicit loop above when you need a true success fraction across independent suite executions.
+
 ---
 
 ## `SuiteResult`

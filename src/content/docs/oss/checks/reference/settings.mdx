@@ -149,6 +149,51 @@ Checks such as `SemanticSimilarity` use this embedding model when you do not pas
 
 ---
 
+## Configuring a custom provider endpoint
+
+`giskard.llm.configure(name, provider=None, **kwargs)` registers a named provider configuration so you can reference it as a `"<name>/model"` model string anywhere a model id is accepted (`set_default_generator`, `set_default_judge`, a `Generator(...)` or `LLMChatJudge(...)` constructor, etc.). The provider is created lazily on first use and cached. Use it for OpenAI-compatible servers (vLLM, Ollama, OpenRouter, a Vertex AI OpenAPI endpoint, an internal gateway) that are not covered by the built-in provider prefixes.
+
+`provider` selects the SDK to drive (default: the `name`). For an OpenAI-compatible endpoint use `provider="openai"`. `**kwargs` are forwarded to that provider's constructor. The `openai` provider accepts `api_key`, `base_url`, `timeout`, `http_client`, and `default_headers` (extra headers merged into every request). Values may use the `os.environ/VAR_NAME` form for deferred environment-variable resolution, so secrets are read at call time rather than at import.
+
+```python
+import giskard.llm
+from giskard.checks import set_default_generator
+
+giskard.llm.configure(
+    "my-endpoint",
+    provider="openai",
+    base_url="https://my-llm-host.example.com/v1",
+    api_key="os.environ/MY_ENDPOINT_API_KEY",
+)
+
+set_default_generator("my-endpoint/my-model-id")
+```
+
+For an OpenAI-compatible endpoint that authenticates with a request header rather than the `Authorization` header the SDK sends by default — for example Vertex AI's OpenAPI endpoint, which expects `x-goog-api-key` — pass `default_headers`. Set `api_key` to a non-empty placeholder (the SDK still requires it) and clear `Authorization` so the real key is sent only in your header:
+
+```python
+import giskard.llm
+from giskard.agents.generators import Generator
+from giskard.checks import set_default_generator
+
+giskard.llm.configure(
+    "vertex",
+    provider="openai",
+    api_key="dummy-key",
+    base_url=(
+        "https://aiplatform.googleapis.com/v1/projects/PROJECT"
+        "/locations/global/endpoints/openapi"
+    ),
+    default_headers={"x-goog-api-key": "os.environ/VERTEX_API_KEY", "Authorization": ""},
+)
+
+set_default_generator(Generator(model="vertex/gemini-2.5-flash"))
+```
+
+`configure()` is a process-wide setting on the default `giskard.llm` client; call it once at startup (for example in a pytest `session` fixture or your conftest). `giskard.llm.reset()` clears registered providers, useful in tests.
+
+---
+
 ## Imports
 
 ```python

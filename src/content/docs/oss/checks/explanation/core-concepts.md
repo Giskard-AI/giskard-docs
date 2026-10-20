@@ -68,6 +68,8 @@ spec = Interact(
 
 Interaction specs are resolved into interactions during scenario execution. This is common in multi-turn scenarios, where inputs and outputs are generated based on previous interactions. See [Multi-Turn Scenarios](/oss/checks/tutorials/multi-turn) for practical examples.
 
+`inputs` and `outputs` callables may be `async def` — the runner awaits coroutine results before adding the interaction to the trace. This lets a target call out to an `async` client (or a framework whose `.run()` is awaitable, like pydantic-ai's `Agent.run()`) without wrapping it in `asyncio.run()` yourself.
+
 ## Trace
 
 A `Trace` is an immutable snapshot of all data exchanged with the system under test. In its simplest form, it is a list of interactions.
@@ -169,6 +171,10 @@ result = asyncio.run(test_scenario.run())
 ```
 
 In async contexts (like pytest with `@pytest.mark.asyncio`), you can use `await` directly.
+
+### Stop on failure
+
+A scenario runs its steps in order. Within a single step, **every check attached to that step runs** — the runner does not short-circuit after the first failure inside a step. Execution stops at the first step whose outcome is not `PASS` (any check `FAIL`s or `ERROR`s, or every check in the step `SKIP`s): **all later steps are `SKIP`** (their checks are reported as skipped, not silently dropped). Branch on a step's `status` or the per-check `CheckResult.failed` / `errored` properties rather than on `not passed`, because `SKIP` and `ERROR` are distinct from `FAIL`.
 
 ## Fluent API Mapping
 

@@ -1093,6 +1093,13 @@ class QuotesPublishedFee(Check):
 check = QuotesPublishedFee(min_retrieval_score=0.85)
 ```
 
+### `CheckResult`
+
+`CheckResult` (see [Core API](/oss/checks/reference/core#checkresult) for its fields, factory methods, and `passed`/`failed`/`errored`/`skipped` properties) is the immutable result a `Check.run()` returns. `ScenarioResult` and `SuiteResult` roll those up by step. Two details matter when you read results produced by the runner:
+
+- The runner augments every result's `details` with `duration_ms`, `check_kind`, `check_name`, `check_description`, and `check_spec`.
+- A `CheckResult` has no top-level `name` field. When you need the check's name, read it from `details["check_name"]` (set by the runner from `Check.name`). Skipped results carry the same key, so the lookup works uniformly for passed, failed, errored, and skipped results.
+
 ---
 
 ## See also
