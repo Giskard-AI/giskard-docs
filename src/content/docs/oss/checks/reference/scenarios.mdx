@@ -42,16 +42,40 @@ Create a scenario, add interactions and checks, then call `.run()`. Each method 
   <Property name="check" type="Check" required>A Check instance to validate the trace.</Property>
 </MethodCard>
 
+<MethodCard name=".checks()" returnType="self">
+  Add several checks to the current step at once. Equivalent to chaining `.check()` for each one. Returns self for chaining.
+
+  <Property name="*checks" type="Check" required>Checks to add, in order.</Property>
+</MethodCard>
+
 <MethodCard name=".add_interaction()" returnType="self">
   Add a pre-constructed `InteractionSpec` object.
 
   <Property name="interaction" type="InteractionSpec" required>The interaction spec to add.</Property>
 </MethodCard>
 
+<MethodCard name=".add_interactions()" returnType="self">
+  Add several pre-constructed `InteractionSpec` objects to the same step. Returns self for chaining.
+
+  <Property name="*interactions" type="InteractionSpec" required>Interaction specs to add, in order.</Property>
+</MethodCard>
+
 <MethodCard name=".extend()" returnType="self">
   Append one or more interaction specs and/or checks. Returns self for chaining.
 
   <Property name="*components" type="InteractionSpec | Check" required>Components to append in order.</Property>
+</MethodCard>
+
+<MethodCard name=".with_target()" returnType="self">
+  Set the default system under test. Every `.interact()` that omits `outputs` calls this target. A `target` passed to `.run()` overrides it for that run. Returns self for chaining.
+
+  <Property name="target" type="Callable" required>Callable that produces outputs from `(inputs)` or `(trace, inputs)`, sync or async.</Property>
+</MethodCard>
+
+<MethodCard name=".with_annotations()" returnType="self">
+  Set scenario-level annotations, copied onto the trace at the start of each run and readable as `trace.annotations`. Replaces any annotations already set. Returns self for chaining.
+
+  <Property name="annotations" type="dict[str, Any]" required>Shared, read-only context for checks and callables.</Property>
 </MethodCard>
 
 <MethodCard name=".with_tags()" returnType="self">

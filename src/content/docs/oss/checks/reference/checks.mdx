@@ -14,6 +14,10 @@ Ready-to-use validation checks: function-based checks, string and regex matching
 
 For the tradeoffs between rule-based checks, semantic similarity, and LLM judges, see [When to use which check](/oss/checks/explanation/when-to-use-which-check).
 
+:::note[`MISSING` is not `None`]
+Parameters typed `... | MISSING` (for example `answer`, `context`, `keyword`, `expected_value`) are optional: leave them out and the check reads the value from the trace through the matching `*_key`. Passing `None` is not the same as leaving them out. On string parameters such as `answer` or `keyword`, `None` raises a `ValidationError` when you build the check. On `expected_value`, `None` is a real expected value: `Equals(expected_value=None)` compares against `None` and skips `expected_value_key`. `MISSING` is Pydantic's `MISSING` sentinel; you never need to pass it.
+:::
+
 ## Function-based Checks
 
 ### `FnCheck`
@@ -85,13 +89,13 @@ Reach for `FnCheck` when the pass condition is a predicate you can already write
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="keyword" type="str | None">
+<Property name="keyword" type="str | MISSING" defaultValue="MISSING">
   Substring to search for (or use `keyword_key` to extract from trace).
 </Property>
-<Property name="keyword_key" type="str | None">
+<Property name="keyword_key" type="str | MISSING" defaultValue="MISSING">
   JSONPath to extract keyword from trace.
 </Property>
-<Property name="text" type="str | None">Static text to search in. If unset, the check uses `target_key`.</Property>
+<Property name="text" type="str | MISSING" defaultValue="MISSING">Static text to search in. If unset, the check uses `target_key`.</Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to search in.
 </Property>
@@ -125,11 +129,11 @@ Use `StringMatching` when a specific phrase is required, such as a disclaimer yo
 
 **Module:** `giskard.checks.builtin.text_matching`
 
-<Property name="pattern" type="str | None">
+<Property name="pattern" type="str | MISSING" defaultValue="MISSING">
   Regular expression pattern.
 </Property>
-<Property name="pattern_key" type="str | None">JSONPath to extract the regex pattern from the trace. Provide exactly one of `pattern` or `pattern_key`.</Property>
-<Property name="text" type="str | None">Static text to match against (alternative to `target_key`).</Property>
+<Property name="pattern_key" type="str | MISSING" defaultValue="MISSING">JSONPath to extract the regex pattern from the trace. Provide exactly one of `pattern` or `pattern_key`.</Property>
+<Property name="text" type="str | MISSING" defaultValue="MISSING">Static text to match against (alternative to `target_key`).</Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract text to match against.
 </Property>
@@ -164,10 +168,10 @@ Validate numeric and comparable values against expected thresholds.
 
 All comparison checks share these parameters:
 
-<Property name="expected_value" type="Any | None">
+<Property name="expected_value" type="Any | MISSING" defaultValue="MISSING">
   Static expected value.
 </Property>
-<Property name="expected_value_key" type="JSONPathStr | NotProvided">
+<Property name="expected_value_key" type="JSONPathStr | MISSING" defaultValue="MISSING">
   JSONPath to extract expected value from trace.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
@@ -554,13 +558,13 @@ Default result model for LLM-based checks. This is the structured output format 
 
 **Module:** `giskard.checks.judges.groundedness`
 
-<Property name="answer" type="str | None">
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
   The answer text to evaluate (static).
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract answer from trace.
 </Property>
-<Property name="context" type="str | list[str] | None">
+<Property name="context" type="str | list[str] | MISSING" defaultValue="MISSING">
   Context document(s) that should support the answer (static).
 </Property>
 <Property
@@ -612,13 +616,13 @@ Use `Groundedness` when every claim must be supported by the context. Use [`Cont
 
 **Module:** `giskard.checks.judges.contradiction`
 
-<Property name="answer" type="str | MISSING">
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
   The answer text to evaluate (static).
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
   JSONPath to extract the answer from the trace.
 </Property>
-<Property name="context" type="str | list[str] | MISSING">
+<Property name="context" type="str | list[str] | MISSING" defaultValue="MISSING">
   Context document(s) the answer is checked against (static).
 </Property>
 <Property
@@ -657,13 +661,13 @@ Uses the same inputs as [`Groundedness`](#groundedness), but only reports a conf
 
 **Module:** `giskard.checks.judges.answer_relevance`
 
-<Property name="question" type="str | None" defaultValue="None">
+<Property name="question" type="str | MISSING" defaultValue="MISSING">
   Question to evaluate against. Takes priority over `question_key` when set.
 </Property>
 <Property name="question_key" type="str" defaultValue='"trace.last.inputs"'>
   JSONPath to extract the question from the trace.
 </Property>
-<Property name="answer" type="str | None" defaultValue="None">
+<Property name="answer" type="str | MISSING" defaultValue="MISSING">
   Answer to evaluate. Takes priority over `target_key` when set.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
@@ -719,7 +723,7 @@ scenario = (
 
 **Module:** `giskard.checks.judges.toxicity`
 
-<Property name="output" type="str | None" defaultValue="None">
+<Property name="output" type="str | MISSING" defaultValue="MISSING">
   Text to evaluate. If omitted, extracted from the trace using `target_key`.
 </Property>
 <Property name="target_key" type="str" defaultValue='"trace.last.outputs"'>
@@ -879,7 +883,7 @@ Reach for `LLMJudge` last. If the criterion fits [`Conformity`](#conformity), [`
 
 **Module:** `giskard.checks.builtin.semantic_similarity`
 
-<Property name="reference_text" type="str | None">
+<Property name="reference_text" type="str | MISSING" defaultValue="MISSING">
   Reference text to compare against (static).
 </Property>
 <Property
