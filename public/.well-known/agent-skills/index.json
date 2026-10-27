@@ -11,9 +11,9 @@
     {
       "name": "hub-agent-setup",
       "type": "archive",
-      "description": "Connect a local or remote AI agent to Giskard Hub through an authenticated, non-streaming HTTPS endpoint. Use when a user asks to connect, integrate, or register their agent with the Hub. Build a minimal wrapper, deploy or tunnel it, and use the Hub SDK connection test to guide any fixes.",
+      "description": "Connect a local or remote AI agent to Giskard Hub through an authenticated, non-streaming HTTPS endpoint. Use when a user asks to connect, integrate, or register their agent with the Hub. Build a minimal wrapper, deploy or tunnel it, and use the Hub connection test (SDK or MCP) to guide any fixes.",
       "url": "https://docs.giskard.ai/.well-known/agent-skills/hub-agent-setup.tar.gz",
-      "digest": "sha256:55abe8babb003cd59d19a6795b7cb2dd8287d8a2a0a485a17525b15eb321221c"
+      "digest": "sha256:ddf8ba0421d704bdd679269daef2ac1f224ce524abd45f0045f4efd2ce607c25"
     },
     {
       "name": "rag-evaluator",
@@ -28,6 +28,13 @@
       "description": "Generates tailored giskard.checks test scenarios and suites for AI agents. Use when user describes their agent and fears, asks to \"create scenarios\", \"test my agent\", \"generate checks\", \"evaluate my chatbot\", \"red-team my AI\", or wants to build adversarial test cases for LLM-based applications.",
       "url": "https://docs.giskard.ai/.well-known/agent-skills/scenario-generator.tar.gz",
       "digest": "sha256:411e09b369e9c695c26c5c09ad60c68f14058acc20d3c5b3875b002ea2e73bcf"
+    },
+    {
+      "name": "third-party-to-giskard",
+      "type": "archive",
+      "description": "Convert existing result files from third-party LLM red-teaming and evaluation tools (garak, promptfoo, DeepTeam, PyRIT) into Giskard OSS SuiteResults, one suite per tool, and optionally upload them to Giskard Hub as evaluations. Use this whenever the user has a garak report.jsonl, a promptfoo eval or redteam output, a DeepTeam risk assessment JSON, or a PyRIT memory database or export, and wants to import, convert, consolidate, compare, or upload those results into Giskard or Giskard Hub. The skill never runs the third-party tools.",
+      "url": "https://docs.giskard.ai/.well-known/agent-skills/third-party-to-giskard.tar.gz",
+      "digest": "sha256:c14ccd9dceafde1447cfb6b3f46856abb3b557a173a1130969cb12fe25196c33"
     }
   ]
 }
