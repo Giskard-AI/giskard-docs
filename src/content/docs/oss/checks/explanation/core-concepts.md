@@ -11,16 +11,17 @@ Giskard Checks is built around a few core primitives that work together:
 - **InteractionSpec**: A specification for generating interactions dynamically
 - **Trace**: An immutable snapshot of all interactions in a scenario
 - **Check**: A validation that runs on a trace and returns a result
-- **Scenario**: A list of steps (interactions and checks) executed sequentially
+- **Scenario**: A list of steps executed sequentially. A step is a run of `.interact()` calls followed by the `.check()` calls that come after them
 
 At runtime, the flow looks like this:
 
 1.  A Scenario is created with a sequence of steps.
 2.  For each step in order:
-    1.  Each InteractionSpec is resolved into a concrete Interaction.
-    2.  The Interaction is appended to the Trace.
-    3.  Checks run against the current Trace.
-3.  Results are returned as a ScenarioResult.
+    1.  Each InteractionSpec in the step is resolved into interactions. A spec can produce several: a `UserSimulator` writes one user turn after another until it stops.
+    2.  Every interaction is appended to the Trace as it is produced.
+    3.  The step's checks run once, against the Trace as it stands after the step's last interaction.
+3.  Execution stops at the first step that does not pass. Its checks report FAIL or ERROR, and every later step is reported as SKIP. If an input generator raises, `run()` raises too; with `run(return_exception=True)` the error is recorded on that step instead, its checks are skipped, and so are the later steps.
+4.  Results are returned as a ScenarioResult.
 
 ## Interaction
 
@@ -106,7 +107,7 @@ scenario = Scenario(
 
 ## Checks
 
-A `Check` validates something about a trace and returns a `CheckResult`. Checks run after each interaction in a scenario and can inspect any part of the trace — including outputs from earlier turns.
+A `Check` validates something about a trace and returns a `CheckResult`. Checks run once per step, after the step's interactions, and can inspect any part of the trace — including outputs from earlier turns. A check added after two `.interact()` calls sees both interactions; it does not run between them.
 
 When referencing values in a trace, use JSONPath expressions that start with `trace.`. The `last` property is a shortcut for `interactions[-1]` and can be used in both JSONPath keys and Python code.
 
