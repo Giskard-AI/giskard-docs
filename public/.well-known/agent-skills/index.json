@@ -11,9 +11,9 @@
     {
       "name": "hub-agent-setup",
       "type": "archive",
-      "description": "Connect a local or remote AI agent to Giskard Hub through an authenticated, non-streaming HTTPS endpoint. Use when a user asks to connect, integrate, or register their agent with the Hub. Build a minimal wrapper, deploy or tunnel it, and use the Hub connection test (SDK or MCP) to guide any fixes.",
+      "description": "Connect a local or remote AI agent to Giskard Hub through an authenticated, non-streaming HTTPS endpoint. Use when a user asks to connect, integrate, or register their agent with the Hub, including triggered (cron, webhook, event) agents. Build a minimal wrapper, deploy or tunnel it, and use the Hub connection test (SDK or MCP) to guide any fixes.",
       "url": "https://docs.giskard.ai/.well-known/agent-skills/hub-agent-setup.tar.gz",
-      "digest": "sha256:ddf8ba0421d704bdd679269daef2ac1f224ce524abd45f0045f4efd2ce607c25"
+      "digest": "sha256:2a92829865c44fccaa14104f2b232781937cae4bd6ec50afd45ab84bb9b64b47"
     },
     {
       "name": "rag-evaluator",
@@ -27,7 +27,7 @@
       "type": "archive",
       "description": "Generates tailored giskard.checks test scenarios and suites for AI agents. Use when user describes their agent and fears, asks to \"create scenarios\", \"test my agent\", \"generate checks\", \"evaluate my chatbot\", \"red-team my AI\", or wants to build adversarial test cases for LLM-based applications.",
       "url": "https://docs.giskard.ai/.well-known/agent-skills/scenario-generator.tar.gz",
-      "digest": "sha256:411e09b369e9c695c26c5c09ad60c68f14058acc20d3c5b3875b002ea2e73bcf"
+      "digest": "sha256:53d4014b3bc14224e19c4686e294f4ca65b26751ba6929ff36b5f763bde122e2"
     },
     {
       "name": "third-party-to-giskard",
