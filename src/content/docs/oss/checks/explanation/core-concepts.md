@@ -118,6 +118,8 @@ Giskard provides several families of checks:
 - **Semantic similarity** — `SemanticSimilarity`: compare meaning rather than exact text. Uses embeddings; good when phrasing varies.
 - **LLM-as-judge** — `Groundedness`, `Conformity`, `LLMJudge`: qualitative evaluation (tone, policy compliance, reasoning). Flexible but slower and non-deterministic.
 
+Qualitative checks accept a `judge` backend. The default is `LLMChatJudge` (chat completion). Alternatively, `SOMJudge` calls a System One Model and passes when `P(pass)` meets `pass_threshold`. See [SOM as a judge](/oss/checks/explanation/som-as-judge).
+
 For guidance on choosing the right check, see [When to Use Which Check](/oss/checks/explanation/when-to-use-which-check). For the full API, see the [Checks reference](/oss/checks/reference/checks). To build your own validation logic, see [Custom Checks](/oss/checks/how-to/custom-checks).
 
 ### Generators and judges
@@ -127,9 +129,10 @@ Suites often call two different LLM defaults:
 | | `set_default_generator()` | `set_default_judge()` |
 | --- | --- | --- |
 | **Used for** | Generating scenario content (`UserSimulator`, `LLMGenerator`, `Generator` in interaction specs) | Scoring LLM checks (`Groundedness`, `Conformity`, `LLMJudge`, …) |
+| **Typical backend** | Chat LLM (`Generator`) | Chat LLM (`LLMChatJudge`) or SOM (`SOMJudge`, e.g. `typesafe/jev`) |
 | **Env var** | `GISKARD_CHECKS_DEFAULT_MODEL` | `GISKARD_CHECKS_DEFAULT_JUDGE` |
 
-The two defaults are independent; many projects point both at the same model id. Environment variables and resolution order are documented in [Settings](/oss/checks/reference/settings).
+The two defaults are independent; many projects use an LLM for generation and either an LLM or a SOM for judging. Environment variables and resolution order are documented in [Settings](/oss/checks/reference/settings).
 
 ```python
 from giskard.checks import Groundedness
