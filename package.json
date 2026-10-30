@@ -2,7 +2,7 @@
   "name": "giskard-docs",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.16.1",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -38,6 +38,6 @@
   "devDependencies": {
     "pyright": "1.1.414",
     "prettier": "3.9.10",
-    "wrangler": "4.152.0"
+    "wrangler": "4.154.0"
   }
 }
