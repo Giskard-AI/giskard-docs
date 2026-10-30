@@ -31,6 +31,6 @@ Documentation = "https://docs.giskard.ai/"
 # Block compromised litellm versions — supply chain attack (CVE-2026-PENDING)
 # https://github.com/BerriAI/litellm/issues/24512
 constraint-dependencies = [
-    "litellm!=1.82.7,!=1.82.8",
+    "litellm!=1.82.7,!=1.82.8,!=1.107.0",
     "certifi>=2026.10.19",
 ]
