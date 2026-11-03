@@ -98,6 +98,27 @@ set_default_generator("anthropic/claude-sonnet-4-20250514")
 
 Set `ANTHROPIC_API_KEY` in your environment.
 
+:::note[Knowledge-base embeddings]
+Anthropic has no embeddings API. Quality scan generators embed your documents for nearest-neighbor retrieval, but the [default embedding model](/oss/checks/reference/settings#default-embedding-model) is OpenAI's `text-embedding-3-small`, which needs the `openai` extra and `OPENAI_API_KEY` even when Anthropic generates and judges scenarios.
+
+Point embeddings at a provider Giskard supports for embeddings (`openai`, `google`, `azure`, or `azure_ai`) with [`set_default_embedding_model`](/oss/checks/reference/settings#default-embedding-model) or `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL`. You can also pass `embedding_model=` on [`KnowledgeBase`](/oss/scan/reference/knowledge-base).
+
+Example: Anthropic for the scan, Google for embeddings:
+
+```bash
+pip install "giskard[scan,anthropic,google]"
+```
+
+```python
+from giskard.checks import set_default_embedding_model, set_default_generator
+
+set_default_generator("anthropic/claude-sonnet-4-20250514")
+set_default_embedding_model("google/gemini-embedding-001")
+```
+
+Set `ANTHROPIC_API_KEY` and `GOOGLE_API_KEY` (or `GEMINI_API_KEY`).
+:::
+
 </TabItem>
 <TabItem label="Gemini">
 
@@ -112,6 +133,10 @@ set_default_generator("gemini/gemini-2.5-flash")
 ```
 
 Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment.
+
+:::note[Knowledge-base embeddings]
+The default embedding model (`text-embedding-3-small`) is routed to OpenAI. With only `giskard[scan,google]`, set embeddings explicitly so retrieval uses Gemini, for example `set_default_embedding_model("google/gemini-embedding-001")` or `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL=google/gemini-embedding-001`. See [Settings](/oss/checks/reference/settings#default-embedding-model) and [KnowledgeBase](/oss/scan/reference/knowledge-base).
+:::
 
 </TabItem>
 <TabItem label="Any provider">
@@ -132,10 +157,14 @@ set_default_generator(llm_judge)
 
 For example `mistral/mistral-large-latest`, `bedrock/anthropic.claude-3-sonnet-20240229-v1:0`, or `ollama/qwen2.5`. For the full list of providers, see [LiteLLM's provider conventions](https://docs.litellm.ai/docs/providers) and set the matching API key in your environment.
 
+:::note[Knowledge-base embeddings]
+`set_default_generator` only configures generation and judging. Knowledge-base retrieval still uses the [default embedding model](/oss/checks/reference/settings#default-embedding-model) unless you override it with [`set_default_embedding_model`](/oss/checks/reference/settings#default-embedding-model), `GISKARD_CHECKS_DEFAULT_EMBEDDING_MODEL`, or `embedding_model=` on [`KnowledgeBase`](/oss/scan/reference/knowledge-base). Pick an embedding provider that matches an installed extra and API key (`openai`, `google`, `azure`, or `azure_ai`).
+:::
+
 </TabItem>
 </Tabs>
 
-`set_default_generator` makes your chosen model the default for generating and judging every scenario in the scan.
+`set_default_generator` makes your chosen model the default for generating and judging every scenario in the scan. Knowledge-base generators also embed documents for retrieval; with the OpenAI tab above, the default embedding model uses the same provider.
 
 ## Run a quality assessment
 
