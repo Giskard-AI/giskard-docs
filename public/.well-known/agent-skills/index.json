@@ -13,7 +13,7 @@
       "type": "archive",
       "description": "Connect a local or remote AI agent to Giskard Hub through an authenticated, non-streaming HTTPS endpoint. Use when a user asks to connect, integrate, or register their agent with the Hub, including triggered (cron, webhook, event) agents. Build a minimal wrapper, deploy or tunnel it, and use the Hub connection test (SDK or MCP) to guide any fixes.",
       "url": "https://docs.giskard.ai/.well-known/agent-skills/hub-agent-setup.tar.gz",
-      "digest": "sha256:2a92829865c44fccaa14104f2b232781937cae4bd6ec50afd45ab84bb9b64b47"
+      "digest": "sha256:f43f7e27bf10d38e31115ab32879c40b2dcfd6d12217018605ac63daf8c3b88b"
     },
     {
       "name": "rag-evaluator",
