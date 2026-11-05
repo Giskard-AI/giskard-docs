@@ -6,14 +6,14 @@
       "type": "archive",
       "description": "Export Giskard scan results into Collibra AI Governance. Use this whenever the user asks to export, push, sync, or import a Giskard scan, agent, or project (e.g. \"Zephyr\") into Collibra, or to update Collibra AI Governance assets, monitors, or Quality-tab metrics from Giskard. Also use it when the user asks to \"retrieve the latest scan of a project and send it to Collibra\", even if they do not say the word \"export\".",
       "url": "https://docs.giskard.ai/.well-known/agent-skills/giskard-to-collibra.tar.gz",
-      "digest": "sha256:4d7b90c86d8930b605e16c703d519caf5a8ac18e52c952f6585378db491d2125"
+      "digest": "sha256:7abe0b444d8a67919c9238af2250c5d1302608a6182f7917f5a573f71ae81191"
     },
     {
       "name": "hub-agent-setup",
       "type": "archive",
       "description": "Connect a local or remote AI agent to Giskard Hub through an authenticated, non-streaming HTTPS endpoint. Use when a user asks to connect, integrate, or register their agent with the Hub, including triggered (cron, webhook, event) agents. Build a minimal wrapper, deploy or tunnel it, and use the Hub connection test (SDK or MCP) to guide any fixes.",
       "url": "https://docs.giskard.ai/.well-known/agent-skills/hub-agent-setup.tar.gz",
-      "digest": "sha256:f43f7e27bf10d38e31115ab32879c40b2dcfd6d12217018605ac63daf8c3b88b"
+      "digest": "sha256:a452373be0319aed0f405256af7659caf66c1f4f11e1cef682473ab012cfd43e"
     },
     {
       "name": "rag-evaluator",
