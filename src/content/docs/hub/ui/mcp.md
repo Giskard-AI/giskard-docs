@@ -14,8 +14,8 @@ The server works with any MCP client that supports the HTTP transport, for examp
 
 You need two values:
 
-- **Hub Base URL.** For the Giskard self-serve SaaS, this is `https://saas.giskard.cloud/`. If your organization uses an enterprise Hub, cloud or on-premise, use the URL of that instance.
-- **Hub API key.** Click the user badge in the bottom-left corner of the Hub UI and copy the **API Key** value. See [Finding your API key](/hub/sdk/quickstart#finding-your-api-key).
+- **Hub Base URL**: For the Giskard self-serve SaaS, this is `https://saas.giskard.cloud/`. If your organization uses an enterprise Hub, cloud or on-premise, use the URL of that instance.
+- **Hub API Key**: Click the user badge in the bottom-left corner of the Hub UI and copy the **API Key** value. See [Finding your API key](/hub/sdk/quickstart#finding-your-api-key).
 
 Set them as environment variables:
 
