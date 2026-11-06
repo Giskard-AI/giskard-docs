@@ -13,7 +13,7 @@ To install a skill with your coding assistant, share this page and ask it to ins
 
 ### Agent Setup <Badge text="v1.5.1" variant="tip" />
 
-Connects a local or remote agent to [Giskard Hub](/hub/ui/setup/agents). Your coding agent creates an authenticated HTTPS endpoint for Chat or Structured inputs, collects any streamed output into a complete response, and registers and tests the connection through the [Hub SDK](/hub/sdk). When Python is not available, it uses the Hub MCP server instead.
+Connects a local or remote agent to [Giskard Hub](/hub/ui/setup/agents). Your coding agent creates an authenticated HTTPS endpoint for Chat or Structured inputs, collects any streamed output into a complete response, and registers and tests the connection through the [Hub SDK](/hub/sdk). When Python is not available, it uses the [Hub MCP server](/hub/ui/mcp) instead.
 
 For an editable remote agent, the skill recommends that you deploy the wrapper on the remote host, and asks you to confirm before it deploys. For a local wrapper, it opens a public HTTPS tunnel through Cloudflare or ngrok, protected by the wrapper's API key. The skill asks for your Hub URL, [Hub API key](/hub/sdk/quickstart#finding-your-api-key), and project name or ID.
 
