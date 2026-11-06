@@ -103,7 +103,7 @@ evaluation = hub.helpers.evaluate(
 
 ## Upload results from Giskard OSS
 
-If you already run evaluations with [Giskard OSS](/oss), you can upload a finished run to the Hub instead of re-executing it. Any `SuiteResult` works: a [checks suite](/oss/checks) run via `giskard.checks.Suite`, or a [scan](/oss/scan) run via `giskard.scan`. Export the run with `SuiteResult.to_hub_format()` and pass it to `hub.evaluations.upload()`:
+If you already run evaluations with [Giskard OSS](/oss), you can upload a finished run to the Hub instead of re-executing it. Any `SuiteResult` works: a [checks suite](/oss/checks) run via `giskard.checks.Suite`, or a [scan](/oss/scan) run via `giskard.scan`. Export the run with `SuiteResult.to_hub_format()` and pass it to `hub.evaluations.upload()`. This example needs Giskard OSS (`pip install giskard` for checks suites, or `pip install "giskard[scan]"` for scans):
 
 ```python
 from giskard.checks import Suite  # or: from giskard.scan import vulnerability_scan
@@ -203,23 +203,24 @@ After an evaluation completes, access the per-check aggregated metrics programma
 
 ```python
 for metric in evaluation.metrics:
+    rate = "n/a" if metric.success_rate is None else f"{metric.success_rate * 100:.1f}%"
     print(
-        f"{metric.name}: {metric.success_rate * 100:.1f}% "
+        f"{metric.name}: {rate} "
         f"({metric.passed} passed, {metric.failed} failed, {metric.errored} errored)"
     )
 ```
 
-Each `Metric` object has the following fields:
+Each `Metric` object has the following fields. All fields except `name` can be `None`.
 
-| Field          | Type    | Description                                             |
-| -------------- | ------- | ------------------------------------------------------- |
-| `name`         | `str`   | Check identifier (e.g. `"hub_correctness"`, `"global"`) |
-| `display_name` | `str`   | Human-readable name                                     |
-| `passed`       | `int`   | Number of scenarios that passed                         |
-| `failed`       | `int`   | Number of scenarios that failed                         |
-| `errored`      | `int`   | Number of scenarios that errored                        |
-| `total`        | `int`   | Total number of scenarios                               |
-| `success_rate` | `float` | Pass rate as a float between 0.0 and 1.0                |
+| Field          | Type            | Description                                                                                                                    |
+| -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `name`         | `str`           | Metric key: `"global"`, a check identifier (e.g. `"hub_correctness"`) or a check name                                          |
+| `display_name` | `str \| None`   | Human-readable name                                                                                                            |
+| `passed`       | `int \| None`   | Number of scenarios that passed                                                                                                |
+| `failed`       | `int \| None`   | Number of scenarios that failed                                                                                                |
+| `errored`      | `int \| None`   | Number of scenarios that errored                                                                                               |
+| `total`        | `int \| None`   | Total number of scenarios                                                                                                      |
+| `success_rate` | `float \| None` | `passed / (passed + failed)`, between 0.0 and 1.0. Errored scenarios are not counted. `None` when no scenario passed or failed |
 
 The special `"global"` metric aggregates across all checks.
 
@@ -268,7 +269,7 @@ except Exception as e:
     sys.exit(1)
 
 global_metrics = [m for m in evaluation.metrics if m.name == "global"][0]
-pass_rate = global_metrics.success_rate * 100
+pass_rate = (global_metrics.success_rate or 0.0) * 100
 
 print(
     f"Pass rate: {pass_rate:.2f}% ({global_metrics.passed}/{global_metrics.total})"

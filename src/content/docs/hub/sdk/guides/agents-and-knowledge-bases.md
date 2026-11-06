@@ -168,7 +168,7 @@ response = hub.agents.generate_completion(
 )
 
 print(response.output["response"])
-print(response.output["metadata"])  # any metadata returned by your agent
+print(response.output.get("metadata"))  # any metadata returned by your agent
 ```
 
 For a structured agent, pass an `input` that matches its input schema instead, and read the fields of `response.output` that its output schema defines.
@@ -269,7 +269,7 @@ hub.knowledge_bases.update("kb-id", name="Updated Name")
 
 ## Search documents
 
-You can perform a semantic search over the documents in a knowledge base directly from the SDK:
+You can search the documents in a knowledge base directly from the SDK:
 
 ```python
 results = hub.knowledge_bases.search_documents(

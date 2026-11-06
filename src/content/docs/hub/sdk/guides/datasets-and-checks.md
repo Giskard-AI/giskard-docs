@@ -169,6 +169,7 @@ hub.scenarios.create(
                     "identifier": "string_matching",
                     "params": {
                         "keyword": "#12345",
+                        "target_key": "trace.last.outputs.response.content",
                     },
                 },
             ],
@@ -321,7 +322,7 @@ dataset = hub.datasets.upload(
 
 ### Import OSS checks
 
-OSS Conformity and Groundedness configurations are converted to Hub checks when you import them. The Hub uses its own evaluation logic, which is improved over the OSS version. Explicit input values and trace paths are preserved.
+OSS Conformity and Groundedness configurations are converted to Hub checks when you import them. The Hub uses its own evaluation logic, which is improved over the OSS version. Explicit input values and trace paths are preserved. This example needs the OSS checks package (`pip install giskard`).
 
 ```python
 from giskard.checks import Conformity, Groundedness
@@ -438,6 +439,7 @@ search_result = hub.datasets.search_scenarios(
 hub.scenarios.bulk_move(
     scenario_ids=["scenario-id-1", "scenario-id-2"],
     target_dataset_id="other-dataset-id",
+    duplicate=False, # by default, bulk_move copies them (duplicate=True)
 )
 
 # Bulk update tags on multiple scenarios
@@ -478,7 +480,7 @@ Conformity and Groundedness default to the assistant message text (`trace.last.o
 - `hub_conformity` and `hub_groundedness` use `target_key`.
 - `hub_correctness` uses `text_key`.
 - `hub_metadata` uses `metadata_key` (default `trace.last.outputs.metadata`).
-- Other checks with a configurable target use `target_key`; see their defaults below.
+- Other checks with a configurable target use `target_key`. Always set it for `string_matching`, `regex_matching`, the comparison checks, `json_valid` and `readability`. Without it, these checks read the full output object and the result might be an error.
 
 For example, `"target_key": "trace.last.outputs.category"` evaluates the `category` field of a structured response.
 
@@ -673,26 +675,40 @@ Checks whether the agent's response contains a specific keyword or substring. Ca
 | ---------------- | ------ | -------------------------------------- |
 | `keyword`        | `str`  | The keyword or substring to search for |
 | `case_sensitive` | `bool` | Match case exactly (default: `True`)   |
+| `target_key`     | `str`  | Trace path of the text to search       |
 
 ```python
-{"identifier": "string_matching", "params": {"keyword": "#12345"}}
+{
+    "identifier": "string_matching",
+    "params": {
+        "keyword": "#12345",
+        "target_key": "trace.last.outputs.response.content",
+    },
+}
 ```
 
 ### Regex matching
 
 Checks whether the agent's response matches a regular expression pattern. Does **not** use an LLM judge.
 
-| Parameter | Type  | Description                          |
-| --------- | ----- | ------------------------------------ |
-| `pattern` | `str` | The regular expression to match with |
+| Parameter    | Type  | Description                          |
+| ------------ | ----- | ------------------------------------ |
+| `pattern`    | `str` | The regular expression to match with |
+| `target_key` | `str` | Trace path of the text to match      |
 
 ```python
-{"identifier": "regex_matching", "params": {"pattern": r"#\d{5}"}}
+{
+    "identifier": "regex_matching",
+    "params": {
+        "pattern": r"#\d{5}",
+        "target_key": "trace.last.outputs.response.content",
+    },
+}
 ```
 
 ### Comparison checks
 
-Six rule-based checks compare a value extracted from the trace against an expected value: `equals`, `not_equals`, `greater_than`, `greater_than_equals`, `less_than`, `less_than_equals`. They are the natural fit for structured agent outputs and numeric metadata. The numeric checks default their `target_key` to `trace.last.outputs.metadata.score`.
+Six rule-based checks compare a value extracted from the trace against an expected value: `equals`, `not_equals`, `greater_than`, `greater_than_equals`, `less_than`, `less_than_equals`. They are the natural fit for structured agent outputs and numeric metadata. Always set `target_key` to the trace path of the value under test.
 
 | Parameter        | Type   | Description                                    |
 | ---------------- | ------ | ---------------------------------------------- |
@@ -713,7 +729,10 @@ Six rule-based checks compare a value extracted from the trace against an expect
 ```python
 {
     "identifier": "greater_than_equals",
-    "params": {"expected_value": 0.5},  # reads trace.last.outputs.metadata.score
+    "params": {
+        "target_key": "trace.last.outputs.metadata.score",
+        "expected_value": 0.5,
+    },
 }
 ```
 
@@ -765,11 +784,13 @@ Checks that a value extracted from the trace is valid JSON and, optionally, that
 | ----------------- | ------ | ------------------------------------------------ |
 | `expected_schema` | `dict` | JSON Schema the value must conform to (optional) |
 | `parse`           | `bool` | Parse the value from a string before validating  |
+| `target_key`      | `str`  | Trace path of the value to validate              |
 
 ```python
 {
     "identifier": "json_valid",
     "params": {
+        "target_key": "trace.last.outputs.response.content",
         "expected_schema": {
             "type": "object",
             "properties": {"category": {"type": "string"}},
@@ -783,16 +804,21 @@ Checks that a value extracted from the trace is valid JSON and, optionally, that
 
 Checks that the response satisfies readability score thresholds for a selected metric. Does **not** use an LLM judge.
 
-| Parameter   | Type    | Description                                                                                                                                              |
-| ----------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `metric`    | `str`   | One of `flesch_reading_ease`, `flesch_kincaid_grade`, `gunning_fog`, `automated_readability_index`, `coleman_liau_index`, `dale_chall_readability_score` |
-| `min_score` | `float` | Minimum acceptable score (optional)                                                                                                                      |
-| `max_score` | `float` | Maximum acceptable score (optional)                                                                                                                      |
+| Parameter    | Type    | Description                                                                                                                                              |
+| ------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `metric`     | `str`   | One of `flesch_reading_ease`, `flesch_kincaid_grade`, `gunning_fog`, `automated_readability_index`, `coleman_liau_index`, `dale_chall_readability_score` |
+| `min_score`  | `float` | Minimum acceptable score (optional)                                                                                                                      |
+| `max_score`  | `float` | Maximum acceptable score (optional)                                                                                                                      |
+| `target_key` | `str`   | Trace path of the text to score                                                                                                                          |
 
 ```python
 {
     "identifier": "readability",
-    "params": {"metric": "flesch_reading_ease", "min_score": 60},
+    "params": {
+        "metric": "flesch_reading_ease",
+        "min_score": 60,
+        "target_key": "trace.last.outputs.response.content",
+    },
 }
 ```
 
