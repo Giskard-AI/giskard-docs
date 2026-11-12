@@ -1,5 +1,8 @@
 ---
 title: "Autonomous Agent Audit"
+head:
+  - tag: title
+    content: "Autonomous Agent Audit with Python | Giskard"
 description: "Launch autonomous agent audits with the Giskard Hub Python SDK. Monitor progress, retrieve output datasets and evaluations, and manage audits."
 sidebar:
   order: 2.5
