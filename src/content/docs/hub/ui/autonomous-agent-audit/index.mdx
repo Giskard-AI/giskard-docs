@@ -1,0 +1,43 @@
+---
+title: "Autonomous Agent Audit"
+description: "Audit AI agents for security vulnerabilities, safety risks, and quality issues. Get a risk assessment, supporting evidence, and recommendations for fixes."
+sidebar:
+  order: 1
+  label: Overview
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+An **Autonomous Agent Audit** tests your AI agent for security vulnerabilities, safety risks, and quality issues using autonomous red teaming agents. It explores how your agent behaves, builds a risk model for its use case, and runs targeted attacks to find weaknesses.
+
+Use the results to understand how failures could affect your application, prioritize fixes, and build regression tests.
+
+## What you get
+
+- **AI Trust level**: An overall grade and assessment of your agent's behavior.
+- **Risk model**: The risks identified for your agent and the scenarios tested.
+- **Findings and recommendations**: Identified issues, supporting evidence, and proposed fixes.
+- **Reusable tests**: Generated attack scenarios and results that you can review and use in evaluations.
+
+Choose a **Light** audit for a prioritized subset of risk scenarios or a **Full** audit for all scenarios in the generated risk model across multiple attack waves.
+
+## Audit report
+
+The PDF report brings together the priority findings, their severity, and the AI Trust assessment. [Download the report](/hub/ui/autonomous-agent-audit/review-audit-results#download-the-report) to share the results with your team.
+
+![Audit report with priority findings and an AI Trust assessment](@assets/images/hub/audit/audit-report.png)
+
+## Get started
+
+<CardGrid>
+  <LinkCard
+    title="Launch an audit"
+    href="/hub/ui/autonomous-agent-audit/launch-audit"
+    description="Choose your agent and audit effort, then follow the progress."
+  />
+  <LinkCard
+    title="Review audit results"
+    href="/hub/ui/autonomous-agent-audit/review-audit-results"
+    description="Investigate findings, prioritize fixes, and build regression tests."
+  />
+</CardGrid>
