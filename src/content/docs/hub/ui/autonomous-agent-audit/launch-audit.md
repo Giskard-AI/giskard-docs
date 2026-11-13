@@ -21,6 +21,10 @@ Start an [Autonomous Agent Audit](/hub/ui/autonomous-agent-audit) to test your a
 
 ![Audit setup with agent, effort, and input evaluation options](@assets/images/hub/audit/launch-audit.png)
 
+:::tip[Input evaluations]
+Any evaluation from the same project can serve as a lead for attacker agents, such as results from another scanner that you [uploaded as a Hub evaluation](#use-results-from-other-testing-tools), or an evaluation on an internal dataset of known failure cases.
+:::
+
 ## Choose the audit effort
 
 The effort determines how many of the identified risk scenarios are tested and how deeply they are explored:
