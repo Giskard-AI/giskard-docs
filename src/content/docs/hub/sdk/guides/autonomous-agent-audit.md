@@ -8,7 +8,9 @@ sidebar:
   order: 2.5
 ---
 
-An **Autonomous Agent Audit** investigates security vulnerabilities, safety risks, and quality issues in your agent through targeted attacks and returns a risk model, findings, and recommendations. Use `hub.red_team_audits` to run audits from Python. You can also [launch and review audits in the Hub UI](/hub/ui/autonomous-agent-audit).
+An **Autonomous Agent Audit** tests your AI agent for security vulnerabilities, safety risks, and quality issues using autonomous red teaming agents. It explores how your agent behaves, builds a risk model for its use case, and runs targeted attacks to find weaknesses.
+
+Use `hub.red_team_audits` to run audits from Python, or [launch and review them in the Hub UI](/hub/ui/autonomous-agent-audit).
 
 ## Before you start
 
@@ -37,11 +39,11 @@ print(audit.id, audit.status)
 
 The audit runs in the Hub. Save `audit.id` to check its progress and retrieve the results.
 
-Use `mode="light"` for a Light audit or `mode="regular"` for a Full audit.
+A Light audit (`mode="light"`) tests a prioritized subset of the risk scenarios in a single attack wave and takes around one hour, while a Full audit (`mode="regular"`) covers every scenario in the risk model across multiple attack waves and can take several hours.
 
 ### Provide existing evaluations
 
-Pass `input_evaluation_ids` to use previous results as leads for attacker agents, choosing evaluations from the same project:
+Pass `input_evaluation_ids` to give attacker agents leads to investigate further. You can use any evaluation from the same project, such as results from another scanner that you [uploaded as a Hub evaluation](/hub/ui/autonomous-agent-audit/launch-audit#use-results-from-other-testing-tools), or an evaluation on an internal dataset of known failure cases:
 
 ```python
 audit = hub.red_team_audits.create(
@@ -70,7 +72,7 @@ Retrieve the audit again to refresh its progress while it runs.
 
 ## Retrieve the output dataset and evaluation
 
-Use `output_dataset_id` to retrieve the audit's generated scenarios and `output_evaluation_id` to retrieve the evidence supporting its findings:
+The audit dataset (`output_dataset_id`) contains every interaction that the attacker agents had with your agent as reusable scenarios, while the evidence evaluation (`output_evaluation_id`) holds the results of the observed failures that support the audit's findings:
 
 ```python
 if audit.output_dataset_id:
