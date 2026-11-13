@@ -28,6 +28,9 @@ Repository = "https://github.com/Giskard-AI/giskard-hub"
 Documentation = "https://docs.giskard.ai/"
 
 [tool.uv]
+# Supply-chain cooldown: resolve only artifacts uploaded at least 7 days ago,
+# like Renovate's minimumReleaseAge for the other dependencies.
+exclude-newer = "7 days"
 # Block compromised litellm versions — supply chain attack (CVE-2026-PENDING)
 # https://github.com/BerriAI/litellm/issues/24512
 constraint-dependencies = [

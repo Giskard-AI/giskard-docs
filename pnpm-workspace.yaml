@@ -1,6 +1,10 @@
 overrides:
   dompurify: "^3.4.17"
 
+# Supply-chain cooldown: resolve only versions published at least 7 days ago
+# (in minutes), like Renovate's minimumReleaseAge for the other dependencies.
+minimumReleaseAge: 10080
+
 supportedArchitectures:
   cpu:
     - current
