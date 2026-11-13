@@ -62,7 +62,7 @@ Use the resources in **Audit outputs** to investigate findings and test your fix
 
 ![Audit dataset and evidence evaluation with scenario and result counts](@assets/images/hub/audit/audit-outputs.png)
 
-Review the generated scenarios and their checks before using them as regression tests. After improving your agent, [run an evaluation](/hub/ui/evaluations/create) against the audit dataset and [compare results](/hub/ui/evaluations/compare) to check whether the fixes worked.
+Review the generated scenarios before using them as regression tests. After improving your agent, [run an evaluation](/hub/ui/evaluations/create) against the audit dataset and [compare results](/hub/ui/evaluations/compare) to check whether the fixes worked.
 
 If no issues were found, there may be no evidence evaluation. Any problems saving the results are shown in this section.
 

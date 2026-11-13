@@ -21,6 +21,23 @@ Use the results to understand how failures could affect your application, priori
 
 Choose a **Light** audit for a prioritized subset of risk scenarios or a **Full** audit for all scenarios in the generated risk model across multiple attack waves.
 
+## How an audit works
+
+A Light audit runs one attack wave. A Full audit runs multiple waves.
+
+```mermaid
+graph LR
+    I[Input evaluations] -.->|optional| A
+    A([Reconnaissance]) --> B([Risk modeling])
+    B --> C([Attack wave])
+    C -->|"Next wave (Full only)"| C
+    C --> D([Report generation])
+```
+
+:::tip[Audit or scan?]
+An audit is more complete than a [vulnerability scan](/hub/ui/scan) because it maps your agent's attack surface, builds a risk model, and generates attacks that target those risks, all summed up in a report your whole organization can read. A scan instead runs a set of probes from the categories you select, and while its attacks still adapt to your agent, they don't follow a risk model. That said, scans finish in minutes, whereas audits take an hour or more.
+:::
+
 ## Audit report
 
 The PDF report brings together the priority findings, their severity, and the AI Trust assessment. [Download the report](/hub/ui/autonomous-agent-audit/review-audit-results#download-the-report) to share the results with your team.
