@@ -34,6 +34,8 @@ The effort determines how many of the identified risk scenarios are tested and h
 | **Light** | Tests a prioritized subset of the risk scenarios in a single attack wave.        | Around one hour  |
 | **Full**  | Tests all risk scenarios in the audit's risk model across multiple attack waves. | Several hours    |
 
+A Light audit gives you a quick first look, but it leaves at least half of the risk scenarios untested and its attacker agents are less persistent, so [follow it with a Full audit](/hub/ui/autonomous-agent-audit/review-audit-results#run-a-full-audit-after-a-light-audit).
+
 Times are approximate and depend on your agent's response time. A Light audit can send hundreds to thousands of requests; a Full audit sends more requests and uses more tokens. Check your endpoint's capacity and rate limits before launching.
 
 ## Use results from other testing tools

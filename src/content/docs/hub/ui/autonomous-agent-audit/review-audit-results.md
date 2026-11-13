@@ -18,7 +18,7 @@ The **AI Trust level** summarizes your agent's behavior during the audit with a 
 | **C** | Insufficient | Exploitable attacks were identified and need remediation before production. |
 | **D** | Poor         | Failures were found that undermine trust in the agent.                      |
 
-Review the grade alongside the severity counts and overall assessment to prioritize your investigation. For a Light audit, check how many scenarios were covered: untested scenarios still need investigation. The **OWASP coverage** section groups findings that have OWASP category mappings.
+Review the grade alongside the severity counts and overall assessment to prioritize your investigation. For a Light audit, check how many scenarios were covered, since the untested ones still need a Full audit. The **OWASP coverage** section groups findings that have OWASP category mappings.
 
 ![Audit results with trust grade, severity counts, scenario coverage, and assessment](@assets/images/hub/audit/audit-results.png)
 
@@ -26,7 +26,7 @@ Review the grade alongside the severity counts and overall assessment to priorit
 
 The **Risk model** tab lists the risk scenarios identified for your agent. Expand a scenario to understand what could go wrong, which assets are at risk, and why the scenario matters. Linked findings show the issues discovered while testing it.
 
-For a Light audit, the table separates covered scenarios from those left uncovered. Use this to decide whether to run a Full audit for broader coverage.
+For a Light audit, the table separates covered scenarios from those left uncovered, which only a [Full audit](#run-a-full-audit-after-a-light-audit) will test.
 
 ![Expanded risk scenario with affected assets, rationale, and a linked finding](@assets/images/hub/audit/audit-risk-model.png)
 
@@ -35,7 +35,7 @@ For a Light audit, the table separates covered scenarios from those left uncover
 Open the **Findings** tab and expand a finding to inspect:
 
 - The issue description and severity.
-- Its likelihood, impact, and taxonomy categories.
+- Its likelihood, impact, and taxonomy categories, which can include one or more OWASP categories.
 - **Attack examples** linking to recorded test results.
 - Related risk scenarios and recommendations.
 
