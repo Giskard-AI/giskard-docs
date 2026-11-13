@@ -107,9 +107,18 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-/** Plain stream/plain output: safe to emit as literal text inside <Card> (not inside braces). */
+/**
+ * Plain stream/plain output: safe to emit as literal text inside <Card> (not inside braces).
+ *
+ * Literal text is parsed as Markdown, so a line that Markdown reads as a heading
+ * (a `# ...` line, or a `===` / `---` underline under a non-blank line) would turn
+ * program output into a real <h1>/<h2>. That breaks the page outline and gives the
+ * page a second <h1>, which search engines read as a competing title. Such output
+ * goes through the escaped <pre> path instead.
+ */
 function isSafeMdxCardLiteral(text) {
-  return !/[<>{}]/.test(text);
+  if (/[<>{}]/.test(text)) return false;
+  return !/^ {0,3}(#{1,6}(\s|$)|=+\s*$|-+\s*$)/m.test(text);
 }
 
 function preSetHtml(innerHtml) {

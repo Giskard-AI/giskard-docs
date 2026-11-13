@@ -7,6 +7,10 @@
  *
  * Duplicate metadata is only visible site-wide. Length guidance remains a
  * review concern, not a merge-blocking requirement.
+ *
+ * Each page must also render exactly one <h1>. Starlight emits it from the
+ * frontmatter title; a second one usually comes from notebook output parsed as
+ * Markdown (a "====" underline), and reads to crawlers as a competing title.
  */
 import { readFileSync, readdirSync, statSync, existsSync } from "fs";
 import { resolve, dirname, relative } from "path";
@@ -70,6 +74,9 @@ for (const file of walk(clientDir)) {
   const title = decode((html.match(/<title>([\s\S]*?)<\/title>/) || [, ""])[1]).trim();
   const desc = decode(metaDescription(html)).trim();
 
+  const h1Count = (html.match(/<h1\b/gi) || []).length;
+  if (h1Count !== 1) failures.push(`${page} renders ${h1Count} <h1> elements (expected 1)`);
+
   if (title) {
     if (!titles.has(title)) titles.set(title, []);
     titles.get(title).push(page);
@@ -92,10 +99,12 @@ for (const [desc, pages] of descriptions)
 if (failures.length) {
   console.error(`✖ SEO check FAILED (${failures.length}):\n`);
   for (const f of failures) console.error("  - " + f);
-  console.error("\nRules: rendered titles and meta descriptions must be unique.");
+  console.error(
+    "\nRules: rendered titles and meta descriptions must be unique; each page has exactly one <h1>.",
+  );
   process.exit(1);
 }
 
 console.log(
-  `✓ SEO check passed: ${checked} pages — rendered titles and meta descriptions are unique.`,
+  `✓ SEO check passed: ${checked} pages — rendered titles and meta descriptions are unique, one <h1> per page.`,
 );

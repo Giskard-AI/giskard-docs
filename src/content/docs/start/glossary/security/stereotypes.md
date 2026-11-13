@@ -64,7 +64,7 @@ Bias and discrimination can have severe consequences:
 Giskard provides comprehensive tools to test and prevent stereotypes and discrimination vulnerabilities. You can use either the Hub UI or the Python SDK to create test datasets and run evaluations.
 
 - [Hub UI - Security Dataset Creation](/hub/ui/scan) -- Use the Hub interface to generate adversarial test cases for stereotypes and discrimination detection. The UI automatically generates queries that test for biased responses and discriminatory behavior.
-- [SDK - Security Dataset Creation](/hub/sdk/datasets/security) -- Programmatically create security test datasets using the Python SDK. Generate adversarial queries and configure evaluation checks for automated bias and discrimination detection.
+- [SDK - Security Dataset Creation](/hub/sdk/guides/scans) -- Programmatically create security test datasets using the Python SDK. Generate adversarial queries and configure evaluation checks for automated bias and discrimination detection.
 
 **Using Giskard Metrics for Stereotypes & Discrimination Testing**
 
