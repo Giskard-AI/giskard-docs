@@ -84,6 +84,26 @@ set_default_generator("openai/gpt-5-mini")
 
 A model identifier string is wrapped in `Generator` automatically. Pass a `Generator` instance when you need further configuration. Use a capable judge model and review failures before acting on them.
 
+### Use an OpenAI-compatible endpoint
+
+To use a server that exposes the OpenAI Chat Completions API (vLLM, Ollama, OpenRouter, etc.), register it with `configure` and use its name as the model prefix:
+
+```python
+from giskard.checks import set_default_generator
+from giskard.llm import configure
+
+configure(
+    "my-endpoint",
+    provider="openai",
+    base_url="https://my-llm-host.example.com/v1",
+    api_key="os.environ/MY_ENDPOINT_API_KEY",
+)
+
+set_default_generator("my-endpoint/my-model-id")
+```
+
+`base_url` is the `/v1` root of the server. `api_key` accepts a value or an `os.environ/VAR_NAME` reference; local servers that don't check keys still need a placeholder. The judge checks rely on structured outputs, so pick a model that supports them.
+
 ## Next steps
 
 For a step-by-step lesson with no API key, try [Your First Test](/oss/checks/tutorials/your-first-test) first. Or head to the [Quickstart](/oss/checks/quickstart) for a single example.
