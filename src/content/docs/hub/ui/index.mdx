@@ -27,6 +27,11 @@ The Hub is the user interface from which you can scan, test, and evaluate agenti
     href="/hub/ui/setup"
   />
   <LinkCard
+    title="Autonomous Agent Audit"
+    description="Find security, safety, and quality issues in your agent and get recommendations for fixing them."
+    href="/hub/ui/autonomous-agent-audit"
+  />
+  <LinkCard
     title="Launch vulnerability scans"
     description="Automatically scan your agent for safety and security failures."
     href="/hub/ui/scan"
@@ -62,12 +67,12 @@ The Hub is the user interface from which you can scan, test, and evaluate agenti
 
 ```mermaid
 graph LR
-    B[<a href="/hub/ui/scan" target="_self">Scan</a>] -->  D[<a href="/hub/ui/datasets" target="_self">Create Scenarios</a>]
+    A[<a href="/hub/ui/autonomous-agent-audit" target="_self">Audit</a>] --> D[<a href="/hub/ui/datasets" target="_self">Create Scenarios</a>]
+    B[<a href="/hub/ui/scan" target="_self">Scan</a>] --> D
     D --> F[<a href="/hub/ui/annotate" target="_self">Annotate & Assign Checks</a>]
     F --> G[<a href="/hub/ui/evaluations" target="_self">Run Evaluations</a>]
     G --> H[<a href="/hub/ui/evaluations" target="_self">Review Results</a>]
     H --> F
-    H --> B
 ```
 
 ## The dashboard
