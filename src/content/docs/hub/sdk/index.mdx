@@ -10,7 +10,7 @@ sidebar:
 
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
-The **Giskard Hub Python SDK** (`giskard-hub`) gives you programmatic access to everything the Hub can do: define agents, build evaluation datasets, run evaluations and vulnerability scans, schedule recurring runs, and manage your entire quality workflow from code.
+The **Giskard Hub Python SDK** (`giskard-hub`) gives you programmatic access to everything the Hub can do: define agents, run autonomous agent audits, build evaluation datasets, run evaluations and vulnerability scans, schedule recurring runs, and manage your entire quality workflow from code.
 
 ```bash
 pip install giskard-hub
@@ -48,6 +48,11 @@ You can also connect Claude, Cursor, or another MCP client to the Hub without Py
     description="Understand how Projects, Agents, Datasets, Evaluations, and Scans fit together."
   />
   <LinkCard
+    title="Autonomous Agent Audit"
+    href="/hub/sdk/guides/autonomous-agent-audit"
+    description="Run audits from Python, investigate findings, and build regression tests."
+  />
+  <LinkCard
     title="How-to Guides"
     href="/hub/sdk/guides/projects"
     description="Step-by-step guides for every feature: datasets, evaluations, scans, scheduling, and more."
@@ -61,6 +66,7 @@ You can also connect Claude, Cursor, or another MCP client to the Hub without Py
 
 ## Key capabilities
 
+- **Audit** -- run [autonomous agent audits](/hub/sdk/guides/autonomous-agent-audit) to find security, safety, and quality issues and prioritize fixes
 - **Evaluate** -- run your agent against datasets of scenarios with configurable checks (LLM judge, embedding similarity, rule-based, etc.)
 - **Scan** -- automated red-teaming covering the [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/) and additional threat categories
 - **Generate** -- auto-generate scenarios from prompt presets or knowledge bases, or promote playground conversations into datasets
