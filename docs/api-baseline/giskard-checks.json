@@ -377,7 +377,7 @@
       "signature": "(*, role: Literal['user'] = 'user', content: str | collections.abc.Sequence[giskard.llm.types.chat.TextContent]) -> None"
     }
   },
-  "source_ref": "giskard-checks/v1.0.5",
+  "source_ref": "giskard-checks/v1.0.6",
   "symbols": {
     "giskard.checks.AllOf": {
       "aliases": [
@@ -1887,7 +1887,7 @@
           "signature": "(self, prompt: str | giskard.llm.types.chat.SystemMessage | giskard.llm.types.chat.DeveloperMessage | giskard.llm.types.chat.UserMessage | giskard.llm.types.chat.AssistantMessage | giskard.llm.types.chat.ToolMessage | giskard.llm.types.chat.FunctionMessage | giskard.agents.templates.message.MessageTemplate | giskard.agents.workflow.TemplateReference, inputs: dict[str, typing.Any], *, output_type: type[pydantic.main.BaseModel] | None = <class 'giskard.checks._judge_result.LLMCheckResult'>) -> pydantic.main.BaseModel"
         }
       },
-      "signature": "(*, model: giskard.agents.som.base.BaseSOM, pass_threshold: Annotated[float, Ge(ge=0), Le(le=1), _PydanticGeneralMetadata(allow_inf_nan=False)] = 0.5, timeout: float | int | None = None) -> None"
+      "signature": "(*, model: giskard.agents.som.base.BaseSOM, pass_threshold: Annotated[float, Ge(ge=0), Le(le=1), AllowInfNan(allow_inf_nan=False)] = 0.5, timeout: float | int | None = None) -> None"
     },
     "giskard.checks.Scenario": {
       "bases": [
@@ -2786,5 +2786,5 @@
       "signature": "(judge: JudgeInput | None) -> None"
     }
   },
-  "version": "1.0.5"
+  "version": "1.0.6"
 }
