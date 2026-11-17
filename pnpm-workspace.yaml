@@ -1,5 +1,5 @@
 overrides:
-  dompurify: "^3.4.17"
+  dompurify: "3.4.18"
 
 # Supply-chain cooldown: resolve only versions published at least 7 days ago
 # (in minutes), like Renovate's minimumReleaseAge for the other dependencies.
