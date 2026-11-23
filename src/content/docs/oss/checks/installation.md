@@ -86,7 +86,7 @@ A model identifier string is wrapped in `Generator` automatically. Pass a `Gener
 
 ### Use an OpenAI-compatible endpoint
 
-To use a server that exposes the OpenAI Chat Completions API (vLLM, Ollama, OpenRouter, etc.), register it with `configure` and use its name as the model prefix:
+To use a server that exposes the OpenAI Chat Completions API, such as vLLM, Ollama, or OpenRouter, install the `openai` extra and register the server with `configure`. Use its name as the model prefix:
 
 ```python
 from giskard.checks import set_default_generator
@@ -101,8 +101,6 @@ configure(
 
 set_default_generator("my-endpoint/my-model-id")
 ```
-
-`base_url` is the `/v1` root of the server. `api_key` accepts a value or an `os.environ/VAR_NAME` reference; local servers that don't check keys still need a placeholder. The judge checks rely on structured outputs, so pick a model that supports them.
 
 ## Next steps
 
