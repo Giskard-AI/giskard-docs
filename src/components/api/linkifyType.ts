@@ -16,7 +16,7 @@
 
 /** Types defined as `<TypeTable>` in /hub/sdk/reference. */
 export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
-  // Core
+  // Core types
   "ChatMessage",
   "ChatMessageParam",
   "ChatMessageWithMetadata",
@@ -26,48 +26,62 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "ExecutionError",
   "ExecutionErrorParam",
   "User",
+  "GroupReference",
   "UserReference",
   "TaskProgress",
   "TaskState",
   "APIPaginatedMetadata",
-  // Agent
+  "ListFilterValueParam",
+  "DateRangeFilterValueParam",
+  // Agent types
   "Agent",
+  "ForwardBinding",
+  "AggregateBinding",
+  "ForwardBindingParam",
+  "AggregateBindingParam",
+  "AgentInterface",
   "AgentReference",
   "AgentOutput",
   "AgentOutputParam",
-  "AgentDetectStatefulness",
+  "GenerateCompletionOutput",
   "MinimalAgent",
   "MinimalAgentParam",
-  // Check
+  // Check types
   "Check",
   "CheckResult",
   "CheckConfig",
   "CheckConfigParam",
-  "CheckTypeParam",
   "OutputAnnotation",
+  "ContextAnnotation",
   "JsonPathRule",
-  // Dataset & test cases
+  "CheckTypeParam",
+  // Dataset and scenario types
   "Dataset",
   "DatasetReference",
   "DatasetSubset",
-  "TestCase",
-  "TestCaseReference",
-  "TestCaseComment",
-  "TestCaseOrderByParam",
-  "TestCaseFiltersParam",
-  // Evaluation
+  "Scenario",
+  "Interaction",
+  "InteractionCheckConfig",
+  "InteractionParam",
+  "InteractionCheckConfigParam",
+  "ScenarioSchemaValidation",
+  "ScenarioReference",
+  "ScenarioComment",
+  "ScenarioOrderByParam",
+  "ScenarioFiltersParam",
+  // Evaluation types
   "Evaluation",
   "EvaluationReference",
   "Metric",
-  "TestCaseEvaluation",
-  "TestCaseEvaluationReference",
-  "DivergenceWarning",
+  "ScenarioEvaluation",
+  "InteractionResultData",
   "FailureCategory",
   "FailureCategoryParam",
+  "ScenarioEvaluationReference",
   "FailureCategoryResult",
   "ResultOrderByParam",
   "ResultFiltersParam",
-  // Scan
+  // Scan types
   "Scan",
   "ScanAvailableProbe",
   "ScanCategory",
@@ -75,23 +89,34 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "ScanProbeMetric",
   "ScanProbeAttempt",
   "ScanProbeAttemptError",
-  "ScanProbeAttemptReference",
   "Severity",
   "ReviewStatus",
-  // Knowledge base
+  "ScanProbeAttemptReference",
+  // Red team audit types
+  "RedTeamAudit",
+  "RedTeamAuditStatus",
+  "RedTeamAuditProgress",
+  "RedTeamAuditLogs",
+  "RedTeamAuditLogChunk",
+  "RedTeamAuditContent",
+  "RedTeamAuditOverallAssessment",
+  "RedTeamAuditFinding",
+  "RedTeamAuditFindingEvidence",
+  "RedTeamAuditRemediation",
+  "RedTeamAuditCoverage",
+  // Knowledge base types
   "KnowledgeBase",
   "KnowledgeBaseReference",
+  "Topic",
   "KnowledgeBaseDocumentRow",
   "KnowledgeBaseDocumentDetail",
   "KnowledgeBaseDocumentOrderByParam",
   "KnowledgeBaseDocumentFiltersParam",
-  "Topic",
-  // Project & scenario
+  // Project and prompt preset types
   "Project",
-  "Scenario",
-  "ScenarioPreview",
-  // Scheduled evaluation
-  "ScheduledEvaluation",
+  "PromptPreset",
+  "PromptPresetPreview",
+  // Scheduled evaluation types
   "FrequencyOption",
   "LastExecutionStatus",
   "LastExecutionStatusParam",
@@ -99,19 +124,24 @@ export const HUB_SDK_KNOWN_TYPES: ReadonlySet<string> = new Set([
   "SuccessExecutionStatusParam",
   "ErrorExecutionStatus",
   "ErrorExecutionStatusParam",
-  // Task
+  "ScheduledEvaluation",
+  // Task types
   "Task",
   "TaskStatus",
   "TaskPriority",
-  // Playground chat
+  "UnknownTaskReference",
+  // Playground chat types
   "PlaygroundChat",
-  // Audit
+  "PlaygroundExchange",
+  // Audit types
   "Audit",
   "AuditDisplay",
-  "AuditDiffItem",
   "AuditDisplayDiffItem",
   "AuditOrderByParam",
   "AuditFiltersParam",
+  // Credit types
+  "CreditEstimate",
+  "CreditUsageSummary",
 ]);
 
 /**
