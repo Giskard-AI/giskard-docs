@@ -9,6 +9,36 @@ Below you will find the release notes for each version of Giskard Hub UI. Each e
 
 ---
 
+## 3.1.0 (2026-11-03)
+
+We're releasing a new version of the Hub that introduces Autonomous Agent Audits, a guided agent setup for coding assistants, a getting started checklist for new projects, and credit estimates for metered work.
+
+This release goes together with [Hub SDK 3.3.0](/hub/sdk/release-notes#330-2026-11-06).
+
+### What's new?
+
+**Autonomous Agent Audit**
+An audit tests your agent for security vulnerabilities, safety risks, and quality issues with autonomous red teaming agents. It explores how your agent behaves, builds a risk model for its use case, and runs targeted attacks to find weaknesses. Choose a **Light** audit for a quick first look, or a **Full** audit to test every risk scenario across several attack waves. The page shows live progress while the audit runs, and the results include an AI Trust level, findings with recommendations, a PDF report, and a dataset of attack scenarios that you can reuse in evaluations. You can also pass results from other testing tools to the audit as leads, through a prompt that your coding assistant uses to upload them. See [Autonomous Agent Audit](/hub/ui/autonomous-agent-audit).
+
+**Agent setup with a coding assistant**
+Creating an agent now opens a full-page setup with two paths. The coding assistant path gives you a prompt to copy, waits while your assistant registers the agent, and then opens the new agent automatically. The manual path keeps the endpoint form you already know. See [Setup agents](/hub/ui/setup/agents).
+
+**Getting started checklist**
+New projects show a checklist that guides you through connecting an agent, trying the Playground, and launching an Autonomous Agent Audit. You can track your progress, collapse or dismiss the panel, and restart it from the project settings.
+
+**Credit estimates**
+When your Hub uses credits, it shows your balance and the estimated cost of evaluations, dataset generation, scans, and audits before they start. The Hub does not start work that exceeds your balance, and it charges only for the work that runs.
+
+### What's fixed?
+
+- **Sign-in reliability** - An expired login session now restarts the sign-in instead of showing an error, and a temporary network failure no longer sends a valid session into a login loop.
+
+- **Evaluation comparison** - Comparisons now align scenarios across runs and classify differences by verdict instead of by the judge's reasoning. Search and the Same/Different filters stay in place while you navigate.
+
+- **Security hardening** - Permission checks are now stricter across projects, playground chats, custom checks, and user management. Sensitive data is also better protected in [event logs](/hub/ui/audit-logs) and API responses.
+
+---
+
 ## 3.0.4 (2026-09-15)
 
 We're releasing a patch that simplifies Conformity and Groundedness checks and improves dataset imports.
