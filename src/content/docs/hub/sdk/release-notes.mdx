@@ -10,6 +10,30 @@ Below you will find the release notes for each version of Giskard Hub SDK. Each 
 
 ---
 
+## 3.3.0 (2026-11-06)
+
+This minor release adds Autonomous Agent Audits and credit estimates to the SDK. Supported by [Hub 3.1.0](/hub/ui/release-notes#310-2026-11-03).
+
+### New features
+
+- **Autonomous Agent Audits** - `hub.red_team_audits` lets you launch, list, retrieve, and delete audits, read their content and logs, and import results from audits that ran outside the Hub. See [Autonomous Agent Audit](/hub/sdk/guides/autonomous-agent-audit).
+- **Credit estimates** - `hub.usage.retrieve_credits()` returns your credit balance. New `estimate*` methods on `hub.datasets`, `hub.evaluations`, `hub.evaluations.results`, `hub.scans`, and `hub.red_team_audits` return the cost of an action before you start it.
+- **Generation target** - `hub.datasets.generate_document_based()` accepts `target_path` to choose the output field that generated scenarios use as their target.
+
+### What's changed?
+
+- `hub.projects.prompt_presets.preview()` now requires `agent_id`, and `hub.tasks.list()` now requires `project_id`. The Hub API already required these values.
+- `hub.checks.create()` and `hub.checks.update()` now raise `ValueError` when `params` has no `type`. These calls never succeeded before. Set the check kind in `params["type"]`, or use `spec`.
+- The `chat_test_case_id` filter on evaluation results is deprecated. Use `scenario_id` instead.
+
+### What's fixed?
+
+- **Evaluation checks** - `hub.evaluations.run_single()` now sends checks given by `check_id`, `override_spec`, or `enabled=False` correctly.
+- **Scenario parsing** - A scenario with a non-object input or output no longer breaks `retrieve`, `search_scenarios`, or `list_scenarios` for the whole dataset.
+- **Raw responses** - Creating a resource through `with_raw_response` or `with_streaming_response` no longer raises `AttributeError`.
+
+---
+
 ## 3.2.1 (2026-09-16)
 
 This patch release improves check configuration and dataset upload compatibility. Supported by [Hub 3.0.4](/hub/ui/release-notes#304-2026-09-15).
