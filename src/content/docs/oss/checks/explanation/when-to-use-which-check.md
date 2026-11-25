@@ -13,7 +13,7 @@ A check is a rule your agent's answer has to satisfy for the test to pass. Three
 | ----------------- | ------------------------------------- | -------------------------- | ---------------------------------------- |
 | **Examples**      | `Equals`, `StringMatching`, `FnCheck` | `SemanticSimilarity`       | `Groundedness`, `Conformity`, `LLMJudge` |
 | **Cost**          | Free                                  | Low (embedding call)       | Medium–High (LLM call)                   |
-| **Latency**       | <1 ms                                 | ~50–200 ms                 | ~1–10 s                                  |
+| **Latency**       | <1 ms                                 | ~50–200 ms                 | ~1–5 s (chat LLM judge; SOM can be much faster) |
 | **Deterministic** | Yes                                   | Near-deterministic         | No                                       |
 | **Best for**      | Exact values, keywords, formats       | Meaning-equivalent answers | Tone, reasoning, policy compliance       |
 
@@ -48,7 +48,7 @@ SemanticSimilarity(
 )
 ```
 
-**LLM-as-judge** — when the criterion is qualitative and hard to express as a rule: tone, groundedness (whether the answer is supported by the documents you retrieved), policy compliance, reasoning quality. Read failing verdicts before you trust them. For `judge=` and suite-wide defaults, see [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges).
+**LLM-as-judge** — when the criterion is qualitative and hard to express as a rule: tone, groundedness (whether the answer is supported by the documents you retrieved), policy compliance, reasoning quality. Read failing verdicts before you trust them. For `judge=` and suite-wide defaults, see [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges). The default backend is a chat LLM; you can switch qualitative checks to a [SOM judge](/oss/checks/explanation/som-as-judge) that scores a pass probability instead of generating a rationale.
 
 ```python
 Groundedness(
@@ -115,7 +115,10 @@ When you can write the pass condition as ordinary Python: a required keyword, a 
 When the wording of a correct answer can vary but the meaning should not. `SemanticSimilarity` converts the answer and a reference text into vectors and compares them, so "Paris is the capital of France" matches "The capital of France is Paris". One embedding call takes roughly 50-200 ms and costs far less than an LLM judge, and the result barely changes between runs. It only measures similarity of meaning, so it cannot tell you whether an answer is polite, safe, or supported by your documents.
 
 **When should you use an LLM-as-judge check?**
-When the rule is qualitative and cannot be written as code: tone, whether the answer is supported by the retrieved documents, whether it follows a policy, whether the reasoning holds up. `Groundedness`, `Conformity`, and `LLMJudge` cover these. Each verdict costs one model call and takes roughly 0.5-5 seconds. See [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges) for defaults.
+When the rule is qualitative and cannot be written as code: tone, whether the answer is supported by the retrieved documents, whether it follows a policy, whether the reasoning holds up. `Groundedness`, `Conformity`, and `LLMJudge` cover these. Each verdict costs one chat completion — often on the order of a few seconds (about 3 seconds per check for `gpt-5.6-luna` in an internal benchmark; depends on the model and provider). See [Generators and judges](/oss/checks/explanation/core-concepts#generators-and-judges) for defaults.
+
+**When should you use a SOM judge instead of a chat LLM judge?**
+When you want the same qualitative checks but a **probability and threshold** instead of a free-form rationale — for example rubric-style conformity at scale. Enable with `set_default_judge("typesafe/jev")` or `GISKARD_CHECKS_DEFAULT_JUDGE`, or pass `judge=SOMJudge(...)`. In the same internal `quality_scan` benchmark (100 scenarios), `typesafe/jev` averaged about 0.3 s per check versus about 3 s for the chat judge — again, illustrative and provider-dependent. Tradeoff: a SOM judge does not generate a natural-language reason when a check fails, only probabilities, so chat LLM judges are a better fit when you need to read why something failed. See [SOM as a judge](/oss/checks/explanation/som-as-judge).
 
 **Can you combine several checks in one test?**
 Yes. A scenario takes any number of checks, and every one has to pass for the scenario to pass. Order them by cost: rule-based first, then semantic similarity, then the LLM judges. A cheap check that fails often tells you what went wrong without paying for an LLM call.
