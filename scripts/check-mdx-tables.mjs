@@ -34,14 +34,21 @@ function walk(dir, acc = []) {
 }
 
 // Strip HTML comments plus code, script and style blocks so framework markers
-// and examples that show table syntax do not trip the scan.
+// and examples that show table syntax do not trip the scan. Repeat until stable
+// so a removal cannot splice a new tag together (CodeQL js/incomplete-multi-
+// character-sanitization), and allow whitespace in end tags (js/bad-tag-filter).
 function prose(html) {
-  return html
-    .replace(/<!--[\s\S]*?-->/g, "")
-    .replace(/<pre[\s\S]*?<\/pre>/gi, "")
-    .replace(/<code[\s\S]*?<\/code>/gi, "")
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "");
+  let prev;
+  do {
+    prev = html;
+    html = html
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .replace(/<pre[\s\S]*?<\/pre\s*>/gi, "")
+      .replace(/<code[\s\S]*?<\/code\s*>/gi, "")
+      .replace(/<script[\s\S]*?<\/script\s*>/gi, "")
+      .replace(/<style[\s\S]*?<\/style\s*>/gi, "");
+  } while (html !== prev);
+  return html;
 }
 
 let htmlFiles;
